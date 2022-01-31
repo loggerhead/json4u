@@ -301,15 +301,19 @@ function diffObject(
     config2.popTrace();
   });
 
-  const remain = [];
+  const seen = new Set();
 
   // iterate over keys which need char compare keys
   for (let i = 0; i < difkk.length; i++) {
     let key1 = difkk[i];
-    let needDiff = false;
+
+    if (seen.has(key1)) {
+      continue;
+    }
 
     for (let j = i + 1; j < difkk.length; j++) {
       let key2 = difkk[j];
+      let needDiff = false;
 
       if (data1.hasOwnProperty(key1) && data2.hasOwnProperty(key2)) {
         needDiff = isNeedDiffKey(data1, data2, key1, key2);
@@ -322,19 +326,19 @@ function diffObject(
           config1.genDiff(UNEQ_KEY, key1, key1),
           config2.genDiff(UNEQ_KEY, key2, key2),
         ]);
+        seen.add(key1);
+        seen.add(key2);
         break;
       }
     }
-
-    if (!needDiff) {
-      remain.push(key1);
-    }
   }
 
-  remain.forEach((key) => {
-    if (data1.hasOwnProperty(key)) {
-      // if data1 has key, data2 don't
-      jdd.diffs.push([
+  difkk
+    .filter((k) => !seen.has(k))
+    .forEach((key) => {
+      if (data1.hasOwnProperty(key)) {
+        // if data1 has key, data2 don't
+        jdd.diffs.push([
         config1.genDiff(MORE, key, data1[key]),
         config2.genDiff(MISS, "", null),
       ]);
@@ -527,13 +531,8 @@ function getNextDiff(
     }
   }
 
-  const nextIdx = start === end ? -1 : end;
-  if (nextIdx < 0) {
-    return undefined;
-  }
-
-  jdd.currentDiff = nextIdx;
-  return jdd.diffs[nextIdx];
+  jdd.currentDiff = end;
+  return jdd.diffs[end];
 }
 
 function scrollToPrevDiff(side: Side) {

@@ -50,12 +50,10 @@ export default class Editor {
   }
 
   setClickListener(fn: (_: number) => void) {
-    this.cm.on("mousedown", (cm: CodeMirror.Editor, event: Event) => {
-      const pos = cm.coordsChar({ left: 0, top: (event as any).y });
-      if (pos) {
-        // NOTICE: 比实际点击位置小一行
-        fn(pos.line + 1);
-      }
+    this.cm.on("cursorActivity", (cm: CodeMirror.Editor) => {
+      const pos = cm.getCursor();
+      // NOTICE: 比实际点击位置小一行
+      fn(pos.line + 1);
     });
   }
 
