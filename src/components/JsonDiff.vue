@@ -78,6 +78,7 @@ let rightEditor: Editor;
 onMounted(() => {
   leftEditor = new Editor("left-editor");
   rightEditor = new Editor("right-editor");
+  // TODO: delete
   compare();
 });
 
@@ -109,6 +110,7 @@ function resetJdd() {
 }
 
 function compare() {
+  // TODO: delete
   leftEditor.setText(
     `{"Aidan Gillen": {"array": ["Game of Thron\\"es","The Wire"],"string": "some string","int": 2,"aboolean": true, "boolean": true, "null": null, "a_null": null, "another_null": "null check", "object": {"foo": "bar","object1": {"new prop1": "new prop value"},"object2": {"new prop1": "new prop value"},"object3": {"new prop1": "new prop value"},"object4": {"new prop1": "new prop value"}}},"Amy Ryan": {"one": "In Treatment","two": "The Wire"},"Annie Fitzgerald": ["Big Love","True Blood"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsgard": ["Generation Kill","True Blood"], "Clarke Peters": null}`
   );
@@ -192,18 +194,22 @@ function genCharsDiff(ltext: string, rtext: string, ldiff: Diff, rdiff: Diff) {
   const lline = ldiff.line - 1;
   const rline = rdiff.line - 1;
   let cdiffs = diffChars(ltext, rtext);
-  let pos = 0;
+  let lpos = 0;
+  let rpos = 0;
 
   for (const d of cdiffs) {
     const v = d.value;
 
     if (d.added) {
-      rightEditor.addClassToRange(rline, pos, pos + v.length, getInsClass());
+      rightEditor.addClassToRange(rline, rpos, rpos + v.length, getInsClass());
+      rpos += v.length;
     } else if (d.removed) {
-      leftEditor.addClassToRange(lline, pos, pos + v.length, getDelClass());
+      leftEditor.addClassToRange(lline, lpos, lpos + v.length, getDelClass());
+      lpos += v.length;
+    } else {
+      lpos += v.length;
+      rpos += v.length;
     }
-
-    pos += v.length;
   }
 }
 
@@ -241,11 +247,11 @@ function diffArray(
   data1: Array<any>,
   data2: Array<any>
 ) {
-  const sup = Math.max(data1.length, data2.length);
-  const sub = Math.min(data1.length, data2.length);
+  const union = Math.max(data1.length, data2.length);
+  const subset = Math.min(data1.length, data2.length);
 
-  for (let i = 0; i < sup; i++) {
-    if (i < sub) {
+  for (let i = 0; i < union; i++) {
+    if (i < subset) {
       config1.addArrayTrace(i);
       config2.addArrayTrace(i);
       diffVal(config1, config2, data1[i], data2[i]);
