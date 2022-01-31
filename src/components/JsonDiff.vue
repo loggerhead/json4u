@@ -3,22 +3,25 @@
     <div class="col-span-6"></div>
     <div class="col-span-4">
       <div class="col-span-4 space-x-3" v-if="hasDiffs">
-        <button @click="scrollToPrevDiff('right')" :class="style.button">
-          Prev
-        </button>
-        <!-- Left arrow key -->
-        <button @click="scrollToNextDiff('right')" :class="style.button">
-          Next
-        </button>
-        <!-- Right arrow key -->
+        <Tooltip text="Ctrl + Left">
+          <button @click="scrollToPrevDiff('right')" :class="style.button">
+            Prev
+          </button>
+        </Tooltip>
+        <Tooltip text="Ctrl + Right">
+          <button @click="scrollToNextDiff('right')" :class="style.button">
+            Next
+          </button>
+        </Tooltip>
       </div>
       <div v-else :class="style.alert">
         There is no difference between left and right
       </div>
     </div>
     <div class="col-span-2 flex justify-end">
-      <button @click="compare" :class="style.compareButton">Compare</button>
-      <!-- Ctrl + Enter -->
+      <Tooltip text="Ctrl + Enter">
+        <button @click="compare" :class="style.compareButton">Compare</button>
+      </Tooltip>
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
@@ -33,6 +36,7 @@ import { computed, onMounted, shallowReactive } from "vue";
 // @ts-ignore
 import { diffChars } from "diff/lib/diff/character";
 import { deepEqual } from "fast-equals";
+import Tooltip from "./Tooltip.vue";
 import {
   trace,
   TraceRecord,
