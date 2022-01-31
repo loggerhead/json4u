@@ -2,7 +2,7 @@
   <div class="grid grid-cols-12 gap-4" @keyup.ctrl.enter.prevent="compare">
     <div class="col-span-6"></div>
     <div class="col-span-4">
-      <n-space v-if="hasDiffs">
+      <div class="col-span-4 space-x-3" v-if="hasDiffs">
         <n-tooltip trigger="hover">
           <template #trigger>
             <n-button @click="scrollToPrevDiff('right')"> Prev </n-button>
@@ -15,7 +15,7 @@
           </template>
           Right arrow key
         </n-tooltip>
-      </n-space>
+      </div>
       <n-alert v-else title="" class="max-w-xs">No diffs</n-alert>
     </div>
     <div class="col-span-2 flex justify-end">
@@ -426,7 +426,7 @@ function addClickHandler() {
   });
 }
 
-function scrollToDiff(dd: [Diff, Diff], side: Side) {
+function scrollToDiff(dd: [Diff, Diff] | undefined, side: Side) {
   if (dd === undefined) {
     return;
   }
@@ -463,12 +463,12 @@ function handleDiffClick(lineno: number, side: Side) {
       } else if (side === "right" && linenoR == lineno) {
         return ["left", linenoL];
       } else {
-        return null;
+        return undefined;
       }
     })
     .filter((pp) => pp)
-    .forEach((pp: [Side, number]) => {
-      const [side, lineno] = pp;
+    .forEach((pp) => {
+      const [side, lineno] = pp as [Side, number];
       let e = side == "left" ? leftEditor : rightEditor;
       cnt++;
 
@@ -492,8 +492,11 @@ function handleDiffClick(lineno: number, side: Side) {
 }
 
 // skip same line in one side
-function getNextDiff(side: Side, direction: ScrollDirection) {
-  const nextIndex = (i) => {
+function getNextDiff(
+  side: Side,
+  direction: ScrollDirection
+): [Diff, Diff] | undefined {
+  const nextIndex = (i: number) => {
     if (direction === "next") {
       if (++i >= jdd.diffs.length) {
         i = 0;
