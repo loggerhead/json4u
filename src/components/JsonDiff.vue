@@ -1,30 +1,24 @@
 <template>
-  <div class="grid grid-cols-12 gap-4" @keyup.ctrl.enter.prevent="compare">
+  <div class="grid grid-cols-12 gap-2" @keyup.ctrl.enter.prevent="compare">
     <div class="col-span-6"></div>
     <div class="col-span-4">
       <div class="col-span-4 space-x-3" v-if="hasDiffs">
-        <n-tooltip trigger="hover">
-          <template #trigger>
-            <n-button @click="scrollToPrevDiff('right')"> Prev </n-button>
-          </template>
-          Left arrow key
-        </n-tooltip>
-        <n-tooltip trigger="hover">
-          <template #trigger>
-            <n-button @click="scrollToNextDiff('right')"> Next </n-button>
-          </template>
-          Right arrow key
-        </n-tooltip>
+        <button @click="scrollToPrevDiff('right')" :class="style.button">
+          Prev
+        </button>
+        <!-- Left arrow key -->
+        <button @click="scrollToNextDiff('right')" :class="style.button">
+          Next
+        </button>
+        <!-- Right arrow key -->
       </div>
-      <n-alert v-else title="" class="max-w-xs">No diffs</n-alert>
+      <div v-else :class="style.alert">
+        There is no difference between left and right
+      </div>
     </div>
     <div class="col-span-2 flex justify-end">
-      <n-tooltip class="justify-end" trigger="hover">
-        <template #trigger>
-          <n-button @click="compare"> Compare </n-button>
-        </template>
-        Ctrl + Enter
-      </n-tooltip>
+      <button @click="compare" :class="style.compareButton">Compare</button>
+      <!-- Ctrl + Enter -->
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
@@ -52,6 +46,7 @@ import {
 import { isObject, isBaseType } from "../utils/typeHelper";
 import formatJsonString from "../utils/format";
 import Editor from "../utils/editor";
+import * as style from "./style";
 
 type Side = "left" | "right";
 type ScrollDirection = "prev" | "next";

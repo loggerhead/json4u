@@ -1,7 +1,5 @@
 <template>
-  <n-layout-footer
-    ><div>
-      <slot></slot>
-    </div>
-  </n-layout-footer>
+  <div class="h-10">
+    <slot></slot>
+  </div>
 </template>

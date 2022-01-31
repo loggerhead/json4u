@@ -1,5 +1,5 @@
 <template>
-  <n-layout>
+  <div class="flex-col space-y-2">
     <Header></Header>
     <div class="flex">
       <Sider />
@@ -7,7 +7,7 @@
       <Sider />
     </div>
     <Footer></Footer>
-  </n-layout>
+  </div>
 </template>
 
 <script setup lang="ts">
