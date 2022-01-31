@@ -60,6 +60,13 @@ export default class Editor {
     return this.cm.setValue(text);
   }
 
+  hasClass(lineno: number, cls: string): boolean {
+    return this.cm
+      .lineInfo(lineno - 1)
+      .wrapClass.split(/\s+/)
+      .includes(cls);
+  }
+
   addClass(lineno: number, cls: string) {
     this.cm.addLineClass(lineno - 1, "wrap", cls);
   }

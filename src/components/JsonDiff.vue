@@ -5,13 +5,13 @@
       <n-space v-if="hasDiffs">
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button @click="scrollToPrevDiff('both')"> Prev </n-button>
+            <n-button @click="scrollToPrevDiff('right')"> Prev </n-button>
           </template>
           Left arrow key
         </n-tooltip>
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button @click="scrollToNextDiff('both')"> Next </n-button>
+            <n-button @click="scrollToNextDiff('right')"> Next </n-button>
           </template>
           Right arrow key
         </n-tooltip>
@@ -53,6 +53,7 @@ import formatJsonString from "../utils/format";
 import Editor from "../utils/editor";
 
 type Side = "left" | "right";
+type ScrollDirection = "prev" | "next";
 
 const jdd = shallowReactive({
   llines: [],
@@ -77,6 +78,26 @@ let rightEditor: Editor;
 onMounted(() => {
   leftEditor = new Editor("left-editor");
   rightEditor = new Editor("right-editor");
+  compare();
+});
+
+window.addEventListener("keydown", (e) => {
+  if (!hasDiffs.value) {
+    return;
+  }
+
+  switch (e.key) {
+    // TODO: change to ctrl
+    case "ArrowLeft":
+      // prevent scroll
+      e.preventDefault();
+      scrollToPrevDiff("right");
+      break;
+    case "ArrowRight":
+      e.preventDefault();
+      scrollToNextDiff("right");
+      break;
+  }
 });
 
 function resetJdd() {
@@ -88,6 +109,13 @@ function resetJdd() {
 }
 
 function compare() {
+  leftEditor.setText(
+    `{"Aidan Gillen": {"array": ["Game of Thron\\"es","The Wire"],"string": "some string","int": 2,"aboolean": true, "boolean": true, "null": null, "a_null": null, "another_null": "null check", "object": {"foo": "bar","object1": {"new prop1": "new prop value"},"object2": {"new prop1": "new prop value"},"object3": {"new prop1": "new prop value"},"object4": {"new prop1": "new prop value"}}},"Amy Ryan": {"one": "In Treatment","two": "The Wire"},"Annie Fitzgerald": ["Big Love","True Blood"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsgard": ["Generation Kill","True Blood"], "Clarke Peters": null}`
+  );
+  rightEditor.setText(
+    `{"Aidan Gillen": {"array": ["Game of Thrones","The Wire"],"string": "some string","int": "2","otherint": 4, "aboolean": "true", "boolean": false, "null": null, "a_null":88, "another_null": null, "object": {"foo": "bar"}},"Amy Ryan": ["In Treatment","The Wire"],"Annie Fitzgerald": ["True Blood","Big Love","The Sopranos","Oz"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsg?rd": ["Generation Kill","True Blood"],"Alice Farmer": ["The Corner","Oz","The Wire"]}`
+  );
+
   try {
     leftEditor.startOperation();
     rightEditor.startOperation();
@@ -148,9 +176,16 @@ function processDiffs(lformated: string, rformated: string) {
     }
   });
 
-  // TODO:
-  // addClickHandler(lnodes, rnodes);
-  // scrollToDiff(0, "both");
+  if (jdd.diffs.length > 0) {
+    // sort by right side line number
+    jdd.diffs.sort((a: [Diff, Diff], b: [Diff, Diff]): number => {
+      return a[1].line - b[1].line;
+    });
+
+    // TODO:
+    // addClickHandler(lnodes, rnodes);
+    scrollToDiff(jdd.diffs[0], "right");
+  }
 }
 
 function genCharsDiff(ltext: string, rtext: string, ldiff: Diff, rdiff: Diff) {
@@ -363,6 +398,115 @@ function isNeedDiffKey(
   }
 
   return deepEqual(val1, val2);
+}
+
+function scrollToDiff(dd: [Diff, Diff], side: Side) {
+  if (dd === undefined) {
+    return;
+  }
+
+  const [ldiff, rdiff] = dd;
+  leftEditor.scrollTo(ldiff.line);
+  rightEditor.scrollTo(rdiff.line);
+
+  if (side === "left") {
+    handleDiffClick(ldiff.line, side);
+  } else if (side === "right") {
+    handleDiffClick(rdiff.line, side);
+  }
+}
+
+function handleDiffClick(lineno: number, side: Side) {
+  let editor = side == "left" ? leftEditor : rightEditor;
+  const selected = getSeletedClass();
+  const isSelected = editor.hasClass(lineno, selected);
+
+  jdd.diffs
+    .map((dd) => {
+      const [ldiff, rdiff] = dd;
+      const linenoL = ldiff.line;
+      const linenoR = rdiff.line;
+
+      // 清除所有 diff 的 selected class
+      leftEditor.removeClass(linenoL, selected);
+      rightEditor.removeClass(linenoR, selected);
+
+      if (side === "left" && linenoL == lineno) {
+        return ["right", linenoR];
+      } else if (side === "right" && linenoR == lineno) {
+        return ["left", linenoL];
+      } else {
+        return null;
+      }
+    })
+    .filter((pp) => pp)
+    .forEach((pp: [Side, number]) => {
+      const [side, lineno] = pp;
+      let e = side == "left" ? leftEditor : rightEditor;
+
+      if (isSelected) {
+        e.removeClass(lineno, selected);
+      } else {
+        e.addClass(lineno, selected);
+      }
+    });
+
+  if (isSelected) {
+    editor.removeClass(lineno, selected);
+  } else {
+    editor.addClass(lineno, selected);
+  }
+}
+
+// skip same line in one side
+function getNextDiff(side: Side, direction: ScrollDirection) {
+  const nextIndex = (i) => {
+    if (direction === "next") {
+      if (++i >= jdd.diffs.length) {
+        i = 0;
+      }
+    } else {
+      if (--i < 0) {
+        i = Math.max(0, jdd.diffs.length - 1);
+      }
+    }
+
+    return i;
+  };
+
+  const start = jdd.currentDiff;
+  let end = nextIndex(start);
+
+  for (; start != end; end = nextIndex(end)) {
+    const [ldiff1, rdiff1] = jdd.diffs[start];
+    const [ldiff2, rdiff2] = jdd.diffs[end];
+
+    if (side === "left") {
+      if (ldiff1.line != ldiff2.line) {
+        break;
+      }
+    } else {
+      if (rdiff1.line != rdiff2.line) {
+        break;
+      }
+    }
+  }
+
+  const nextIdx = start === end ? -1 : end;
+  if (nextIdx < 0) {
+    return undefined;
+  }
+
+  jdd.currentDiff = nextIdx;
+  return jdd.diffs[nextIdx];
+}
+
+function scrollToPrevDiff(side: Side) {
+  scrollToDiff(getNextDiff(side, "prev"), side);
+}
+
+function scrollToNextDiff(side: Side) {
+  scrollToDiff(getNextDiff(side, "next"), side);
 }
 
 function getDiffClass(diffType: DiffType, side: Side): string {
