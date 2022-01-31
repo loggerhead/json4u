@@ -9,6 +9,7 @@ import "codemirror/addon/fold/brace-fold.js";
 import "codemirror/addon/lint/lint.css";
 import "codemirror/addon/lint/lint.js";
 import "codemirror/addon/lint/json-lint.js";
+// @ts-ignore
 import jsonlint from "jsonlint-mod";
 window.jsonlint = jsonlint;
 
@@ -49,13 +50,24 @@ export default class Editor {
   }
 
   setClickListener(fn: (_: number) => void) {
-    this.cm.on("mousedown", (cm: CodeMirror.Editor, e: Event) => {
-      const pos = cm.coordsChar({ left: 0, top: e.y });
+    this.cm.on("mousedown", (cm: CodeMirror.Editor, event: Event) => {
+      const pos = cm.coordsChar({ left: 0, top: event.y });
       if (pos) {
         // NOTICE: 比实际点击位置小一行
         fn(pos.line + 1);
       }
     });
+  }
+
+  setPasteListener(fn: (event: CodeMirror.EditorChange) => void) {
+    this.cm.on(
+      "inputRead",
+      (cm: CodeMirror.Editor, event: CodeMirror.EditorChange) => {
+        if (event.origin === "paste") {
+          fn(event);
+        }
+      }
+    );
   }
 
   getText(): string {
@@ -102,5 +114,9 @@ export default class Editor {
   endOperation() {
     this.cm.endOperation();
     this.refresh();
+  }
+
+  focus() {
+    this.cm.focus();
   }
 }

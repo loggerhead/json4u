@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, shallowReactive } from "vue";
+// @ts-ignore
 import { diffChars } from "diff/lib/diff/character";
 import { deepEqual } from "fast-equals";
 import {
@@ -78,8 +79,26 @@ let rightEditor: Editor;
 onMounted(() => {
   leftEditor = new Editor("left-editor");
   rightEditor = new Editor("right-editor");
-  // TODO: delete
-  compare();
+
+  leftEditor.setPasteListener((event: CodeMirror.EditorChange) => {
+    if (
+      event.from.line == 0 &&
+      event.from.ch == 0 &&
+      leftEditor.getText().length > 0
+    ) {
+      rightEditor.focus();
+    }
+  });
+
+  rightEditor.setPasteListener((event: CodeMirror.EditorChange) => {
+    if (
+      event.from.line == 0 &&
+      event.from.ch == 0 &&
+      leftEditor.getText().length > 0
+    ) {
+      compare();
+    }
+  });
 });
 
 window.addEventListener("keydown", (e) => {
@@ -111,14 +130,6 @@ function resetJdd() {
 }
 
 function compare() {
-  // TODO: delete
-  leftEditor.setText(
-    `{"Aidan Gillen": {"array": ["Game of Thron\\"es","The Wire"],"string": "some string","int": 2,"aboolean": true, "boolean": true, "null": null, "a_null": null, "another_null": "null check", "object": {"foo": "bar","object1": {"new prop1": "new prop value"},"object2": {"new prop1": "new prop value"},"object3": {"new prop1": "new prop value"},"object4": {"new prop1": "new prop value"}}},"Amy Ryan": {"one": "In Treatment","two": "The Wire"},"Annie Fitzgerald": ["Big Love","True Blood"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsgard": ["Generation Kill","True Blood"], "Clarke Peters": null}`
-  );
-  rightEditor.setText(
-    `{"Aidan Gillen": {"array": ["Game of Thrones","The Wire"],"string": "some string","int": "2","otherint": 4, "aboolean": "true", "boolean": false, "null": null, "a_null":88, "another_null": null, "object": {"foo": "bar"}},"Amy Ryan": ["In Treatment","The Wire"],"Annie Fitzgerald": ["True Blood","Big Love","The Sopranos","Oz"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsg?rd": ["Generation Kill","True Blood"],"Alice Farmer": ["The Corner","Oz","The Wire"]}`
-  );
-
   try {
     leftEditor.startOperation();
     rightEditor.startOperation();
