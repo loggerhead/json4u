@@ -48,8 +48,14 @@ export default class Editor {
     return true;
   }
 
-  setupKeymap(key: string, fn: any) {
-    this.cm.addKeyMap(key);
+  setClickListener(fn: (_: number) => void) {
+    this.cm.on("mousedown", (cm: CodeMirror.Editor, e: Event) => {
+      const pos = cm.coordsChar({ left: 0, top: e.y });
+      if (pos) {
+        // NOTICE: 比实际点击位置小一行
+        fn(pos.line + 1);
+      }
+    });
   }
 
   getText(): string {
@@ -61,10 +67,10 @@ export default class Editor {
   }
 
   hasClass(lineno: number, cls: string): boolean {
-    return this.cm
-      .lineInfo(lineno - 1)
-      .wrapClass.split(/\s+/)
-      .includes(cls);
+    const lineInfo = this.cm.lineInfo(lineno - 1);
+    return lineInfo.wrapClass
+      ? lineInfo.wrapClass.split(/\s+/).includes(cls)
+      : false;
   }
 
   addClass(lineno: number, cls: string) {

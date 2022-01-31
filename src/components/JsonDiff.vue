@@ -85,10 +85,11 @@ onMounted(() => {
 window.addEventListener("keydown", (e) => {
   if (!hasDiffs.value) {
     return;
+  } else if (!e.ctrlKey) {
+    return;
   }
 
   switch (e.key) {
-    // TODO: change to ctrl
     case "ArrowLeft":
       // prevent scroll
       e.preventDefault();
@@ -184,8 +185,7 @@ function processDiffs(lformated: string, rformated: string) {
       return a[1].line - b[1].line;
     });
 
-    // TODO:
-    // addClickHandler(lnodes, rnodes);
+    addClickHandler();
     scrollToDiff(jdd.diffs[0], "right");
   }
 }
@@ -406,6 +406,15 @@ function isNeedDiffKey(
   return deepEqual(val1, val2);
 }
 
+function addClickHandler() {
+  leftEditor.setClickListener((line: number) => {
+    handleDiffClick(line, "left");
+  });
+  rightEditor.setClickListener((line: number) => {
+    handleDiffClick(line, "right");
+  });
+}
+
 function scrollToDiff(dd: [Diff, Diff], side: Side) {
   if (dd === undefined) {
     return;
@@ -426,6 +435,7 @@ function handleDiffClick(lineno: number, side: Side) {
   let editor = side == "left" ? leftEditor : rightEditor;
   const selected = getSeletedClass();
   const isSelected = editor.hasClass(lineno, selected);
+  let cnt = 0;
 
   jdd.diffs
     .map((dd) => {
@@ -449,6 +459,7 @@ function handleDiffClick(lineno: number, side: Side) {
     .forEach((pp: [Side, number]) => {
       const [side, lineno] = pp;
       let e = side == "left" ? leftEditor : rightEditor;
+      cnt++;
 
       if (isSelected) {
         e.removeClass(lineno, selected);
@@ -456,6 +467,11 @@ function handleDiffClick(lineno: number, side: Side) {
         e.addClass(lineno, selected);
       }
     });
+
+  // 点击在不是 diff 的行时，直接返回
+  if (cnt === 0) {
+    return;
+  }
 
   if (isSelected) {
     editor.removeClass(lineno, selected);
