@@ -85,6 +85,8 @@ onMounted(() => {
       event.from.ch == 0 &&
       leftEditor.getText().length > 0
     ) {
+      // auto format when paste
+      leftEditor.setText(formatJsonString(leftEditor.getText()));
       rightEditor.focus();
     }
   });
@@ -339,16 +341,16 @@ function diffObject(
       if (data1.hasOwnProperty(key)) {
         // if data1 has key, data2 don't
         jdd.diffs.push([
-        config1.genDiff(MORE, key, data1[key]),
-        config2.genDiff(MISS, "", null),
-      ]);
-    } else {
-      jdd.diffs.push([
-        config1.genDiff(MISS, "", null),
-        config2.genDiff(MORE, key, data2[key]),
-      ]);
-    }
-  });
+          config1.genDiff(MORE, key, data1[key]),
+          config2.genDiff(MISS, "", null),
+        ]);
+      } else {
+        jdd.diffs.push([
+          config1.genDiff(MISS, "", null),
+          config2.genDiff(MORE, key, data2[key]),
+        ]);
+      }
+    });
 
   config1.popTrace();
   config2.popTrace();
