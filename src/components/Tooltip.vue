@@ -17,9 +17,7 @@ export default {
 <style lang="scss" scoped>
 $gray: #495057;
 
-// https://codepen.io/tutsplus/pen/WROvdG => tooltip source code
 [tooltip] {
-  // used for slot editing
   & > * {
     display: inline-block;
   }
@@ -67,84 +65,26 @@ $gray: #495057;
   &:hover:after {
     display: block;
   }
-  /* position: TOP */
-  &:not([position]):before,
-  &[position^="top"]:before {
-    bottom: 100%;
-    border-bottom-width: 0;
-    border-top-color: $gray;
-  }
-  &:not([position]):after,
-  &[position^="top"]::after {
-    bottom: calc(100% + 5px);
-  }
-
-  &:not([position])::before,
-  &:not([position])::after,
-  &[position^="top"]::before,
-  &[position^="top"]::after {
-    left: 50%;
-    transform: translate(-50%, -0.5em);
-  }
 
   /* position: BOTTOM */
-  &[position^="bottom"]::before {
+  &::before {
     top: 105%;
     border-top-width: 0;
     border-bottom-color: $gray;
   }
-  &[position^="bottom"]::after {
+  &::after {
     top: calc(105% + 5px);
   }
-  &[position^="bottom"]::before,
-  &[position^="bottom"]::after {
+  &::before,
+  &::after {
     left: 50%;
     transform: translate(-50%, 0.5em);
   }
 
-  /* position: LEFT */
-  &[position^="left"]::before {
-    top: 50%;
-    border-right-width: 0;
-    border-left-color: $gray;
-    left: calc(0em - 5px);
-    transform: translate(-0.5em, -50%);
-  }
-  &[position^="left"]::after {
-    top: 50%;
-    right: calc(100% + 5px);
-    transform: translate(-0.5em, -50%);
-  }
-
-  /* position: RIGHT */
-  &[position^="right"]::before {
-    top: 50%;
-    border-left-width: 0;
-    border-right-color: $gray;
-    right: calc(0em - 5px);
-    transform: translate(0.5em, -50%);
-  }
-  &[position^="right"]::after {
-    top: 50%;
-    left: calc(100% + 5px);
-    transform: translate(0.5em, -50%);
-  }
-
   /* FX All The Things */
-  &:not([position]):hover::before,
-  &:not([position]):hover::after,
-  &[position^="top"]:hover::before,
-  &[position^="top"]:hover::after,
-  &[position^="bottom"]:hover::before,
-  &[position^="bottom"]:hover::after {
+  &:hover::before,
+  &:hover::after {
     animation: tooltips-vert 300ms ease-out forwards;
-  }
-
-  &[position^="left"]:hover::before,
-  &[position^="left"]:hover::after,
-  &[position^="right"]:hover::before,
-  &[position^="right"]:hover::after {
-    animation: tooltips-horz 300ms ease-out forwards;
   }
 }
 

@@ -1,6 +1,13 @@
 <template>
   <div class="grid grid-cols-12 gap-2" @keyup.ctrl.enter.prevent="compare">
-    <div class="col-span-6"></div>
+    <div class="col-span-6 flex space-x-3">
+      <div>
+        <button @click="pretty" :class="style.actionButton">Pretty</button>
+      </div>
+      <div>
+        <button @click="minify" :class="style.actionButton">Minify</button>
+      </div>
+    </div>
     <div class="col-span-4">
       <div class="col-span-4 space-x-3" v-if="hasDiffs">
         <Tooltip text="Ctrl + Left">
@@ -23,7 +30,7 @@
     </div>
     <div class="col-span-2 flex justify-end">
       <Tooltip text="Ctrl + Enter">
-        <button @click="compare" :class="style.compareButton">Compare</button>
+        <button @click="compare" :class="style.actionButton">Compare</button>
       </Tooltip>
     </div>
 
@@ -134,6 +141,29 @@ function resetJdd() {
   jdd.errmsg = "";
 }
 
+function pretty() {
+  const text = formatJsonString(leftEditor.getText().trim());
+  leftEditor.setText(text);
+  leftEditor.refresh();
+}
+
+function minify() {
+  try {
+    const obj = JSON.parse(leftEditor.getText().trim());
+    const text = JSON.stringify(obj, null, 0);
+    leftEditor.setText(text);
+    leftEditor.refresh();
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      leftEditor.lint();
+      rightEditor.lint();
+      jdd.errmsg = (<Error>e).message;
+    } else {
+      throw e;
+    }
+  }
+}
+
 function compare() {
   try {
     leftEditor.startOperation();
@@ -165,9 +195,13 @@ function compare() {
       processDiffs(lconfig.out, rconfig.out);
     });
   } catch (e) {
-    leftEditor.lint();
-    rightEditor.lint();
-    jdd.errmsg = e;
+    if (e instanceof SyntaxError) {
+      leftEditor.lint();
+      rightEditor.lint();
+      jdd.errmsg = (<Error>e).message;
+    } else {
+      throw e;
+    }
   } finally {
     measure("render", () => {
       leftEditor.endOperation();
