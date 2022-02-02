@@ -11,11 +11,6 @@ export default defineConfig({
     importToCDN({
       modules: [
         {
-          name: "vue",
-          var: "Vue",
-          path: "https://cdn.jsdelivr.net/npm/vue@3.2.29/dist/vue.runtime.global.prod.js",
-        },
-        {
           name: "codemirror",
           var: "codemirror",
           path: "https://cdn.jsdelivr.net/npm/codemirror@5.65.1/lib/codemirror.min.js",
@@ -58,6 +53,11 @@ export default defineConfig({
           name: "codemirror/addon/lint/json-lint.js",
           var: "codemirror/addon/lint/json-lint.js",
           path: "https://cdn.jsdelivr.net/npm/codemirror@5.65.1/addon/lint/json-lint.js",
+        },
+        {
+          name: "vue",
+          var: "Vue",
+          path: "https://cdn.jsdelivr.net/npm/vue@3.2.29/dist/vue.runtime.global.prod.js",
         },
       ],
     }),

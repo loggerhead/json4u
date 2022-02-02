@@ -14,7 +14,10 @@
           </button>
         </Tooltip>
       </div>
-      <div v-else :class="style.alert">
+      <div v-else-if="jdd.errmsg" :class="style.alertError">
+        {{ jdd.errmsg }}
+      </div>
+      <div v-else :class="style.alertInfo">
         There is no difference between left and right
       </div>
     </div>
@@ -61,12 +64,14 @@ const jdd = shallowReactive({
   diffs: [],
   currentDiff: 0,
   startTime: performance.now(),
+  errmsg: "",
 } as {
   llines: Array<string>;
   rlines: Array<string>;
   diffs: Array<[Diff, Diff]>;
   currentDiff: number;
   startTime: number;
+  errmsg: string;
 });
 
 const hasDiffs = computed(() => jdd.diffs.length > 0);
@@ -85,8 +90,6 @@ onMounted(() => {
       event.from.ch == 0 &&
       leftEditor.getText().length > 0
     ) {
-      // auto format when paste
-      leftEditor.setText(formatJsonString(leftEditor.getText()));
       rightEditor.focus();
     }
   });
@@ -128,6 +131,7 @@ function resetJdd() {
   jdd.diffs = [];
   jdd.currentDiff = 0;
   jdd.startTime = performance.now();
+  jdd.errmsg = "";
 }
 
 function compare() {
@@ -146,11 +150,9 @@ function compare() {
 
       leftEditor.setText(lconfig.out);
       rightEditor.setText(rconfig.out);
-      leftEditor.lint();
-      rightEditor.lint();
 
-      leftObj = JSON.parse(lconfig.out);
-      rightObj = JSON.parse(rconfig.out);
+      leftObj = JSON.parse(lconfig.out, parseReviver);
+      rightObj = JSON.parse(rconfig.out, parseReviver);
       trace(lconfig, leftObj);
       trace(rconfig, rightObj);
 
@@ -162,6 +164,10 @@ function compare() {
       diffVal(lconfig, rconfig, leftObj, rightObj);
       processDiffs(lconfig.out, rconfig.out);
     });
+  } catch (e) {
+    leftEditor.lint();
+    rightEditor.lint();
+    jdd.errmsg = e;
   } finally {
     measure("render", () => {
       leftEditor.endOperation();
@@ -574,5 +580,12 @@ function measure(msg: string, fn: () => void) {
   fn();
   const cost = performance.now() - now;
   console.log(`${msg} (${Math.trunc(cost)}ms)`);
+}
+
+function parseReviver(key: string, value: any): any {
+  if (typeof value === "number" && !Number.isSafeInteger(value)) {
+    jdd.errmsg = `The integer overflow: ${value}`;
+  }
+  return value;
 }
 </script>
