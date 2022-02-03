@@ -16,6 +16,7 @@
     "rollup-plugin-analyzer": "^4.0.0",
     "sass": "^1.49.0",
     "vite-plugin-cdn-import": "^0.3.5",
+    "vite-plugin-radar": "^0.4.2",
     "vue": "^3.2.25"
   },
   "devDependencies": {
