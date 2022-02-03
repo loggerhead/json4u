@@ -3,6 +3,7 @@ import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/theme/idea.css";
+import "codemirror/addon/display/placeholder.js";
 import "codemirror/addon/fold/foldgutter.js";
 import "codemirror/addon/fold/foldcode.js";
 import "codemirror/addon/fold/foldgutter.css";
@@ -18,8 +19,8 @@ export default class Editor {
   cm: CodeMirror.Editor;
 
   constructor(id: string) {
-    const el = document.getElementById(id) as ParentNode;
-    const cm = CodeMirror(el, {
+    const el = document.getElementById(id) as HTMLTextAreaElement;
+    const cm = CodeMirror.fromTextArea(el, {
       mode: "application/json",
       theme: "idea",
       smartIndent: true,

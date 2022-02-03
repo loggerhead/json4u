@@ -2,22 +2,26 @@
   <div class="grid grid-cols-12 gap-2" @keyup.ctrl.enter.prevent="compare">
     <div class="col-span-6 flex space-x-3">
       <div>
-        <button @click="pretty" :class="style.actionButton">Pretty</button>
+        <button @click="pretty" :class="style.actionButton">
+          {{ $t("msg.pretty") }}
+        </button>
       </div>
       <div>
-        <button @click="minify" :class="style.actionButton">Minify</button>
+        <button @click="minify" :class="style.actionButton">
+          {{ $t("msg.minify") }}
+        </button>
       </div>
     </div>
     <div class="col-span-4">
       <div class="col-span-4 space-x-3" v-if="hasDiffs">
         <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
           <button @click="scrollToPrevDiff('right')" :class="style.button">
-            Prev
+            {{ $t("msg.prev") }}
           </button>
         </span>
         <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Right">
           <button @click="scrollToNextDiff('right')" :class="style.button">
-            Next
+            {{ $t("msg.next") }}
           </button>
         </span>
       </div>
@@ -25,7 +29,7 @@
         {{ jdd.errmsg }}
       </div>
       <div v-else :class="style.alertInfo">
-        There is no difference between left and right
+        {{ $t("msg.nodiff") }}
       </div>
     </div>
     <div class="col-span-2 space-x-3 flex justify-end">
@@ -37,20 +41,39 @@
             :checked="syncScroll"
             class="toggle toggle-sm"
           />
-          <span class="label-text">Sync scroll</span>
+          <span class="label-text">{{ $t("msg.syncScroll") }}</span>
         </label>
       </div>
       <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
-        <button @click="compare" :class="style.actionButton">Compare</button>
+        <button @click="compare" :class="style.actionButton">
+          {{ $t("msg.compare") }}
+        </button>
       </span>
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
-      <div id="left-editor" class="w-1/2 h-screen"></div>
-      <div id="right-editor" class="w-1/2 h-screen"></div>
+      <div class="w-1/2 h-screen">
+        <textarea
+          id="left-editor"
+          :placeholder="$t('msg.leftPlaceholder')"
+        ></textarea>
+      </div>
+      <div class="w-1/2 h-screen">
+        <textarea
+          id="right-editor"
+          :placeholder="$t('msg.rightPlaceholder')"
+        ></textarea>
+      </div>
     </div>
   </div>
 </template>
+
+<style lang="scss">
+.CodeMirror-placeholder {
+  font-size: 0.875rem !important;
+  color: rgb(148 163 184) !important;
+}
+</style>
 
 <script setup lang="ts">
 import { computed, onMounted, shallowReactive, ref } from "vue";
