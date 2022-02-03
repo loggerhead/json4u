@@ -116,6 +116,7 @@ onMounted(() => {
   });
 
   Editor.setSyncScroll(leftEditor, rightEditor, syncScroll);
+  leftEditor.focus();
 });
 
 window.addEventListener("keydown", (e) => {
