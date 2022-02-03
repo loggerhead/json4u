@@ -77,9 +77,11 @@
 
 <script setup lang="ts">
 import { computed, onMounted, shallowReactive, ref } from "vue";
+import { deepEqual } from "fast-equals";
 // @ts-ignore
 import { diffChars } from "diff/lib/diff/character";
-import { deepEqual } from "fast-equals";
+// @ts-ignore
+import jsonMap from "json-source-map";
 import {
   trace,
   TraceRecord,
@@ -179,8 +181,10 @@ function pretty() {
 
 function minify() {
   try {
-    const obj = JSON.parse(leftEditor.getText().trim());
-    const text = JSON.stringify(obj, null, 0);
+    const obj = jsonMap.parse(leftEditor.getText().trim(), null, {
+      bigint: true,
+    });
+    const text = jsonMap.stringify(obj.data, null, 0).json;
     leftEditor.setText(text);
     leftEditor.refresh();
   } catch (e) {
@@ -207,20 +211,20 @@ function compare() {
     measure("format", () => {
       lconfig.out = formatJsonString(leftEditor.getText().trim());
       rconfig.out = formatJsonString(rightEditor.getText().trim());
-
       leftEditor.setText(lconfig.out);
       rightEditor.setText(rconfig.out);
+    });
 
-      leftObj = JSON.parse(lconfig.out, parseReviver);
-      rightObj = JSON.parse(rconfig.out, parseReviver);
+    measure("parse", () => {
+      leftObj = jsonMap.parse(lconfig.out, null, { bigint: true }).data;
+      rightObj = jsonMap.parse(rconfig.out, null, { bigint: true }).data;
       trace(lconfig, leftObj);
       trace(rconfig, rightObj);
-
-      lconfig.currentPath = [];
-      rconfig.currentPath = [];
     });
 
     measure("diff", () => {
+      lconfig.currentPath = [];
+      rconfig.currentPath = [];
       diffVal(lconfig, rconfig, leftObj, rightObj);
       processDiffs(lconfig.out, rconfig.out);
     });
@@ -653,12 +657,5 @@ function measure(msg: string, fn: () => void) {
   fn();
   const cost = performance.now() - now;
   console.log(`${msg} (${Math.trunc(cost)}ms)`);
-}
-
-function parseReviver(key: string, value: any): any {
-  if (typeof value === "number" && !Number.isSafeInteger(value)) {
-    jdd.errmsg = `The integer overflow: ${value}`;
-  }
-  return value;
 }
 </script>

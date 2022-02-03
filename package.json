@@ -12,6 +12,7 @@
     "daisyui": "^1.25.4",
     "diff": "^5.0.0",
     "fast-equals": "^2.0.4",
+    "json-source-map": "^0.6.1",
     "jsonlint-mod": "^1.7.6",
     "rollup-plugin-analyzer": "^4.0.0",
     "sass": "^1.49.0",
