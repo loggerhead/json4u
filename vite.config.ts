@@ -12,7 +12,7 @@ export default defineConfig({
       modules: [
         {
           name: "codemirror",
-          var: "codemirror",
+          var: "CodeMirror",
           path: "https://cdn.jsdelivr.net/npm/codemirror@5.65.1/lib/codemirror.min.js",
           css: "https://cdn.jsdelivr.net/npm/codemirror@5.65.0/lib/codemirror.min.css",
         },
@@ -53,6 +53,11 @@ export default defineConfig({
           name: "codemirror/addon/lint/json-lint.js",
           var: "codemirror/addon/lint/json-lint.js",
           path: "https://cdn.jsdelivr.net/npm/codemirror@5.65.1/addon/lint/json-lint.js",
+        },
+        {
+          name: "jsonlint-mod",
+          var: "jsonlint",
+          path: "https://cdn.jsdelivr.net/npm/jsonlint-mod@1.7.6/web/jsonlint.min.js",
         },
         {
           name: "vue",

@@ -1,3 +1,4 @@
+import { Ref } from "vue";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/javascript/javascript.js";
@@ -116,5 +117,24 @@ export default class Editor {
 
   focus() {
     this.cm.focus();
+  }
+
+  static setSyncScroll(
+    leftEditor: Editor,
+    rightEditor: Editor,
+    enableSyncScroll: Ref<boolean>
+  ) {
+    leftEditor.cm.on("scroll", function () {
+      if (enableSyncScroll.value) {
+        const scrollInfo = leftEditor.cm.getScrollInfo();
+        rightEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
+      }
+    });
+    rightEditor.cm.on("scroll", function () {
+      if (enableSyncScroll.value) {
+        const scrollInfo = rightEditor.cm.getScrollInfo();
+        leftEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
+      }
+    });
   }
 }

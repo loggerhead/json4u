@@ -9,6 +9,7 @@
   "dependencies": {
     "@types/codemirror": "^5.60.5",
     "codemirror": "^5.65.1",
+    "daisyui": "^1.25.4",
     "diff": "^5.0.0",
     "fast-equals": "^2.0.4",
     "jsonlint-mod": "^1.7.6",

@@ -10,16 +10,16 @@
     </div>
     <div class="col-span-4">
       <div class="col-span-4 space-x-3" v-if="hasDiffs">
-        <Tooltip text="Ctrl + Left">
+        <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
           <button @click="scrollToPrevDiff('right')" :class="style.button">
             Prev
           </button>
-        </Tooltip>
-        <Tooltip text="Ctrl + Right">
+        </span>
+        <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Right">
           <button @click="scrollToNextDiff('right')" :class="style.button">
             Next
           </button>
-        </Tooltip>
+        </span>
       </div>
       <div v-else-if="jdd.errmsg" :class="style.alertError">
         {{ jdd.errmsg }}
@@ -28,10 +28,21 @@
         There is no difference between left and right
       </div>
     </div>
-    <div class="col-span-2 flex justify-end">
-      <Tooltip text="Ctrl + Enter">
+    <div class="col-span-2 space-x-3 flex justify-end">
+      <div class="form-control">
+        <label class="cursor-pointer items-center label space-x-1">
+          <input
+            v-model="syncScroll"
+            type="checkbox"
+            :checked="syncScroll"
+            class="toggle toggle-sm"
+          />
+          <span class="label-text">Sync scroll</span>
+        </label>
+      </div>
+      <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
         <button @click="compare" :class="style.actionButton">Compare</button>
-      </Tooltip>
+      </span>
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
@@ -42,11 +53,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, shallowReactive } from "vue";
+import { computed, onMounted, shallowReactive, ref } from "vue";
 // @ts-ignore
 import { diffChars } from "diff/lib/diff/character";
 import { deepEqual } from "fast-equals";
-import Tooltip from "./Tooltip.vue";
 import {
   trace,
   TraceRecord,
@@ -66,21 +76,15 @@ type Side = "left" | "right";
 type ScrollDirection = "prev" | "next";
 
 const jdd = shallowReactive({
-  llines: [],
-  rlines: [],
-  diffs: [],
+  llines: [] as Array<string>,
+  rlines: [] as Array<string>,
+  diffs: [] as Array<[Diff, Diff]>,
   currentDiff: 0,
   startTime: performance.now(),
   errmsg: "",
-} as {
-  llines: Array<string>;
-  rlines: Array<string>;
-  diffs: Array<[Diff, Diff]>;
-  currentDiff: number;
-  startTime: number;
-  errmsg: string;
 });
 
+let syncScroll = ref(true);
 const hasDiffs = computed(() => jdd.diffs.length > 0);
 const timeCost = computed(() => performance.now() - jdd.startTime);
 
@@ -110,6 +114,8 @@ onMounted(() => {
       compare();
     }
   });
+
+  Editor.setSyncScroll(leftEditor, rightEditor, syncScroll);
 });
 
 window.addEventListener("keydown", (e) => {
@@ -168,13 +174,13 @@ function compare() {
   try {
     leftEditor.startOperation();
     rightEditor.startOperation();
+    resetJdd();
     let lconfig = new TraceRecord();
     let rconfig = new TraceRecord();
     let leftObj: any;
     let rightObj: any;
 
     measure("format", () => {
-      resetJdd();
       lconfig.out = formatJsonString(leftEditor.getText().trim());
       rconfig.out = formatJsonString(rightEditor.getText().trim());
 
@@ -476,9 +482,18 @@ function scrollToDiff(dd: [Diff, Diff] | undefined, side: Side) {
     return;
   }
 
+  // 暂时关闭同步滚动
+  const old = syncScroll.value;
+  syncScroll.value = false;
+
   const [ldiff, rdiff] = dd;
   leftEditor.scrollTo(ldiff.line);
   rightEditor.scrollTo(rdiff.line);
+
+  // 需要延迟设置
+  setTimeout(() => {
+    syncScroll.value = old;
+  }, 100);
 
   if (side === "left") {
     handleDiffClick(ldiff.line, side);
