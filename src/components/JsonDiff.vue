@@ -1,13 +1,13 @@
 <template>
-  <div class="grid grid-cols-12 gap-2" @keyup.ctrl.enter.prevent="compare">
+  <div class="grid grid-cols-12 gap-2">
     <div class="col-span-6 flex space-x-3">
       <div>
-        <button @click="pretty" :class="style.actionButton">
+        <button @click="pretty()" :class="style.actionButton">
           {{ $t("msg.pretty") }}
         </button>
       </div>
       <div>
-        <button @click="minify" :class="style.actionButton">
+        <button @click="minify()" :class="style.actionButton">
           {{ $t("msg.minify") }}
         </button>
       </div>
@@ -96,17 +96,20 @@ let leftEditor: Editor;
 let rightEditor: Editor;
 
 onMounted(() => {
+  // must new after mounted
   leftEditor = new Editor("left-editor");
   rightEditor = new Editor("right-editor");
 
   leftEditor.setPasteListener((event: CodeMirror.EditorChange) => {
     if (event.from.line == 0 && event.from.ch == 0 && leftEditor.getText().length > 0) {
+      pretty(leftEditor);
       rightEditor.focus();
     }
   });
 
   rightEditor.setPasteListener((event: CodeMirror.EditorChange) => {
-    if (event.from.line == 0 && event.from.ch == 0 && leftEditor.getText().length > 0) {
+    if (event.from.line == 0 && event.from.ch == 0 && rightEditor.getText().length > 0) {
+      pretty(rightEditor);
       compare();
     }
   });
@@ -116,13 +119,16 @@ onMounted(() => {
 });
 
 window.addEventListener("keydown", (e) => {
-  if (!hasDiffs.value) {
-    return;
-  } else if (!e.ctrlKey) {
+  if (!e.ctrlKey) {
     return;
   }
 
   switch (e.key) {
+    case "Enter":
+      // prevent input a new line
+      e.preventDefault();
+      compare();
+      break;
     case "ArrowLeft":
       // prevent scroll
       e.preventDefault();
@@ -144,22 +150,21 @@ function resetJdd() {
   jdd.errmsg = "";
 }
 
-function pretty() {
-  const text = formatJsonString(leftEditor.getText().trim());
-  leftEditor.setText(text);
-  leftEditor.refresh();
+function pretty(editor = leftEditor) {
+  const text = formatJsonString(editor.getText().trim());
+  editor.setText(text);
+  editor.refresh();
 }
 
-function minify() {
+function minify(editor = leftEditor) {
   try {
-    const obj = jsonMap.parse(leftEditor.getText().trim());
+    const obj = jsonMap.parse(editor.getText().trim());
     const text = jsonMap.stringify(obj.data, null, 0).json;
-    leftEditor.setText(text);
-    leftEditor.refresh();
+    editor.setText(text);
+    editor.refresh();
   } catch (e) {
     if (e instanceof SyntaxError) {
-      leftEditor.lint();
-      rightEditor.lint();
+      editor.lint();
       jdd.errmsg = (<Error>e).message;
     } else {
       throw e;
@@ -172,17 +177,12 @@ function compare() {
     leftEditor.startOperation();
     rightEditor.startOperation();
     resetJdd();
-    let lconfig = new TraceRecord();
-    let rconfig = new TraceRecord();
     let leftObj: any;
     let rightObj: any;
-
-    measure("format", () => {
-      lconfig.out = formatJsonString(leftEditor.getText().trim());
-      rconfig.out = formatJsonString(rightEditor.getText().trim());
-      leftEditor.setText(lconfig.out);
-      rightEditor.setText(rconfig.out);
-    });
+    let lconfig = new TraceRecord();
+    let rconfig = new TraceRecord();
+    lconfig.out = leftEditor.getText();
+    rconfig.out = rightEditor.getText();
 
     measure("parse", () => {
       leftObj = jsonMap.parse(lconfig.out).data;
