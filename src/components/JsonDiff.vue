@@ -35,12 +35,7 @@
     <div class="col-span-2 space-x-3 flex justify-end">
       <div class="form-control">
         <label class="cursor-pointer items-center label space-x-1">
-          <input
-            v-model="syncScroll"
-            type="checkbox"
-            :checked="syncScroll"
-            class="toggle toggle-sm"
-          />
+          <input v-model="syncScroll" type="checkbox" :checked="syncScroll" class="toggle toggle-sm" />
           <span class="label-text">{{ $t("msg.syncScroll") }}</span>
         </label>
       </div>
@@ -53,16 +48,10 @@
 
     <div class="col-span-12 flex border border-slate-100">
       <div class="w-1/2 h-screen">
-        <textarea
-          id="left-editor"
-          :placeholder="$t('msg.leftPlaceholder')"
-        ></textarea>
+        <textarea id="left-editor" :placeholder="$t('msg.leftPlaceholder')"></textarea>
       </div>
       <div class="w-1/2 h-screen">
-        <textarea
-          id="right-editor"
-          :placeholder="$t('msg.rightPlaceholder')"
-        ></textarea>
+        <textarea id="right-editor" :placeholder="$t('msg.rightPlaceholder')"></textarea>
       </div>
     </div>
   </div>
@@ -80,18 +69,8 @@ import { computed, onMounted, shallowReactive, ref } from "vue";
 import { deepEqual } from "fast-equals";
 // @ts-ignore
 import { diffChars } from "diff/lib/diff/character";
-// @ts-ignore
-import jsonMap from "json-source-map";
-import {
-  trace,
-  TraceRecord,
-  Diff,
-  DiffType,
-  MORE,
-  MISS,
-  UNEQ,
-  UNEQ_KEY,
-} from "../utils/trace";
+import * as jsonMap from "json-map-ts";
+import { trace, TraceRecord, Diff, DiffType, MORE, MISS, UNEQ, UNEQ_KEY } from "../utils/trace";
 import { isObject, isBaseType } from "../utils/typeHelper";
 import formatJsonString from "../utils/format";
 import Editor from "../utils/editor";
@@ -121,21 +100,13 @@ onMounted(() => {
   rightEditor = new Editor("right-editor");
 
   leftEditor.setPasteListener((event: CodeMirror.EditorChange) => {
-    if (
-      event.from.line == 0 &&
-      event.from.ch == 0 &&
-      leftEditor.getText().length > 0
-    ) {
+    if (event.from.line == 0 && event.from.ch == 0 && leftEditor.getText().length > 0) {
       rightEditor.focus();
     }
   });
 
   rightEditor.setPasteListener((event: CodeMirror.EditorChange) => {
-    if (
-      event.from.line == 0 &&
-      event.from.ch == 0 &&
-      leftEditor.getText().length > 0
-    ) {
+    if (event.from.line == 0 && event.from.ch == 0 && leftEditor.getText().length > 0) {
       compare();
     }
   });
@@ -181,9 +152,7 @@ function pretty() {
 
 function minify() {
   try {
-    const obj = jsonMap.parse(leftEditor.getText().trim(), null, {
-      bigint: true,
-    });
+    const obj = jsonMap.parse(leftEditor.getText().trim());
     const text = jsonMap.stringify(obj.data, null, 0).json;
     leftEditor.setText(text);
     leftEditor.refresh();
@@ -216,8 +185,8 @@ function compare() {
     });
 
     measure("parse", () => {
-      leftObj = jsonMap.parse(lconfig.out, null, { bigint: true }).data;
-      rightObj = jsonMap.parse(rconfig.out, null, { bigint: true }).data;
+      leftObj = jsonMap.parse(lconfig.out).data;
+      rightObj = jsonMap.parse(rconfig.out).data;
       trace(lconfig, leftObj);
       trace(rconfig, rightObj);
     });
@@ -228,11 +197,17 @@ function compare() {
       diffVal(lconfig, rconfig, leftObj, rightObj);
       processDiffs(lconfig.out, rconfig.out);
     });
-  } catch (e) {
+  } catch (e: any) {
+    switch (e.constructor) {
+      case jsonMap.DetailedSyntaxError:
+        jdd.errmsg = (<Error>e).message;
+      case jsonMap.UnexpectedEndError:
+      // case jsonMap.UnexpectedTypeError:
+    }
+
     if (e instanceof SyntaxError) {
       leftEditor.lint();
       rightEditor.lint();
-      jdd.errmsg = (<Error>e).message;
     } else {
       throw e;
     }
@@ -302,37 +277,21 @@ function genCharsDiff(ltext: string, rtext: string, ldiff: Diff, rdiff: Diff) {
 function needCharDiff(ldiff: Diff, rdiff: Diff) {
   return (
     (ldiff.type === UNEQ_KEY && rdiff.type === UNEQ_KEY) ||
-    (isBaseType(ldiff.val) &&
-      isBaseType(rdiff.val) &&
-      ldiff.type === UNEQ &&
-      rdiff.type === UNEQ)
+    (isBaseType(ldiff.val) && isBaseType(rdiff.val) && ldiff.type === UNEQ && rdiff.type === UNEQ)
   );
 }
 
-function diffVal(
-  config1: TraceRecord,
-  config2: TraceRecord,
-  data1: any,
-  data2: any
-) {
+function diffVal(config1: TraceRecord, config2: TraceRecord, data1: any, data2: any) {
   if (Array.isArray(data1) && Array.isArray(data2)) {
     diffArray(config1, config2, data1, data2);
   } else if (isObject(data1) && isObject(data2)) {
     diffObject(config1, config2, data1, data2);
   } else if (data1 !== data2) {
-    jdd.diffs.push([
-      config1.genDiff(UNEQ, "", data1),
-      config2.genDiff(UNEQ, "", data2),
-    ]);
+    jdd.diffs.push([config1.genDiff(UNEQ, "", data1), config2.genDiff(UNEQ, "", data2)]);
   }
 }
 
-function diffArray(
-  config1: TraceRecord,
-  config2: TraceRecord,
-  data1: Array<any>,
-  data2: Array<any>
-) {
+function diffArray(config1: TraceRecord, config2: TraceRecord, data1: Array<any>, data2: Array<any>) {
   const union = Math.max(data1.length, data2.length);
   const subset = Math.min(data1.length, data2.length);
 
@@ -344,25 +303,14 @@ function diffArray(
       config1.popTrace();
       config2.popTrace();
     } else if (data1.length < data2.length) {
-      jdd.diffs.push([
-        config1.genDiff(MISS, "", null),
-        config2.genDiff(MORE, `[${i}]`, data2[i]),
-      ]);
+      jdd.diffs.push([config1.genDiff(MISS, "", null), config2.genDiff(MORE, `[${i}]`, data2[i])]);
     } else if (data1.length > data2.length) {
-      jdd.diffs.push([
-        config1.genDiff(MORE, `[${i}]`, data1[i]),
-        config2.genDiff(MISS, "", null),
-      ]);
+      jdd.diffs.push([config1.genDiff(MORE, `[${i}]`, data1[i]), config2.genDiff(MISS, "", null)]);
     }
   }
 }
 
-function diffObject(
-  config1: TraceRecord,
-  config2: TraceRecord,
-  data1: any,
-  data2: any
-) {
+function diffObject(config1: TraceRecord, config2: TraceRecord, data1: any, data2: any) {
   config1.addTrace();
   config2.addTrace();
 
@@ -398,10 +346,7 @@ function diffObject(
       }
 
       if (needDiff) {
-        jdd.diffs.push([
-          config1.genDiff(UNEQ_KEY, key1, key1),
-          config2.genDiff(UNEQ_KEY, key2, key2),
-        ]);
+        jdd.diffs.push([config1.genDiff(UNEQ_KEY, key1, key1), config2.genDiff(UNEQ_KEY, key2, key2)]);
         seen.add(key1);
         seen.add(key2);
         break;
@@ -414,15 +359,9 @@ function diffObject(
     .forEach((key) => {
       if (data1.hasOwnProperty(key)) {
         // if data1 has key, data2 don't
-        jdd.diffs.push([
-          config1.genDiff(MORE, key, data1[key]),
-          config2.genDiff(MISS, "", null),
-        ]);
+        jdd.diffs.push([config1.genDiff(MORE, key, data1[key]), config2.genDiff(MISS, "", null)]);
       } else {
-        jdd.diffs.push([
-          config1.genDiff(MISS, "", null),
-          config2.genDiff(MORE, key, data2[key]),
-        ]);
+        jdd.diffs.push([config1.genDiff(MISS, "", null), config2.genDiff(MORE, key, data2[key])]);
       }
     });
 
@@ -430,10 +369,7 @@ function diffObject(
   config2.popTrace();
 }
 
-function splitKeys(
-  data1: Object,
-  data2: Object
-): [Array<string>, Array<string>] {
+function splitKeys(data1: Object, data2: Object): [Array<string>, Array<string>] {
   const seen = new Set<string>();
   const sub = new Array<string>();
   const dif = new Array<string>();
@@ -473,12 +409,7 @@ function splitKeys(
   return [sub, dif];
 }
 
-function isNeedDiffKey(
-  data1: any,
-  data2: any,
-  key1: string,
-  key2: string
-): boolean {
+function isNeedDiffKey(data1: any, data2: any, key1: string, key2: string): boolean {
   const val1 = data1[key1];
   const val2 = data2[key2];
 
@@ -580,10 +511,7 @@ function handleDiffClick(lineno: number, side: Side) {
 }
 
 // skip same line in one side
-function getNextDiff(
-  side: Side,
-  direction: ScrollDirection
-): [Diff, Diff] | undefined {
+function getNextDiff(side: Side, direction: ScrollDirection): [Diff, Diff] | undefined {
   const nextIndex = (i: number) => {
     if (direction === "next") {
       if (++i >= jdd.diffs.length) {
