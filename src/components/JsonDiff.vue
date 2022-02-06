@@ -111,7 +111,10 @@ onMounted(() => {
   rightEditor.setPasteListener((event: CodeMirror.EditorChange) => {
     if (event.from.line == 0 && event.from.ch == 0 && rightEditor.getText().length > 0) {
       pretty(rightEditor);
-      compare();
+
+      if (leftEditor.getText().length > 0) {
+        compare();
+      }
     }
   });
 
