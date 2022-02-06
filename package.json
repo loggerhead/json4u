@@ -14,12 +14,12 @@
     "fast-equals": "^2.0.4",
     "json-map-ts": "file:../json-map-ts/json-map-ts-0.0.1.tgz",
     "jsonlint-mod": "^1.7.6",
+    "micromustache": "^8.0.3",
     "rollup-plugin-analyzer": "^4.0.0",
     "sass": "^1.49.0",
     "vite-plugin-cdn-import": "^0.3.5",
     "vite-plugin-radar": "^0.4.2",
-    "vue": "^3.2.25",
-    "vue-i18n": "^9.2.0-beta.30"
+    "vue": "^3.2.25"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.0.0",

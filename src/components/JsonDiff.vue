@@ -3,12 +3,12 @@
     <div class="col-span-6 flex space-x-3">
       <div>
         <button @click="pretty()" :class="style.actionButton">
-          {{ $t("msg.pretty") }}
+          {{ t("pretty") }}
         </button>
       </div>
       <div>
         <button @click="minify()" :class="style.actionButton">
-          {{ $t("msg.minify") }}
+          {{ t("minify") }}
         </button>
       </div>
     </div>
@@ -16,12 +16,12 @@
       <div class="col-span-4 space-x-3" v-if="hasDiffs">
         <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
           <button @click="scrollToPrevDiff('right')" :class="style.button">
-            {{ $t("msg.prev") }}
+            {{ t("prev") }}
           </button>
         </span>
         <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Right">
           <button @click="scrollToNextDiff('right')" :class="style.button">
-            {{ $t("msg.next") }}
+            {{ t("next") }}
           </button>
         </span>
       </div>
@@ -29,29 +29,29 @@
         {{ jdd.errmsg }}
       </div>
       <div v-else :class="style.alertInfo">
-        {{ $t("msg.nodiff") }}
+        {{ t("nodiff") }}
       </div>
     </div>
     <div class="col-span-2 space-x-3 flex justify-end">
       <div class="form-control">
         <label class="cursor-pointer items-center label space-x-1">
           <input v-model="syncScroll" type="checkbox" :checked="syncScroll" class="toggle toggle-sm" />
-          <span class="label-text">{{ $t("msg.syncScroll") }}</span>
+          <span class="label-text">{{ t("syncScroll") }}</span>
         </label>
       </div>
       <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
         <button @click="compare" :class="style.actionButton">
-          {{ $t("msg.compare") }}
+          {{ t("compare") }}
         </button>
       </span>
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
       <div class="w-1/2 h-screen">
-        <textarea id="left-editor" :placeholder="$t('msg.leftPlaceholder')"></textarea>
+        <textarea id="left-editor" :placeholder="t('leftPlaceholder')"></textarea>
       </div>
       <div class="w-1/2 h-screen">
-        <textarea id="right-editor" :placeholder="$t('msg.rightPlaceholder')"></textarea>
+        <textarea id="right-editor" :placeholder="t('rightPlaceholder')"></textarea>
       </div>
     </div>
   </div>
@@ -74,6 +74,7 @@ import { trace, TraceRecord, Diff, DiffType, MORE, MISS, UNEQ, UNEQ_KEY } from "
 import { isObject, isBaseType } from "../utils/typeHelper";
 import formatJsonString from "../utils/format";
 import Editor from "../utils/editor";
+import { t } from "../utils/i18n";
 import * as style from "./style";
 
 type Side = "left" | "right";
@@ -141,13 +142,32 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-function resetJdd() {
-  jdd.llines = [];
-  jdd.rlines = [];
-  jdd.diffs = [];
-  jdd.currentDiff = 0;
-  jdd.startTime = performance.now();
-  jdd.errmsg = "";
+function handleError(e: Error, side: Side) {
+  let errmsg = e.message;
+
+  switch (e.constructor) {
+    case jsonMap.DetailedSyntaxError:
+      errmsg = t("syntaxError", e);
+      break;
+    case jsonMap.UnexpectedEndError:
+      errmsg = t("unexpectedEndError", e);
+      break;
+    case jsonMap.UnexpectedTypeError:
+      errmsg = t("unexpectedTypeError", e);
+      break;
+  }
+
+  jdd.errmsg = errmsg;
+
+  if (e instanceof SyntaxError) {
+    if (side === "left") {
+      leftEditor.lint();
+    } else {
+      rightEditor.lint();
+    }
+  } else {
+    throw e;
+  }
 }
 
 function pretty(editor = leftEditor) {
@@ -162,61 +182,58 @@ function minify(editor = leftEditor) {
     const text = jsonMap.stringify(obj.data, null, 0).json;
     editor.setText(text);
     editor.refresh();
-  } catch (e) {
-    if (e instanceof SyntaxError) {
-      editor.lint();
-      jdd.errmsg = (<Error>e).message;
-    } else {
-      throw e;
-    }
+  } catch (e: any) {
+    handleError(e, editor === leftEditor ? "left" : "right");
   }
 }
 
+function resetJdd() {
+  jdd.llines = [];
+  jdd.rlines = [];
+  jdd.diffs = [];
+  jdd.currentDiff = 0;
+  jdd.startTime = performance.now();
+  jdd.errmsg = "";
+}
+
 function compare() {
-  try {
+  resetJdd();
+
+  let leftObj: any;
+  let rightObj: any;
+  let lconfig = new TraceRecord();
+  let rconfig = new TraceRecord();
+  lconfig.out = leftEditor.getText();
+  rconfig.out = rightEditor.getText();
+
+  measure("parse and diff", () => {
+    try {
+      leftObj = jsonMap.parse(lconfig.out).data;
+    } catch (e: any) {
+      handleError(e, "left");
+    }
+
+    try {
+      rightObj = jsonMap.parse(rconfig.out).data;
+    } catch (e: any) {
+      handleError(e, "right");
+    }
+
+    trace(lconfig, leftObj);
+    trace(rconfig, rightObj);
+
+    lconfig.currentPath = [];
+    rconfig.currentPath = [];
+    diffVal(lconfig, rconfig, leftObj, rightObj);
+  });
+
+  measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
-    resetJdd();
-    let leftObj: any;
-    let rightObj: any;
-    let lconfig = new TraceRecord();
-    let rconfig = new TraceRecord();
-    lconfig.out = leftEditor.getText();
-    rconfig.out = rightEditor.getText();
-
-    measure("parse", () => {
-      leftObj = jsonMap.parse(lconfig.out).data;
-      rightObj = jsonMap.parse(rconfig.out).data;
-      trace(lconfig, leftObj);
-      trace(rconfig, rightObj);
-    });
-
-    measure("diff", () => {
-      lconfig.currentPath = [];
-      rconfig.currentPath = [];
-      diffVal(lconfig, rconfig, leftObj, rightObj);
-      processDiffs(lconfig.out, rconfig.out);
-    });
-  } catch (e: any) {
-    switch (e.constructor) {
-      case jsonMap.DetailedSyntaxError:
-        jdd.errmsg = (<Error>e).message;
-      case jsonMap.UnexpectedEndError:
-      // case jsonMap.UnexpectedTypeError:
-    }
-
-    if (e instanceof SyntaxError) {
-      leftEditor.lint();
-      rightEditor.lint();
-    } else {
-      throw e;
-    }
-  } finally {
-    measure("render", () => {
-      leftEditor.endOperation();
-      rightEditor.endOperation();
-    });
-  }
+    processDiffs(lconfig.out, rconfig.out);
+    leftEditor.endOperation();
+    rightEditor.endOperation();
+  });
 }
 
 function processDiffs(lformated: string, rformated: string) {
