@@ -70,8 +70,8 @@ import { deepEqual } from "fast-equals";
 // @ts-ignore
 import { diffChars } from "diff/lib/diff/character";
 import * as jsonMap from "json-map-ts";
-import { trace, TraceRecord, Diff, DiffType, MORE, MISS, UNEQ, UNEQ_KEY } from "../utils/trace";
-import { isObject, isBaseType } from "../utils/typeHelper";
+import * as trace from "../utils/trace";
+import { isObject, isBaseType, isComparable } from "../utils/typeHelper";
 import formatJsonString from "../utils/format";
 import Editor from "../utils/editor";
 import { t } from "../utils/i18n";
@@ -83,7 +83,7 @@ type ScrollDirection = "prev" | "next";
 const jdd = shallowReactive({
   llines: [] as Array<string>,
   rlines: [] as Array<string>,
-  diffs: [] as Array<[Diff, Diff]>,
+  diffs: [] as Array<[trace.Diff, trace.Diff]>,
   currentDiff: 0,
   startTime: performance.now(),
   errmsg: "",
@@ -202,67 +202,52 @@ function resetJdd() {
 function compare() {
   resetJdd();
 
-  let leftObj: any;
-  let rightObj: any;
-  let lconfig = new TraceRecord();
-  let rconfig = new TraceRecord();
-  lconfig.out = leftEditor.getText();
-  rconfig.out = rightEditor.getText();
+  let ltrace = new trace.TraceRecord(leftEditor.getText());
+  let rtrace = new trace.TraceRecord(rightEditor.getText());
 
   measure("parse and diff", () => {
     try {
-      leftObj = jsonMap.parse(lconfig.out).data;
+      ltrace.setParseResult(jsonMap.parse(ltrace.out));
     } catch (e: any) {
       handleError(e, "left");
     }
 
     try {
-      rightObj = jsonMap.parse(rconfig.out).data;
+      rtrace.setParseResult(jsonMap.parse(rtrace.out));
     } catch (e: any) {
       handleError(e, "right");
     }
 
-    trace(lconfig, leftObj);
-    trace(rconfig, rightObj);
-
-    lconfig.currentPath = [];
-    rconfig.currentPath = [];
-    diffVal(lconfig, rconfig, leftObj, rightObj);
+    diffVal(ltrace, rtrace, ltrace.data, rtrace.data);
   });
 
   measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
-    processDiffs(lconfig.out, rconfig.out);
+    processDiffs(ltrace, rtrace);
     leftEditor.endOperation();
     rightEditor.endOperation();
   });
 }
 
-function processDiffs(lformated: string, rformated: string) {
-  let llines = lformated.split("\n");
-  let rlines = rformated.split("\n");
-
-  // 生成差异 vnode
-  jdd.diffs.forEach(function (dd: Diff[]) {
+function processDiffs(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord) {
+  jdd.diffs.forEach(function (dd: trace.Diff[]) {
     const [ldiff, rdiff] = dd;
     const lline = ldiff.line;
     const rline = rdiff.line;
-    const ltext = llines[lline - 1];
-    const rtext = rlines[rline - 1];
 
-    leftEditor.addClass(lline, getDiffClass(ldiff.type, "left"));
-    rightEditor.addClass(rline, getDiffClass(rdiff.type, "right"));
+    leftEditor.addClass(lline, getDiffClass(ldiff.diffType, "left"));
+    rightEditor.addClass(rline, getDiffClass(rdiff.diffType, "right"));
 
     // char diff
-    if (needCharDiff(ldiff, rdiff)) {
-      genCharsDiff(ltext, rtext, ldiff, rdiff);
+    if (needCharDiff(ltrace, rtrace, ldiff, rdiff)) {
+      genCharsDiff(ltrace, rtrace, ldiff, rdiff);
     }
   });
 
   if (jdd.diffs.length > 0) {
     // sort by right side line number
-    jdd.diffs.sort((a: [Diff, Diff], b: [Diff, Diff]): number => {
+    jdd.diffs.sort((a: [trace.Diff, trace.Diff], b: [trace.Diff, trace.Diff]): number => {
       return a[1].line - b[1].line;
     });
 
@@ -271,78 +256,89 @@ function processDiffs(lformated: string, rformated: string) {
   }
 }
 
-function genCharsDiff(ltext: string, rtext: string, ldiff: Diff, rdiff: Diff) {
-  const lline = ldiff.line - 1;
-  const rline = rdiff.line - 1;
+function genCharsDiff(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldiff: trace.Diff, rdiff: trace.Diff) {
+  let lch;
+  let rch;
+  let ltext;
+  let rtext;
+
+  if (ldiff.diffType === trace.UNEQ_KEY && rdiff.diffType === trace.UNEQ_KEY) {
+    lch = ltrace.getKeyPos(ldiff.pointer) - ltrace.getKeyLinePos(ldiff.pointer);
+    rch = rtrace.getKeyPos(rdiff.pointer) - rtrace.getKeyLinePos(rdiff.pointer);
+    ltext = ltrace.getKey(ldiff.pointer);
+    rtext = rtrace.getKey(rdiff.pointer);
+  } else {
+    lch = ltrace.getValuePos(ldiff.pointer) - ltrace.getValueLinePos(ldiff.pointer);
+    rch = rtrace.getValuePos(rdiff.pointer) - rtrace.getValueLinePos(rdiff.pointer);
+    ltext = ltrace.getValue(ldiff.pointer);
+    rtext = rtrace.getValue(rdiff.pointer);
+  }
+
   let cdiffs = diffChars(ltext, rtext);
-  let lpos = 0;
-  let rpos = 0;
 
   for (const d of cdiffs) {
     const v = d.value;
 
     if (d.added) {
-      rightEditor.addClassToRange(rline, rpos, rpos + v.length, getInsClass());
-      rpos += v.length;
+      rightEditor.addClassToRange(rdiff.line - 1, rch, rch + v.length, getInsClass());
+      rch += v.length;
     } else if (d.removed) {
-      leftEditor.addClassToRange(lline, lpos, lpos + v.length, getDelClass());
-      lpos += v.length;
+      leftEditor.addClassToRange(ldiff.line - 1, lch, lch + v.length, getDelClass());
+      lch += v.length;
     } else {
-      lpos += v.length;
-      rpos += v.length;
+      lch += v.length;
+      rch += v.length;
     }
   }
 }
 
-function needCharDiff(ldiff: Diff, rdiff: Diff) {
+function needCharDiff(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldiff: trace.Diff, rdiff: trace.Diff) {
   return (
-    (ldiff.type === UNEQ_KEY && rdiff.type === UNEQ_KEY) ||
-    (isBaseType(ldiff.val) && isBaseType(rdiff.val) && ldiff.type === UNEQ && rdiff.type === UNEQ)
+    (ldiff.diffType === trace.UNEQ_KEY && rdiff.diffType === trace.UNEQ_KEY) ||
+    (ldiff.diffType === trace.UNEQ_VAL && rdiff.diffType === trace.UNEQ_VAL)
   );
 }
 
-function diffVal(config1: TraceRecord, config2: TraceRecord, data1: any, data2: any) {
-  if (Array.isArray(data1) && Array.isArray(data2)) {
-    diffArray(config1, config2, data1, data2);
-  } else if (isObject(data1) && isObject(data2)) {
-    diffObject(config1, config2, data1, data2);
-  } else if (data1 !== data2) {
-    jdd.diffs.push([config1.genDiff(UNEQ, "", data1), config2.genDiff(UNEQ, "", data2)]);
+function diffVal(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldata: any, rdata: any) {
+  if (Array.isArray(ldata) && Array.isArray(rdata)) {
+    diffArray(ltrace, rtrace, ldata, rdata);
+  } else if (isObject(ldata) && isObject(rdata)) {
+    diffObject(ltrace, rtrace, ldata, rdata);
+  } else if (ldata !== rdata) {
+    const t = isComparable(ldata, rdata) ? trace.UNEQ_VAL : trace.UNEQ_TYPE;
+    jdd.diffs.push([ltrace.genDiff(t), rtrace.genDiff(t)]);
   }
 }
 
-function diffArray(config1: TraceRecord, config2: TraceRecord, data1: Array<any>, data2: Array<any>) {
-  const union = Math.max(data1.length, data2.length);
-  const subset = Math.min(data1.length, data2.length);
+function diffArray(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldata: Array<any>, rdata: Array<any>) {
+  const union = Math.max(ldata.length, rdata.length);
+  const subset = Math.min(ldata.length, rdata.length);
 
   for (let i = 0; i < union; i++) {
     if (i < subset) {
-      config1.addArrayTrace(i);
-      config2.addArrayTrace(i);
-      diffVal(config1, config2, data1[i], data2[i]);
-      config1.popTrace();
-      config2.popTrace();
-    } else if (data1.length < data2.length) {
-      jdd.diffs.push([config1.genDiff(MISS, "", null), config2.genDiff(MORE, `[${i}]`, data2[i])]);
-    } else if (data1.length > data2.length) {
-      jdd.diffs.push([config1.genDiff(MORE, `[${i}]`, data1[i]), config2.genDiff(MISS, "", null)]);
+      ltrace.push(i);
+      rtrace.push(i);
+      diffVal(ltrace, rtrace, ldata[i], rdata[i]);
+      ltrace.pop();
+      rtrace.pop();
+    } else if (ldata.length < rdata.length) {
+      jdd.diffs.push([ltrace.genDiff(trace.MISS), rtrace.genDiff(trace.MORE, i)]);
+    } else if (ldata.length > rdata.length) {
+      jdd.diffs.push([ltrace.genDiff(trace.MORE, i), rtrace.genDiff(trace.MISS)]);
     }
   }
 }
 
-function diffObject(config1: TraceRecord, config2: TraceRecord, data1: any, data2: any) {
-  config1.addTrace();
-  config2.addTrace();
-
-  const [subkk, difkk] = splitKeys(data1, data2);
+function diffObject(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldata: any, rdata: any) {
+  const [subkk, difkk] = splitKeys(ldata, rdata);
 
   // iterate over same keys
   subkk.forEach((key) => {
-    config1.addTrace(key);
-    config2.addTrace(key);
-    diffVal(config1, config2, data1[key], data2[key]);
-    config1.popTrace();
-    config2.popTrace();
+    ltrace.push(key);
+    rtrace.push(key);
+    diffVal(ltrace, rtrace, ldata[key], rdata[key]);
+    ltrace.pop();
+    rtrace.pop();
   });
 
   const seen = new Set();
@@ -359,14 +355,14 @@ function diffObject(config1: TraceRecord, config2: TraceRecord, data1: any, data
       let key2 = difkk[j];
       let needDiff = false;
 
-      if (data1.hasOwnProperty(key1) && data2.hasOwnProperty(key2)) {
-        needDiff = isNeedDiffKey(data1, data2, key1, key2);
-      } else if (data1.hasOwnProperty(key2) && data2.hasOwnProperty(key1)) {
-        needDiff = isNeedDiffKey(data1, data2, key2, key1);
+      if (ldata.hasOwnProperty(key1) && rdata.hasOwnProperty(key2)) {
+        needDiff = isNeedDiffKey(ldata, rdata, key1, key2);
+      } else if (ldata.hasOwnProperty(key2) && rdata.hasOwnProperty(key1)) {
+        needDiff = isNeedDiffKey(ldata, rdata, key2, key1);
       }
 
       if (needDiff) {
-        jdd.diffs.push([config1.genDiff(UNEQ_KEY, key1, key1), config2.genDiff(UNEQ_KEY, key2, key2)]);
+        jdd.diffs.push([ltrace.genDiff(trace.UNEQ_KEY, key1), rtrace.genDiff(trace.UNEQ_KEY, key2)]);
         seen.add(key1);
         seen.add(key2);
         break;
@@ -377,24 +373,21 @@ function diffObject(config1: TraceRecord, config2: TraceRecord, data1: any, data
   difkk
     .filter((k) => !seen.has(k))
     .forEach((key) => {
-      if (data1.hasOwnProperty(key)) {
+      if (ldata.hasOwnProperty(key)) {
         // if data1 has key, data2 don't
-        jdd.diffs.push([config1.genDiff(MORE, key, data1[key]), config2.genDiff(MISS, "", null)]);
+        jdd.diffs.push([ltrace.genDiff(trace.MORE, key), rtrace.genDiff(trace.MISS)]);
       } else {
-        jdd.diffs.push([config1.genDiff(MISS, "", null), config2.genDiff(MORE, key, data2[key])]);
+        jdd.diffs.push([ltrace.genDiff(trace.MISS), rtrace.genDiff(trace.MORE, key)]);
       }
     });
-
-  config1.popTrace();
-  config2.popTrace();
 }
 
-function splitKeys(data1: Object, data2: Object): [Array<string>, Array<string>] {
+function splitKeys(ldata: Object, rdata: Object): [Array<string>, Array<string>] {
   const seen = new Set<string>();
   const sub = new Array<string>();
   const dif = new Array<string>();
-  const kk1 = Object.keys(data1);
-  const kk2 = Object.keys(data2);
+  const kk1 = Object.keys(ldata);
+  const kk2 = Object.keys(rdata);
   const n = Math.max(kk1.length, kk2.length);
 
   for (let i = 0; i < n; i++) {
@@ -408,7 +401,7 @@ function splitKeys(data1: Object, data2: Object): [Array<string>, Array<string>]
     }
 
     if (k1 !== undefined) {
-      if (data2.hasOwnProperty(k1)) {
+      if (rdata.hasOwnProperty(k1)) {
         sub.push(k1);
       } else if (!seen.has(k1)) {
         dif.push(k1);
@@ -417,7 +410,7 @@ function splitKeys(data1: Object, data2: Object): [Array<string>, Array<string>]
     }
 
     if (k2 !== undefined) {
-      if (data1.hasOwnProperty(k2)) {
+      if (ldata.hasOwnProperty(k2)) {
         sub.push(k2);
       } else if (!seen.has(k2)) {
         dif.push(k2);
@@ -429,9 +422,9 @@ function splitKeys(data1: Object, data2: Object): [Array<string>, Array<string>]
   return [sub, dif];
 }
 
-function isNeedDiffKey(data1: any, data2: any, key1: string, key2: string): boolean {
-  const val1 = data1[key1];
-  const val2 = data2[key2];
+function isNeedDiffKey(ldata: any, rdata: any, lkey: string, rkey: string): boolean {
+  const val1 = ldata[lkey];
+  const val2 = rdata[rkey];
 
   if (val1 === undefined || val2 === undefined) {
     return false;
@@ -456,7 +449,7 @@ function addClickHandler() {
   });
 }
 
-function scrollToDiff(dd: [Diff, Diff] | undefined, side: Side) {
+function scrollToDiff(dd: [trace.Diff, trace.Diff] | undefined, side: Side) {
   if (dd === undefined) {
     return;
   }
@@ -531,7 +524,7 @@ function handleDiffClick(lineno: number, side: Side) {
 }
 
 // skip same line in one side
-function getNextDiff(side: Side, direction: ScrollDirection): [Diff, Diff] | undefined {
+function getNextDiff(side: Side, direction: ScrollDirection): [trace.Diff, trace.Diff] | undefined {
   const nextIndex = (i: number) => {
     if (direction === "next") {
       if (++i >= jdd.diffs.length) {
@@ -576,12 +569,12 @@ function scrollToNextDiff(side: Side) {
   scrollToDiff(getNextDiff(side, "next"), side);
 }
 
-function getDiffClass(diffType: DiffType, side: Side): string {
-  if (diffType === UNEQ || diffType == UNEQ_KEY) {
+function getDiffClass(diffType: trace.DiffType, side: Side): string {
+  if ([trace.UNEQ_TYPE, trace.UNEQ_VAL, trace.UNEQ_KEY].includes(diffType)) {
     return side == "left" ? "bg-blue-100" : "bg-blue-100";
-  } else if (diffType === MORE) {
+  } else if (diffType === trace.MORE) {
     return side == "left" ? "bg-red-100" : "bg-green-100";
-  } else if (diffType === MISS) {
+  } else if (diffType === trace.MISS) {
     return side == "left" ? "bg-green-100" : "bg-red-100";
   }
 

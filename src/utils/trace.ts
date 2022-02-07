@@ -1,168 +1,95 @@
-import { isObject } from "./typeHelper";
+import * as jsonMap from "json-map-ts";
+import jsonPointer from "json-pointer";
 
 export const MORE = "more";
 export const MISS = "miss";
-export const UNEQ = "uneq";
-export const UNEQ_KEY = "uneq_key";
-export type DiffType =
-  | typeof MORE
-  | typeof MISS
-  | typeof UNEQ
-  | typeof UNEQ_KEY;
-
-const SEPARATOR = "/";
+export const UNEQ_TYPE = "uneq_type"; // different type
+export const UNEQ_VAL = "uneq_val"; // same type, different val
+export const UNEQ_KEY = "uneq_key"; // same value, different key
+export type DiffType = typeof MORE | typeof MISS | typeof UNEQ_TYPE | typeof UNEQ_VAL | typeof UNEQ_KEY;
 
 export interface Diff {
   line: number;
-  val: any;
-  type: DiffType;
+  pointer: string;
+  diffType: DiffType;
 }
 
 export class TraceRecord {
   // current path of key
-  currentPath: Array<String>;
+  path: Array<string>;
   // formated JSON for output
   out: string;
-  // line number when generate paths
-  line: number;
-  // current indent of key
-  indent: number;
-  // paths of all keys. generated at format
-  paths: { [path: string]: number };
+  data: any;
+  pointers: jsonMap.Pointers;
 
-  constructor() {
-    this.currentPath = [];
-    this.out = "";
-    this.line = 1;
-    this.indent = -1;
-    this.paths = {};
+  constructor(out: string) {
+    this.out = out;
+    this.path = [];
+    this.pointers = {};
   }
 
-  addTrace(p: string = SEPARATOR) {
-    if (p !== SEPARATOR) {
-      p = p.replace(SEPARATOR, "#");
-    }
-    this.currentPath.push(p);
+  setParseResult(r: jsonMap.ParseResult) {
+    this.data = r.data;
+    this.pointers = r.pointers;
   }
 
-  addArrayTrace(i: number) {
-    this.currentPath.push(`${SEPARATOR}[${i}]`);
+  push(k: string | number) {
+    this.path.push(k.toString());
   }
 
-  popTrace() {
-    this.currentPath.pop();
+  pop() {
+    this.path.pop();
   }
 
-  addPath(key?: string) {
-    this.paths[this.genPath(key)] = this.line;
+  getPointer(pointer: string): Record<jsonMap.PointerProp, jsonMap.Location> {
+    return this.pointers[pointer];
   }
 
-  // Generate a JSON path based on the specific configuration and an optional property.
-  genPath(prop?: string) {
-    let path = this.currentPath.join("");
-
-    if (path.charAt(path.length - 1) === SEPARATOR) {
-      path = path.substring(0, path.length - 1);
-    }
-
-    if (prop) {
-      path += SEPARATOR + prop.replace(SEPARATOR, "#");
-    }
-
-    return path.length > 0 ? path : SEPARATOR;
+  getLine(pointer: string): number {
+    return this.getPointer(pointer).key.line;
   }
 
-  // Generate the diff and verify that it matches a JSON path
-  genDiff(type: any, key: string, val: string | null): Diff {
-    let path = this.genPath(key);
-    let line = this.paths[path];
+  getKeyLinePos(pointer: string): number {
+    return this.getPointer(pointer).key.linePos;
+  }
 
-    if (!line) {
-      throw `Unable to find line number for path[${line}]. key[${key}]`;
+  getValueLinePos(pointer: string): number {
+    return this.getPointer(pointer).value.linePos;
+  }
+
+  getKeyPos(pointer: string): number {
+    return this.getPointer(pointer).key.pos;
+  }
+
+  getValuePos(pointer: string): number {
+    return this.getPointer(pointer).value.pos;
+  }
+
+  getKey(pointer: string): string {
+    const p = this.getPointer(pointer);
+    return this.out.slice(p.key.pos, p.keyEnd.pos);
+  }
+
+  getValue(pointer: string): string {
+    const p = this.getPointer(pointer);
+    return this.out.slice(p.value.pos, p.valueEnd.pos);
+  }
+
+  genDiff(diffType: any, key?: string | number, val?: any): Diff {
+    let pointer;
+
+    if (key === undefined) {
+      pointer = jsonPointer.compile(this.path);
+    } else {
+      this.path.push(key.toString());
+      pointer = jsonPointer.compile(this.path);
+      this.path.pop();
     }
 
     return {
-      line: line,
-      val: val,
-      type: type,
+      line: this.getLine(pointer),
+      pointer: pointer,
+      diffType: diffType,
     };
   }
-}
-
-// decorate the data tree with the data about this object.
-export function trace(config: TraceRecord, data: any) {
-  if (Array.isArray(data)) {
-    traceArray(config, data);
-    return;
-  }
-
-  startObject(config);
-  config.addTrace();
-
-  for (const key in data) {
-    config.line++;
-    config.addTrace(key);
-    config.addPath();
-    traceVal(config, data[key]);
-    config.popTrace();
-  }
-
-  finishObject(config);
-  config.popTrace();
-}
-
-function traceArray(config: TraceRecord, data: any) {
-  startObject(config);
-
-  data.forEach(function (val: any, i: number) {
-    config.line++;
-    config.addPath(`[${i}]`);
-    config.addArrayTrace(i);
-    traceVal(config, val);
-    config.popTrace();
-  });
-
-  finishObject(config);
-  config.popTrace();
-}
-
-function traceVal(config: TraceRecord, data: any) {
-  if (Array.isArray(data)) {
-    config.indent++;
-
-    data.forEach(function (val: any, i: number) {
-      config.line++;
-      config.addPath(`[${i}]`);
-      config.addArrayTrace(i);
-      traceVal(config, val);
-      config.popTrace();
-    });
-
-    config.indent--;
-    config.line++;
-  } else if (isObject(data)) {
-    trace(config, data);
-  }
-}
-
-function startObject(config: TraceRecord) {
-  config.indent++;
-
-  if (Object.keys(config.paths).length === 0) {
-    config.addPath();
-  }
-
-  if (config.indent === 0) {
-    config.indent++;
-  }
-}
-
-function finishObject(config: TraceRecord) {
-  if (config.indent === 0) {
-    config.indent--;
-    config.line++;
-  }
-
-  config.indent--;
-  config.line++;
 }

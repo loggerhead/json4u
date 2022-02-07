@@ -96,6 +96,11 @@
   "resolved" "http://mirrors.cloud.tencent.com/npm/@types%2festree/-/estree-0.0.50.tgz"
   "version" "0.0.50"
 
+"@types/json-pointer@^1.0.31":
+  "integrity" "sha512-hTPul7Um6LqsHXHQpdkXTU7Oysjsf+9k4Yfmg6JhSKG/jj9QuQGyMUdj6trPH6WHiIdxw7nYSROgOxeFmCVK2w=="
+  "resolved" "http://mirrors.cloud.tencent.com/npm/@types%2fjson-pointer/-/json-pointer-1.0.31.tgz"
+  "version" "1.0.31"
+
 "@types/parse-json@^4.0.0":
   "integrity" "sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA=="
   "resolved" "http://mirrors.cloud.tencent.com/npm/@types%2fparse-json/-/parse-json-4.0.0.tgz"
@@ -671,6 +676,11 @@
   dependencies:
     "to-regex-range" "^5.0.1"
 
+"foreach@^2.0.4":
+  "integrity" "sha1-C+4AUBiusmDQo6865ljdATbsG5k="
+  "resolved" "http://mirrors.cloud.tencent.com/npm/foreach/-/foreach-2.0.5.tgz"
+  "version" "2.0.5"
+
 "fraction.js@^4.1.2":
   "integrity" "sha512-o2RiJQ6DZaR/5+Si0qJUIy637QMRudSi9kU/FFzx9EZazrIdnBgpU+3sEWCxAVhH2RtxW2Oz+T4p2o8uOPVcgA=="
   "resolved" "https://mirrors.tencent.com/npm/fraction.js/-/fraction.js-4.1.2.tgz"
@@ -842,15 +852,22 @@
   "resolved" "http://mirrors.cloud.tencent.com/npm/js-tokens/-/js-tokens-4.0.0.tgz"
   "version" "4.0.0"
 
-"json-map-ts@file:../json-map-ts/json-map-ts-0.0.1.tgz":
-  "integrity" "sha512-zfPlfwUwDkNmac2+EyIrUS2V9QSuWdXDXsSTusPZCUVLXLTcXPPEvo1AIJLBqlYDPB1qXIdNjqMhafi+Md0c1Q=="
-  "resolved" "file:../json-map-ts/json-map-ts-0.0.1.tgz"
-  "version" "0.0.1"
+"json-map-ts@file:../json-map-ts/json-map-ts-v0.0.3.tgz":
+  "integrity" "sha512-OtDPpG0lGU08BgJ/4kAmh4G9PmgXqWRejyo9vGX/G9lAqvcqc9BPcICYEvliAesCi9jtF1BhiV2BrCqybjkC1w=="
+  "resolved" "file:../json-map-ts/json-map-ts-v0.0.3.tgz"
+  "version" "0.0.3"
 
 "json-parse-even-better-errors@^2.3.0":
   "integrity" "sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w=="
   "resolved" "http://mirrors.cloud.tencent.com/npm/json-parse-even-better-errors/-/json-parse-even-better-errors-2.3.1.tgz"
   "version" "2.3.1"
+
+"json-pointer@^0.6.1":
+  "integrity" "sha512-3OvjqKdCBvH41DLpV4iSt6v2XhZXV1bPB4OROuknvUXI7ZQNofieCPkmE26stEJ9zdQuvIxDHCuYhfgxFAAs+Q=="
+  "resolved" "http://mirrors.cloud.tencent.com/npm/json-pointer/-/json-pointer-0.6.1.tgz"
+  "version" "0.6.1"
+  dependencies:
+    "foreach" "^2.0.4"
 
 "jsonc-parser@^2.3.0":
   "integrity" "sha512-H8jvkz1O50L3dMZCsLqiuB2tA7muqbSg1AtGEkN0leAqGjsUzDJir3Zwr02BhqdcITPg3ei3mZ+HjMocAknhhg=="
