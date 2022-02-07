@@ -1,24 +1,29 @@
 import { Ref } from "vue";
-import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
-import "codemirror/mode/javascript/javascript.js";
 import "codemirror/theme/idea.css";
-import "codemirror/addon/display/placeholder.js";
-import "codemirror/addon/fold/foldgutter.js";
-import "codemirror/addon/fold/foldcode.js";
 import "codemirror/addon/fold/foldgutter.css";
-import "codemirror/addon/fold/brace-fold.js";
 import "codemirror/addon/lint/lint.css";
-import "codemirror/addon/lint/lint.js";
-import "codemirror/addon/lint/json-lint.js";
-// @ts-ignore
-import jsonlint from "jsonlint-mod";
-(window as any).jsonlint = jsonlint;
 
 export default class Editor {
   cm: CodeMirror.Editor;
 
-  constructor(id: string) {
+  constructor() {
+    this.cm = <CodeMirror.Editor>(<unknown>null);
+  }
+
+  async setupCM(id: string) {
+    var CodeMirror = await import("codemirror");
+    // @ts-ignore
+    await import("codemirror/mode/javascript/javascript.js");
+    await import("codemirror/addon/display/placeholder.js");
+    await import("codemirror/addon/fold/foldgutter.js");
+    await import("codemirror/addon/fold/foldcode.js");
+    await import("codemirror/addon/fold/brace-fold.js");
+    await import("codemirror/addon/lint/lint.js");
+    await import("codemirror/addon/lint/json-lint.js");
+    // @ts-ignore
+    (window as any).jsonlint = await import("jsonlint-mod");
+
     const el = document.getElementById(id) as HTMLTextAreaElement;
     const cm = CodeMirror.fromTextArea(el, {
       mode: "application/json",
@@ -27,15 +32,12 @@ export default class Editor {
       lineNumbers: true,
       // 显示折叠箭头
       foldGutter: true,
-      gutters: [
-        "CodeMirror-linenumbers",
-        "CodeMirror-foldgutter",
-        "CodeMirror-lint-markers",
-      ],
+      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
     });
 
     cm.setSize("100%", "100%");
     this.cm = cm;
+    return this;
   }
 
   refresh() {
@@ -60,14 +62,11 @@ export default class Editor {
   }
 
   setPasteListener(fn: (event: CodeMirror.EditorChange) => void) {
-    this.cm.on(
-      "inputRead",
-      (cm: CodeMirror.Editor, event: CodeMirror.EditorChange) => {
-        if (event.origin === "paste") {
-          fn(event);
-        }
+    this.cm.on("inputRead", (cm: CodeMirror.Editor, event: CodeMirror.EditorChange) => {
+      if (event.origin === "paste") {
+        fn(event);
       }
-    );
+    });
   }
 
   getText(): string {
@@ -80,9 +79,7 @@ export default class Editor {
 
   hasClass(lineno: number, cls: string): boolean {
     const lineInfo = this.cm.lineInfo(lineno - 1);
-    return lineInfo.wrapClass
-      ? lineInfo.wrapClass.split(/\s+/).includes(cls)
-      : false;
+    return lineInfo.wrapClass ? lineInfo.wrapClass.split(/\s+/).includes(cls) : false;
   }
 
   addClass(lineno: number, cls: string) {
@@ -94,11 +91,7 @@ export default class Editor {
   }
 
   addClassToRange(lineno: number, from: number, to: number, cls: string) {
-    this.cm.markText(
-      { line: lineno, ch: from },
-      { line: lineno, ch: to },
-      { className: cls }
-    );
+    this.cm.markText({ line: lineno, ch: from }, { line: lineno, ch: to }, { className: cls });
   }
 
   scrollTo(lineno: number) {
@@ -120,11 +113,7 @@ export default class Editor {
     this.cm.focus();
   }
 
-  static setSyncScroll(
-    leftEditor: Editor,
-    rightEditor: Editor,
-    enableSyncScroll: Ref<boolean>
-  ) {
+  static setSyncScroll(leftEditor: Editor, rightEditor: Editor, enableSyncScroll: Ref<boolean>) {
     leftEditor.cm.on("scroll", function () {
       if (enableSyncScroll.value) {
         const scrollInfo = leftEditor.cm.getScrollInfo();

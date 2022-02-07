@@ -4,14 +4,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "build:ssg": "vue-tsc --noEmit && vite-ssg build",
     "preview": "vite preview"
   },
   "dependencies": {
     "codemirror": "^5.65.1",
     "daisyui": "^1.25.4",
     "diff": "^5.0.0",
+    "fast-diff": "^1.2.0",
     "fast-equals": "^2.0.4",
-    "json-map-ts": "file:../json-map-ts/json-map-ts-v0.0.3.tgz",
+    "json-map-ts": "^0.0.4",
     "json-pointer": "^0.6.1",
     "jsonlint-mod": "^1.7.6",
     "micromustache": "^8.0.3",
@@ -19,9 +21,12 @@
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.5",
+    "@types/fast-diff": "^1.2.0",
     "@types/json-pointer": "^1.0.31",
     "@vitejs/plugin-vue": "^2.0.0",
+    "@vueuse/head": "^0.7.5",
     "autoprefixer": "^10.4.2",
+    "critters": "^0.0.16",
     "postcss": "^8.4.5",
     "rollup-plugin-analyzer": "^4.0.0",
     "sass": "^1.49.0",
@@ -30,6 +35,8 @@
     "vite": "^2.7.2",
     "vite-plugin-cdn-import": "^0.3.5",
     "vite-plugin-radar": "^0.4.2",
+    "vite-ssg": "^0.17.10",
+    "vue-router": "^4.0.12",
     "vue-tsc": "^0.31.1"
   }
 }

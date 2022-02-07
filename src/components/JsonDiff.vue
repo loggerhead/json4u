@@ -67,13 +67,12 @@
 <script setup lang="ts">
 import { computed, onMounted, shallowReactive, ref } from "vue";
 import { deepEqual } from "fast-equals";
-// @ts-ignore
-import { diffChars } from "diff/lib/diff/character";
+import diff from "fast-diff";
 import * as jsonMap from "json-map-ts";
 import * as trace from "../utils/trace";
+import Editor from "../utils/editor";
 import { isObject, isBaseType, isComparable } from "../utils/typeHelper";
 import formatJsonString from "../utils/format";
-import Editor from "../utils/editor";
 import { t } from "../utils/i18n";
 import * as style from "./style";
 
@@ -93,13 +92,17 @@ let syncScroll = ref(true);
 const hasDiffs = computed(() => jdd.diffs.length > 0);
 const timeCost = computed(() => performance.now() - jdd.startTime);
 
-let leftEditor: Editor;
-let rightEditor: Editor;
+let leftEditor = new Editor();
+let rightEditor = new Editor();
 
-onMounted(() => {
-  // must new after mounted
-  leftEditor = new Editor("left-editor");
-  rightEditor = new Editor("right-editor");
+onMounted(async () => {
+  if (typeof window === "undefined") {
+    console.log("skip onMounted when SSG");
+    return;
+  }
+
+  await leftEditor.setupCM("left-editor");
+  await rightEditor.setupCM("right-editor");
 
   leftEditor.setPasteListener((event: CodeMirror.EditorChange) => {
     if (event.from.line == 0 && event.from.ch == 0 && leftEditor.getText().length > 0) {
@@ -120,29 +123,29 @@ onMounted(() => {
 
   Editor.setSyncScroll(leftEditor, rightEditor, syncScroll);
   leftEditor.focus();
-});
 
-window.addEventListener("keydown", (e) => {
-  if (!e.ctrlKey) {
-    return;
-  }
+  window.addEventListener("keydown", (e) => {
+    if (!e.ctrlKey) {
+      return;
+    }
 
-  switch (e.key) {
-    case "Enter":
-      // prevent input a new line
-      e.preventDefault();
-      compare();
-      break;
-    case "ArrowLeft":
-      // prevent scroll
-      e.preventDefault();
-      scrollToPrevDiff("right");
-      break;
-    case "ArrowRight":
-      e.preventDefault();
-      scrollToNextDiff("right");
-      break;
-  }
+    switch (e.key) {
+      case "Enter":
+        // prevent input a new line
+        e.preventDefault();
+        compare();
+        break;
+      case "ArrowLeft":
+        // prevent scroll
+        e.preventDefault();
+        scrollToPrevDiff("right");
+        break;
+      case "ArrowRight":
+        e.preventDefault();
+        scrollToNextDiff("right");
+        break;
+    }
+  });
 });
 
 function handleError(e: Error, side: Side) {
@@ -274,15 +277,15 @@ function genCharsDiff(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldif
     rtext = rtrace.getValue(rdiff.pointer);
   }
 
-  let cdiffs = diffChars(ltext, rtext);
+  let cdiffs = diff(ltext, rtext);
 
   for (const d of cdiffs) {
-    const v = d.value;
+    const v = d[1];
 
-    if (d.added) {
+    if (d[0] == diff.INSERT) {
       rightEditor.addClassToRange(rdiff.line - 1, rch, rch + v.length, getInsClass());
       rch += v.length;
-    } else if (d.removed) {
+    } else if (d[0] == diff.DELETE) {
       leftEditor.addClassToRange(ldiff.line - 1, lch, lch + v.length, getDelClass());
       lch += v.length;
     } else {
