@@ -3,6 +3,8 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css";
 import "codemirror/addon/fold/foldgutter.css";
 import "codemirror/addon/lint/lint.css";
+// @ts-ignore
+import jsonlint from "jsonlint-mod";
 
 export default class Editor {
   cm: CodeMirror.Editor;
@@ -21,8 +23,7 @@ export default class Editor {
     await import("codemirror/addon/fold/brace-fold.js");
     await import("codemirror/addon/lint/lint.js");
     await import("codemirror/addon/lint/json-lint.js");
-    // @ts-ignore
-    (window as any).jsonlint = await import("jsonlint-mod");
+    (window as any).jsonlint = jsonlint;
 
     const el = document.getElementById(id) as HTMLTextAreaElement;
     const cm = CodeMirror.fromTextArea(el, {
