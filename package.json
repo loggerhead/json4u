@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "build:ssg": "vue-tsc --noEmit && vite-ssg build",
+    "build": "vue-tsc --noEmit && vite-ssg build",
+    "build:raw": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
