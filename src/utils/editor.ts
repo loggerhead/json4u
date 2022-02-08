@@ -15,14 +15,16 @@ export default class Editor {
 
   async setupCM(id: string) {
     var CodeMirror = await import("codemirror");
-    // @ts-ignore
-    await import("codemirror/mode/javascript/javascript.js");
-    await import("codemirror/addon/display/placeholder.js");
-    await import("codemirror/addon/fold/foldgutter.js");
-    await import("codemirror/addon/fold/foldcode.js");
-    await import("codemirror/addon/fold/brace-fold.js");
-    await import("codemirror/addon/lint/lint.js");
-    await import("codemirror/addon/lint/json-lint.js");
+    await Promise.all([
+      // @ts-ignore
+      import("codemirror/mode/javascript/javascript.js"),
+      import("codemirror/addon/display/placeholder.js"),
+      import("codemirror/addon/fold/foldgutter.js"),
+      import("codemirror/addon/fold/foldcode.js"),
+      import("codemirror/addon/fold/brace-fold.js"),
+      import("codemirror/addon/lint/lint.js"),
+      import("codemirror/addon/lint/json-lint.js"),
+    ]);
     (window as any).jsonlint = jsonlint;
 
     const el = document.getElementById(id) as HTMLTextAreaElement;
