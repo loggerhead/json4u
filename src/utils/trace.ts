@@ -46,7 +46,8 @@ export class TraceRecord {
   }
 
   getLine(pointer: string): number {
-    return this.getPointer(pointer).key.line;
+    const p = this.getPointer(pointer);
+    return p.key === undefined ? p.value.line : p.key.line;
   }
 
   getKeyLinePos(pointer: string): number {
