@@ -64,10 +64,10 @@ export default class Editor {
     });
   }
 
-  setPasteListener(fn: (event: CodeMirror.EditorChange) => void) {
+  setPasteListener(fn: () => void) {
     this.cm.on("inputRead", (cm: CodeMirror.Editor, event: CodeMirror.EditorChange) => {
-      if (event.origin === "paste") {
-        fn(event);
+      if (event.origin === "paste" && event.from.line == 0 && event.from.ch == 0 && cm.getValue().length > 0) {
+        fn();
       }
     });
   }
@@ -94,7 +94,7 @@ export default class Editor {
   }
 
   addClassToRange(lineno: number, from: number, to: number, cls: string) {
-    this.cm.markText({ line: lineno, ch: from }, { line: lineno, ch: to }, { className: cls });
+    this.cm.markText({ line: lineno - 1, ch: from }, { line: lineno - 1, ch: to }, { className: cls });
   }
 
   scrollTo(lineno: number) {

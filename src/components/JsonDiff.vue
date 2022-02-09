@@ -1,49 +1,45 @@
 <template>
   <div class="grid grid-cols-12 gap-2">
     <div class="col-span-6 flex space-x-3">
-      <div>
-        <button @click="pretty()" :class="style.actionButton">
-          {{ t("pretty") }}
-        </button>
-      </div>
-      <div>
-        <button @click="minify()" :class="style.actionButton">
-          {{ t("minify") }}
-        </button>
-      </div>
+      <button @click="pretty()" :class="style.actionButton">
+        {{ t("pretty") }}
+      </button>
+      <button @click="minify()" :class="style.actionButton">
+        {{ t("minify") }}
+      </button>
     </div>
-    <div class="col-span-4">
-      <div class="col-span-4 space-x-3" v-if="hasDiffs">
-        <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
-          <button @click="scrollToPrevDiff('right')" :class="style.button">
-            {{ t("prev") }}
-          </button>
-        </span>
-        <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Right">
-          <button @click="scrollToNextDiff('right')" :class="style.button">
-            {{ t("next") }}
-          </button>
-        </span>
-      </div>
-      <div v-else-if="jdd.errmsg" :class="style.alertError">
-        {{ jdd.errmsg }}
-      </div>
-      <div v-else :class="style.alertInfo">
-        {{ t("nodiff") }}
-      </div>
-    </div>
-    <div class="col-span-2 space-x-3 flex justify-end">
-      <div class="form-control">
-        <label class="cursor-pointer items-center label space-x-1">
-          <input v-model="syncScroll" type="checkbox" :checked="syncScroll" class="toggle toggle-sm" />
-          <span class="label-text">{{ t("syncScroll") }}</span>
-        </label>
-      </div>
+    <div class="col-span-6 flex">
       <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
         <button @click="compare" :class="style.actionButton">
           {{ t("compare") }}
         </button>
       </span>
+      <div class="form-control ml-3">
+        <label class="cursor-pointer items-center label space-x-1">
+          <input v-model="syncScroll" type="checkbox" :checked="syncScroll" class="toggle toggle-sm" />
+          <span class="label-text">{{ t("syncScroll") }}</span>
+        </label>
+      </div>
+      <div class="ml-12">
+        <div class="space-x-3" v-if="hasDiffs">
+          <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
+            <button @click="scrollToPrevDiff('right')" :class="style.button">
+              {{ t("prev") }}
+            </button>
+          </span>
+          <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Right">
+            <button @click="scrollToNextDiff('right')" :class="style.button">
+              {{ t("next") }}
+            </button>
+          </span>
+        </div>
+        <div v-else-if="jdd.errmsg" :class="style.alertError">
+          {{ jdd.errmsg }}
+        </div>
+        <div v-else :class="style.alertInfo">
+          {{ t("nodiff") }}
+        </div>
+      </div>
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
@@ -80,8 +76,6 @@ type Side = "left" | "right";
 type ScrollDirection = "prev" | "next";
 
 const jdd = shallowReactive({
-  llines: [] as Array<string>,
-  rlines: [] as Array<string>,
   diffs: [] as Array<[trace.Diff, trace.Diff]>,
   currentDiff: 0,
   startTime: performance.now(),
@@ -104,22 +98,21 @@ onMounted(async () => {
   await leftEditor.setupCM("left-editor");
   await rightEditor.setupCM("right-editor");
 
-  leftEditor.setPasteListener((event: CodeMirror.EditorChange) => {
-    if (event.from.line == 0 && event.from.ch == 0 && leftEditor.getText().length > 0) {
-      pretty(leftEditor);
-      rightEditor.focus();
-    }
-  });
+  function leftPasteHandler() {
+    pretty(leftEditor);
+    rightEditor.focus();
+  }
 
-  rightEditor.setPasteListener((event: CodeMirror.EditorChange) => {
-    if (event.from.line == 0 && event.from.ch == 0 && rightEditor.getText().length > 0) {
-      pretty(rightEditor);
+  function rightPasteHandler() {
+    pretty(rightEditor);
 
-      if (leftEditor.getText().length > 0) {
-        compare();
-      }
+    if (leftEditor.getText().length > 0) {
+      compare();
     }
-  });
+  }
+
+  leftEditor.setPasteListener(leftPasteHandler);
+  rightEditor.setPasteListener(rightPasteHandler);
 
   Editor.setSyncScroll(leftEditor, rightEditor, syncScroll);
   leftEditor.focus();
@@ -194,8 +187,6 @@ function minify(editor = leftEditor) {
 }
 
 function resetJdd() {
-  jdd.llines = [];
-  jdd.rlines = [];
   jdd.diffs = [];
   jdd.currentDiff = 0;
   jdd.startTime = performance.now();
@@ -283,10 +274,10 @@ function genCharsDiff(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldif
     const v = d[1];
 
     if (d[0] == diff.INSERT) {
-      rightEditor.addClassToRange(rdiff.line - 1, rch, rch + v.length, getInsClass());
+      rightEditor.addClassToRange(rdiff.line, rch, rch + v.length, getInsClass());
       rch += v.length;
     } else if (d[0] == diff.DELETE) {
-      leftEditor.addClassToRange(ldiff.line - 1, lch, lch + v.length, getDelClass());
+      leftEditor.addClassToRange(ldiff.line, lch, lch + v.length, getDelClass());
       lch += v.length;
     } else {
       lch += v.length;

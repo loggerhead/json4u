@@ -4,7 +4,6 @@
     <div class="flex">
       <Sider />
       <div class="grow"><JsonDiff></JsonDiff></div>
-      <Sider />
     </div>
     <Footer></Footer>
   </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-fit w-10">
+  <div class="h-fit w-40">
     <slot></slot>
   </div>
 </template>
