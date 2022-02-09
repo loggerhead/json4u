@@ -10,13 +10,3 @@ export function isBaseType(v: any): boolean {
 export function isObject(v: any): boolean {
   return !isBaseType(v) && !Array.isArray(v) && typeof v === "object";
 }
-
-export function isComparable(a: any, b: any): boolean {
-  if (isNumber(a) && isNumber(b)) {
-    return true;
-  } else if (typeof a !== typeof b) {
-    return false;
-  }
-
-  return isObject(a) === isObject(b);
-}

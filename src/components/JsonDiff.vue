@@ -62,12 +62,10 @@
 
 <script setup lang="ts">
 import { computed, onMounted, shallowReactive, ref } from "vue";
-import { deepEqual } from "fast-equals";
-import diff from "fast-diff";
 import * as jsonMap from "json-map-ts";
-import * as trace from "../utils/trace";
+import * as diff from "../utils/diff";
+import TraceRecord from "../utils/trace";
 import Editor from "../utils/editor";
-import { isObject, isBaseType, isComparable } from "../utils/typeHelper";
 import formatJsonString from "../utils/format";
 import { t } from "../utils/i18n";
 import * as style from "./style";
@@ -76,15 +74,13 @@ type Side = "left" | "right";
 type ScrollDirection = "prev" | "next";
 
 const jdd = shallowReactive({
-  diffs: [] as Array<[trace.Diff, trace.Diff]>,
+  diffs: [] as Array<[diff.Diff, diff.Diff]>,
   currentDiff: 0,
-  startTime: performance.now(),
   errmsg: "",
 });
 
 let syncScroll = ref(true);
 const hasDiffs = computed(() => jdd.diffs.length > 0);
-const timeCost = computed(() => performance.now() - jdd.startTime);
 
 let leftEditor = new Editor();
 let rightEditor = new Editor();
@@ -189,17 +185,16 @@ function minify(editor = leftEditor) {
 function resetJdd() {
   jdd.diffs = [];
   jdd.currentDiff = 0;
-  jdd.startTime = performance.now();
   jdd.errmsg = "";
 }
 
 function compare() {
   resetJdd();
 
-  let ltrace = new trace.TraceRecord(leftEditor.getText());
-  let rtrace = new trace.TraceRecord(rightEditor.getText());
-
   measure("parse and diff", () => {
+    let ltrace = new TraceRecord(leftEditor.getText());
+    let rtrace = new TraceRecord(rightEditor.getText());
+
     try {
       ltrace.setParseResult(jsonMap.parse(ltrace.out));
     } catch (e: any) {
@@ -212,20 +207,20 @@ function compare() {
       handleError(e, "right");
     }
 
-    diffVal(ltrace, rtrace, ltrace.data, rtrace.data);
+    jdd.diffs = new diff.Handler(ltrace, rtrace).compare();
   });
 
   measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
-    processDiffs(ltrace, rtrace);
+    processDiffs();
     leftEditor.endOperation();
     rightEditor.endOperation();
   });
 }
 
-function processDiffs(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord) {
-  jdd.diffs.forEach(function (dd: trace.Diff[]) {
+function processDiffs() {
+  jdd.diffs.forEach((dd) => {
     const [ldiff, rdiff] = dd;
     const lline = ldiff.line;
     const rline = rdiff.line;
@@ -233,205 +228,17 @@ function processDiffs(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord) {
     leftEditor.addClass(lline, getDiffClass(ldiff.diffType, "left"));
     rightEditor.addClass(rline, getDiffClass(rdiff.diffType, "right"));
 
-    // char diff
-    if (needCharDiff(ltrace, rtrace, ldiff, rdiff)) {
-      genCharsDiff(ltrace, rtrace, ldiff, rdiff);
+    for (const cdiff of ldiff.charDiffs) {
+      leftEditor.addClassToRange(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
+    }
+
+    for (const cdiff of rdiff.charDiffs) {
+      rightEditor.addClassToRange(rline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
   });
 
-  if (jdd.diffs.length > 0) {
-    // sort by right side line number
-    jdd.diffs.sort((a: [trace.Diff, trace.Diff], b: [trace.Diff, trace.Diff]): number => {
-      return a[1].line - b[1].line;
-    });
-
-    addClickHandler();
-    scrollToDiff(jdd.diffs[0], "right");
-  }
-}
-
-function genCharsDiff(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldiff: trace.Diff, rdiff: trace.Diff) {
-  let lch;
-  let rch;
-  let ltext;
-  let rtext;
-
-  if (ldiff.diffType === trace.UNEQ_KEY && rdiff.diffType === trace.UNEQ_KEY) {
-    lch = ltrace.getKeyPos(ldiff.pointer) - ltrace.getKeyLinePos(ldiff.pointer);
-    rch = rtrace.getKeyPos(rdiff.pointer) - rtrace.getKeyLinePos(rdiff.pointer);
-    ltext = ltrace.getKey(ldiff.pointer);
-    rtext = rtrace.getKey(rdiff.pointer);
-  } else {
-    lch = ltrace.getValuePos(ldiff.pointer) - ltrace.getValueLinePos(ldiff.pointer);
-    rch = rtrace.getValuePos(rdiff.pointer) - rtrace.getValueLinePos(rdiff.pointer);
-    ltext = ltrace.getValue(ldiff.pointer);
-    rtext = rtrace.getValue(rdiff.pointer);
-  }
-
-  let cdiffs = diff(ltext, rtext);
-
-  for (const d of cdiffs) {
-    const v = d[1];
-
-    if (d[0] == diff.INSERT) {
-      rightEditor.addClassToRange(rdiff.line, rch, rch + v.length, getInsClass());
-      rch += v.length;
-    } else if (d[0] == diff.DELETE) {
-      leftEditor.addClassToRange(ldiff.line, lch, lch + v.length, getDelClass());
-      lch += v.length;
-    } else {
-      lch += v.length;
-      rch += v.length;
-    }
-  }
-}
-
-function needCharDiff(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldiff: trace.Diff, rdiff: trace.Diff) {
-  return (
-    (ldiff.diffType === trace.UNEQ_KEY && rdiff.diffType === trace.UNEQ_KEY) ||
-    (ldiff.diffType === trace.UNEQ_VAL && rdiff.diffType === trace.UNEQ_VAL)
-  );
-}
-
-function diffVal(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldata: any, rdata: any) {
-  if (Array.isArray(ldata) && Array.isArray(rdata)) {
-    diffArray(ltrace, rtrace, ldata, rdata);
-  } else if (isObject(ldata) && isObject(rdata)) {
-    diffObject(ltrace, rtrace, ldata, rdata);
-  } else if (ldata !== rdata) {
-    const t = isComparable(ldata, rdata) ? trace.UNEQ_VAL : trace.UNEQ_TYPE;
-    jdd.diffs.push([ltrace.genDiff(t), rtrace.genDiff(t)]);
-  }
-}
-
-function diffArray(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldata: Array<any>, rdata: Array<any>) {
-  const union = Math.max(ldata.length, rdata.length);
-  const subset = Math.min(ldata.length, rdata.length);
-
-  for (let i = 0; i < union; i++) {
-    if (i < subset) {
-      ltrace.push(i);
-      rtrace.push(i);
-      diffVal(ltrace, rtrace, ldata[i], rdata[i]);
-      ltrace.pop();
-      rtrace.pop();
-    } else if (ldata.length < rdata.length) {
-      jdd.diffs.push([ltrace.genDiff(trace.MISS), rtrace.genDiff(trace.MORE, i)]);
-    } else if (ldata.length > rdata.length) {
-      jdd.diffs.push([ltrace.genDiff(trace.MORE, i), rtrace.genDiff(trace.MISS)]);
-    }
-  }
-}
-
-function diffObject(ltrace: trace.TraceRecord, rtrace: trace.TraceRecord, ldata: any, rdata: any) {
-  const [subkk, difkk] = splitKeys(ldata, rdata);
-
-  // iterate over same keys
-  subkk.forEach((key) => {
-    ltrace.push(key);
-    rtrace.push(key);
-    diffVal(ltrace, rtrace, ldata[key], rdata[key]);
-    ltrace.pop();
-    rtrace.pop();
-  });
-
-  const seen = new Set();
-
-  // iterate over keys which need char compare keys
-  for (let i = 0; i < difkk.length; i++) {
-    let key1 = difkk[i];
-
-    if (seen.has(key1)) {
-      continue;
-    }
-
-    for (let j = i + 1; j < difkk.length; j++) {
-      let key2 = difkk[j];
-      let needDiff = false;
-
-      if (ldata.hasOwnProperty(key1) && rdata.hasOwnProperty(key2)) {
-        needDiff = isNeedDiffKey(ldata, rdata, key1, key2);
-      } else if (ldata.hasOwnProperty(key2) && rdata.hasOwnProperty(key1)) {
-        needDiff = isNeedDiffKey(ldata, rdata, key2, key1);
-      }
-
-      if (needDiff) {
-        jdd.diffs.push([ltrace.genDiff(trace.UNEQ_KEY, key1), rtrace.genDiff(trace.UNEQ_KEY, key2)]);
-        seen.add(key1);
-        seen.add(key2);
-        break;
-      }
-    }
-  }
-
-  difkk
-    .filter((k) => !seen.has(k))
-    .forEach((key) => {
-      if (ldata.hasOwnProperty(key)) {
-        // if data1 has key, data2 don't
-        jdd.diffs.push([ltrace.genDiff(trace.MORE, key), rtrace.genDiff(trace.MISS)]);
-      } else {
-        jdd.diffs.push([ltrace.genDiff(trace.MISS), rtrace.genDiff(trace.MORE, key)]);
-      }
-    });
-}
-
-function splitKeys(ldata: Object, rdata: Object): [Array<string>, Array<string>] {
-  const seen = new Set<string>();
-  const sub = new Array<string>();
-  const dif = new Array<string>();
-  const kk1 = Object.keys(ldata);
-  const kk2 = Object.keys(rdata);
-  const n = Math.max(kk1.length, kk2.length);
-
-  for (let i = 0; i < n; i++) {
-    const k1 = kk1[i];
-    const k2 = kk2[i];
-
-    if (k1 == k2) {
-      sub.push(k1);
-      seen.add(k1);
-      continue;
-    }
-
-    if (k1 !== undefined) {
-      if (rdata.hasOwnProperty(k1)) {
-        sub.push(k1);
-      } else if (!seen.has(k1)) {
-        dif.push(k1);
-      }
-      seen.add(k1);
-    }
-
-    if (k2 !== undefined) {
-      if (ldata.hasOwnProperty(k2)) {
-        sub.push(k2);
-      } else if (!seen.has(k2)) {
-        dif.push(k2);
-      }
-      seen.add(k2);
-    }
-  }
-
-  return [sub, dif];
-}
-
-function isNeedDiffKey(ldata: any, rdata: any, lkey: string, rkey: string): boolean {
-  const val1 = ldata[lkey];
-  const val2 = rdata[rkey];
-
-  if (val1 === undefined || val2 === undefined) {
-    return false;
-  } else if (typeof val1 !== typeof val2) {
-    return false;
-  } else if (isBaseType(val1) && val1 === val2) {
-    return true;
-  } else if (timeCost.value > 500) {
-    console.log("skip key diff because cost of too much time.");
-    return false;
-  }
-
-  return deepEqual(val1, val2);
+  addClickHandler();
+  scrollToDiff(jdd.diffs[0], "right");
 }
 
 function addClickHandler() {
@@ -443,7 +250,7 @@ function addClickHandler() {
   });
 }
 
-function scrollToDiff(dd: [trace.Diff, trace.Diff] | undefined, side: Side) {
+function scrollToDiff(dd: [diff.Diff, diff.Diff] | undefined, side: Side) {
   if (dd === undefined) {
     return;
   }
@@ -518,7 +325,7 @@ function handleDiffClick(lineno: number, side: Side) {
 }
 
 // skip same line in one side
-function getNextDiff(side: Side, direction: ScrollDirection): [trace.Diff, trace.Diff] | undefined {
+function getNextDiff(side: Side, direction: ScrollDirection): [diff.Diff, diff.Diff] | undefined {
   const nextIndex = (i: number) => {
     if (direction === "next") {
       if (++i >= jdd.diffs.length) {
@@ -563,24 +370,21 @@ function scrollToNextDiff(side: Side) {
   scrollToDiff(getNextDiff(side, "next"), side);
 }
 
-function getDiffClass(diffType: trace.DiffType, side: Side): string {
-  if ([trace.UNEQ_TYPE, trace.UNEQ_VAL, trace.UNEQ_KEY].includes(diffType)) {
-    return side == "left" ? "bg-blue-100" : "bg-blue-100";
-  } else if (diffType === trace.MORE) {
-    return side == "left" ? "bg-red-100" : "bg-green-100";
-  } else if (diffType === trace.MISS) {
-    return side == "left" ? "bg-green-100" : "bg-red-100";
+function getDiffClass(diffType: diff.DiffType, side?: Side): string {
+  switch (diffType) {
+    case diff.UNEQ:
+      return side == "left" ? "bg-blue-100" : "bg-blue-100";
+    case diff.MORE:
+      return side == "left" ? "bg-red-100" : "bg-green-100";
+    case diff.MISS:
+      return side == "left" ? "bg-green-100" : "bg-red-100";
+    case diff.CHAR_INS:
+      return "bg-green-300";
+    case diff.CHAR_DEL:
+      return "bg-red-300";
   }
 
   return "";
-}
-
-function getInsClass(): string {
-  return "bg-green-300";
-}
-
-function getDelClass(): string {
-  return "bg-red-300";
 }
 
 function getSeletedClass(): string {
