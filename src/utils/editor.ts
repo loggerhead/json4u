@@ -39,7 +39,7 @@ export default class Editor {
     });
 
     this.cm.setSize("100%", "100%");
-    this.setupDragHandler();
+    this.setupDragFileHandler();
     return this;
   }
 
@@ -72,10 +72,32 @@ export default class Editor {
         fn();
       }
     });
+
+    this.setPasteFileHandler(fn);
+  }
+
+  private setPasteFileHandler(fn: () => void) {
+    this.cm.on("paste", (cm, e) => {
+      const items = (e.clipboardData || (e as any).originalEvent.clipboardData).items;
+
+      for (const item of items) {
+        if (item.kind !== "file") {
+          continue;
+        }
+        e.preventDefault();
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          cm.setValue(e.target?.result as string);
+          fn();
+        };
+        reader.readAsText(item.getAsFile());
+      }
+    });
   }
 
   // 拖拽时展示 hover 效果
-  setupDragHandler() {
+  private setupDragFileHandler() {
     const dragHandler = (e: DragEvent) => {
       const el = (e.target as HTMLElement).closest(".CodeMirror");
 
