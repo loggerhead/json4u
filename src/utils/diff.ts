@@ -18,15 +18,17 @@ interface CharDiff {
   diffType: DiffType;
 }
 
+export type DiffPair = [Diff, Diff];
+
 export interface Diff {
   line: number;
   pointer: string;
   diffType: DiffType;
-  charDiffs: Array<CharDiff>;
+  charDiffs: CharDiff[];
 }
 
 export class Handler {
-  results: Array<[Diff, Diff]>;
+  results: DiffPair[];
   ltrace: TraceRecord;
   rtrace: TraceRecord;
 
@@ -36,7 +38,7 @@ export class Handler {
     this.rtrace = rtrace;
   }
 
-  compare(): Array<[Diff, Diff]> {
+  compare(): DiffPair[] {
     this.diffVal(this.ltrace.data, this.rtrace.data);
     this.results.sort((a, b): number => {
       const right = a[1].line - b[1].line;
