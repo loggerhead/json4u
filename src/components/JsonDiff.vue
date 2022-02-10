@@ -56,6 +56,9 @@
 <style lang="scss">
 .CodeMirror-placeholder {
   color: rgb(148 163 184) !important;
+  font-size: 1.5rem !important;
+  text-align: center;
+  line-height: 50vh !important;
 }
 
 .editor-hover {
