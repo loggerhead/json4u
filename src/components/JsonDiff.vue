@@ -57,6 +57,10 @@
 .CodeMirror-placeholder {
   color: rgb(148 163 184) !important;
 }
+
+.editor-hover {
+  border: 1px solid #2098d1;
+}
 </style>
 
 <script setup lang="ts">
@@ -106,8 +110,8 @@ onMounted(async () => {
     }
   }
 
-  leftEditor.setPasteListener(leftPasteHandler);
-  rightEditor.setPasteListener(rightPasteHandler);
+  leftEditor.setChangesListener(leftPasteHandler);
+  rightEditor.setChangesListener(rightPasteHandler);
 
   Editor.setSyncScroll(leftEditor, rightEditor, syncScroll);
   leftEditor.focus();

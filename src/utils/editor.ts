@@ -28,7 +28,7 @@ export default class Editor {
     (window as any).jsonlint = jsonlint;
 
     const el = document.getElementById(id) as HTMLTextAreaElement;
-    const cm = CodeMirror.fromTextArea(el, {
+    this.cm = CodeMirror.fromTextArea(el, {
       mode: "application/json",
       theme: "idea",
       smartIndent: true,
@@ -38,8 +38,8 @@ export default class Editor {
       gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
     });
 
-    cm.setSize("100%", "100%");
-    this.cm = cm;
+    this.cm.setSize("100%", "100%");
+    this.setupDragHandler();
     return this;
   }
 
@@ -57,18 +57,43 @@ export default class Editor {
   }
 
   setClickListener(fn: (_: number) => void) {
-    this.cm.on("cursorActivity", (cm: CodeMirror.Editor) => {
+    this.cm.on("cursorActivity", (cm) => {
       const pos = cm.getCursor();
       // NOTICE: 比实际点击位置小一行
       fn(pos.line + 1);
     });
   }
 
-  setPasteListener(fn: () => void) {
-    this.cm.on("inputRead", (cm: CodeMirror.Editor, event: CodeMirror.EditorChange) => {
-      if (event.origin === "paste" && event.from.line == 0 && event.from.ch == 0 && cm.getValue().length > 0) {
+  setChangesListener(fn: () => void) {
+    this.cm.on("changes", (cm, e) => {
+      const hasEvent = e.filter((e) => e.origin === "paste" && e.from.line == 0 && e.from.ch == 0).length > 0;
+
+      if (hasEvent && cm.getValue().length > 0) {
         fn();
       }
+    });
+  }
+
+  // 拖拽时展示 hover 效果
+  setupDragHandler() {
+    const dragHandler = (e: DragEvent) => {
+      const el = (e.target as HTMLElement).closest(".CodeMirror");
+
+      if (e.type === "dragover") {
+        el?.classList.add("editor-hover");
+      } else {
+        el?.classList.remove("editor-hover");
+      }
+    };
+
+    this.cm.on("dragover", (_, e) => {
+      dragHandler(e);
+    });
+    this.cm.on("drop", (_, e) => {
+      dragHandler(e);
+    });
+    this.cm.on("dragleave", (_, e) => {
+      dragHandler(e);
     });
   }
 
