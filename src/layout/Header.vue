@@ -1,5 +1,5 @@
 <template>
-  <div class="max-h-10">
+  <div class="h-2">
     <slot></slot>
   </div>
 </template>

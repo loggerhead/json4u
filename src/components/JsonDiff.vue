@@ -43,10 +43,10 @@
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
-      <div class="w-1/2 h-screen">
+      <div class="w-1/2 h-editor">
         <textarea id="left-editor" :placeholder="t('leftPlaceholder')"></textarea>
       </div>
-      <div class="w-1/2 h-screen">
+      <div class="w-1/2 h-editor">
         <textarea id="right-editor" :placeholder="t('rightPlaceholder')"></textarea>
       </div>
     </div>
@@ -55,7 +55,6 @@
 
 <style lang="scss">
 .CodeMirror-placeholder {
-  font-size: 0.875rem !important;
   color: rgb(148 163 184) !important;
 }
 </style>

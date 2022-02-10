@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-col space-y-2">
+  <div class="text-[14px] flex-col space-y-2">
     <Header></Header>
     <div class="flex">
       <Sider />
