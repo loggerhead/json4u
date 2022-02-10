@@ -36,7 +36,7 @@
         <div v-else-if="jdd.errmsg" :class="style.alertError">
           {{ jdd.errmsg }}
         </div>
-        <div v-else :class="style.alertInfo">
+        <div v-else-if="isCompared" :class="style.alertInfo">
           {{ t("nodiff") }}
         </div>
       </div>
@@ -87,6 +87,7 @@ const jdd = shallowReactive({
 
 let syncScroll = ref(true);
 const hasDiffs = computed(() => jdd.diffs.length > 0);
+const isCompared = computed(() => Editor.isCompared());
 
 let leftEditor = new Editor();
 let rightEditor = new Editor();
@@ -222,6 +223,7 @@ function compare() {
     leftEditor.clearClass();
     rightEditor.clearClass();
     processDiffs();
+    Editor.incCompareVersion();
     leftEditor.endOperation();
     rightEditor.endOperation();
   });

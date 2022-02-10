@@ -1,4 +1,4 @@
-import { Ref } from "vue";
+import { ref, Ref } from "vue";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css";
 import "codemirror/addon/fold/foldgutter.css";
@@ -8,6 +8,8 @@ import jsonlint from "jsonlint-mod";
 
 export default class Editor {
   cm: CodeMirror.Editor;
+  static changeVersion = ref(0);
+  static compareVersion = ref(0);
 
   constructor() {
     this.cm = <CodeMirror.Editor>(<unknown>null);
@@ -67,6 +69,7 @@ export default class Editor {
   setChangesListener(fn: () => void) {
     this.cm.on("changes", (cm, e) => {
       const hasEvent = e.filter((e) => e.origin === "paste" && e.from.line == 0 && e.from.ch == 0).length > 0;
+      Editor.changeVersion.value = Editor.compareVersion.value + 1;
 
       if (hasEvent && cm.getValue().length > 0) {
         fn();
@@ -165,6 +168,14 @@ export default class Editor {
 
   focus() {
     this.cm.focus();
+  }
+
+  static incCompareVersion() {
+    this.compareVersion.value++;
+  }
+
+  static isCompared() {
+    return this.compareVersion.value > 0 && this.compareVersion.value >= this.changeVersion.value;
   }
 
   static setSyncScroll(leftEditor: Editor, rightEditor: Editor, enableSyncScroll: Ref<boolean>) {
