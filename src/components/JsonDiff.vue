@@ -213,6 +213,8 @@ function compare() {
   measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
+    leftEditor.clearClass();
+    rightEditor.clearClass();
     processDiffs();
     leftEditor.endOperation();
     rightEditor.endOperation();

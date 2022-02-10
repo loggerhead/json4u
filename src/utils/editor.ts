@@ -97,6 +97,10 @@ export default class Editor {
     this.cm.markText({ line: lineno - 1, ch: from }, { line: lineno - 1, ch: to }, { className: cls });
   }
 
+  clearClass() {
+    this.cm.getAllMarks().forEach((marker) => marker.clear());
+  }
+
   scrollTo(lineno: number) {
     let t = this.cm.charCoords({ line: lineno, ch: 0 }, "local").top;
     let middleHeight = this.cm.getScrollerElement().offsetHeight / 2;
