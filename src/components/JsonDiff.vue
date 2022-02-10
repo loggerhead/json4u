@@ -80,7 +80,7 @@ type Side = "left" | "right";
 type ScrollDirection = "prev" | "next";
 
 const jdd = shallowReactive({
-  diffs: [] as Array<[diff.Diff, diff.Diff]>,
+  diffs: [] as diff.DiffPair[],
   currentDiff: 0,
   errmsg: "",
 });
@@ -260,7 +260,7 @@ function addClickHandler() {
   });
 }
 
-function scrollToDiff(dd: [diff.Diff, diff.Diff] | undefined, side: Side) {
+function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
   if (dd === undefined) {
     return;
   }
@@ -335,7 +335,7 @@ function handleDiffClick(lineno: number, side: Side) {
 }
 
 // skip same line in one side
-function getNextDiff(side: Side, direction: ScrollDirection): [diff.Diff, diff.Diff] | undefined {
+function getNextDiff(side: Side, direction: ScrollDirection): diff.DiffPair | undefined {
   const nextIndex = (i: number) => {
     if (direction === "next") {
       if (++i >= jdd.diffs.length) {
