@@ -24,7 +24,7 @@ export interface Diff {
   line: number;
   pointer: string;
   diffType: DiffType;
-  charDiffs: CharDiff[];
+  charDiffs?: CharDiff[];
 }
 
 export class Handler {
@@ -68,10 +68,10 @@ export class Handler {
       const [t, v] = cdiff;
 
       if (t == diff.INSERT) {
-        rdiff.charDiffs.push({ start: rpos, end: rpos + v.length, diffType: CHAR_INS });
+        rdiff.charDiffs?.push({ start: rpos, end: rpos + v.length, diffType: CHAR_INS });
         rpos += v.length;
       } else if (t == diff.DELETE) {
-        ldiff.charDiffs.push({ start: lpos, end: lpos + v.length, diffType: CHAR_DEL });
+        ldiff.charDiffs?.push({ start: lpos, end: lpos + v.length, diffType: CHAR_DEL });
         lpos += v.length;
       } else {
         lpos += v.length;

@@ -238,11 +238,11 @@ function processDiffs() {
     leftEditor.addClass(lline, getDiffClass(ldiff.diffType, "left"));
     rightEditor.addClass(rline, getDiffClass(rdiff.diffType, "right"));
 
-    for (const cdiff of ldiff.charDiffs) {
+    for (const cdiff of ldiff.charDiffs || []) {
       leftEditor.addClassToRange(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
 
-    for (const cdiff of rdiff.charDiffs) {
+    for (const cdiff of rdiff.charDiffs || []) {
       rightEditor.addClassToRange(rline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
   });
