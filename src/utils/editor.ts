@@ -115,6 +115,8 @@ export default class Editor {
       dragHandler(e);
     });
     this.cm.on("drop", (_, e) => {
+      // clear all text before drop content is fill in
+      this.setText("");
       dragHandler(e);
     });
     this.cm.on("dragleave", (_, e) => {
