@@ -197,6 +197,9 @@ function resetJdd() {
     rightEditor.removeClass(rdiff.line);
   });
 
+  leftEditor.clearClickListener();
+  rightEditor.clearClickListener();
+
   jdd.diffs = [];
   jdd.currentDiff = 0;
   jdd.errmsg = "";
