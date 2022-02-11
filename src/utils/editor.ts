@@ -8,11 +8,13 @@ import jsonlint from "jsonlint-mod";
 
 export default class Editor {
   cm: CodeMirror.Editor;
+  clickFn: null | ((_: CodeMirror.Editor) => void);
   static changeVersion = ref(0);
   static compareVersion = ref(0);
 
   constructor() {
     this.cm = <CodeMirror.Editor>(<unknown>null);
+    this.clickFn = null;
   }
 
   async setupCM(id: string) {
@@ -59,11 +61,18 @@ export default class Editor {
   }
 
   setClickListener(fn: (_: number) => void) {
-    this.cm.on("cursorActivity", (cm) => {
-      const pos = cm.getCursor();
+    this.clickFn = (_) => {
       // NOTICE: 比实际点击位置小一行
-      fn(pos.line + 1);
-    });
+      fn(this.cm.getCursor().line + 1);
+    };
+    this.cm.on("cursorActivity", this.clickFn);
+  }
+
+  clearClickListener() {
+    if (this.clickFn === null) {
+      return;
+    }
+    this.cm.off("cursorActivity", this.clickFn);
   }
 
   setChangesListener(fn: () => void) {
