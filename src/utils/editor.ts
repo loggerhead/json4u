@@ -141,16 +141,12 @@ export default class Editor {
     this.cm.addLineClass(lineno - 1, "wrap", cls);
   }
 
-  removeClass(lineno: number, cls: string) {
+  removeClass(lineno: number, cls?: string) {
     this.cm.removeLineClass(lineno - 1, "wrap", cls);
   }
 
   addClassToRange(lineno: number, from: number, to: number, cls: string) {
     this.cm.markText({ line: lineno - 1, ch: from }, { line: lineno - 1, ch: to }, { className: cls });
-  }
-
-  clearClass() {
-    this.cm.getAllMarks().forEach((marker) => marker.clear());
   }
 
   scrollTo(lineno: number) {
