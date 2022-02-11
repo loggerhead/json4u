@@ -6,11 +6,11 @@ import TraceRecord from "./trace";
 import MySet from "./set";
 
 export const MORE = "more";
-export const MISS = "miss";
-export const UNEQ = "uneq";
-export const CHAR_INS = "char_ins"; // inline character insert
-export const CHAR_DEL = "char_del"; // inline character delete
-export type DiffType = typeof MORE | typeof MISS | typeof UNEQ | typeof CHAR_INS | typeof CHAR_DEL;
+export const LESS = "less";
+export const NE = "not_equal";
+export const CHAR_INS = "char_insert"; // inline character insert
+export const CHAR_DEL = "char_delete"; // inline character delete
+export type DiffType = typeof MORE | typeof LESS | typeof NE | typeof CHAR_INS | typeof CHAR_DEL;
 
 interface CharDiff {
   start: number;
@@ -86,8 +86,8 @@ export class Handler {
     } else if (isObject(ldata) && isObject(rdata)) {
       this.diffObject(ldata, rdata);
     } else if (ldata !== rdata) {
-      let ldiff = genDiff(this.ltrace, UNEQ);
-      let rdiff = genDiff(this.rtrace, UNEQ);
+      let ldiff = genDiff(this.ltrace, NE);
+      let rdiff = genDiff(this.rtrace, NE);
 
       if (isNeedDiffVal(ldata, rdata)) {
         this.genAndSetCharsDiff(ldiff, rdiff);
@@ -109,9 +109,9 @@ export class Handler {
         this.ltrace.pop();
         this.rtrace.pop();
       } else if (ldata.length < rdata.length) {
-        this.results.push([genDiff(this.ltrace, MISS), genDiff(this.rtrace, MORE, i)]);
+        this.results.push([genDiff(this.ltrace, LESS), genDiff(this.rtrace, MORE, i)]);
       } else if (ldata.length > rdata.length) {
-        this.results.push([genDiff(this.ltrace, MORE, i), genDiff(this.rtrace, MISS)]);
+        this.results.push([genDiff(this.ltrace, MORE, i), genDiff(this.rtrace, LESS)]);
       }
     }
   }
@@ -137,8 +137,8 @@ export class Handler {
           return;
         }
 
-        let ldiff = genDiff(this.ltrace, UNEQ, lkey);
-        let rdiff = genDiff(this.rtrace, UNEQ, rkey);
+        let ldiff = genDiff(this.ltrace, NE, lkey);
+        let rdiff = genDiff(this.rtrace, NE, rkey);
         this.genAndSetCharsDiff(ldiff, rdiff, true);
         this.results.push([ldiff, rdiff]);
         seen.add(lkey);
@@ -150,14 +150,14 @@ export class Handler {
       if (seen.has(key)) {
         return;
       }
-      this.results.push([genDiff(this.ltrace, MORE, key), genDiff(this.rtrace, MISS)]);
+      this.results.push([genDiff(this.ltrace, MORE, key), genDiff(this.rtrace, LESS)]);
     });
 
     rightOnly.forEach((key) => {
       if (seen.has(key)) {
         return;
       }
-      this.results.push([genDiff(this.ltrace, MISS), genDiff(this.rtrace, MORE, key)]);
+      this.results.push([genDiff(this.ltrace, LESS), genDiff(this.rtrace, MORE, key)]);
     });
   }
 }

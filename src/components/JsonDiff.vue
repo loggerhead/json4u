@@ -382,7 +382,7 @@ function scrollToNextDiff(side: Side) {
 
 function getDiffClass(diffType: diff.DiffType, side?: Side): string {
   switch (diffType) {
-    case diff.UNEQ:
+    case diff.NE:
     case diff.MORE:
       return side == "left" ? "bg-red-100" : "bg-green-100";
     case diff.CHAR_INS:
