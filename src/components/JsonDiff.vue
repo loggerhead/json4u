@@ -190,6 +190,13 @@ function minify(editor = leftEditor) {
 }
 
 function resetJdd() {
+  // 清除所有的高亮
+  jdd.diffs.map((dd) => {
+    const [ldiff, rdiff] = dd;
+    leftEditor.removeClass(ldiff.line);
+    rightEditor.removeClass(rdiff.line);
+  });
+
   jdd.diffs = [];
   jdd.currentDiff = 0;
   jdd.errmsg = "";
@@ -220,8 +227,6 @@ function compare() {
   measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
-    leftEditor.clearClass();
-    rightEditor.clearClass();
     processDiffs();
     Editor.incCompareVersion();
     leftEditor.endOperation();
