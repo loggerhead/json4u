@@ -61,8 +61,13 @@
   line-height: 50vh !important;
 }
 
+.CodeMirror {
+  // 占位，避免 editor focus 时抖动一下
+  border: 1px solid transparent;
+}
+
 .editor-hover {
-  border: 1px solid #2098d1;
+  border: 1px solid #2099d180;
 }
 </style>
 

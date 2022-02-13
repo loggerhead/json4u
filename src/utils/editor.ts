@@ -43,7 +43,7 @@ export default class Editor {
     });
 
     this.cm.setSize("100%", "100%");
-    this.setupDragFileHandler();
+    this.setupFocusAndDropHandler();
     return this;
   }
 
@@ -109,27 +109,37 @@ export default class Editor {
   }
 
   // 拖拽时展示 hover 效果
-  private setupDragFileHandler() {
-    const dragHandler = (e: DragEvent) => {
+  private setupFocusAndDropHandler() {
+    const hoverHandler = (e: Event) => {
       const el = (e.target as HTMLElement).closest(".CodeMirror");
 
-      if (e.type === "dragover") {
+      if (e.type === "dragover" || e.type === "focus") {
         el?.classList.add("editor-hover");
       } else {
         el?.classList.remove("editor-hover");
       }
     };
 
-    this.cm.on("dragover", (_, e) => {
-      dragHandler(e);
+    this.cm.on("focus", (_, e) => {
+      hoverHandler(e);
     });
+
+    this.cm.on("blur", (_, e) => {
+      hoverHandler(e);
+    });
+
+    this.cm.on("dragover", (_, e) => {
+      hoverHandler(e);
+    });
+
     this.cm.on("drop", (_, e) => {
       // clear all text before drop content is fill in
       this.setText("");
-      dragHandler(e);
+      hoverHandler(e);
     });
+
     this.cm.on("dragleave", (_, e) => {
-      dragHandler(e);
+      hoverHandler(e);
     });
   }
 
