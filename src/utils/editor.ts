@@ -77,8 +77,10 @@ export default class Editor {
     this.cm.off("cursorActivity", this.clickFn);
   }
 
-  setChangesListener(fn: () => void) {
+  setChangesListener(fn: () => void, fnChanges: () => void) {
     this.cm.on("changes", (cm, e) => {
+      fnChanges();
+
       const hasEvent = e.filter((e) => e.origin === "paste" && e.from.line == 0 && e.from.ch == 0).length > 0;
       Editor.changeVersion.value = Editor.compareVersion.value + 1;
 
