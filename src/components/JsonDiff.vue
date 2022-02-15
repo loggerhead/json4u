@@ -119,8 +119,8 @@ onMounted(async () => {
     }
   }
 
-  leftEditor.setChangesListener(leftPasteHandler);
-  rightEditor.setChangesListener(rightPasteHandler);
+  leftEditor.setChangesListener(leftPasteHandler, resetJdd);
+  rightEditor.setChangesListener(rightPasteHandler, resetJdd);
 
   Editor.setSyncScroll(leftEditor, rightEditor, syncScroll);
   leftEditor.focus();
