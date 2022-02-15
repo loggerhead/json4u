@@ -44,10 +44,10 @@
 
     <div class="col-span-12 flex border border-slate-100">
       <div class="w-1/2 h-editor">
-        <textarea id="left-editor" :placeholder="t('leftPlaceholder')"></textarea>
+        <textarea id="left-editor" class="hidden" :placeholder="t('leftPlaceholder')"></textarea>
       </div>
       <div class="w-1/2 h-editor">
-        <textarea id="right-editor" :placeholder="t('rightPlaceholder')"></textarea>
+        <textarea id="right-editor" class="hidden" :placeholder="t('rightPlaceholder')"></textarea>
       </div>
     </div>
   </div>
