@@ -44,6 +44,8 @@ export default class Editor {
 
     this.cm.setSize("100%", "100%");
     this.setupFocusAndDropHandler();
+
+    el.classList.remove("hidden");
     return this;
   }
 
