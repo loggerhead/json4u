@@ -17,9 +17,9 @@ const messages = {
   },
   en: {
     compare: "Compare",
-    pretty: "Pretty",
+    pretty: "Format",
     minify: "Minify",
-    leftPlaceholder: "Paste or drop your file here will auto pretty",
+    leftPlaceholder: "Paste or drop your file here will auto format",
     rightPlaceholder: "Paste or drop your file here will auto compare",
     syncScroll: "Sync scroll",
     prev: "Previous",
