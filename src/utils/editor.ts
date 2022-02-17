@@ -9,12 +9,14 @@ import jsonlint from "jsonlint-mod";
 export default class Editor {
   cm: CodeMirror.Editor;
   clickFn: null | ((_: CodeMirror.Editor) => void);
+  markLines: number[];
   static changeVersion = ref(0);
   static compareVersion = ref(0);
 
   constructor() {
     this.cm = <CodeMirror.Editor>(<unknown>null);
     this.clickFn = null;
+    this.markLines = [];
   }
 
   async setupCM(id: string) {
@@ -68,13 +70,6 @@ export default class Editor {
       fn(this.cm.getCursor().line + 1);
     };
     this.cm.on("cursorActivity", this.clickFn);
-  }
-
-  clearClickListener() {
-    if (this.clickFn === null) {
-      return;
-    }
-    this.cm.off("cursorActivity", this.clickFn);
   }
 
   setChangesListener(fn: () => void, fnChanges: () => void) {
@@ -168,8 +163,15 @@ export default class Editor {
     this.cm.removeLineClass(lineno - 1, "wrap", cls);
   }
 
-  addClassToRange(lineno: number, from: number, to: number, cls: string) {
-    this.cm.markText({ line: lineno - 1, ch: from }, { line: lineno - 1, ch: to }, { className: cls });
+  mark(lineno: number, startPos?: number, endPos?: number, cls?: string) {
+    const from = { line: lineno - 1, ch: startPos ? startPos : 0 };
+    const to = { line: lineno - 1, ch: endPos ? endPos : 0 };
+
+    if (cls) {
+      this.cm.markText(from, to, { className: cls });
+    } else {
+      this.markLines.push(lineno);
+    }
   }
 
   scrollTo(lineno: number) {
@@ -191,8 +193,20 @@ export default class Editor {
     this.cm.focus();
   }
 
-  clearMarks() {
-    this.cm.getAllMarks().forEach((marker) => marker.clear());
+  reset() {
+    for (const lineno of this.markLines) {
+      this.removeClass(lineno);
+    }
+
+    this.cm.getAllMarks().forEach((marker) => {
+      marker.clear();
+    });
+
+    this.markLines = [];
+
+    if (this.clickFn) {
+      this.cm.off("cursorActivity", this.clickFn);
+    }
   }
 
   static incCompareVersion() {
