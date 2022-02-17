@@ -31,7 +31,7 @@ const messages = {
   },
 };
 
-const lang = (typeof window !== "undefined" && (navigator.language || (navigator as any).userLanguage)) || "en";
+const lang = (typeof window !== "undefined" && (navigator.language || (navigator as any).userLanguage)) || "zh";
 
 export function t(name: string, args?: any): string {
   let langKey = lang.split("-")[0];
