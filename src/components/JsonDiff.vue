@@ -195,18 +195,8 @@ function minify(editor = leftEditor) {
 }
 
 function resetJdd() {
-  // 清除所有的高亮
-  jdd.diffs.map((dd) => {
-    const [ldiff, rdiff] = dd;
-    leftEditor.removeClass(ldiff.line);
-    rightEditor.removeClass(rdiff.line);
-  });
-
-  leftEditor.clearMarks();
-  rightEditor.clearMarks();
-  leftEditor.clearClickListener();
-  rightEditor.clearClickListener();
-
+  leftEditor.reset();
+  rightEditor.reset();
   jdd.diffs = [];
   jdd.currentDiff = 0;
   jdd.errmsg = "";
@@ -252,13 +242,15 @@ function processDiffs() {
 
     leftEditor.addClass(lline, getDiffClass(ldiff.diffType, "left"));
     rightEditor.addClass(rline, getDiffClass(rdiff.diffType, "right"));
+    leftEditor.mark(lline);
+    rightEditor.mark(rline);
 
     for (const cdiff of ldiff.charDiffs || []) {
-      leftEditor.addClassToRange(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
+      leftEditor.mark(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
 
     for (const cdiff of rdiff.charDiffs || []) {
-      rightEditor.addClassToRange(rline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
+      rightEditor.mark(rline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
   });
 
