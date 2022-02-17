@@ -191,6 +191,10 @@ export default class Editor {
     this.cm.focus();
   }
 
+  clearMarks() {
+    this.cm.getAllMarks().forEach((marker) => marker.clear());
+  }
+
   static incCompareVersion() {
     this.compareVersion.value++;
   }
