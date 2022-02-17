@@ -202,6 +202,8 @@ function resetJdd() {
     rightEditor.removeClass(rdiff.line);
   });
 
+  leftEditor.clearMarks();
+  rightEditor.clearMarks();
   leftEditor.clearClickListener();
   rightEditor.clearClickListener();
 
@@ -266,11 +268,33 @@ function processDiffs() {
 
 function addClickHandler() {
   leftEditor.setClickListener((line: number) => {
-    handleDiffClick(line, "left");
+    scrollToDiffLine(line, "left");
   });
   rightEditor.setClickListener((line: number) => {
-    handleDiffClick(line, "right");
+    scrollToDiffLine(line, "right");
   });
+}
+
+function scrollToDiffLine(line: number, side: Side) {
+  const diffs = jdd.diffs.filter((dd) => {
+    const [ldiff, rdiff] = dd;
+    const linenoL = ldiff.line;
+    const linenoR = rdiff.line;
+
+    if (side === "left" && line === linenoL) {
+      return true;
+    } else if (side === "right" && line === linenoR) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  if (diffs.length === 0) {
+    return;
+  }
+
+  scrollToDiff(diffs[0], side);
 }
 
 function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
@@ -301,7 +325,6 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
 function handleDiffClick(lineno: number, side: Side) {
   let editor = side == "left" ? leftEditor : rightEditor;
   const selected = getSeletedClass();
-  const isSelected = editor.hasClass(lineno, selected);
   let cnt = 0;
 
   jdd.diffs
@@ -327,12 +350,7 @@ function handleDiffClick(lineno: number, side: Side) {
       const [side, lineno] = pp as [Side, number];
       let e = side == "left" ? leftEditor : rightEditor;
       cnt++;
-
-      if (isSelected) {
-        e.removeClass(lineno, selected);
-      } else {
-        e.addClass(lineno, selected);
-      }
+      e.addClass(lineno, selected);
     });
 
   // 点击在不是 diff 的行时，直接返回
@@ -340,11 +358,7 @@ function handleDiffClick(lineno: number, side: Side) {
     return;
   }
 
-  if (isSelected) {
-    editor.removeClass(lineno, selected);
-  } else {
-    editor.addClass(lineno, selected);
-  }
+  editor.addClass(lineno, selected);
 }
 
 // skip same line in one side
