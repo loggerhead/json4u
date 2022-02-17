@@ -75,13 +75,12 @@
 import { computed, onMounted, shallowReactive, ref } from "vue";
 import * as jsonMap from "json-map-ts";
 import * as diff from "../utils/diff";
-import TraceRecord from "../utils/trace";
 import Editor from "../utils/editor";
 import formatJsonString from "../utils/format";
 import { t } from "../utils/i18n";
 import * as style from "./style";
 
-type Side = "left" | "right";
+type Side = diff.Side;
 type ScrollDirection = "prev" | "next";
 
 const jdd = shallowReactive({
@@ -206,22 +205,13 @@ function compare() {
   resetJdd();
 
   measure("parse and diff", () => {
-    let ltrace = new TraceRecord(leftEditor.getText());
-    let rtrace = new TraceRecord(rightEditor.getText());
+    const diffsOrErr = diff.compare(leftEditor.getText(), rightEditor.getText());
 
-    try {
-      ltrace.setParseResult(jsonMap.parse(ltrace.out));
-    } catch (e: any) {
-      handleError(e, "left");
+    if (diffsOrErr instanceof diff.Error) {
+      handleError(diffsOrErr.error, diffsOrErr.side);
+    } else {
+      jdd.diffs = diffsOrErr as diff.DiffPair[];
     }
-
-    try {
-      rtrace.setParseResult(jsonMap.parse(rtrace.out));
-    } catch (e: any) {
-      handleError(e, "right");
-    }
-
-    jdd.diffs = new diff.Handler(ltrace, rtrace).compare();
   });
 
   measure("render", () => {

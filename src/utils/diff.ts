@@ -1,5 +1,6 @@
 import jsonPointer from "json-pointer";
 import diff from "fast-diff";
+import * as jsonMap from "json-map-ts";
 import { deepEqual } from "fast-equals";
 import { isObject, isBaseType, isNumber } from "../utils/typeHelper";
 import TraceRecord from "./trace";
@@ -11,6 +12,7 @@ export const NE = "not_equal";
 export const CHAR_INS = "char_insert"; // inline character insert
 export const CHAR_DEL = "char_delete"; // inline character delete
 export type DiffType = typeof MORE | typeof LESS | typeof NE | typeof CHAR_INS | typeof CHAR_DEL;
+export type Side = "left" | "right";
 
 interface CharDiff {
   start: number;
@@ -19,6 +21,15 @@ interface CharDiff {
 }
 
 export type DiffPair = [Diff, Diff];
+export class Error {
+  error: any;
+  side: Side;
+
+  constructor(e: any, side: Side) {
+    this.error = e;
+    this.side = side;
+  }
+}
 
 export interface Diff {
   line: number;
@@ -160,6 +171,25 @@ export class Handler {
       this.results.push([genDiff(this.ltrace, LESS), genDiff(this.rtrace, MORE, key)]);
     });
   }
+}
+
+export function compare(ltext: string, rtext: string): DiffPair[] | Error {
+  let ltrace = new TraceRecord(ltext);
+  let rtrace = new TraceRecord(rtext);
+
+  try {
+    ltrace.setParseResult(jsonMap.parse(ltrace.out));
+  } catch (e: any) {
+    return new Error(e, "left");
+  }
+
+  try {
+    rtrace.setParseResult(jsonMap.parse(rtrace.out));
+  } catch (e: any) {
+    return new Error(e, "right");
+  }
+
+  return new Handler(ltrace, rtrace).compare();
 }
 
 function genDiff(trace: TraceRecord, diffType: any, key?: string | number, val?: any): Diff {
