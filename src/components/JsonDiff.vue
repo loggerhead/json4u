@@ -1,42 +1,42 @@
 <template>
   <div class="grid grid-cols-12 gap-2">
     <div class="col-span-6 flex space-x-3">
-      <button @click="pretty()" :class="style.actionButton">
+      <button @click="pretty()" class="actionButton">
         {{ t("pretty") }}
       </button>
-      <button @click="minify()" :class="style.actionButton">
+      <button @click="minify()" class="actionButton">
         {{ t("minify") }}
       </button>
     </div>
     <div class="col-span-6 flex">
       <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
-        <button @click="compare" :class="style.actionButton">
+        <button @click="compare" class="actionButton">
           {{ t("compare") }}
         </button>
       </span>
       <div class="form-control ml-3">
         <label class="cursor-pointer items-center label space-x-1">
-          <input v-model="syncScroll" type="checkbox" :checked="syncScroll" class="toggle toggle-sm" />
+          <input type="checkbox" class="toggle toggle-sm" v-model="syncScroll" />
           <span class="label-text">{{ t("syncScroll") }}</span>
         </label>
       </div>
       <div class="ml-12">
         <div class="space-x-3" v-if="hasDiffs">
           <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
-            <button @click="scrollToPrevDiff('right')" :class="style.button">
+            <button @click="scrollToPrevDiff('right')" class="button">
               {{ t("prev") }}
             </button>
           </span>
           <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Right">
-            <button @click="scrollToNextDiff('right')" :class="style.button">
+            <button @click="scrollToNextDiff('right')" class="button">
               {{ t("next") }}
             </button>
           </span>
         </div>
-        <div v-else-if="jdd.errmsg" :class="style.alertError">
+        <div v-else-if="jdd.errmsg" class="alertError">
           {{ jdd.errmsg }}
         </div>
-        <div v-else-if="isCompared" :class="style.alertInfo">
+        <div v-else-if="isCompared" class="alertInfo">
           {{ t("nodiff") }}
         </div>
       </div>
@@ -53,6 +53,7 @@
   </div>
 </template>
 
+<!-- astro 对 scope 支持有 bug -->
 <style lang="scss">
 .CodeMirror-placeholder {
   color: rgb(148 163 184) !important;
@@ -71,14 +72,13 @@
 }
 </style>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, onMounted, shallowReactive, ref } from "vue";
 import * as jsonMap from "json-map-ts";
 import * as diff from "../utils/diff";
 import Editor from "../utils/editor";
 import formatJsonString from "../utils/format";
-import { t } from "../utils/i18n";
-import * as style from "./style";
+import { initLang, t } from "../utils/i18n";
 
 type Side = diff.Side;
 type ScrollDirection = "prev" | "next";
@@ -102,8 +102,9 @@ onMounted(async () => {
     return;
   }
 
-  await leftEditor.setupCM("left-editor");
-  await rightEditor.setupCM("right-editor");
+  initLang();
+  await leftEditor.init("left-editor");
+  await rightEditor.init("right-editor");
 
   function leftPasteHandler() {
     pretty(leftEditor);

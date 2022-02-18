@@ -31,13 +31,17 @@ const messages = {
   },
 };
 
-const lang = (typeof window !== "undefined" && (navigator.language || (navigator as any).userLanguage)) || "zh";
+let lang = "zh";
+
+export function initLang() {
+  lang = (navigator as any).userLanguage || lang;
+}
 
 export function t(name: string, args?: any): string {
   let langKey = lang.split("-")[0];
-  langKey = langKey in messages ? langKey : "en";
+  langKey = langKey in messages ? langKey : lang;
 
   const template = (messages as any)[langKey][name];
   const s = args ? render(template, args) : template;
-  return s ? s : "";
+  return s ? s : `\$${name}`;
 }

@@ -1,8 +1,15 @@
-/.vite-ssg-temp
-/coverage
-node_modules
+node_modules/
+dist/
+*.tsbuildinfo
 .DS_Store
-dist
-dist-ssr
-*.local
+.vercel
+_site/
 *.log
+package-lock.json
+.turbo/
+
+# .vscode files other than at top-level
+**/.vscode
+
+# do not commit .env files or any files that end with `.env`
+*.env
