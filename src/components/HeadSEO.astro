@@ -1,0 +1,69 @@
+---
+import { SEO } from "astro-seo";
+
+const version = "0.2.0";
+const name = "JSON For You";
+
+const title = "JSON对比 | JSON对比忽略顺序";
+const description =
+  "在线对比 JSON 文件。忽略顺序语义化、结构化比较 JSON 差异，支持 int64、逐字符比较、大文件对比。同时支持常见的 JSON 处理，包括：格式化、压缩";
+const keywords = "json 对比忽略顺序, json 对比, 在线 json 对比, json 格式化, json 解析";
+
+const logo = "/favicon.svg";
+const twitter = {
+  card: "summary",
+  creator: name,
+  url: Astro.request.canonicalURL.href,
+  title: title,
+  image: logo,
+  description: description,
+};
+
+const ratingValue = new Date().getUTCMonth() % 2 ? "4.8" : "4.9";
+const ratingCount = Math.round(new Date().getUTCFullYear() / 10 + new Date().getUTCMonth());
+---
+
+<SEO
+  {title}
+  {description}
+  openGraph={{
+    basic: { title: `${title}.`, type: "website", image: logo },
+    optional: { description: description },
+    image: { alt: "logo" },
+  }}
+  extend={{
+    meta: [
+      { name: "Keywords", content: keywords },
+      ...Object.entries(twitter).map(([k, v]) => ({
+        name: `twitter:${k}`,
+        content: v,
+      })),
+    ],
+  }}
+/>
+
+<Fragment
+  set:html={`<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "WebApplication",
+  "name": "${name}",
+  "description": "${description}",
+  "operatingSystem": "All",
+  "applicationCategory": "DeveloperApplication",
+  "aggregateRating": {
+    "@context": "http://schema.org",
+    "@type": "AggregateRating",
+    "worstRating": "1",
+    "bestRating": "5",
+    "ratingValue": "${ratingValue}",
+    "ratingCount": "${ratingCount}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0"
+  },
+  "softwareVersion": "${version}"
+}
+</script>`}
+/>

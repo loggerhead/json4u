@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .button {
+    @apply btn btn-sm	btn-outline btn-secondary rounded normal-case;
+  }
+
+  .actionButton {
+    @apply btn btn-sm	btn-outline rounded normal-case;
+  }
+
+  .alertInfo {
+    @apply px-4 py-2 text-sm text-blue-700 bg-blue-100 rounded w-fit;
+  }
+
+  .alertError {
+    @apply px-4 py-2 text-sm text-red-700 bg-red-100 rounded w-fit;
+  }
+}

@@ -19,7 +19,7 @@ export default class Editor {
     this.markLines = [];
   }
 
-  async setupCM(id: string) {
+  async init(id: string) {
     var CodeMirror = await import("codemirror");
     await Promise.all([
       // @ts-ignore

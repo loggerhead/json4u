@@ -1,0 +1,30 @@
+---
+import Header from "../layouts/Header.astro";
+import Footer from "../layouts/Footer.astro";
+import Sidebar from "../layouts/Sidebar.astro";
+import HeadCommon from "../components/HeadCommon.astro";
+import HeadSEO from "../components/HeadSEO.astro";
+import JsonDiff from "../components/JsonDiff.vue";
+---
+
+<html lang="zh-CN">
+  <head>
+    <HeadCommon />
+    <HeadSEO />
+    <style global>
+      @import "../styles/global.css";
+    </style>
+  </head>
+  <body>
+    <div class="text-[14px] flex-col space-y-2">
+      <Header />
+      <div class="flex">
+        <Sidebar />
+        <div class="grow">
+          <JsonDiff client:load />
+        </div>
+      </div>
+      <Footer />
+    </div>
+  </body>
+</html>

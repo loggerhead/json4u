@@ -1,16 +1,6 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import analyzer from "rollup-plugin-analyzer";
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    // analyzer({ summaryOnly: true }),
-  ],
-  ssgOptions: {
-    script: "async",
-    formatting: "minify",
-  },
   build: {
     rollupOptions: {
       output: {
@@ -26,6 +16,7 @@ export default defineConfig({
             "codemirror/addon/fold/foldcode",
             "codemirror/addon/fold/brace-fold",
             "codemirror/addon/lint/lint",
+            "jsonlint-mod",
           ],
         },
       },
