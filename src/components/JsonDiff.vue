@@ -1,42 +1,46 @@
 <template>
   <div class="grid grid-cols-12 gap-2">
     <div class="col-span-6 flex space-x-3">
-      <button @click="pretty()" :class="style.actionButton">
+      <button @click="pretty()" class="actionButton">
         {{ t("pretty") }}
       </button>
-      <button @click="minify()" :class="style.actionButton">
+      <button @click="minify()" class="actionButton">
         {{ t("minify") }}
       </button>
     </div>
     <div class="col-span-6 flex">
       <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
-        <button @click="compare" :class="style.actionButton">
+        <button @click="compare" class="actionButton">
           {{ t("compare") }}
         </button>
       </span>
       <div class="form-control ml-3">
         <label class="cursor-pointer items-center label space-x-1">
-          <input v-model="syncScroll" type="checkbox" :checked="syncScroll" class="toggle toggle-sm" />
+          <input
+            type="checkbox"
+            class="toggle toggle-sm"
+            v-model="syncScroll"
+          />
           <span class="label-text">{{ t("syncScroll") }}</span>
         </label>
       </div>
       <div class="ml-12">
         <div class="space-x-3" v-if="hasDiffs">
           <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
-            <button @click="scrollToPrevDiff('right')" :class="style.button">
+            <button @click="scrollToPrevDiff('right')" class="button">
               {{ t("prev") }}
             </button>
           </span>
           <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Right">
-            <button @click="scrollToNextDiff('right')" :class="style.button">
+            <button @click="scrollToNextDiff('right')" class="button">
               {{ t("next") }}
             </button>
           </span>
         </div>
-        <div v-else-if="jdd.errmsg" :class="style.alertError">
+        <div v-else-if="jdd.errmsg" class="alertError">
           {{ jdd.errmsg }}
         </div>
-        <div v-else-if="isCompared" :class="style.alertInfo">
+        <div v-else-if="isCompared" class="alertInfo">
           {{ t("nodiff") }}
         </div>
       </div>
@@ -44,32 +48,22 @@
 
     <div class="col-span-12 flex border border-slate-100">
       <div class="w-1/2 h-editor">
-        <textarea id="left-editor" class="hidden" :placeholder="t('leftPlaceholder')"></textarea>
+        <textarea
+          id="left-editor"
+          class="hidden"
+          :placeholder="t('leftPlaceholder')"
+        ></textarea>
       </div>
       <div class="w-1/2 h-editor">
-        <textarea id="right-editor" class="hidden" :placeholder="t('rightPlaceholder')"></textarea>
+        <textarea
+          id="right-editor"
+          class="hidden"
+          :placeholder="t('rightPlaceholder')"
+        ></textarea>
       </div>
     </div>
   </div>
 </template>
-
-<style lang="scss">
-.CodeMirror-placeholder {
-  color: rgb(148 163 184) !important;
-  font-size: 1.5rem !important;
-  text-align: center;
-  line-height: 50vh !important;
-}
-
-.CodeMirror {
-  // 占位，避免 editor focus 时抖动一下
-  border: 1px solid transparent;
-}
-
-.editor-hover {
-  border: 1px solid #2099d180;
-}
-</style>
 
 <script setup lang="ts">
 import { computed, onMounted, shallowReactive, ref } from "vue";
@@ -78,7 +72,7 @@ import * as diff from "../utils/diff";
 import Editor from "../utils/editor";
 import formatJsonString from "../utils/format";
 import { t } from "../utils/i18n";
-import * as style from "./style";
+import "../styles/jsondiff.scss";
 
 type Side = diff.Side;
 type ScrollDirection = "prev" | "next";
@@ -205,7 +199,10 @@ function compare() {
   resetJdd();
 
   measure("parse and diff", () => {
-    const diffsOrErr = diff.compare(leftEditor.getText(), rightEditor.getText());
+    const diffsOrErr = diff.compare(
+      leftEditor.getText(),
+      rightEditor.getText()
+    );
 
     if (diffsOrErr instanceof diff.Error) {
       handleError(diffsOrErr.error, diffsOrErr.side);
@@ -236,11 +233,21 @@ function processDiffs() {
     rightEditor.mark(rline);
 
     for (const cdiff of ldiff.charDiffs || []) {
-      leftEditor.mark(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
+      leftEditor.mark(
+        lline,
+        cdiff.start,
+        cdiff.end,
+        getDiffClass(cdiff.diffType)
+      );
     }
 
     for (const cdiff of rdiff.charDiffs || []) {
-      rightEditor.mark(rline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
+      rightEditor.mark(
+        rline,
+        cdiff.start,
+        cdiff.end,
+        getDiffClass(cdiff.diffType)
+      );
     }
   });
 
@@ -344,7 +351,10 @@ function handleDiffClick(lineno: number, side: Side) {
 }
 
 // skip same line in one side
-function getNextDiff(side: Side, direction: ScrollDirection): diff.DiffPair | undefined {
+function getNextDiff(
+  side: Side,
+  direction: ScrollDirection
+): diff.DiffPair | undefined {
   const nextIndex = (i: number) => {
     if (direction === "next") {
       if (++i >= jdd.diffs.length) {

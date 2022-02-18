@@ -41,7 +41,11 @@ export default class Editor {
       lineNumbers: true,
       // 显示折叠箭头
       foldGutter: true,
-      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+      gutters: [
+        "CodeMirror-linenumbers",
+        "CodeMirror-foldgutter",
+        "CodeMirror-lint-markers",
+      ],
     });
 
     this.cm.setSize("100%", "100%");
@@ -76,7 +80,10 @@ export default class Editor {
     this.cm.on("changes", (cm, e) => {
       fnChanges();
 
-      const hasEvent = e.filter((e) => e.origin === "paste" && e.from.line == 0 && e.from.ch == 0).length > 0;
+      const hasEvent =
+        e.filter(
+          (e) => e.origin === "paste" && e.from.line == 0 && e.from.ch == 0
+        ).length > 0;
       Editor.changeVersion.value = Editor.compareVersion.value + 1;
 
       if (hasEvent && cm.getValue().length > 0) {
@@ -89,7 +96,8 @@ export default class Editor {
 
   private setPasteFileHandler(fn: () => void) {
     this.cm.on("paste", (cm, e) => {
-      const items = (e.clipboardData || (e as any).originalEvent.clipboardData).items;
+      const items = (e.clipboardData || (e as any).originalEvent.clipboardData)
+        .items;
 
       for (const item of items) {
         if (item.kind !== "file") {
@@ -152,7 +160,9 @@ export default class Editor {
 
   hasClass(lineno: number, cls: string): boolean {
     const lineInfo = this.cm.lineInfo(lineno - 1);
-    return lineInfo.wrapClass ? lineInfo.wrapClass.split(/\s+/).includes(cls) : false;
+    return lineInfo.wrapClass
+      ? lineInfo.wrapClass.split(/\s+/).includes(cls)
+      : false;
   }
 
   addClass(lineno: number, cls: string) {
@@ -214,10 +224,17 @@ export default class Editor {
   }
 
   static isCompared() {
-    return this.compareVersion.value > 0 && this.compareVersion.value >= this.changeVersion.value;
+    return (
+      this.compareVersion.value > 0 &&
+      this.compareVersion.value >= this.changeVersion.value
+    );
   }
 
-  static setSyncScroll(leftEditor: Editor, rightEditor: Editor, enableSyncScroll: Ref<boolean>) {
+  static setSyncScroll(
+    leftEditor: Editor,
+    rightEditor: Editor,
+    enableSyncScroll: Ref<boolean>
+  ) {
     leftEditor.cm.on("scroll", function () {
       if (enableSyncScroll.value) {
         const scrollInfo = leftEditor.cm.getScrollInfo();
