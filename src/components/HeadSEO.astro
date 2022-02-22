@@ -4,10 +4,9 @@ import { SEO } from "astro-seo";
 const version = "0.2.0";
 const name = "JSON For You";
 
-const title = "JSON对比 | JSON对比忽略顺序";
+const title = "JSON对比, JSON忽略顺序比较差异, JSON Diff";
 const description =
-  "在线对比 JSON 文件。忽略顺序语义化、结构化比较 JSON 差异，支持 int64、逐字符比较、大文件对比。同时支持常见的 JSON 处理，包括：格式化、压缩";
-const keywords = "json 对比忽略顺序, json 对比, 在线 json 对比, json 格式化, json 解析";
+  "在线快速对比 JSON 差异，进行语义化、结构化比较。支持 64 位大整数 (bigint)、逐字符比较、大文件对比。同时支持 JSON 格式化、压缩、校验";
 
 const logo = "/favicon.svg";
 const twitter = {
@@ -32,13 +31,10 @@ const ratingCount = Math.round(new Date().getUTCFullYear() / 10 + new Date().get
     image: { alt: "logo" },
   }}
   extend={{
-    meta: [
-      { name: "Keywords", content: keywords },
-      ...Object.entries(twitter).map(([k, v]) => ({
-        name: `twitter:${k}`,
-        content: v,
-      })),
-    ],
+    meta: Object.entries(twitter).map(([k, v]) => ({
+      name: `twitter:${k}`,
+      content: v,
+    })),
   }}
 />
 
