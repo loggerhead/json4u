@@ -8,4 +8,7 @@ export default /** @type {import('astro').AstroUserConfig} */ ({
     openBrowser: true,
   },
   renderers: ["@astrojs/renderer-vue"],
+  vite: {
+    plugins: [],
+  },
 });
