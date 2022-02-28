@@ -78,10 +78,16 @@ import * as jsonMap from "json-map-ts";
 import * as diff from "../utils/diff";
 import Editor from "../utils/editor";
 import formatJsonString from "../utils/format";
-import { initLang, t } from "../utils/i18n";
+import { setupLang, t } from "../utils/i18n";
 
 type Side = diff.Side;
 type ScrollDirection = "prev" | "next";
+
+const props = defineProps({
+  lang: String,
+});
+
+setupLang(props.lang);
 
 const jdd = shallowReactive({
   diffs: [] as diff.DiffPair[],
@@ -102,7 +108,6 @@ onMounted(async () => {
     return;
   }
 
-  initLang();
   await leftEditor.init("left-editor");
   await rightEditor.init("right-editor");
 
