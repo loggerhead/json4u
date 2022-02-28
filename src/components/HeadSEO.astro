@@ -1,13 +1,18 @@
 ---
 import { SEO } from "astro-seo";
+import { t } from "../utils/i18n.ts";
+
+export interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
 
 const version = "0.2.0";
 const name = "JSON For You";
 
-const title = "JSON对比, JSON忽略顺序比较差异, JSON Diff";
-const description =
-  "在线快速对比 JSON 差异，进行语义化、结构化比较。支持 64 位大整数 (bigint)、逐字符比较、大文件对比。同时支持 JSON 格式化、压缩、校验";
-
+const title = t("title");
+const description = t("description");
 const logo = "/favicon.svg";
 const twitter = {
   card: "summary",
@@ -63,3 +68,9 @@ const ratingCount = Math.round(new Date().getUTCFullYear() / 10 + new Date().get
 }
 </script>`}
 />
+
+{lang === "zh-CN" ? (
+  <link rel="alternate" hreflang="en" href="https://json4u.com/en" />
+) : (
+  <link rel="alternate" hreflang="zh" href="https://json4u.com" />
+)}

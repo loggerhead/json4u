@@ -2,6 +2,9 @@ import { render } from "micromustache";
 
 const messages = {
   zh: {
+    title: "JSON对比, JSON忽略顺序比较差异, JSON Diff",
+    description:
+      "在线快速对比 JSON 差异，进行语义化、结构化比较。支持 64 位大整数 (bigint)、逐字符比较、大文件对比。同时支持 JSON 格式化、压缩、校验",
     compare: "比较",
     pretty: "格式化",
     minify: "最小化",
@@ -16,6 +19,9 @@ const messages = {
     unexpectedTypeError: "不支持的类型 '{{type}}'",
   },
   en: {
+    title: "JSON Diff | JSON Compare",
+    description:
+      "Semantic compare two JSON. Support 64 bit number (use bigint), char-by-char compare. And also support JSON format, minify and validate.",
     compare: "Compare",
     pretty: "Format",
     minify: "Minify",
@@ -33,15 +39,12 @@ const messages = {
 
 let lang = "zh";
 
-export function initLang() {
-  lang = (navigator as any).userLanguage || lang;
+export function setupLang(l?: string) {
+  lang = (l || lang).split("-")[0];
 }
 
 export function t(name: string, args?: any): string {
-  let langKey = lang.split("-")[0];
-  langKey = langKey in messages ? langKey : lang;
-
-  const template = (messages as any)[langKey][name];
+  const template = (messages as any)[lang][name];
   const s = args ? render(template, args) : template;
   return s ? s : `\$${name}`;
 }

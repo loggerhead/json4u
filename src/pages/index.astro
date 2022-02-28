@@ -5,12 +5,20 @@ import Sidebar from "../layouts/Sidebar.astro";
 import HeadCommon from "../components/HeadCommon.astro";
 import HeadSEO from "../components/HeadSEO.astro";
 import JsonDiff from "../components/JsonDiff.vue";
+import { setupLang } from "../utils/i18n.ts";
+
+export interface Props {
+  lang: string;
+}
+
+const { lang = "zh-CN" } = Astro.props;
+setupLang(lang);
 ---
 
-<html lang="zh-CN">
+<html {lang}>
   <head>
     <HeadCommon />
-    <HeadSEO />
+    <HeadSEO {lang} />
     <link rel="stylesheet" href={Astro.resolve("../styles/global.css")} />
   </head>
   <body>
@@ -19,7 +27,7 @@ import JsonDiff from "../components/JsonDiff.vue";
       <div class="flex">
         <Sidebar />
         <div class="grow">
-          <JsonDiff client:load />
+          <JsonDiff {lang} client:load />
         </div>
       </div>
       <Footer />
