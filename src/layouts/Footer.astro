@@ -1,3 +1,17 @@
-<div class="h-10">
-  <slot />
-</div>
+---
+export interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+---
+
+{lang === "zh-CN" ? (
+  <div class="h-10 text-center">
+    <a href="http://www.miitbeian.gov.cn/" target="_blank">
+      粤ICP备16007488号
+    </a>
+  </div>
+) : (
+  <slot></slot>
+)}
