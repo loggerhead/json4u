@@ -4,7 +4,8 @@ module.exports = {
   theme: {
     extend: {
       height: {
-        editor: "calc(100vh - 7rem)",
+        editor: "calc(100vh - 6rem)",
+        editor_full: "calc(100vh - 3.5rem)",
       },
     },
   },
