@@ -7,6 +7,12 @@
       <button @click="minify()" class="actionButton">
         {{ t("minify") }}
       </button>
+      <button @click="escape()" class="actionButton invisible lg:visible">
+        {{ t("escape") }}
+      </button>
+      <button @click="unescape()" class="actionButton invisible lg:visible">
+        {{ t("unescape") }}
+      </button>
     </div>
     <div class="col-span-6 flex">
       <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
@@ -14,7 +20,7 @@
           {{ t("compare") }}
         </button>
       </span>
-      <div class="form-control ml-3">
+      <div class="form-control ml-3 hidden lg:block">
         <label class="cursor-pointer items-center label space-x-1">
           <input type="checkbox" class="toggle toggle-sm" v-model="syncScroll" />
           <span class="label-text">{{ t("syncScroll") }}</span>
@@ -43,10 +49,10 @@
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
-      <div class="w-1/2 h-editor">
+      <div class="w-1/2 h-editor_full lg:h-editor">
         <textarea id="left-editor" class="hidden" :placeholder="t('leftPlaceholder')"></textarea>
       </div>
-      <div class="w-1/2 h-editor">
+      <div class="w-1/2 h-editor_full lg:h-editor">
         <textarea id="right-editor" class="hidden" :placeholder="t('rightPlaceholder')"></textarea>
       </div>
     </div>
@@ -197,6 +203,36 @@ function minify(editor = leftEditor) {
   } catch (e: any) {
     handleError(e, editor === leftEditor ? "left" : "right");
   }
+}
+
+function escape(editor = leftEditor) {
+  let text = editor.getText().trim();
+  text = text
+    .replace(/[\\]/g, "\\\\")
+    .replace(/[\"]/g, '\\"')
+    .replace(/[\/]/g, "\\/")
+    .replace(/[\b]/g, "\\b")
+    .replace(/[\f]/g, "\\f")
+    .replace(/[\n]/g, "\\n")
+    .replace(/[\r]/g, "\\r")
+    .replace(/[\t]/g, "\\t");
+  editor.setText(text);
+  editor.refresh();
+}
+
+function unescape(editor = leftEditor) {
+  let text = editor.getText().trim();
+  text = text
+    .replace(/[\\]n/g, "\n")
+    .replace(/[\\]'/g, "'")
+    .replace(/[\\]"/g, '"')
+    .replace(/[\\]&/g, "\&")
+    .replace(/[\\]r/g, "\r")
+    .replace(/[\\]t/g, "\t")
+    .replace(/[\\]b/g, "\b")
+    .replace(/[\\]f/g, "\f");
+  editor.setText(text);
+  editor.refresh();
 }
 
 function resetJdd() {
