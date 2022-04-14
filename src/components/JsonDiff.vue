@@ -119,7 +119,6 @@ onMounted(async () => {
 
   function leftPasteHandler() {
     pretty(leftEditor);
-    rightEditor.focus();
   }
 
   function rightPasteHandler() {
