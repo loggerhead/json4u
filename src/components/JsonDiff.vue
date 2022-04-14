@@ -124,7 +124,7 @@ onMounted(async () => {
   function rightPasteHandler() {
     pretty(rightEditor);
 
-    if (leftEditor.getText().length > 0) {
+    if (leftEditor.getText().length > 0 && rightEditor.getText().length > 0) {
       compare();
     }
   }
