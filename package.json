@@ -9,6 +9,7 @@
     "ck": "astro check",
     "build": "astro build",
     "preview": "astro preview",
+    "typecheck": "tsc --noEmit",
     "test": "jest --env=node --colors",
     "test:coverage": "yarn test --coverage"
   },

@@ -2,17 +2,21 @@ import jsonPointer from "json-pointer";
 import diff from "fast-diff";
 import * as jsonMap from "json-map-ts";
 import { deepEqual } from "fast-equals";
-import { isObject, isBaseType, isNumber } from "../utils/typeHelper";
+import { OptionNum, isObject, isBaseType, isNumber } from "./typeHelper";
 import TraceRecord from "./trace";
 import MySet from "./set";
+import * as MyersDiff from "./myersDiff";
 
+export const NONE = "none"; // 不需要展示的 diff
 export const MORE = "more";
 export const LESS = "less";
-export const NE = "not_equal";
 export const CHAR_INS = "char_insert"; // inline character insert
 export const CHAR_DEL = "char_delete"; // inline character delete
-export type DiffType = typeof MORE | typeof LESS | typeof NE | typeof CHAR_INS | typeof CHAR_DEL;
-export type Side = "left" | "right";
+export type DiffType = typeof NONE | typeof MORE | typeof LESS | typeof CHAR_INS | typeof CHAR_DEL;
+
+export const LEFT = "left";
+export const RIGHT = "right";
+export type Side = typeof LEFT | typeof RIGHT;
 
 interface CharDiff {
   start: number;
@@ -20,7 +24,7 @@ interface CharDiff {
   diffType: DiffType;
 }
 
-export type DiffPair = [Diff, Diff];
+export type DiffPair = [Diff | undefined, Diff | undefined];
 export class Error {
   error: any;
   side: Side;
@@ -33,8 +37,8 @@ export class Error {
 
 export interface Diff {
   line: number;
-  pointer: string;
   diffType: DiffType;
+  pointer: string;
   charDiffs?: CharDiff[];
 }
 
@@ -51,9 +55,12 @@ export class Handler {
 
   compare(): DiffPair[] {
     this.diffVal(this.ltrace.data, this.rtrace.data);
-    this.results.sort((a, b): number => {
-      const right = a[1].line - b[1].line;
-      return right ? right : a[0].line - b[0].line;
+    this.results.sort((aa: DiffPair, bb: DiffPair): number => {
+      const [al, ar] = aa;
+      const [bl, br] = bb;
+      const left = al === undefined || bl === undefined ? 0 : al.line - bl.line;
+      const right = ar === undefined || br === undefined ? 0 : ar.line - br.line;
+      return right ? right : left;
     });
     return this.results;
   }
@@ -97,8 +104,8 @@ export class Handler {
     } else if (isObject(ldata) && isObject(rdata)) {
       this.diffObject(ldata, rdata);
     } else if (ldata !== rdata) {
-      let ldiff = genDiff(this.ltrace, NE);
-      let rdiff = genDiff(this.rtrace, NE);
+      let ldiff = genDiff(this.ltrace, LESS);
+      let rdiff = genDiff(this.rtrace, MORE);
 
       if (isNeedDiffVal(ldata, rdata)) {
         this.genAndSetCharsDiff(ldiff, rdiff);
@@ -120,9 +127,9 @@ export class Handler {
         this.ltrace.pop();
         this.rtrace.pop();
       } else if (ldata.length < rdata.length) {
-        this.results.push([genDiff(this.ltrace, LESS), genDiff(this.rtrace, MORE, i)]);
+        this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, MORE, i)]);
       } else if (ldata.length > rdata.length) {
-        this.results.push([genDiff(this.ltrace, MORE, i), genDiff(this.rtrace, LESS)]);
+        this.results.push([genDiff(this.ltrace, MORE, i), genDiff(this.rtrace, NONE)]);
       }
     }
   }
@@ -148,8 +155,8 @@ export class Handler {
           return;
         }
 
-        let ldiff = genDiff(this.ltrace, NE, lkey);
-        let rdiff = genDiff(this.rtrace, NE, rkey);
+        let ldiff = genDiff(this.ltrace, LESS, lkey);
+        let rdiff = genDiff(this.rtrace, MORE, rkey);
         this.genAndSetCharsDiff(ldiff, rdiff, true);
         this.results.push([ldiff, rdiff]);
         seen.add(lkey);
@@ -161,14 +168,14 @@ export class Handler {
       if (seen.has(key)) {
         return;
       }
-      this.results.push([genDiff(this.ltrace, MORE, key), genDiff(this.rtrace, LESS)]);
+      this.results.push([genDiff(this.ltrace, MORE, key), genDiff(this.rtrace, NONE)]);
     });
 
     rightOnly.forEach((key) => {
       if (seen.has(key)) {
         return;
       }
-      this.results.push([genDiff(this.ltrace, LESS), genDiff(this.rtrace, MORE, key)]);
+      this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, MORE, key)]);
     });
   }
 }
@@ -180,19 +187,74 @@ export function compare(ltext: string, rtext: string): DiffPair[] | Error {
   try {
     ltrace.setParseResult(jsonMap.parse(ltrace.out));
   } catch (e: any) {
-    return new Error(e, "left");
+    return new Error(e, LEFT);
   }
 
   try {
     rtrace.setParseResult(jsonMap.parse(rtrace.out));
   } catch (e: any) {
-    return new Error(e, "right");
+    return new Error(e, RIGHT);
   }
 
   return new Handler(ltrace, rtrace).compare();
 }
 
-function genDiff(trace: TraceRecord, diffType: any, key?: string | number, val?: any): Diff {
+export function textCompare(ltext: string, rtext: string): DiffPair[] {
+  const llines = ltext.split("\n");
+  const rlines = rtext.split("\n");
+  const dd = MyersDiff.diff(llines, rlines);
+
+  const genDiffs = function (lIndex: OptionNum, rIndex: OptionNum, lDiffType: DiffType, rDiffType: DiffType): DiffPair {
+    return [
+      lIndex === undefined
+        ? undefined
+        : {
+            line: Math.min(lIndex, llines.length - 1),
+            diffType: lDiffType,
+            pointer: "",
+          },
+      rIndex === undefined
+        ? undefined
+        : {
+            line: Math.min(rIndex, rlines.length - 1),
+            diffType: rDiffType,
+            pointer: "",
+          },
+    ];
+  };
+
+  let results: DiffPair[] = [];
+
+  for (const d of dd) {
+    const i = d.index + 1;
+    const t = d.diffType;
+    const side = d.side;
+
+    if (t === MyersDiff.DELETE) {
+      if (side == LEFT) {
+        results.push(genDiffs(i, undefined, LESS, NONE));
+      } else {
+        results.push(genDiffs(undefined, i, NONE, LESS));
+      }
+    } else if (t === MyersDiff.INSERT) {
+      if (side == LEFT) {
+        results.push(genDiffs(i, undefined, MORE, NONE));
+      } else {
+        results.push(genDiffs(undefined, i, NONE, MORE));
+      }
+    } else if (t === MyersDiff.REPLACE) {
+      if (side == LEFT) {
+        results.push(genDiffs(i, undefined, LESS, NONE));
+      } else {
+        results.push(genDiffs(undefined, i, NONE, MORE));
+      }
+    }
+  }
+
+  return results;
+}
+
+function genDiff(trace: TraceRecord, diffType: DiffType, key?: string | number, val?: any): Diff {
   let pointer;
 
   if (key === undefined) {
