@@ -85,6 +85,7 @@ import * as diff from "../utils/diff";
 import Editor from "../utils/editor";
 import formatJsonString from "../utils/format";
 import { setupLang, t } from "../utils/i18n";
+import { OptionNum } from "./utils/typeHelper";
 
 type Side = diff.Side;
 type ScrollDirection = "prev" | "next";
@@ -149,11 +150,11 @@ onMounted(async () => {
       case "ArrowLeft":
         // prevent scroll
         e.preventDefault();
-        scrollToPrevDiff("right");
+        scrollToPrevDiff(diff.RIGHT);
         break;
       case "ArrowRight":
         e.preventDefault();
-        scrollToNextDiff("right");
+        scrollToNextDiff(diff.RIGHT);
         break;
     }
   });
@@ -177,7 +178,7 @@ function handleError(e: Error, side: Side) {
   jdd.errmsg = errmsg;
 
   if (e instanceof SyntaxError) {
-    if (side === "left") {
+    if (side === diff.LEFT) {
       leftEditor.lint();
     } else {
       rightEditor.lint();
@@ -200,7 +201,7 @@ function minify(editor = leftEditor) {
     editor.setText(text);
     editor.refresh();
   } catch (e: any) {
-    handleError(e, editor === leftEditor ? "left" : "right");
+    handleError(e, editor === leftEditor ? diff.LEFT : diff.RIGHT);
   }
 }
 
@@ -244,12 +245,17 @@ function resetJdd() {
 
 function compare() {
   resetJdd();
+  let isTextCompare = false;
 
   measure("parse and diff", () => {
-    const diffsOrErr = diff.compare(leftEditor.getText(), rightEditor.getText());
+    const ltext = leftEditor.getText();
+    const rtext = rightEditor.getText();
+    const diffsOrErr = diff.compare(ltext, rtext);
 
     if (diffsOrErr instanceof diff.Error) {
       handleError(diffsOrErr.error, diffsOrErr.side);
+      jdd.diffs = diff.textCompare(ltext, rtext);
+      isTextCompare = true;
     } else {
       jdd.diffs = diffsOrErr as diff.DiffPair[];
     }
@@ -258,55 +264,57 @@ function compare() {
   measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
-    processDiffs();
+    processDiffs(isTextCompare);
     Editor.incCompareVersion();
     leftEditor.endOperation();
     rightEditor.endOperation();
   });
 }
 
-function processDiffs() {
+function processDiffs(isTextCompare: boolean) {
   jdd.diffs.forEach((dd) => {
     const [ldiff, rdiff] = dd;
-    const lline = ldiff.line;
-    const rline = rdiff.line;
+    const lline = ldiff?.line;
+    const rline = rdiff?.line;
 
-    leftEditor.addClass(lline, getDiffClass(ldiff.diffType, "left"));
-    rightEditor.addClass(rline, getDiffClass(rdiff.diffType, "right"));
+    leftEditor.addClass(lline, getDiffClass(ldiff?.diffType));
+    rightEditor.addClass(rline, getDiffClass(rdiff?.diffType));
     leftEditor.mark(lline);
     rightEditor.mark(rline);
 
-    for (const cdiff of ldiff.charDiffs || []) {
+    for (const cdiff of ldiff?.charDiffs || []) {
       leftEditor.mark(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
 
-    for (const cdiff of rdiff.charDiffs || []) {
+    for (const cdiff of rdiff?.charDiffs || []) {
       rightEditor.mark(rline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
   });
 
-  addClickHandler();
-  scrollToDiff(jdd.diffs[0], "right");
+  if (!isTextCompare) {
+    addClickHandler();
+    scrollToDiff(jdd.diffs[0], diff.RIGHT);
+  }
 }
 
 function addClickHandler() {
   leftEditor.setClickListener((line: number) => {
-    scrollToDiffLine(line, "left");
+    scrollToDiffLine(line, diff.LEFT);
   });
   rightEditor.setClickListener((line: number) => {
-    scrollToDiffLine(line, "right");
+    scrollToDiffLine(line, diff.RIGHT);
   });
 }
 
 function scrollToDiffLine(line: number, side: Side) {
   const diffs = jdd.diffs.filter((dd) => {
     const [ldiff, rdiff] = dd;
-    const linenoL = ldiff.line;
-    const linenoR = rdiff.line;
+    const linenoL = ldiff?.line;
+    const linenoR = rdiff?.line;
 
-    if (side === "left" && line === linenoL) {
+    if (side === diff.LEFT && line === linenoL) {
       return true;
-    } else if (side === "right" && line === linenoR) {
+    } else if (side === diff.RIGHT && line === linenoR) {
       return true;
     } else {
       return false;
@@ -330,40 +338,44 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
   syncScroll.value = false;
 
   const [ldiff, rdiff] = dd;
-  leftEditor.scrollTo(ldiff.line);
-  rightEditor.scrollTo(rdiff.line);
+  leftEditor.scrollTo(ldiff?.line);
+  rightEditor.scrollTo(rdiff?.line);
 
   // 需要延迟设置
   setTimeout(() => {
     syncScroll.value = old;
   }, 100);
 
-  if (side === "left") {
-    handleDiffClick(ldiff.line, side);
-  } else if (side === "right") {
-    handleDiffClick(rdiff.line, side);
+  if (side === diff.LEFT) {
+    handleDiffClick(ldiff?.line, side);
+  } else if (side === diff.RIGHT) {
+    handleDiffClick(rdiff?.line, side);
   }
 }
 
-function handleDiffClick(lineno: number, side: Side) {
-  let editor = side == "left" ? leftEditor : rightEditor;
+function handleDiffClick(lineno: OptionNum, side: Side) {
+  if (lineno === undefined) {
+    return;
+  }
+
+  let editor = side == diff.LEFT ? leftEditor : rightEditor;
   const selected = getSeletedClass();
   let cnt = 0;
 
   jdd.diffs
     .map((dd) => {
       const [ldiff, rdiff] = dd;
-      const linenoL = ldiff.line;
-      const linenoR = rdiff.line;
+      const linenoL = ldiff?.line;
+      const linenoR = rdiff?.line;
 
       // 清除所有 diff 的 selected class
       leftEditor.removeClass(linenoL, selected);
       rightEditor.removeClass(linenoR, selected);
 
-      if (side === "left" && linenoL == lineno) {
-        return ["right", linenoR];
-      } else if (side === "right" && linenoR == lineno) {
-        return ["left", linenoL];
+      if (side === diff.LEFT && linenoL == lineno) {
+        return [diff.RIGHT, linenoR];
+      } else if (side === diff.RIGHT && linenoR == lineno) {
+        return [diff.LEFT, linenoL];
       } else {
         return undefined;
       }
@@ -371,7 +383,7 @@ function handleDiffClick(lineno: number, side: Side) {
     .filter((pp) => pp)
     .forEach((pp) => {
       const [side, lineno] = pp as [Side, number];
-      let e = side == "left" ? leftEditor : rightEditor;
+      let e = side == diff.LEFT ? leftEditor : rightEditor;
       cnt++;
       e.addClass(lineno, selected);
     });
@@ -407,7 +419,7 @@ function getNextDiff(side: Side, direction: ScrollDirection): diff.DiffPair | un
     const [ldiff1, rdiff1] = jdd.diffs[start];
     const [ldiff2, rdiff2] = jdd.diffs[end];
 
-    if (side === "left") {
+    if (side === diff.LEFT) {
       if (ldiff1.line != ldiff2.line) {
         break;
       }
@@ -430,11 +442,12 @@ function scrollToNextDiff(side: Side) {
   scrollToDiff(getNextDiff(side, "next"), side);
 }
 
-function getDiffClass(diffType: diff.DiffType, side?: Side): string {
+function getDiffClass(diffType: diff.DiffType | undefined): string {
   switch (diffType) {
-    case diff.NE:
     case diff.MORE:
-      return side == "left" ? "bg-red-100" : "bg-green-100";
+      return "bg-green-100";
+    case diff.LESS:
+      return "bg-red-100";
     case diff.CHAR_INS:
       return "bg-green-300";
     case diff.CHAR_DEL:

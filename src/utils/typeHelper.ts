@@ -1,3 +1,5 @@
+export type OptionNum = number | undefined;
+
 export function isNumber(v: any): boolean {
   return ["number", "bigint"].includes(typeof v);
 }
