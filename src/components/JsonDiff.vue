@@ -27,7 +27,10 @@
         </label>
       </div>
       <div class="ml-12">
-        <div class="space-x-3" v-if="hasDiffs">
+        <div v-if="jdd.errmsg" class="alertError">
+          {{ jdd.errmsg }}
+        </div>
+        <div class="space-x-3" v-else-if="hasDiffs">
           <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
             <button @click="scrollToPrevDiff('right')" class="button">
               {{ t("prev") }}
@@ -38,9 +41,6 @@
               {{ t("next") }}
             </button>
           </span>
-        </div>
-        <div v-else-if="jdd.errmsg" class="alertError">
-          {{ jdd.errmsg }}
         </div>
         <div v-else-if="isCompared" class="alertInfo">
           {{ t("nodiff") }}
@@ -100,6 +100,7 @@ const jdd = shallowReactive({
   diffs: [] as diff.DiffPair[],
   currentDiff: 0,
   errmsg: "",
+  isTextCompared: false,
 });
 
 let syncScroll = ref(true);
@@ -175,14 +176,13 @@ function handleError(e: Error, side: Side) {
       break;
   }
 
+  if (jdd.isTextCompared) {
+    errmsg += t("period") + t("textCompared");
+  }
   jdd.errmsg = errmsg;
 
   if (e instanceof SyntaxError) {
-    if (side === diff.LEFT) {
-      leftEditor.lint();
-    } else {
-      rightEditor.lint();
-    }
+    (side === diff.LEFT ? leftEditor : rightEditor).lint();
   } else {
     throw e;
   }
@@ -241,11 +241,11 @@ function resetJdd() {
   jdd.diffs = [];
   jdd.currentDiff = 0;
   jdd.errmsg = "";
+  jdd.isTextCompared = false;
 }
 
 function compare() {
   resetJdd();
-  let isTextCompare = false;
 
   measure("parse and diff", () => {
     const ltext = leftEditor.getText();
@@ -253,9 +253,9 @@ function compare() {
     const diffsOrErr = diff.compare(ltext, rtext);
 
     if (diffsOrErr instanceof diff.Error) {
+      jdd.isTextCompared = true;
       handleError(diffsOrErr.error, diffsOrErr.side);
       jdd.diffs = diff.textCompare(ltext, rtext);
-      isTextCompare = true;
     } else {
       jdd.diffs = diffsOrErr as diff.DiffPair[];
     }
@@ -264,18 +264,18 @@ function compare() {
   measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
-    processDiffs(isTextCompare);
+    processDiffs();
     Editor.incCompareVersion();
     leftEditor.endOperation();
     rightEditor.endOperation();
   });
 }
 
-function processDiffs(isTextCompare: boolean) {
+function processDiffs() {
   jdd.diffs.forEach((dd) => {
     const [ldiff, rdiff] = dd;
-    const lline = ldiff?.line;
-    const rline = rdiff?.line;
+    const lline = ldiff?.index;
+    const rline = rdiff?.index;
 
     leftEditor.addClass(lline, getDiffClass(ldiff?.diffType));
     rightEditor.addClass(rline, getDiffClass(rdiff?.diffType));
@@ -291,7 +291,7 @@ function processDiffs(isTextCompare: boolean) {
     }
   });
 
-  if (!isTextCompare) {
+  if (!jdd.isTextCompared) {
     addClickHandler();
     scrollToDiff(jdd.diffs[0], diff.RIGHT);
   }
@@ -309,8 +309,8 @@ function addClickHandler() {
 function scrollToDiffLine(line: number, side: Side) {
   const diffs = jdd.diffs.filter((dd) => {
     const [ldiff, rdiff] = dd;
-    const linenoL = ldiff?.line;
-    const linenoR = rdiff?.line;
+    const linenoL = ldiff?.index;
+    const linenoR = rdiff?.index;
 
     if (side === diff.LEFT && line === linenoL) {
       return true;
@@ -338,8 +338,8 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
   syncScroll.value = false;
 
   const [ldiff, rdiff] = dd;
-  leftEditor.scrollTo(ldiff?.line);
-  rightEditor.scrollTo(rdiff?.line);
+  leftEditor.scrollTo(ldiff?.index);
+  rightEditor.scrollTo(rdiff?.index);
 
   // 需要延迟设置
   setTimeout(() => {
@@ -347,9 +347,9 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
   }, 100);
 
   if (side === diff.LEFT) {
-    handleDiffClick(ldiff?.line, side);
+    handleDiffClick(ldiff?.index, side);
   } else if (side === diff.RIGHT) {
-    handleDiffClick(rdiff?.line, side);
+    handleDiffClick(rdiff?.index, side);
   }
 }
 
@@ -365,8 +365,8 @@ function handleDiffClick(lineno: OptionNum, side: Side) {
   jdd.diffs
     .map((dd) => {
       const [ldiff, rdiff] = dd;
-      const linenoL = ldiff?.line;
-      const linenoR = rdiff?.line;
+      const linenoL = ldiff?.index;
+      const linenoR = rdiff?.index;
 
       // 清除所有 diff 的 selected class
       leftEditor.removeClass(linenoL, selected);
@@ -420,11 +420,11 @@ function getNextDiff(side: Side, direction: ScrollDirection): diff.DiffPair | un
     const [ldiff2, rdiff2] = jdd.diffs[end];
 
     if (side === diff.LEFT) {
-      if (ldiff1.line != ldiff2.line) {
+      if (ldiff1.index != ldiff2.index) {
         break;
       }
     } else {
-      if (rdiff1.line != rdiff2.line) {
+      if (rdiff1.index != rdiff2.index) {
         break;
       }
     }
@@ -444,13 +444,13 @@ function scrollToNextDiff(side: Side) {
 
 function getDiffClass(diffType: diff.DiffType | undefined): string {
   switch (diffType) {
-    case diff.MORE:
+    case diff.INS:
       return "bg-green-100";
-    case diff.LESS:
+    case diff.DEL:
       return "bg-red-100";
-    case diff.CHAR_INS:
+    case diff.PART_INS:
       return "bg-green-300";
-    case diff.CHAR_DEL:
+    case diff.PART_DEL:
       return "bg-red-300";
   }
 
