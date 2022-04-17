@@ -22,7 +22,7 @@
       </span>
       <div class="form-control ml-3 hidden lg:block">
         <label class="cursor-pointer items-center label space-x-1">
-          <input type="checkbox" class="toggle toggle-sm" v-model="syncScroll" />
+          <input type="checkbox" class="toggle toggle-sm" v-model="conf.syncScroll" />
           <span class="label-text">{{ t("syncScroll") }}</span>
         </label>
       </div>
@@ -79,13 +79,14 @@
 </style>
 
 <script lang="ts" setup>
-import { computed, onMounted, shallowReactive, ref } from "vue";
+import { computed, onMounted, reactive, shallowReactive } from "vue";
 import * as jsonMap from "json-map-ts";
 import * as diff from "../utils/diff";
 import Editor from "../utils/editor";
 import formatJsonString from "../utils/format";
 import { setupLang, t } from "../utils/i18n";
-import { OptionNum } from "./utils/typeHelper";
+import { OptionNum } from "../utils/typeHelper";
+import { getConfig } from "../utils/config";
 
 type Side = diff.Side;
 type ScrollDirection = "prev" | "next";
@@ -103,7 +104,7 @@ const jdd = shallowReactive({
   isTextCompared: false,
 });
 
-let syncScroll = ref(true);
+let conf = reactive(getConfig());
 const hasDiffs = computed(() => jdd.diffs.length > 0);
 const isCompared = computed(() => Editor.isCompared());
 
@@ -134,7 +135,7 @@ onMounted(async () => {
   leftEditor.setChangesListener(leftPasteHandler, resetJdd);
   rightEditor.setChangesListener(rightPasteHandler, resetJdd);
 
-  Editor.setSyncScroll(leftEditor, rightEditor, syncScroll);
+  Editor.setSyncScroll(leftEditor, rightEditor, conf);
   leftEditor.focus();
 
   window.addEventListener("keydown", (e) => {
@@ -334,8 +335,8 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
   }
 
   // 暂时关闭同步滚动
-  const old = syncScroll.value;
-  syncScroll.value = false;
+  const old = conf.syncScroll;
+  conf.syncScroll = false;
 
   const [ldiff, rdiff] = dd;
   leftEditor.scrollTo(ldiff?.index);
@@ -343,7 +344,7 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
 
   // 需要延迟设置
   setTimeout(() => {
-    syncScroll.value = old;
+    conf.syncScroll = old;
   }, 100);
 
   if (side === diff.LEFT) {

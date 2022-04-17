@@ -6,6 +6,7 @@ import "codemirror/addon/lint/lint.css";
 // @ts-ignore
 import jsonlint from "jsonlint-mod";
 import { OptionNum } from "./typeHelper";
+import { Config } from "./config";
 
 export default class Editor {
   cm: CodeMirror.Editor;
@@ -231,15 +232,15 @@ export default class Editor {
     return this.compareVersion.value > 0 && this.compareVersion.value >= this.changeVersion.value;
   }
 
-  static setSyncScroll(leftEditor: Editor, rightEditor: Editor, enableSyncScroll: Ref<boolean>) {
+  static setSyncScroll(leftEditor: Editor, rightEditor: Editor, conf: Config) {
     leftEditor.cm.on("scroll", function () {
-      if (enableSyncScroll.value) {
+      if (conf.syncScroll) {
         const scrollInfo = leftEditor.cm.getScrollInfo();
         rightEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
       }
     });
     rightEditor.cm.on("scroll", function () {
-      if (enableSyncScroll.value) {
+      if (conf.syncScroll) {
         const scrollInfo = rightEditor.cm.getScrollInfo();
         leftEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
       }
