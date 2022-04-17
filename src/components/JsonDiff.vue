@@ -20,12 +20,24 @@
           {{ t("compare") }}
         </button>
       </span>
-      <div class="form-control ml-3 hidden lg:block">
-        <label class="cursor-pointer items-center label space-x-1">
-          <input type="checkbox" class="toggle toggle-sm" v-model="conf.syncScroll" />
-          <span class="label-text">{{ t("syncScroll") }}</span>
-        </label>
+      <div class="dropdown">
+        <label tabindex="0"><img class="btn-like h-full inline-block" src="/gear.svg" alt="Settings" /></label>
+        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-56">
+          <li>
+            <label class="flex cursor-pointer w-full space-x-1">
+              <input type="checkbox" class="toggle toggle-sm" v-model="conf.syncScroll" />
+              <span class="label-text">{{ t("syncScroll") }}</span>
+            </label>
+          </li>
+          <li>
+            <label class="flex cursor-pointer w-full space-x-1">
+              <input type="checkbox" class="toggle toggle-sm" v-model="conf.hiddenRightEditor" />
+              <span class="label-text">{{ t("hiddenRightEditor") }}</span>
+            </label>
+          </li>
+        </ul>
       </div>
+
       <div class="ml-12">
         <div v-if="jdd.errmsg" class="alertError">
           {{ jdd.errmsg }}
@@ -49,10 +61,10 @@
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
-      <div class="w-1/2 h-editor_full lg:h-editor">
+      <div class="h-editor_full lg:h-editor" :class="conf.hiddenRightEditor ? 'w-full' : 'w-1/2'">
         <textarea id="left-editor" class="hidden" :placeholder="t('leftPlaceholder')"></textarea>
       </div>
-      <div class="w-1/2 h-editor_full lg:h-editor">
+      <div class="h-editor_full lg:h-editor" :class="conf.hiddenRightEditor ? 'w-0' : 'w-1/2'">
         <textarea id="right-editor" class="hidden" :placeholder="t('rightPlaceholder')"></textarea>
       </div>
     </div>
@@ -76,17 +88,22 @@
 .editor-hover {
   border: 1px solid #2099d180;
 }
+
+.btn-like:hover {
+  cursor: pointer;
+  background-color: #00000020;
+}
 </style>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, shallowReactive } from "vue";
+import { computed, onMounted, reactive, shallowReactive, watch } from "vue";
 import * as jsonMap from "json-map-ts";
 import * as diff from "../utils/diff";
 import Editor from "../utils/editor";
 import formatJsonString from "../utils/format";
 import { setupLang, t } from "../utils/i18n";
 import { OptionNum } from "../utils/typeHelper";
-import { getConfig } from "../utils/config";
+import { Config } from "../utils/config";
 
 type Side = diff.Side;
 type ScrollDirection = "prev" | "next";
@@ -104,7 +121,8 @@ const jdd = shallowReactive({
   isTextCompared: false,
 });
 
-let conf = reactive(getConfig());
+let conf = reactive(new Config());
+
 const hasDiffs = computed(() => jdd.diffs.length > 0);
 const isCompared = computed(() => Editor.isCompared());
 
@@ -115,6 +133,12 @@ onMounted(async () => {
   if (typeof window === "undefined") {
     console.log("skip onMounted when SSG");
     return;
+  }
+
+  // 从 localStorage 读配置
+  if (localStorage.getItem("config")) {
+    Object.assign(conf, JSON.parse(localStorage.getItem("config") as string));
+    console.log("load config:", conf);
   }
 
   await leftEditor.init("left-editor");
@@ -160,6 +184,12 @@ onMounted(async () => {
         break;
     }
   });
+});
+
+// 监听配置项变化，写入 localStorage
+watch(conf, (v) => {
+  localStorage.setItem("config", JSON.stringify(v));
+  console.log("save config:", v);
 });
 
 function handleError(e: Error, side: Side) {
