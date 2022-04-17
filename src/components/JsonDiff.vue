@@ -1,6 +1,6 @@
 <template>
   <div class="grid grid-cols-12 gap-2">
-    <div class="col-span-6 flex space-x-3">
+    <div class="col-span-6 flex space-x-2">
       <button @click="pretty()" class="actionButton">
         {{ t("pretty") }}
       </button>
@@ -14,7 +14,7 @@
         {{ t("unescape") }}
       </button>
     </div>
-    <div class="col-span-6 flex">
+    <div class="col-span-6 flex space-x-2">
       <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Enter">
         <button @click="compare" class="actionButton">
           {{ t("compare") }}
@@ -30,7 +30,7 @@
         <div v-if="jdd.errmsg" class="alertError">
           {{ jdd.errmsg }}
         </div>
-        <div class="space-x-3" v-else-if="hasDiffs">
+        <div class="space-x-2" v-else-if="hasDiffs">
           <span class="tooltip tooltip-bottom z-10" data-tip="Ctrl + Left">
             <button @click="scrollToPrevDiff('right')" class="button">
               {{ t("prev") }}
