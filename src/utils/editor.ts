@@ -5,6 +5,8 @@ import "codemirror/addon/fold/foldgutter.css";
 import "codemirror/addon/lint/lint.css";
 // @ts-ignore
 import jsonlint from "jsonlint-mod";
+import { OptionNum } from "./typeHelper";
+import { Config } from "./config";
 
 export default class Editor {
   cm: CodeMirror.Editor;
@@ -155,15 +157,25 @@ export default class Editor {
     return lineInfo.wrapClass ? lineInfo.wrapClass.split(/\s+/).includes(cls) : false;
   }
 
-  addClass(lineno: number, cls: string) {
+  addClass(lineno: OptionNum, cls: string) {
+    if (lineno === undefined) {
+      return;
+    }
     this.cm.addLineClass(lineno - 1, "wrap", cls);
   }
 
-  removeClass(lineno: number, cls?: string) {
+  removeClass(lineno: OptionNum, cls?: string) {
+    if (lineno === undefined) {
+      return;
+    }
     this.cm.removeLineClass(lineno - 1, "wrap", cls);
   }
 
-  mark(lineno: number, startPos?: number, endPos?: number, cls?: string) {
+  mark(lineno: OptionNum, startPos?: number, endPos?: number, cls?: string) {
+    if (lineno === undefined) {
+      return;
+    }
+
     const from = { line: lineno - 1, ch: startPos ? startPos : 0 };
     const to = { line: lineno - 1, ch: endPos ? endPos : 0 };
 
@@ -174,7 +186,10 @@ export default class Editor {
     }
   }
 
-  scrollTo(lineno: number) {
+  scrollTo(lineno: OptionNum) {
+    if (lineno === undefined) {
+      return;
+    }
     let t = this.cm.charCoords({ line: lineno, ch: 0 }, "local").top;
     let middleHeight = this.cm.getScrollerElement().offsetHeight / 2;
     this.cm.scrollTo(null, t - middleHeight - 5);
@@ -217,15 +232,15 @@ export default class Editor {
     return this.compareVersion.value > 0 && this.compareVersion.value >= this.changeVersion.value;
   }
 
-  static setSyncScroll(leftEditor: Editor, rightEditor: Editor, enableSyncScroll: Ref<boolean>) {
+  static setSyncScroll(leftEditor: Editor, rightEditor: Editor, conf: Config) {
     leftEditor.cm.on("scroll", function () {
-      if (enableSyncScroll.value) {
+      if (conf.syncScroll) {
         const scrollInfo = leftEditor.cm.getScrollInfo();
         rightEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
       }
     });
     rightEditor.cm.on("scroll", function () {
-      if (enableSyncScroll.value) {
+      if (conf.syncScroll) {
         const scrollInfo = rightEditor.cm.getScrollInfo();
         leftEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
       }

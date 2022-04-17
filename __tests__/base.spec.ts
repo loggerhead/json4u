@@ -82,80 +82,80 @@ describe("line compare", () => {
       `{"Aidan Gillen": {"array": ["Game of Thrones","The Wire"],"string": "some string","int": "2","otherint": 4, "aboolean": "true", "boolean": false, "null": null, "a_null":88, "another_null": null, "object": {"foo": "bar"}},"Amy Ryan": ["In Treatment","The Wire"],"Annie Fitzgerald": ["True Blood","Big Love","The Sopranos","Oz"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsg?rd": ["Generation Kill","True Blood"],"Alice Farmer": ["The Corner","Oz","The Wire"]}`,
       [
         [
-          { line: 46, pointer: "/Clarke Peters", diffType: diff.MORE },
-          { line: 1, pointer: "", diffType: diff.LESS },
+          { index: 46, pointer: "/Clarke Peters", diffType: diff.INS },
+          { index: 1, pointer: "", diffType: diff.NONE },
         ],
         [
-          { line: 4, pointer: "/Aidan Gillen/array/0", diffType: diff.NE },
-          { line: 4, pointer: "/Aidan Gillen/array/0", diffType: diff.NE },
+          { index: 4, pointer: "/Aidan Gillen/array/0", diffType: diff.DEL },
+          { index: 4, pointer: "/Aidan Gillen/array/0", diffType: diff.INS },
         ],
         [
-          { line: 8, pointer: "/Aidan Gillen/int", diffType: diff.NE },
-          { line: 8, pointer: "/Aidan Gillen/int", diffType: diff.NE },
+          { index: 8, pointer: "/Aidan Gillen/int", diffType: diff.DEL },
+          { index: 8, pointer: "/Aidan Gillen/int", diffType: diff.INS },
         ],
         [
-          { line: 2, pointer: "/Aidan Gillen", diffType: diff.LESS },
-          { line: 9, pointer: "/Aidan Gillen/otherint", diffType: diff.MORE },
+          { index: 2, pointer: "/Aidan Gillen", diffType: diff.NONE },
+          { index: 9, pointer: "/Aidan Gillen/otherint", diffType: diff.INS },
         ],
         [
-          { line: 9, pointer: "/Aidan Gillen/aboolean", diffType: diff.NE },
-          { line: 10, pointer: "/Aidan Gillen/aboolean", diffType: diff.NE },
+          { index: 9, pointer: "/Aidan Gillen/aboolean", diffType: diff.DEL },
+          { index: 10, pointer: "/Aidan Gillen/aboolean", diffType: diff.INS },
         ],
         [
-          { line: 10, pointer: "/Aidan Gillen/boolean", diffType: diff.NE },
-          { line: 11, pointer: "/Aidan Gillen/boolean", diffType: diff.NE },
+          { index: 10, pointer: "/Aidan Gillen/boolean", diffType: diff.DEL },
+          { index: 11, pointer: "/Aidan Gillen/boolean", diffType: diff.INS },
         ],
         [
-          { line: 12, pointer: "/Aidan Gillen/a_null", diffType: diff.NE },
-          { line: 13, pointer: "/Aidan Gillen/a_null", diffType: diff.NE },
+          { index: 12, pointer: "/Aidan Gillen/a_null", diffType: diff.DEL },
+          { index: 13, pointer: "/Aidan Gillen/a_null", diffType: diff.INS },
         ],
         [
-          { line: 13, pointer: "/Aidan Gillen/another_null", diffType: diff.NE },
-          { line: 14, pointer: "/Aidan Gillen/another_null", diffType: diff.NE },
+          { index: 13, pointer: "/Aidan Gillen/another_null", diffType: diff.DEL },
+          { index: 14, pointer: "/Aidan Gillen/another_null", diffType: diff.INS },
         ],
         [
-          { line: 16, pointer: "/Aidan Gillen/object/object1", diffType: diff.MORE },
-          { line: 15, pointer: "/Aidan Gillen/object", diffType: diff.LESS },
+          { index: 16, pointer: "/Aidan Gillen/object/object1", diffType: diff.INS },
+          { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
-          { line: 19, pointer: "/Aidan Gillen/object/object2", diffType: diff.MORE },
-          { line: 15, pointer: "/Aidan Gillen/object", diffType: diff.LESS },
+          { index: 19, pointer: "/Aidan Gillen/object/object2", diffType: diff.INS },
+          { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
-          { line: 22, pointer: "/Aidan Gillen/object/object3", diffType: diff.MORE },
-          { line: 15, pointer: "/Aidan Gillen/object", diffType: diff.LESS },
+          { index: 22, pointer: "/Aidan Gillen/object/object3", diffType: diff.INS },
+          { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
-          { line: 25, pointer: "/Aidan Gillen/object/object4", diffType: diff.MORE },
-          { line: 15, pointer: "/Aidan Gillen/object", diffType: diff.LESS },
+          { index: 25, pointer: "/Aidan Gillen/object/object4", diffType: diff.INS },
+          { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
-          { line: 30, pointer: "/Amy Ryan", diffType: diff.NE },
-          { line: 19, pointer: "/Amy Ryan", diffType: diff.NE },
+          { index: 30, pointer: "/Amy Ryan", diffType: diff.DEL },
+          { index: 19, pointer: "/Amy Ryan", diffType: diff.INS },
         ],
         [
-          { line: 35, pointer: "/Annie Fitzgerald/0", diffType: diff.NE },
-          { line: 24, pointer: "/Annie Fitzgerald/0", diffType: diff.NE },
+          { index: 35, pointer: "/Annie Fitzgerald/0", diffType: diff.DEL },
+          { index: 24, pointer: "/Annie Fitzgerald/0", diffType: diff.INS },
         ],
         [
-          { line: 36, pointer: "/Annie Fitzgerald/1", diffType: diff.NE },
-          { line: 25, pointer: "/Annie Fitzgerald/1", diffType: diff.NE },
+          { index: 36, pointer: "/Annie Fitzgerald/1", diffType: diff.DEL },
+          { index: 25, pointer: "/Annie Fitzgerald/1", diffType: diff.INS },
         ],
         [
-          { line: 34, pointer: "/Annie Fitzgerald", diffType: diff.LESS },
-          { line: 26, pointer: "/Annie Fitzgerald/2", diffType: diff.MORE },
+          { index: 34, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
+          { index: 26, pointer: "/Annie Fitzgerald/2", diffType: diff.INS },
         ],
         [
-          { line: 34, pointer: "/Annie Fitzgerald", diffType: diff.LESS },
-          { line: 27, pointer: "/Annie Fitzgerald/3", diffType: diff.MORE },
+          { index: 34, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
+          { index: 27, pointer: "/Annie Fitzgerald/3", diffType: diff.INS },
         ],
         [
-          { line: 42, pointer: "/Alexander Skarsgard", diffType: diff.NE },
-          { line: 33, pointer: "/Alexander Skarsg?rd", diffType: diff.NE },
+          { index: 42, pointer: "/Alexander Skarsgard", diffType: diff.DEL },
+          { index: 33, pointer: "/Alexander Skarsg?rd", diffType: diff.INS },
         ],
         [
-          { line: 1, pointer: "", diffType: diff.LESS },
-          { line: 37, pointer: "/Alice Farmer", diffType: diff.MORE },
+          { index: 1, pointer: "", diffType: diff.NONE },
+          { index: 37, pointer: "/Alice Farmer", diffType: diff.INS },
         ],
       ]
     );
@@ -167,32 +167,32 @@ describe("line compare", () => {
       `[{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]`,
       [
         [
-          { line: 11, pointer: "/1", diffType: "more", charDiffs: [] },
-          { line: 1, pointer: "", diffType: "less", charDiffs: [] },
+          { index: 11, pointer: "/1", diffType: diff.INS, charDiffs: [] },
+          { index: 1, pointer: "", diffType: diff.NONE, charDiffs: [] },
         ],
         [
-          { line: 3, pointer: "/0/OBJ_ID", diffType: diff.NE },
-          { line: 3, pointer: "/0/OBJ_ID", diffType: diff.NE },
+          { index: 3, pointer: "/0/OBJ_ID", diffType: diff.DEL },
+          { index: 3, pointer: "/0/OBJ_ID", diffType: diff.INS },
         ],
         [
-          { line: 5, pointer: "/0/objectGUID", diffType: diff.NE },
-          { line: 5, pointer: "/0/objectGUID", diffType: diff.NE },
+          { index: 5, pointer: "/0/objectGUID", diffType: diff.DEL },
+          { index: 5, pointer: "/0/objectGUID", diffType: diff.INS },
         ],
         [
-          { line: 6, pointer: "/0/lastLogon", diffType: diff.NE, charDiffs: [] },
-          { line: 6, pointer: "/0/lastLogon", diffType: diff.NE },
+          { index: 6, pointer: "/0/lastLogon", diffType: diff.DEL, charDiffs: [] },
+          { index: 6, pointer: "/0/lastLogon", diffType: diff.INS },
         ],
         [
-          { line: 7, pointer: "/0/sAMAccountName", diffType: diff.NE },
-          { line: 7, pointer: "/0/sAMAccountName", diffType: diff.NE },
+          { index: 7, pointer: "/0/sAMAccountName", diffType: diff.DEL },
+          { index: 7, pointer: "/0/sAMAccountName", diffType: diff.INS },
         ],
         [
-          { line: 8, pointer: "/0/userPrincipalName", diffType: diff.NE },
-          { line: 8, pointer: "/0/userPrincipalName", diffType: diff.NE },
+          { index: 8, pointer: "/0/userPrincipalName", diffType: diff.DEL },
+          { index: 8, pointer: "/0/userPrincipalName", diffType: diff.INS },
         ],
         [
-          { line: 9, pointer: "/0/distinguishedName", diffType: diff.NE },
-          { line: 9, pointer: "/0/distinguishedName", diffType: diff.NE },
+          { index: 9, pointer: "/0/distinguishedName", diffType: diff.DEL },
+          { index: 9, pointer: "/0/distinguishedName", diffType: diff.INS },
         ],
       ]
     );
@@ -207,8 +207,8 @@ describe("char-by-char compare", () => {
   test("key difference", () => {
     compareDiffs(`{"foo": 1}`, `{"foz": 1}`, [
       [
-        { line: 2, pointer: "/foo", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_DEL, start: 7, end: 8 }] },
-        { line: 2, pointer: "/foz", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_INS, start: 7, end: 8 }] },
+        { index: 2, pointer: "/foo", diffType: diff.DEL, charDiffs: [{ diffType: diff.PART_DEL, start: 7, end: 8 }] },
+        { index: 2, pointer: "/foz", diffType: diff.INS, charDiffs: [{ diffType: diff.PART_INS, start: 7, end: 8 }] },
       ],
     ]);
   });
@@ -216,8 +216,18 @@ describe("char-by-char compare", () => {
   test("key difference with equal object value", () => {
     compareDiffs(`[123, {"foo": {"": 1}}]`, `[123, {"foz": {"": 1}}]`, [
       [
-        { line: 4, pointer: "/1/foo", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_DEL, start: 11, end: 12 }] },
-        { line: 4, pointer: "/1/foz", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_INS, start: 11, end: 12 }] },
+        {
+          index: 4,
+          pointer: "/1/foo",
+          diffType: diff.DEL,
+          charDiffs: [{ diffType: diff.PART_DEL, start: 11, end: 12 }],
+        },
+        {
+          index: 4,
+          pointer: "/1/foz",
+          diffType: diff.INS,
+          charDiffs: [{ diffType: diff.PART_INS, start: 11, end: 12 }],
+        },
       ],
     ]);
   });
@@ -225,8 +235,18 @@ describe("char-by-char compare", () => {
   test("key difference with equal array value", () => {
     compareDiffs(`[123, {"foo": [1]}]`, `[123, {"foz": [1]}]`, [
       [
-        { line: 4, pointer: "/1/foo", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_DEL, start: 11, end: 12 }] },
-        { line: 4, pointer: "/1/foz", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_INS, start: 11, end: 12 }] },
+        {
+          index: 4,
+          pointer: "/1/foo",
+          diffType: diff.DEL,
+          charDiffs: [{ diffType: diff.PART_DEL, start: 11, end: 12 }],
+        },
+        {
+          index: 4,
+          pointer: "/1/foz",
+          diffType: diff.INS,
+          charDiffs: [{ diffType: diff.PART_INS, start: 11, end: 12 }],
+        },
       ],
     ]);
   });
@@ -234,8 +254,8 @@ describe("char-by-char compare", () => {
   test("value difference", () => {
     compareDiffs(`{"foo": 123}`, `{"foo": 231}`, [
       [
-        { line: 2, pointer: "/foo", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_DEL, start: 11, end: 12 }] },
-        { line: 2, pointer: "/foo", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_INS, start: 13, end: 14 }] },
+        { index: 2, pointer: "/foo", diffType: diff.DEL, charDiffs: [{ diffType: diff.PART_DEL, start: 11, end: 12 }] },
+        { index: 2, pointer: "/foo", diffType: diff.INS, charDiffs: [{ diffType: diff.PART_INS, start: 13, end: 14 }] },
       ],
     ]);
   });
@@ -243,8 +263,8 @@ describe("char-by-char compare", () => {
   test("value difference of bigint", () => {
     compareDiffs(`{"foo": 18446744073709551615}`, `{"foo": 18446744073709551611}`, [
       [
-        { line: 2, pointer: "/foo", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_DEL, start: 30, end: 31 }] },
-        { line: 2, pointer: "/foo", diffType: diff.NE, charDiffs: [{ diffType: diff.CHAR_INS, start: 30, end: 31 }] },
+        { index: 2, pointer: "/foo", diffType: diff.DEL, charDiffs: [{ diffType: diff.PART_DEL, start: 30, end: 31 }] },
+        { index: 2, pointer: "/foo", diffType: diff.INS, charDiffs: [{ diffType: diff.PART_INS, start: 30, end: 31 }] },
       ],
     ]);
   });
@@ -253,16 +273,16 @@ describe("char-by-char compare", () => {
     compareDiffs(`[{"foo": [123]}]`, `[{"foo": [231]}]`, [
       [
         {
-          line: 4,
+          index: 4,
           pointer: "/0/foo/0",
-          diffType: diff.NE,
-          charDiffs: [{ diffType: diff.CHAR_DEL, start: 12, end: 13 }],
+          diffType: diff.DEL,
+          charDiffs: [{ diffType: diff.PART_DEL, start: 12, end: 13 }],
         },
         {
-          line: 4,
+          index: 4,
           pointer: "/0/foo/0",
-          diffType: diff.NE,
-          charDiffs: [{ diffType: diff.CHAR_INS, start: 14, end: 15 }],
+          diffType: diff.INS,
+          charDiffs: [{ diffType: diff.PART_INS, start: 14, end: 15 }],
         },
       ],
     ]);
@@ -273,22 +293,22 @@ describe("json pointer", () => {
   test("simple json pointer", () => {
     compareDiffs(`{}`, `{"": 1}`, [
       [
-        { line: 1, pointer: "", diffType: diff.LESS },
-        { line: 2, pointer: "/", diffType: diff.MORE },
+        { index: 1, pointer: "", diffType: diff.NONE },
+        { index: 2, pointer: "/", diffType: diff.INS },
       ],
     ]);
 
     compareDiffs(`[]`, `[1]`, [
       [
-        { line: 1, pointer: "", diffType: diff.LESS },
-        { line: 2, pointer: "/0", diffType: diff.MORE },
+        { index: 1, pointer: "", diffType: diff.NONE },
+        { index: 2, pointer: "/0", diffType: diff.INS },
       ],
     ]);
 
     compareDiffs(`{}`, `{"0": 1}`, [
       [
-        { line: 1, pointer: "", diffType: diff.LESS },
-        { line: 2, pointer: "/0", diffType: diff.MORE },
+        { index: 1, pointer: "", diffType: diff.NONE },
+        { index: 2, pointer: "/0", diffType: diff.INS },
       ],
     ]);
   });
@@ -297,23 +317,23 @@ describe("json pointer", () => {
     // escape '~' as '~0'
     compareDiffs(`{"~": 1}`, `{"~0": 1}`, [
       [
-        { line: 2, pointer: "/~0", diffType: diff.NE },
-        { line: 2, pointer: "/~00", diffType: diff.NE },
+        { index: 2, pointer: "/~0", diffType: diff.DEL },
+        { index: 2, pointer: "/~00", diffType: diff.INS },
       ],
     ]);
 
     // escape '/' as '~1'
     compareDiffs(`{"/": 1}`, `{"~1": 1}`, [
       [
-        { line: 2, pointer: "/~1", diffType: diff.NE },
-        { line: 2, pointer: "/~01", diffType: diff.NE },
+        { index: 2, pointer: "/~1", diffType: diff.DEL },
+        { index: 2, pointer: "/~01", diffType: diff.INS },
       ],
     ]);
 
     compareDiffs(`{"<>": 1}`, `{"\\\\": 1}`, [
       [
-        { line: 2, pointer: "/<>", diffType: diff.NE },
-        { line: 2, pointer: "/\\", diffType: diff.NE },
+        { index: 2, pointer: "/<>", diffType: diff.DEL },
+        { index: 2, pointer: "/\\", diffType: diff.INS },
       ],
     ]);
   });
@@ -332,8 +352,8 @@ function gen(...lines: number[]): any {
   let vv = [];
   for (const line of lines) {
     vv.push([
-      { line: line, diffType: diff.NE },
-      { line: line, diffType: diff.NE },
+      { index: line, diffType: diff.DEL },
+      { index: line, diffType: diff.INS },
     ]);
   }
   return vv;

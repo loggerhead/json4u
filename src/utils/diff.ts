@@ -1,26 +1,35 @@
 import jsonPointer from "json-pointer";
-import diff from "fast-diff";
 import * as jsonMap from "json-map-ts";
 import { deepEqual } from "fast-equals";
-import { isObject, isBaseType, isNumber } from "../utils/typeHelper";
+import { OptionNum, isObject, isBaseType, isNumber } from "./typeHelper";
 import TraceRecord from "./trace";
 import MySet from "./set";
+import {
+  DiffType,
+  Diff as BaseDiff,
+  PartDiff,
+  Side,
+  REP,
+  DEL,
+  INS,
+  PART_INS,
+  PART_DEL,
+  LEFT,
+  RIGHT,
+  NONE,
+  myersDiff,
+  partDiff,
+} from "./myersDiff";
 
-export const MORE = "more";
-export const LESS = "less";
-export const NE = "not_equal";
-export const CHAR_INS = "char_insert"; // inline character insert
-export const CHAR_DEL = "char_delete"; // inline character delete
-export type DiffType = typeof MORE | typeof LESS | typeof NE | typeof CHAR_INS | typeof CHAR_DEL;
-export type Side = "left" | "right";
+export type { DiffType, Side };
+export { NONE, DEL, INS, PART_INS, PART_DEL, LEFT, RIGHT };
 
-interface CharDiff {
-  start: number;
-  end: number;
-  diffType: DiffType;
+export interface Diff extends BaseDiff {
+  pointer: string;
+  charDiffs?: PartDiff[];
 }
+export type DiffPair = [Diff | undefined, Diff | undefined];
 
-export type DiffPair = [Diff, Diff];
 export class Error {
   error: any;
   side: Side;
@@ -29,13 +38,6 @@ export class Error {
     this.error = e;
     this.side = side;
   }
-}
-
-export interface Diff {
-  line: number;
-  pointer: string;
-  diffType: DiffType;
-  charDiffs?: CharDiff[];
 }
 
 export class Handler {
@@ -51,9 +53,12 @@ export class Handler {
 
   compare(): DiffPair[] {
     this.diffVal(this.ltrace.data, this.rtrace.data);
-    this.results.sort((a, b): number => {
-      const right = a[1].line - b[1].line;
-      return right ? right : a[0].line - b[0].line;
+    this.results.sort((aa: DiffPair, bb: DiffPair): number => {
+      const [al, ar] = aa;
+      const [bl, br] = bb;
+      const left = al === undefined || bl === undefined ? 0 : al.index - bl.index;
+      const right = ar === undefined || br === undefined ? 0 : ar.index - br.index;
+      return right ? right : left;
     });
     return this.results;
   }
@@ -73,22 +78,7 @@ export class Handler {
           this.rtrace.getValue(rdiff.pointer),
         ];
 
-    let cdiffs = diff(ltext, rtext);
-
-    for (const cdiff of cdiffs) {
-      const [t, v] = cdiff;
-
-      if (t == diff.INSERT) {
-        rdiff.charDiffs?.push({ start: rpos, end: rpos + v.length, diffType: CHAR_INS });
-        rpos += v.length;
-      } else if (t == diff.DELETE) {
-        ldiff.charDiffs?.push({ start: lpos, end: lpos + v.length, diffType: CHAR_DEL });
-        lpos += v.length;
-      } else {
-        lpos += v.length;
-        rpos += v.length;
-      }
-    }
+    [ldiff.charDiffs, rdiff.charDiffs] = charDiff(lpos, rpos, ltext, rtext);
   }
 
   diffVal(ldata: any, rdata: any) {
@@ -97,8 +87,8 @@ export class Handler {
     } else if (isObject(ldata) && isObject(rdata)) {
       this.diffObject(ldata, rdata);
     } else if (ldata !== rdata) {
-      let ldiff = genDiff(this.ltrace, NE);
-      let rdiff = genDiff(this.rtrace, NE);
+      let ldiff = genDiff(this.ltrace, DEL);
+      let rdiff = genDiff(this.rtrace, INS);
 
       if (isNeedDiffVal(ldata, rdata)) {
         this.genAndSetCharsDiff(ldiff, rdiff);
@@ -120,9 +110,9 @@ export class Handler {
         this.ltrace.pop();
         this.rtrace.pop();
       } else if (ldata.length < rdata.length) {
-        this.results.push([genDiff(this.ltrace, LESS), genDiff(this.rtrace, MORE, i)]);
+        this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, INS, i)]);
       } else if (ldata.length > rdata.length) {
-        this.results.push([genDiff(this.ltrace, MORE, i), genDiff(this.rtrace, LESS)]);
+        this.results.push([genDiff(this.ltrace, INS, i), genDiff(this.rtrace, NONE)]);
       }
     }
   }
@@ -148,8 +138,8 @@ export class Handler {
           return;
         }
 
-        let ldiff = genDiff(this.ltrace, NE, lkey);
-        let rdiff = genDiff(this.rtrace, NE, rkey);
+        let ldiff = genDiff(this.ltrace, DEL, lkey);
+        let rdiff = genDiff(this.rtrace, INS, rkey);
         this.genAndSetCharsDiff(ldiff, rdiff, true);
         this.results.push([ldiff, rdiff]);
         seen.add(lkey);
@@ -161,14 +151,14 @@ export class Handler {
       if (seen.has(key)) {
         return;
       }
-      this.results.push([genDiff(this.ltrace, MORE, key), genDiff(this.rtrace, LESS)]);
+      this.results.push([genDiff(this.ltrace, INS, key), genDiff(this.rtrace, NONE)]);
     });
 
     rightOnly.forEach((key) => {
       if (seen.has(key)) {
         return;
       }
-      this.results.push([genDiff(this.ltrace, LESS), genDiff(this.rtrace, MORE, key)]);
+      this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, INS, key)]);
     });
   }
 }
@@ -180,19 +170,93 @@ export function compare(ltext: string, rtext: string): DiffPair[] | Error {
   try {
     ltrace.setParseResult(jsonMap.parse(ltrace.out));
   } catch (e: any) {
-    return new Error(e, "left");
+    return new Error(e, LEFT);
   }
 
   try {
     rtrace.setParseResult(jsonMap.parse(rtrace.out));
   } catch (e: any) {
-    return new Error(e, "right");
+    return new Error(e, RIGHT);
   }
 
   return new Handler(ltrace, rtrace).compare();
 }
 
-function genDiff(trace: TraceRecord, diffType: any, key?: string | number, val?: any): Diff {
+export function textCompare(ltext: string, rtext: string): DiffPair[] {
+  const llines = ltext.split("\n");
+  const rlines = rtext.split("\n");
+  const dd = myersDiff(llines, rlines);
+
+  const genDiffs = function (lIndex: OptionNum, rIndex: OptionNum, lDiffType: DiffType, rDiffType: DiffType): DiffPair {
+    return [
+      lIndex === undefined
+        ? undefined
+        : {
+            index: Math.min(lIndex, llines.length - 1) + 1,
+            diffType: lDiffType,
+            pointer: "",
+          },
+      rIndex === undefined
+        ? undefined
+        : {
+            index: Math.min(rIndex, rlines.length - 1) + 1,
+            diffType: rDiffType,
+            pointer: "",
+          },
+    ];
+  };
+
+  let results: DiffPair[] = [];
+
+  for (let i = 0; i < dd.length; i++) {
+    const d = dd[i];
+    const diffType = d.diffType;
+    const side = d.side;
+
+    if (diffType === DEL) {
+      if (side == LEFT) {
+        results.push(genDiffs(d.index, undefined, DEL, NONE));
+      } else {
+        results.push(genDiffs(undefined, d.index, NONE, DEL));
+      }
+    } else if (diffType === INS) {
+      if (side == LEFT) {
+        results.push(genDiffs(d.index, undefined, INS, NONE));
+      } else {
+        results.push(genDiffs(undefined, d.index, NONE, INS));
+      }
+    } else if (diffType === REP) {
+      const rd = dd[++i];
+      // char-by-char diff
+      let [lcharDiffs, rcharDiffs] = charDiff(0, 0, llines[d.index], rlines[rd.index]);
+      let [ldiff, rdiff] = genDiffs(d.index, d.index, DEL, INS);
+      (ldiff as Diff).charDiffs = lcharDiffs;
+      (rdiff as Diff).charDiffs = rcharDiffs;
+      // 如果不存在 char-by-char diff 结果，说明有一边是 insert 或 delete，而另一边相对而言没有改变
+      results.push([ldiff?.charDiffs ? ldiff : undefined, rdiff?.charDiffs ? rdiff : undefined]);
+    }
+  }
+
+  return results;
+}
+
+function charDiff(lpos: number, rpos: number, ltext: string, rtext: string): [PartDiff[], PartDiff[]] {
+  let [lcharDiffs, rcharDiffs] = partDiff(ltext, rtext);
+
+  for (let d of lcharDiffs) {
+    d.start += lpos;
+    d.end += lpos;
+  }
+
+  for (let d of rcharDiffs) {
+    d.start += rpos;
+    d.end += rpos;
+  }
+
+  return [lcharDiffs, rcharDiffs];
+}
+
+function genDiff(trace: TraceRecord, diffType: DiffType, key?: string | number, val?: any): Diff {
   let pointer;
 
   if (key === undefined) {
@@ -204,7 +268,7 @@ function genDiff(trace: TraceRecord, diffType: any, key?: string | number, val?:
   }
 
   return {
-    line: trace.getLine(pointer),
+    index: trace.getLine(pointer),
     pointer: pointer,
     diffType: diffType,
     charDiffs: [],
