@@ -1,29 +1,6 @@
 export class Config {
+  // 左右两边的 editor 同步滚动
   syncScroll: boolean = true;
-}
-
-var globalConf: Config;
-
-export function getConfig(): Config {
-  if (!globalConf) {
-    const configStr = localStorage.getItem("config");
-    let conf: Config;
-
-    if (configStr) {
-      conf = JSON.parse(configStr);
-    } else {
-      conf = new Config();
-    }
-
-    globalConf = new Proxy(conf, {
-      set(obj, prop, value) {
-        (obj as any)[prop] = value;
-        console.log("save config: ", obj);
-        localStorage.setItem("config", JSON.stringify(obj));
-        return true;
-      },
-    });
-  }
-
-  return globalConf;
+  // 隐藏右边的 editor（常用 format 时不需要 diff，隐藏可以展示更多内容）
+  hiddenRightEditor: boolean = false;
 }
