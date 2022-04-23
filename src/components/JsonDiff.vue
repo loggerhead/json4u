@@ -41,6 +41,12 @@
               <span class="label-text">{{ t("autoFormat") }}</span>
             </label>
           </li>
+          <li>
+            <label class="flex cursor-pointer w-full space-x-1">
+              <input type="checkbox" class="toggle toggle-sm" v-model="conf.ignoreBlank" />
+              <span class="label-text">{{ t("ignoreBlank") }}</span>
+            </label>
+          </li>
         </ul>
       </div>
 
@@ -296,7 +302,7 @@ function compare() {
     if (diffsOrErr instanceof diff.Error) {
       jdd.isTextCompared = true;
       handleError(diffsOrErr.error, diffsOrErr.side);
-      jdd.diffs = diff.textCompare(ltext, rtext);
+      jdd.diffs = diff.textCompare(ltext, rtext, conf.ignoreBlank);
     } else {
       jdd.diffs = diffsOrErr as diff.DiffPair[];
     }
