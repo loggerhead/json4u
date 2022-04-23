@@ -1459,13 +1459,6 @@
   resolved "https://registry.npmjs.org/@types/estree/-/estree-0.0.50.tgz"
   integrity sha512-C6N5s2ZFtuZRj54k2/zyRhNDjJwwcViAM3Nbm8zjBpbqAdZ00mr0CFxvSKeO8Y/e03WVFLpQMdHYVfUd6SB+Hw==
 
-"@types/fast-diff@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@types/fast-diff/-/fast-diff-1.2.0.tgz#89c7b9241a81dcb0407df8301560248f62681735"
-  integrity sha512-JCEpN07uhCp9kIqtxunifE7CxybIsv49XmGPQ39beuhSBYXmgoB1Xh+fFTIQ0ZW78rt8Uer/5zu8nsrKXmGdJQ==
-  dependencies:
-    fast-diff "*"
-
 "@types/glob@^7.1.1":
   version "7.2.0"
   resolved "https://registry.npmjs.org/@types/glob/-/glob-7.2.0.tgz"
@@ -3202,11 +3195,6 @@ extend@^3.0.0:
   version "3.0.2"
   resolved "https://registry.npmjs.org/extend/-/extend-3.0.2.tgz"
   integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
-
-fast-diff@*, fast-diff@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
-  integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
 
 fast-equals@^3.0.0:
   version "3.0.0"
