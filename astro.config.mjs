@@ -1,4 +1,6 @@
 // @ts-check
+import analyzer from "rollup-plugin-analyzer";
+
 export default /** @type {import('astro').AstroUserConfig} */ ({
   buildOptions: {
     site: "https://json4u.com",
@@ -9,6 +11,6 @@ export default /** @type {import('astro').AstroUserConfig} */ ({
   },
   renderers: ["@astrojs/renderer-vue"],
   vite: {
-    plugins: [],
+    plugins: [analyzer({ summaryOnly: true })],
   },
 });
