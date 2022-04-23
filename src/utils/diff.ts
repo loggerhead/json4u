@@ -182,7 +182,7 @@ export function compare(ltext: string, rtext: string): DiffPair[] | Error {
   return new Handler(ltrace, rtrace).compare();
 }
 
-export function textCompare(ltext: string, rtext: string): DiffPair[] {
+export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean): DiffPair[] {
   const llines = ltext.split("\n");
   const rlines = rtext.split("\n");
   const dd = myersDiff(llines, rlines);
@@ -213,6 +213,11 @@ export function textCompare(ltext: string, rtext: string): DiffPair[] {
     const diffType = d.diffType;
     const side = d.side;
 
+    // 忽略空白差异
+    if (ignoreBlank && isBlank((side == LEFT ? llines : rlines)[d.index])) {
+      continue;
+    }
+
     if (diffType === DEL) {
       if (side == LEFT) {
         results.push(genDiffs(d.index, undefined, DEL, NONE));
@@ -229,6 +234,16 @@ export function textCompare(ltext: string, rtext: string): DiffPair[] {
       const rd = dd[++i];
       // char-by-char diff
       let [lcharDiffs, rcharDiffs] = charDiff(0, 0, llines[d.index], rlines[rd.index]);
+
+      // 忽略空白差异
+      if (ignoreBlank) {
+        lcharDiffs = lcharDiffs.filter((cd) => !isBlank(llines[d.index].slice(cd.start, cd.end)));
+        rcharDiffs = rcharDiffs.filter((cd) => !isBlank(rlines[rd.index].slice(cd.start, cd.end)));
+        if (lcharDiffs.length + rcharDiffs.length == 0) {
+          continue;
+        }
+      }
+
       let [ldiff, rdiff] = genDiffs(d.index, d.index, DEL, INS);
       (ldiff as Diff).charDiffs = lcharDiffs;
       (rdiff as Diff).charDiffs = rcharDiffs;
@@ -238,6 +253,10 @@ export function textCompare(ltext: string, rtext: string): DiffPair[] {
   }
 
   return results;
+}
+
+function isBlank(s: string): boolean {
+  return s.trim().length == 0;
 }
 
 function charDiff(lpos: number, rpos: number, ltext: string, rtext: string): [PartDiff[], PartDiff[]] {

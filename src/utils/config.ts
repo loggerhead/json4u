@@ -5,4 +5,6 @@ export class Config {
   showRightEditor: boolean = true;
   // 粘贴时自动格式化
   autoFormat: boolean = true;
+  // 进行文本比较时忽略空白差异
+  ignoreBlank: boolean = true;
 }
