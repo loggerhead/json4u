@@ -10,6 +10,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": false,
     "lib": ["esnext", "dom"],
     "typeRoots": ["node_modules/@types/", "@types"]
   },

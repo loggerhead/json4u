@@ -179,7 +179,12 @@ describe("line compare", () => {
           { index: 5, pointer: "/0/objectGUID", diffType: diff.INS },
         ],
         [
-          { index: 6, pointer: "/0/lastLogon", diffType: diff.DEL, charDiffs: [] },
+          {
+            index: 6,
+            pointer: "/0/lastLogon",
+            diffType: diff.DEL,
+            charDiffs: [{ start: 22, end: 23, diffType: diff.PART_DEL }],
+          },
           { index: 6, pointer: "/0/lastLogon", diffType: diff.INS },
         ],
         [
