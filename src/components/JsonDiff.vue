@@ -41,12 +41,12 @@
               <span class="label-text">{{ t("autoFormat") }}</span>
             </label>
           </li>
-          <!-- <li>
+          <li>
             <label class="flex cursor-pointer w-full space-x-1">
               <input type="checkbox" class="toggle toggle-sm" v-model="conf.ignoreBlank" />
               <span class="label-text">{{ t("ignoreBlank") }}</span>
             </label>
-          </li> -->
+          </li>
         </ul>
       </div>
 
