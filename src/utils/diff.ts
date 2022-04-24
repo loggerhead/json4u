@@ -1,6 +1,6 @@
 import jsonPointer from "json-pointer";
 import * as jsonMap from "json-map-ts";
-import { deepEqual } from "fast-equals";
+import stringify from "json-stable-stringify";
 import { isObject, isBaseType, isNumber } from "./typeHelper";
 import TraceRecord from "./trace";
 import MySet from "./set";
@@ -103,20 +103,48 @@ export class Handler {
   }
 
   diffArray(ldata: Array<any>, rdata: Array<any>) {
-    const union = Math.max(ldata.length, rdata.length);
-    const subset = Math.min(ldata.length, rdata.length);
+    const [ldt, rdt] = myerDiffArray(ldata, rdata);
+    let l = 0;
+    let r = 0;
 
-    for (let i = 0; i < union; i++) {
-      if (i < subset) {
-        this.ltrace.push(i);
-        this.rtrace.push(i);
-        this.diffVal(ldata[i], rdata[i]);
+    while (l < ldata.length && r < rdata.length) {
+      const lt = ldt[l];
+      const rt = rdt[r];
+
+      if (lt === NONE) {
+        l++;
+        continue;
+      } else if (rt === NONE) {
+        r++;
+        continue;
+      }
+
+      if (l === r) {
+        this.ltrace.push(l);
+        this.rtrace.push(r);
+        this.diffVal(ldata[l], rdata[r]);
         this.ltrace.pop();
         this.rtrace.pop();
-      } else if (ldata.length < rdata.length) {
-        this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, INS, i)]);
-      } else if (ldata.length > rdata.length) {
-        this.results.push([genDiff(this.ltrace, INS, i), genDiff(this.rtrace, NONE)]);
+        l++;
+        r++;
+      } else if (lt === DEL) {
+        this.results.push([genDiff(this.ltrace, INS, l), genDiff(this.rtrace, NONE)]);
+        l++;
+      } else if (rt === INS) {
+        this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, INS, r)]);
+        r++;
+      }
+    }
+
+    for (; l < ldata.length; l++) {
+      if (ldt[l] !== NONE) {
+        this.results.push([genDiff(this.ltrace, INS, l), genDiff(this.rtrace, NONE)]);
+      }
+    }
+
+    for (; r < rdata.length; r++) {
+      if (rdt[r] !== NONE) {
+        this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, INS, r)]);
       }
     }
   }
@@ -288,6 +316,32 @@ function charDiff(
   return [lpartDiffs, rpartDiffs];
 }
 
+function myerDiffArray(ldata: Array<any>, rdata: Array<any>): [Array<DiffType>, Array<DiffType>] {
+  const llines = ldata.map((o) => stringify(o)).join("\n");
+  const rlines = rdata.map((o) => stringify(o)).join("\n");
+  let dmp = new diff_match_patch();
+  let hashm = dmp.diff_linesToChars_(llines, rlines);
+  let diffs = dmp.diff_main(hashm.chars1, hashm.chars2, false);
+
+  let ldt: Array<DiffType> = [];
+  let rdt: Array<DiffType> = [];
+
+  for (let i = 0; i < diffs.length; i++) {
+    const t = diffs[i][0];
+
+    if (t === DIFF_EQUAL) {
+      ldt.push(NONE);
+      rdt.push(NONE);
+    } else if (t === DIFF_DELETE) {
+      ldt.push(DEL);
+    } else if (t === DIFF_INSERT) {
+      rdt.push(INS);
+    }
+  }
+
+  return [ldt, rdt];
+}
+
 function genDiff(trace: TraceRecord, diffType: DiffType, key?: string | number, val?: any): Diff {
   let pointer;
 
@@ -328,7 +382,7 @@ function isNeedDiffKey(ldata: any, rdata: any, lkey: string, rkey: string): bool
     return true;
   }
 
-  return deepEqual(val1, val2);
+  return stringify(val1) === stringify(val2);
 }
 
 function isNeedDiffVal(a: any, b: any): boolean {
