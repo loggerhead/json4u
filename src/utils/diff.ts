@@ -82,7 +82,7 @@ export class Handler {
           this.rtrace.getValue(rdiff.pointer),
         ];
 
-    [ldiff.charDiffs, rdiff.charDiffs] = charDiff(lpos, rpos, ltext, rtext);
+    [ldiff.charDiffs, rdiff.charDiffs] = charDiff(lpos, rpos, ltext, rtext, false);
   }
 
   diffVal(ldata: any, rdata: any) {
@@ -188,7 +188,7 @@ export function compare(ltext: string, rtext: string): DiffPair[] | Error {
 
 export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean): DiffPair[] {
   // 先进行文本比较
-  let [lpartDiffs, rpartDiffs] = charDiff(0, 0, ltext, rtext);
+  let [lpartDiffs, rpartDiffs] = charDiff(0, 0, ltext, rtext, ignoreBlank);
   let results: DiffPair[] = [];
 
   // 将文本比较结果转成行比较结果
@@ -200,12 +200,13 @@ export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean):
     let lines = text.split("\n");
 
     for (let i = 0; i < lines.length; i++, start = end + 1) {
-      end = start + lines[i].length;
+      const line = lines[i];
+      end = start + line.length;
       // 过滤出归属本行的文本比较结果
       const dd = partDiffs.filter((d) => d.start < end && start < d.end);
       const diff: Diff = {
         index: i + 1,
-        diffType: NONE,
+        diffType: side === LEFT ? DEL : INS,
         side: side,
         pointer: "",
         charDiffs: dd.map((d) => ({
@@ -228,7 +229,13 @@ export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean):
   return results;
 }
 
-function charDiff(lpos: number, rpos: number, ltext: string, rtext: string): [PartDiff[], PartDiff[]] {
+function charDiff(
+  lpos: number,
+  rpos: number,
+  ltext: string,
+  rtext: string,
+  ignoreBlank: boolean
+): [PartDiff[], PartDiff[]] {
   let dmp = new diff_match_patch();
   let dd = dmp.diff_main(ltext, rtext);
   dmp.diff_cleanupSemantic(dd);
@@ -237,11 +244,11 @@ function charDiff(lpos: number, rpos: number, ltext: string, rtext: string): [Pa
   let lpartDiffs: PartDiff[] = [];
   let rpartDiffs: PartDiff[] = [];
 
-  for (const d of dd) {
+  for (let i = 0; i < dd.length; i++) {
     // diff type
-    const t = d[0];
+    const t = dd[i][0];
     // text length
-    const n = d[1].length;
+    const n = dd[i][1].length;
 
     // equal
     if (t === DIFF_EQUAL) {
@@ -249,19 +256,31 @@ function charDiff(lpos: number, rpos: number, ltext: string, rtext: string): [Pa
       rpos += n;
       // delete from left side
     } else if (t === DIFF_DELETE) {
-      lpartDiffs.push({
-        start: lpos,
-        end: lpos + n,
-        diffType: PART_DEL,
-      });
+      // 如果去除首尾空格，与 INSERT 部分的文本相等，说明没有空白字符以外的变化
+      const skipBlankDiff = ignoreBlank && i < dd.length - 1 && ignoreBlankEqual(dd[i][1], dd[i + 1][1]);
+
+      if (!skipBlankDiff) {
+        lpartDiffs.push({
+          start: lpos,
+          end: lpos + n,
+          diffType: PART_DEL,
+        });
+      }
+
       lpos += n;
       // insert to right side
     } else if (t === DIFF_INSERT) {
-      rpartDiffs.push({
-        start: rpos,
-        end: rpos + n,
-        diffType: PART_INS,
-      });
+      // 如果去除首尾空格，与 DELETE 部分的文本相等，说明没有空白字符以外的变化
+      const skipBlankDiff = ignoreBlank && i > 0 && ignoreBlankEqual(dd[i][1], dd[i - 1][1]);
+
+      if (!skipBlankDiff) {
+        rpartDiffs.push({
+          start: rpos,
+          end: rpos + n,
+          diffType: PART_INS,
+        });
+      }
+
       rpos += n;
     }
   }
@@ -322,6 +341,6 @@ function isNeedDiffVal(a: any, b: any): boolean {
   return isObject(a) === isObject(b);
 }
 
-function isBlank(s: string): boolean {
-  return s.trim().length == 0;
+function ignoreBlankEqual(a: string, b: string): boolean {
+  return a.replaceAll(/\s/g, "") === b.replaceAll(/\s/g, "");
 }
