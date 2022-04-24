@@ -1,33 +1,37 @@
 import jsonPointer from "json-pointer";
 import * as jsonMap from "json-map-ts";
 import { deepEqual } from "fast-equals";
-import { OptionNum, isObject, isBaseType, isNumber } from "./typeHelper";
+import { isObject, isBaseType, isNumber } from "./typeHelper";
 import TraceRecord from "./trace";
 import MySet from "./set";
-import {
-  DiffType,
-  Diff as BaseDiff,
-  PartDiff,
-  Side,
-  REP,
-  DEL,
-  INS,
-  PART_INS,
-  PART_DEL,
-  LEFT,
-  RIGHT,
-  NONE,
-  myersDiff,
-  partDiff,
-} from "./myersDiff";
+import { diff_match_patch, DIFF_DELETE, DIFF_INSERT, DIFF_EQUAL } from "./diff_match_patch.js";
 
-export type { DiffType, Side };
-export { NONE, DEL, INS, PART_INS, PART_DEL, LEFT, RIGHT };
+export const NONE = "none"; // 不需要展示的 diff
+export const REP = "replace"; // 需要处理成 INS、DEL 再展示的 diff
+export const INS = "insert";
+export const DEL = "delete";
+export const PART_INS = "part_insert"; // inline character or word insert
+export const PART_DEL = "part_delete"; // inline character or word delete
+export type DiffType = typeof NONE | typeof REP | typeof INS | typeof DEL | typeof PART_INS | typeof PART_DEL;
 
-export interface Diff extends BaseDiff {
+export const LEFT = "left";
+export const RIGHT = "right";
+export type Side = typeof LEFT | typeof RIGHT;
+
+export interface PartDiff {
+  start: number;
+  end: number;
+  diffType: DiffType;
+}
+
+export interface Diff {
+  index: number;
+  diffType: DiffType;
   pointer: string;
+  side?: Side;
   charDiffs?: PartDiff[];
 }
+
 export type DiffPair = [Diff | undefined, Diff | undefined];
 
 export class Error {
@@ -182,78 +186,87 @@ export function compare(ltext: string, rtext: string): DiffPair[] | Error {
   return new Handler(ltrace, rtrace).compare();
 }
 
-export function textCompare(ltext: string, rtext: string): DiffPair[] {
-  const llines = ltext.split("\n");
-  const rlines = rtext.split("\n");
-  const dd = myersDiff(llines, rlines);
-
-  const genDiffs = function (lIndex: OptionNum, rIndex: OptionNum, lDiffType: DiffType, rDiffType: DiffType): DiffPair {
-    return [
-      lIndex === undefined
-        ? undefined
-        : {
-            index: Math.min(lIndex, llines.length - 1) + 1,
-            diffType: lDiffType,
-            pointer: "",
-          },
-      rIndex === undefined
-        ? undefined
-        : {
-            index: Math.min(rIndex, rlines.length - 1) + 1,
-            diffType: rDiffType,
-            pointer: "",
-          },
-    ];
-  };
-
+export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean): DiffPair[] {
+  // 先进行文本比较
+  let [lpartDiffs, rpartDiffs] = charDiff(0, 0, ltext, rtext);
   let results: DiffPair[] = [];
 
-  for (let i = 0; i < dd.length; i++) {
-    const d = dd[i];
-    const diffType = d.diffType;
-    const side = d.side;
+  // 将文本比较结果转成行比较结果
+  const partDiffs2diffPairs = function (partDiffs: PartDiff[], text: string, side: Side) {
+    // 行起始位置
+    let start = 0;
+    // 行结束位置
+    let end = 0;
+    let lines = text.split("\n");
 
-    if (diffType === DEL) {
-      if (side == LEFT) {
-        results.push(genDiffs(d.index, undefined, DEL, NONE));
-      } else {
-        results.push(genDiffs(undefined, d.index, NONE, DEL));
+    for (let i = 0; i < lines.length; i++, start = end + 1) {
+      end = start + lines[i].length;
+      // 过滤出归属本行的文本比较结果
+      const dd = partDiffs.filter((d) => d.start < end && start < d.end);
+      const diff: Diff = {
+        index: i + 1,
+        diffType: NONE,
+        side: side,
+        pointer: "",
+        charDiffs: dd.map((d) => ({
+          start: Math.max(d.start, start) - start,
+          end: Math.min(d.end, end) - start,
+          diffType: d.diffType,
+        })),
+      };
+
+      if (!diff.charDiffs?.length) {
+        continue;
       }
-    } else if (diffType === INS) {
-      if (side == LEFT) {
-        results.push(genDiffs(d.index, undefined, INS, NONE));
-      } else {
-        results.push(genDiffs(undefined, d.index, NONE, INS));
-      }
-    } else if (diffType === REP) {
-      const rd = dd[++i];
-      // char-by-char diff
-      let [lcharDiffs, rcharDiffs] = charDiff(0, 0, llines[d.index], rlines[rd.index]);
-      let [ldiff, rdiff] = genDiffs(d.index, d.index, DEL, INS);
-      (ldiff as Diff).charDiffs = lcharDiffs;
-      (rdiff as Diff).charDiffs = rcharDiffs;
-      // 如果不存在 char-by-char diff 结果，说明有一边是 insert 或 delete，而另一边相对而言没有改变
-      results.push([ldiff?.charDiffs ? ldiff : undefined, rdiff?.charDiffs ? rdiff : undefined]);
+
+      results.push(side === LEFT ? [diff, undefined] : [undefined, diff]);
     }
-  }
+  };
 
+  partDiffs2diffPairs(lpartDiffs, ltext, LEFT);
+  partDiffs2diffPairs(rpartDiffs, rtext, RIGHT);
   return results;
 }
 
 function charDiff(lpos: number, rpos: number, ltext: string, rtext: string): [PartDiff[], PartDiff[]] {
-  let [lcharDiffs, rcharDiffs] = partDiff(ltext, rtext);
+  let dmp = new diff_match_patch();
+  let dd = dmp.diff_main(ltext, rtext);
+  dmp.diff_cleanupSemantic(dd);
+  dd = dd.filter((d) => d[1].length > 0);
 
-  for (let d of lcharDiffs) {
-    d.start += lpos;
-    d.end += lpos;
+  let lpartDiffs: PartDiff[] = [];
+  let rpartDiffs: PartDiff[] = [];
+
+  for (const d of dd) {
+    // diff type
+    const t = d[0];
+    // text length
+    const n = d[1].length;
+
+    // equal
+    if (t === DIFF_EQUAL) {
+      lpos += n;
+      rpos += n;
+      // delete from left side
+    } else if (t === DIFF_DELETE) {
+      lpartDiffs.push({
+        start: lpos,
+        end: lpos + n,
+        diffType: PART_DEL,
+      });
+      lpos += n;
+      // insert to right side
+    } else if (t === DIFF_INSERT) {
+      rpartDiffs.push({
+        start: rpos,
+        end: rpos + n,
+        diffType: PART_INS,
+      });
+      rpos += n;
+    }
   }
 
-  for (let d of rcharDiffs) {
-    d.start += rpos;
-    d.end += rpos;
-  }
-
-  return [lcharDiffs, rcharDiffs];
+  return [lpartDiffs, rpartDiffs];
 }
 
 function genDiff(trace: TraceRecord, diffType: DiffType, key?: string | number, val?: any): Diff {
@@ -307,4 +320,8 @@ function isNeedDiffVal(a: any, b: any): boolean {
   }
 
   return isObject(a) === isObject(b);
+}
+
+function isBlank(s: string): boolean {
+  return s.trim().length == 0;
 }

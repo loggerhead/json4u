@@ -22,7 +22,7 @@
       </span>
       <div class="dropdown">
         <label tabindex="0"><img class="btn-like h-full inline-block" src="/gear.svg" alt="Settings" /></label>
-        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-56">
+        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-64">
           <li>
             <label class="flex cursor-pointer w-full space-x-1">
               <input type="checkbox" class="toggle toggle-sm" v-model="conf.syncScroll" />
@@ -31,10 +31,22 @@
           </li>
           <li>
             <label class="flex cursor-pointer w-full space-x-1">
-              <input type="checkbox" class="toggle toggle-sm" v-model="conf.hiddenRightEditor" />
-              <span class="label-text">{{ t("hiddenRightEditor") }}</span>
+              <input type="checkbox" class="toggle toggle-sm" v-model="conf.showRightEditor" />
+              <span class="label-text">{{ t("showRightEditor") }}</span>
             </label>
           </li>
+          <li>
+            <label class="flex cursor-pointer w-full space-x-1">
+              <input type="checkbox" class="toggle toggle-sm" v-model="conf.autoFormat" />
+              <span class="label-text">{{ t("autoFormat") }}</span>
+            </label>
+          </li>
+          <!-- <li>
+            <label class="flex cursor-pointer w-full space-x-1">
+              <input type="checkbox" class="toggle toggle-sm" v-model="conf.ignoreBlank" />
+              <span class="label-text">{{ t("ignoreBlank") }}</span>
+            </label>
+          </li> -->
         </ul>
       </div>
 
@@ -61,10 +73,10 @@
     </div>
 
     <div class="col-span-12 flex border border-slate-100">
-      <div class="h-editor_full lg:h-editor" :class="conf.hiddenRightEditor ? 'w-full' : 'w-1/2'">
+      <div class="h-editor_full lg:h-editor" :class="conf.showRightEditor ? 'w-1/2' : 'w-full'">
         <textarea id="left-editor" class="hidden" :placeholder="t('leftPlaceholder')"></textarea>
       </div>
-      <div class="h-editor_full lg:h-editor" :class="conf.hiddenRightEditor ? 'w-0' : 'w-1/2'">
+      <div class="h-editor_full lg:h-editor" :class="conf.showRightEditor ? 'w-1/2' : 'w-0'">
         <textarea id="right-editor" class="hidden" :placeholder="t('rightPlaceholder')"></textarea>
       </div>
     </div>
@@ -145,11 +157,15 @@ onMounted(async () => {
   await rightEditor.init("right-editor");
 
   function leftPasteHandler() {
-    pretty(leftEditor);
+    if (conf.autoFormat) {
+      pretty(leftEditor);
+    }
   }
 
   function rightPasteHandler() {
-    pretty(rightEditor);
+    if (conf.autoFormat) {
+      pretty(rightEditor);
+    }
 
     if (leftEditor.getText().length > 0 && rightEditor.getText().length > 0) {
       compare();
@@ -286,7 +302,7 @@ function compare() {
     if (diffsOrErr instanceof diff.Error) {
       jdd.isTextCompared = true;
       handleError(diffsOrErr.error, diffsOrErr.side);
-      jdd.diffs = diff.textCompare(ltext, rtext);
+      jdd.diffs = diff.textCompare(ltext, rtext, conf.ignoreBlank);
     } else {
       jdd.diffs = diffsOrErr as diff.DiffPair[];
     }
@@ -451,11 +467,11 @@ function getNextDiff(side: Side, direction: ScrollDirection): diff.DiffPair | un
     const [ldiff2, rdiff2] = jdd.diffs[end];
 
     if (side === diff.LEFT) {
-      if (ldiff1.index != ldiff2.index) {
+      if (ldiff1?.index != ldiff2?.index) {
         break;
       }
     } else {
-      if (rdiff1.index != rdiff2.index) {
+      if (rdiff1?.index != rdiff2?.index) {
         break;
       }
     }
