@@ -446,7 +446,6 @@ diff_match_patch.prototype.diff_bisectSplit_ = function (text1, text2, x, y, dea
  *     An object containing the encoded text1, the encoded text2 and
  *     the array of unique strings.
  *     The zeroth element of the array of unique strings is intentionally blank.
- * @private
  */
 diff_match_patch.prototype.diff_linesToChars_ = function (text1, text2) {
   var lineArray = []; // e.g. lineArray[4] == 'Hello\n'
