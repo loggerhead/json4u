@@ -215,45 +215,107 @@ export function compare(ltext: string, rtext: string): DiffPair[] | Error {
 }
 
 export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean): DiffPair[] {
-  // 先进行文本比较
-  let [lpartDiffs, rpartDiffs] = charDiff(0, 0, ltext, rtext, ignoreBlank);
-  let results: DiffPair[] = [];
+  let llines = ltext.split("\n");
+  let rlines = rtext.split("\n");
 
   // 将文本比较结果转成行比较结果
-  const partDiffs2diffPairs = function (partDiffs: PartDiff[], text: string, side: Side) {
+  const partDiffs2diffPairs = function (partDiffs: PartDiff[], text: string, side: Side): Diff[] {
     // 行起始位置
     let start = 0;
     // 行结束位置
     let end = 0;
-    let lines = text.split("\n");
+    let lines = side === LEFT ? llines : rlines;
+    let results: Diff[] = [];
 
     for (let i = 0; i < lines.length; i++, start = end + 1) {
       const line = lines[i];
       end = start + line.length;
+
       // 过滤出归属本行的文本比较结果
       const dd = partDiffs.filter((d) => d.start < end && start < d.end);
-      const diff: Diff = {
+      const charDiffs = dd.map((d) => ({
+        start: Math.max(d.start, start) - start,
+        end: Math.min(d.end, end) - start,
+        diffType: d.diffType,
+      }));
+
+      if (charDiffs.length == 0) {
+        continue;
+      }
+
+      results.push({
         index: i + 1,
         diffType: side === LEFT ? DEL : INS,
         side: side,
         pointer: "",
-        charDiffs: dd.map((d) => ({
-          start: Math.max(d.start, start) - start,
-          end: Math.min(d.end, end) - start,
-          diffType: d.diffType,
-        })),
-      };
+        charDiffs: charDiffs,
+      });
+    }
 
-      if (!diff.charDiffs?.length) {
+    return results;
+  };
+
+  // 进行文本比较
+  let [lpartDiffs, rpartDiffs] = charDiff(0, 0, ltext, rtext, ignoreBlank);
+  let ldiffs = partDiffs2diffPairs(lpartDiffs, ltext, LEFT);
+  let rdiffs = partDiffs2diffPairs(rpartDiffs, rtext, RIGHT);
+
+  let results: DiffPair[] = [];
+
+  // 如果一段的行高亮和 char-by-char 高亮是重复的，去除 char-by-char 高亮
+  const cleanupHighlight = function (diffs: Diff[], side: Side) {
+    // 一段的起始下标
+    let prev = 0;
+
+    for (let i = 0; i < diffs.length; i++) {
+      const diff1 = diffs[i];
+      const diff2 = diffs[i + 1];
+
+      // 如果两个连续的 diff 位于一段
+      if (diff2 && diff1.index + 1 === diff2.index) {
         continue;
       }
 
-      results.push(side === LEFT ? [diff, undefined] : [undefined, diff]);
+      let needCleanup = true;
+
+      // 检查是否需要清理 char-by-char 高亮
+      for (let j = prev; j <= i; j++) {
+        const diff = diffs[j];
+        const line = (side === LEFT ? llines : rlines)[diff.index - 1];
+        const charDiffs = diff.charDiffs?.filter((d) => {
+          if (ignoreBlank) {
+            return ignoreBlankEqual(line.slice(d.start, d.end), line);
+          } else {
+            return d.end - d.start < line.length;
+          }
+        });
+
+        if (charDiffs && charDiffs.length > 0) {
+          needCleanup = false;
+          break;
+        }
+      }
+
+      if (needCleanup) {
+        for (let j = prev; j <= i; j++) {
+          diffs[j].charDiffs = [];
+        }
+      }
+
+      prev = i + 1;
     }
   };
 
-  partDiffs2diffPairs(lpartDiffs, ltext, LEFT);
-  partDiffs2diffPairs(rpartDiffs, rtext, RIGHT);
+  cleanupHighlight(ldiffs, LEFT);
+  cleanupHighlight(rdiffs, RIGHT);
+
+  for (const diff of ldiffs) {
+    results.push([diff, undefined]);
+  }
+  for (const diff of rdiffs) {
+    results.push([undefined, diff]);
+  }
+
   return results;
 }
 
