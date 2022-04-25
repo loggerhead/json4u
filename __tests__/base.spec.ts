@@ -82,7 +82,7 @@ describe("line compare", () => {
       `{"Aidan Gillen": {"array": ["Game of Thrones","The Wire"],"string": "some string","int": "2","otherint": 4, "aboolean": "true", "boolean": false, "null": null, "a_null":88, "another_null": null, "object": {"foo": "bar"}},"Amy Ryan": ["In Treatment","The Wire"],"Annie Fitzgerald": ["True Blood","Big Love","The Sopranos","Oz"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsg?rd": ["Generation Kill","True Blood"],"Alice Farmer": ["The Corner","Oz","The Wire"]}`,
       [
         [
-          { index: 46, pointer: "/Clarke Peters", diffType: diff.INS },
+          { index: 46, pointer: "/Clarke Peters", diffType: diff.DEL },
           { index: 1, pointer: "", diffType: diff.NONE },
         ],
         [
@@ -114,19 +114,19 @@ describe("line compare", () => {
           { index: 14, pointer: "/Aidan Gillen/another_null", diffType: diff.INS },
         ],
         [
-          { index: 16, pointer: "/Aidan Gillen/object/object1", diffType: diff.INS },
+          { index: 16, pointer: "/Aidan Gillen/object/object1", diffType: diff.DEL },
           { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
-          { index: 19, pointer: "/Aidan Gillen/object/object2", diffType: diff.INS },
+          { index: 19, pointer: "/Aidan Gillen/object/object2", diffType: diff.DEL },
           { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
-          { index: 22, pointer: "/Aidan Gillen/object/object3", diffType: diff.INS },
+          { index: 22, pointer: "/Aidan Gillen/object/object3", diffType: diff.DEL },
           { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
-          { index: 25, pointer: "/Aidan Gillen/object/object4", diffType: diff.INS },
+          { index: 25, pointer: "/Aidan Gillen/object/object4", diffType: diff.DEL },
           { index: 15, pointer: "/Aidan Gillen/object", diffType: diff.NONE },
         ],
         [
@@ -134,12 +134,12 @@ describe("line compare", () => {
           { index: 19, pointer: "/Amy Ryan", diffType: diff.INS },
         ],
         [
-          { index: 35, pointer: "/Annie Fitzgerald/0", diffType: diff.DEL },
-          { index: 24, pointer: "/Annie Fitzgerald/0", diffType: diff.INS },
+          { index: 36, pointer: "/Annie Fitzgerald/1", diffType: diff.DEL },
+          { index: 23, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
         ],
         [
-          { index: 36, pointer: "/Annie Fitzgerald/1", diffType: diff.DEL },
-          { index: 25, pointer: "/Annie Fitzgerald/1", diffType: diff.INS },
+          { index: 34, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
+          { index: 24, pointer: "/Annie Fitzgerald/0", diffType: diff.INS },
         ],
         [
           { index: 34, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
@@ -167,37 +167,8 @@ describe("line compare", () => {
       `[{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]`,
       [
         [
-          { index: 11, pointer: "/1", diffType: diff.INS, charDiffs: [] },
+          { index: 2, pointer: "/0", diffType: diff.DEL, charDiffs: [] },
           { index: 1, pointer: "", diffType: diff.NONE, charDiffs: [] },
-        ],
-        [
-          { index: 3, pointer: "/0/OBJ_ID", diffType: diff.DEL },
-          { index: 3, pointer: "/0/OBJ_ID", diffType: diff.INS },
-        ],
-        [
-          { index: 5, pointer: "/0/objectGUID", diffType: diff.DEL },
-          { index: 5, pointer: "/0/objectGUID", diffType: diff.INS },
-        ],
-        [
-          {
-            index: 6,
-            pointer: "/0/lastLogon",
-            diffType: diff.DEL,
-            charDiffs: [{ start: 22, end: 23, diffType: diff.PART_DEL }],
-          },
-          { index: 6, pointer: "/0/lastLogon", diffType: diff.INS },
-        ],
-        [
-          { index: 7, pointer: "/0/sAMAccountName", diffType: diff.DEL },
-          { index: 7, pointer: "/0/sAMAccountName", diffType: diff.INS },
-        ],
-        [
-          { index: 8, pointer: "/0/userPrincipalName", diffType: diff.DEL },
-          { index: 8, pointer: "/0/userPrincipalName", diffType: diff.INS },
-        ],
-        [
-          { index: 9, pointer: "/0/distinguishedName", diffType: diff.DEL },
-          { index: 9, pointer: "/0/distinguishedName", diffType: diff.INS },
         ],
       ]
     );
