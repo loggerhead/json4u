@@ -128,7 +128,7 @@ export class Handler {
         l++;
         r++;
       } else if (lt === DEL) {
-        this.results.push([genDiff(this.ltrace, INS, l), genDiff(this.rtrace, NONE)]);
+        this.results.push([genDiff(this.ltrace, DEL, l), genDiff(this.rtrace, NONE)]);
         l++;
       } else if (rt === INS) {
         this.results.push([genDiff(this.ltrace, NONE), genDiff(this.rtrace, INS, r)]);
@@ -138,7 +138,7 @@ export class Handler {
 
     for (; l < ldata.length; l++) {
       if (ldt[l] !== NONE) {
-        this.results.push([genDiff(this.ltrace, INS, l), genDiff(this.rtrace, NONE)]);
+        this.results.push([genDiff(this.ltrace, DEL, l), genDiff(this.rtrace, NONE)]);
       }
     }
 
@@ -183,7 +183,7 @@ export class Handler {
       if (seen.has(key)) {
         return;
       }
-      this.results.push([genDiff(this.ltrace, INS, key), genDiff(this.rtrace, NONE)]);
+      this.results.push([genDiff(this.ltrace, DEL, key), genDiff(this.rtrace, NONE)]);
     });
 
     rightOnly.forEach((key) => {
