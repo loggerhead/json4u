@@ -230,23 +230,26 @@ export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean):
     for (let i = 0; i < lines.length; i++, start = end + 1) {
       const line = lines[i];
       end = start + line.length;
+
       // 过滤出归属本行的文本比较结果
       const dd = partDiffs.filter((d) => d.start < end && start < d.end);
-      const diff: Diff = {
+      const charDiffs = dd.map((d) => ({
+        start: Math.max(d.start, start) - start,
+        end: Math.min(d.end, end) - start,
+        diffType: d.diffType,
+      }));
+
+      if (charDiffs.length == 0) {
+        continue;
+      }
+
+      let diff: Diff = {
         index: i + 1,
         diffType: side === LEFT ? DEL : INS,
         side: side,
         pointer: "",
-        charDiffs: dd.map((d) => ({
-          start: Math.max(d.start, start) - start,
-          end: Math.min(d.end, end) - start,
-          diffType: d.diffType,
-        })),
+        charDiffs: charDiffs.filter((d) => d.end - d.start < line.length),
       };
-
-      if (!diff.charDiffs?.length) {
-        continue;
-      }
 
       results.push(side === LEFT ? [diff, undefined] : [undefined, diff]);
     }
