@@ -379,8 +379,8 @@ function charDiff(
 }
 
 function myerDiffArray(ldata: Array<any>, rdata: Array<any>): [Array<DiffType>, Array<DiffType>] {
-  const llines = ldata.map((o) => stringify(o)).join("\n");
-  const rlines = rdata.map((o) => stringify(o)).join("\n");
+  const llines = ldata.map((o) => jsonStableStringify(o)).join("\n");
+  const rlines = rdata.map((o) => jsonStableStringify(o)).join("\n");
   let dmp = new diff_match_patch();
   let hashm = dmp.diff_linesToChars_(llines, rlines);
   let diffs = dmp.diff_main(hashm.chars1, hashm.chars2, false);
@@ -444,7 +444,7 @@ function isNeedDiffKey(ldata: any, rdata: any, lkey: string, rkey: string): bool
     return true;
   }
 
-  return stringify(val1) === stringify(val2);
+  return jsonStableStringify(val1) === jsonStableStringify(val2);
 }
 
 function isNeedDiffVal(a: any, b: any): boolean {
@@ -459,4 +459,12 @@ function isNeedDiffVal(a: any, b: any): boolean {
 
 function ignoreBlankEqual(a: string, b: string): boolean {
   return a.replaceAll(/\s/g, "") === b.replaceAll(/\s/g, "");
+}
+
+function jsonStableStringify(o: any): string {
+  return stringify(o, {
+    replacer: (key: any, value: any) => {
+      return typeof value === "bigint" ? value.toString() : value;
+    },
+  });
 }
