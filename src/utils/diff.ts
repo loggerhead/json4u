@@ -284,7 +284,7 @@ export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean):
         const line = (side === LEFT ? llines : rlines)[diff.index - 1];
         const charDiffs = diff.charDiffs?.filter((d) => {
           if (ignoreBlank) {
-            return ignoreBlankEqual(line.slice(d.start, d.end), line);
+            return !ignoreBlankEqual(line.slice(d.start, d.end), line);
           } else {
             return d.end - d.start < line.length;
           }
