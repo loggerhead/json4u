@@ -150,7 +150,6 @@ onMounted(async () => {
   // 从 localStorage 读配置
   if (localStorage.getItem("config")) {
     Object.assign(conf, JSON.parse(localStorage.getItem("config") as string));
-    console.log("load config:", conf);
   }
 
   await leftEditor.init("left-editor");
@@ -205,7 +204,6 @@ onMounted(async () => {
 // 监听配置项变化，写入 localStorage
 watch(conf, (v) => {
   localStorage.setItem("config", JSON.stringify(v));
-  console.log("save config:", v);
 });
 
 function handleError(e: Error, side: Side) {
