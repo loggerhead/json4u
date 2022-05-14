@@ -324,6 +324,81 @@ describe("large json file", () => {
   });
 });
 
+describe("text compare", () => {
+  let l: string;
+  let r: string;
+
+  test("ignore blank difference", () => {
+    l = `
+// Cap returns v's capacity.
+// It panics if v's Kind is not Array, Chan, or Slice.
+func (v Value) Cap() int {
+  // capNonSlice is split out to keep Cap inlineable for slice kinds.
+  if v.kind() == Slice {
+  @@ -1160,6 +1160,11 @@ func (v Value) capNonSlice() int {
+    return v.typ.Len()
+  case Chan:
+    return chancap(v.pointer())
+  }
+  panic(&ValueError{"reflect.Value.Cap", v.kind()})
+}`;
+
+    r = `
+// Cap returns v's capacity.
+// It panics if v's Kind is not Array, Chan, Slice or pointer to Array.
+func (v Value) Cap() int {
+  // capNonSlice is split out to keep Cap inlineable for slice kinds.
+  if v.kind() == Slice {
+  @@ -1160,6 +1160,11 @@ func (v Value) capNonSlice() int {
+    return v.typ.Len()
+  case Chan:
+    return chancap(v.pointer())
+  case Ptr:
+    if v.typ.Elem().Kind() == Array {
+      return v.typ.Elem().Len()
+    }
+    panic("reflect: call of reflect.Value.Cap on ptr to non-array Value")
+  }
+  panic(&ValueError{"reflect.Value.Cap", v.kind()})
+}`;
+
+    assertTextCompare(l, r, [
+      { index: 2, pointer: "", diffType: diff.DEL, charDiffs: [{ diffType: diff.PART_DEL, start: 45, end: 48 }] },
+      { index: 2, pointer: "", diffType: diff.INS, charDiffs: [{ diffType: diff.PART_INS, start: 50, end: 70 }] },
+      { index: 10, pointer: "", diffType: diff.INS, charDiffs: [] },
+      { index: 11, pointer: "", diffType: diff.INS, charDiffs: [] },
+      { index: 12, pointer: "", diffType: diff.INS, charDiffs: [] },
+      { index: 13, pointer: "", diffType: diff.INS, charDiffs: [] },
+      { index: 14, pointer: "", diffType: diff.INS, charDiffs: [] },
+    ]);
+
+    l = `
+default:
+  base: "change"
+  minimum_coverage: 0%
+  threshold: 0%
+  paths:
+    - "!main.go"
+    - "!handler.go"
+    - "!mock"`;
+    r = `
+default:
+  threshold: 0%
+  base: "change"
+report:
+  minimum_coverage: 0%
+  paths:
+    - "!main.go"
+    - "!handler.go"`;
+    assertTextCompare(l, r, [
+      { index: 4, pointer: "", diffType: diff.DEL, charDiffs: [] },
+      { index: 8, pointer: "", diffType: diff.DEL, charDiffs: [] },
+      { index: 2, pointer: "", diffType: diff.INS, charDiffs: [] },
+      { index: 4, pointer: "", diffType: diff.INS, charDiffs: [] },
+    ]);
+  });
+});
+
 function gen(...lines: number[]): any {
   let vv = [];
   for (const line of lines) {
@@ -333,6 +408,30 @@ function gen(...lines: number[]): any {
     ]);
   }
   return vv;
+}
+
+function assertTextCompare(ltext: string, rtext: string, dd: diff.Diff[]) {
+  const removeFirstLine = (text: string): string => {
+    let lines = text.split("\n");
+    lines.splice(0, 1);
+    return lines.join("\n");
+  };
+
+  ltext = removeFirstLine(ltext);
+  rtext = removeFirstLine(rtext);
+
+  let ddPairs: diff.DiffPair[] = [];
+  for (const d of dd) {
+    if (d.diffType === diff.DEL) {
+      ddPairs.push([d, undefined]);
+    } else {
+      ddPairs.push([undefined, d]);
+    }
+  }
+
+  const results = diff.textCompare(ltext, rtext, true);
+  expect(results.length).toEqual(ddPairs.length);
+  expect(results.sort()).toMatchObject(ddPairs.sort());
 }
 
 function compareDiffs(ltext: string, rtext: string, dd: diff.DiffPair[]) {
