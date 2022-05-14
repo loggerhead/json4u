@@ -379,26 +379,43 @@ function charDiff(
 }
 
 function myerDiffArray(ldata: Array<any>, rdata: Array<any>): [Array<DiffType>, Array<DiffType>] {
-  // 将 array 转成 lines
-  const llines = ldata.map((o) => jsonStableStringify(o)).join("\n");
-  const rlines = rdata.map((o) => jsonStableStringify(o)).join("\n");
+  const llines = ldata.map((o) => jsonStableStringify(o));
+  const rlines = rdata.map((o) => jsonStableStringify(o));
 
-  // lines-to-chars diff
+  let lineArray = [""];
+  let lineHash: any = {};
+  let n = lineArray.length;
+
+  // 将 array 映射成 unicode 字符串，然后进行 text compare
+  function lines2chars(lines: string[]): string {
+    const baseChar = "0".charCodeAt(0);
+    let chars = "";
+
+    for (const line of lines) {
+      if (lineHash.hasOwnProperty(line)) {
+        chars += String.fromCharCode(baseChar + lineHash[line]);
+      } else {
+        chars += String.fromCharCode(baseChar + n);
+        lineHash[line] = n;
+        lineArray[n++] = line;
+      }
+    }
+
+    return chars;
+  }
+
+  const lchars = lines2chars(llines);
+  const rchars = lines2chars(rlines);
   let dmp = new diff_match_patch();
-  // 将 line text 映射成一个 unicode 字符
-  let hashm = dmp.diff_linesToChars_(llines, rlines);
-  let diffs = dmp.diff_main(hashm.chars1, hashm.chars2, false);
-  // 将 unicode 字符映射回 line text
-  dmp.diff_charsToLines_(diffs, hashm.lineArray);
+  let diffs = dmp.diff_main(lchars, rchars, false);
 
   let ldt: Array<DiffType> = [];
   let rdt: Array<DiffType> = [];
 
   for (let i = 0; i < diffs.length; i++) {
     const t = diffs[i][0];
-    const diffLines = diffs[i][1].split("\n");
 
-    for (const _ of diffLines) {
+    for (let j = 0; j < diffs[i][1].length; j++) {
       if (t === DIFF_EQUAL) {
         ldt.push(NONE);
         rdt.push(NONE);

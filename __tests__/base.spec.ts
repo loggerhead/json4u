@@ -134,12 +134,12 @@ describe("line compare", () => {
           { index: 19, pointer: "/Amy Ryan", diffType: diff.INS },
         ],
         [
-          { index: 36, pointer: "/Annie Fitzgerald/1", diffType: diff.DEL },
+          { index: 35, pointer: "/Annie Fitzgerald/0", diffType: diff.DEL },
           { index: 23, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
         ],
         [
           { index: 34, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
-          { index: 24, pointer: "/Annie Fitzgerald/0", diffType: diff.INS },
+          { index: 25, pointer: "/Annie Fitzgerald/1", diffType: diff.INS },
         ],
         [
           { index: 34, pointer: "/Annie Fitzgerald", diffType: diff.NONE },
@@ -260,6 +260,38 @@ describe("char-by-char compare", () => {
           diffType: diff.INS,
           charDiffs: [{ diffType: diff.PART_INS, start: 14, end: 15 }],
         },
+      ],
+    ]);
+
+    const l = `[
+      "The hello",
+      "The hello",
+      "The world",
+      "The world"
+    ]`;
+
+    const r = `[
+      "The world",
+      "The world",
+      "The hello",
+      "The hello"
+    ]`;
+    compareDiffs(l, r, [
+      [
+        { index: 4, pointer: "/2", diffType: diff.DEL, charDiffs: [] },
+        { index: 1, pointer: "", diffType: diff.NONE, charDiffs: [] },
+      ],
+      [
+        { index: 5, pointer: "/3", diffType: diff.DEL, charDiffs: [] },
+        { index: 1, pointer: "", diffType: diff.NONE, charDiffs: [] },
+      ],
+      [
+        { index: 1, pointer: "", diffType: diff.NONE, charDiffs: [] },
+        { index: 2, pointer: "/0", diffType: diff.INS, charDiffs: [] },
+      ],
+      [
+        { index: 1, pointer: "", diffType: diff.NONE, charDiffs: [] },
+        { index: 3, pointer: "/1", diffType: diff.INS, charDiffs: [] },
       ],
     ]);
   });
