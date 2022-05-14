@@ -379,25 +379,34 @@ function charDiff(
 }
 
 function myerDiffArray(ldata: Array<any>, rdata: Array<any>): [Array<DiffType>, Array<DiffType>] {
+  // 将 array 转成 lines
   const llines = ldata.map((o) => jsonStableStringify(o)).join("\n");
   const rlines = rdata.map((o) => jsonStableStringify(o)).join("\n");
+
+  // lines-to-chars diff
   let dmp = new diff_match_patch();
+  // 将 line text 映射成一个 unicode 字符
   let hashm = dmp.diff_linesToChars_(llines, rlines);
   let diffs = dmp.diff_main(hashm.chars1, hashm.chars2, false);
+  // 将 unicode 字符映射回 line text
+  dmp.diff_charsToLines_(diffs, hashm.lineArray);
 
   let ldt: Array<DiffType> = [];
   let rdt: Array<DiffType> = [];
 
   for (let i = 0; i < diffs.length; i++) {
     const t = diffs[i][0];
+    const diffLines = diffs[i][1].split("\n");
 
-    if (t === DIFF_EQUAL) {
-      ldt.push(NONE);
-      rdt.push(NONE);
-    } else if (t === DIFF_DELETE) {
-      ldt.push(DEL);
-    } else if (t === DIFF_INSERT) {
-      rdt.push(INS);
+    for (const _ of diffLines) {
+      if (t === DIFF_EQUAL) {
+        ldt.push(NONE);
+        rdt.push(NONE);
+      } else if (t === DIFF_DELETE) {
+        ldt.push(DEL);
+      } else if (t === DIFF_INSERT) {
+        rdt.push(INS);
+      }
     }
   }
 
