@@ -105,6 +105,12 @@
   cursor: pointer;
   background-color: #00000020;
 }
+
+// 实现前景色效果
+.selected-line {
+  outline: 10px inset #00000010;
+  outline-offset: -11px;
+}
 </style>
 
 <script lang="ts" setup>
@@ -507,7 +513,7 @@ function getDiffClass(diffType: diff.DiffType | undefined): string {
 }
 
 function getSeletedClass(): string {
-  return "!bg-yellow-100";
+  return "selected-line";
 }
 
 function measure(msg: string, fn: () => void) {
