@@ -509,7 +509,6 @@ diff_match_patch.prototype.diff_linesToChars_ = function (text1, text2) {
  * text.
  * @param {!Array.<!diff_match_patch.Diff>} diffs Array of diff tuples.
  * @param {!Array.<string>} lineArray Array of unique strings.
- * @private
  */
 diff_match_patch.prototype.diff_charsToLines_ = function (diffs, lineArray) {
   for (var i = 0; i < diffs.length; i++) {

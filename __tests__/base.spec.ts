@@ -263,6 +263,57 @@ describe("char-by-char compare", () => {
       ],
     ]);
   });
+
+  test("value difference of Arabic", () => {
+    const l = `[
+      { "value": "1 day" },
+      { "value": "د.ك 0 / د.ك 2" },
+      { }
+    ]`;
+
+    const r = `[
+      { "value": "--" },
+      { "value": "KD 0 / KD 2" },
+      { }
+    ]`;
+
+    compareDiffs(l, r, [
+      [
+        {
+          index: 3,
+          pointer: "/0/value",
+          diffType: diff.DEL,
+          charDiffs: [{ diffType: diff.PART_DEL, start: 18, end: 23 }],
+        },
+        {
+          index: 3,
+          pointer: "/0/value",
+          diffType: diff.INS,
+          charDiffs: [{ diffType: diff.PART_INS, start: 18, end: 20 }],
+        },
+      ],
+      [
+        {
+          index: 6,
+          pointer: "/1/value",
+          diffType: diff.DEL,
+          charDiffs: [
+            { diffType: diff.PART_DEL, start: 18, end: 21 },
+            { diffType: diff.PART_DEL, start: 26, end: 29 },
+          ],
+        },
+        {
+          index: 6,
+          pointer: "/1/value",
+          diffType: diff.INS,
+          charDiffs: [
+            { diffType: diff.PART_INS, start: 18, end: 20 },
+            { diffType: diff.PART_INS, start: 25, end: 27 },
+          ],
+        },
+      ],
+    ]);
+  });
 });
 
 describe("json pointer", () => {
