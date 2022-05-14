@@ -105,6 +105,12 @@
   cursor: pointer;
   background-color: #00000020;
 }
+
+// 实现前景色效果
+.selected-line {
+  outline: 10px inset #00000010;
+  outline-offset: -11px;
+}
 </style>
 
 <script lang="ts" setup>
@@ -344,14 +350,14 @@ function processDiffs() {
 
 function addClickHandler() {
   leftEditor.setClickListener((line: number) => {
-    scrollToDiffLine(line, diff.LEFT);
+    scrollToDiffLine(line, diff.LEFT, true);
   });
   rightEditor.setClickListener((line: number) => {
-    scrollToDiffLine(line, diff.RIGHT);
+    scrollToDiffLine(line, diff.RIGHT, true);
   });
 }
 
-function scrollToDiffLine(line: number, side: Side) {
+function scrollToDiffLine(line: number, side: Side, isClick?: boolean) {
   const diffs = jdd.diffs.filter((dd) => {
     const [ldiff, rdiff] = dd;
     const linenoL = ldiff?.index;
@@ -370,10 +376,10 @@ function scrollToDiffLine(line: number, side: Side) {
     return;
   }
 
-  scrollToDiff(diffs[0], side);
+  scrollToDiff(diffs[0], side, isClick);
 }
 
-function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
+function scrollToDiff(dd: diff.DiffPair | undefined, side: Side, isClick?: boolean) {
   if (dd === undefined) {
     return;
   }
@@ -383,8 +389,12 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side) {
   conf.syncScroll = false;
 
   const [ldiff, rdiff] = dd;
-  leftEditor.scrollTo(ldiff?.index);
-  rightEditor.scrollTo(rdiff?.index);
+  if (side !== diff.LEFT || !isClick) {
+    leftEditor.scrollTo(ldiff?.index);
+  }
+  if (side !== diff.RIGHT || !isClick) {
+    rightEditor.scrollTo(rdiff?.index);
+  }
 
   // 需要延迟设置
   setTimeout(() => {
@@ -503,7 +513,7 @@ function getDiffClass(diffType: diff.DiffType | undefined): string {
 }
 
 function getSeletedClass(): string {
-  return "!bg-yellow-100";
+  return "selected-line";
 }
 
 function measure(msg: string, fn: () => void) {
