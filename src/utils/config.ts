@@ -7,4 +7,7 @@ export class Config {
   autoFormat: boolean = true;
   // 进行文本比较时忽略空白差异
   ignoreBlank: boolean = true;
+
+  // 临时变量，不保存到 local storage 中 ----------------------------------------------------------
+  _disableSyncScroll: boolean = false;
 }
