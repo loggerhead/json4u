@@ -234,13 +234,14 @@ export default class Editor {
 
   static setSyncScroll(leftEditor: Editor, rightEditor: Editor, conf: Config) {
     leftEditor.cm.on("scroll", function () {
-      if (conf.syncScroll) {
+      if (conf.syncScroll && !conf._disableSyncScroll) {
         const scrollInfo = leftEditor.cm.getScrollInfo();
         rightEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
       }
     });
+
     rightEditor.cm.on("scroll", function () {
-      if (conf.syncScroll) {
+      if (conf.syncScroll && !conf._disableSyncScroll) {
         const scrollInfo = rightEditor.cm.getScrollInfo();
         leftEditor.cm.scrollTo(scrollInfo.left, scrollInfo.top);
       }
