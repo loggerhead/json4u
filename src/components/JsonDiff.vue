@@ -209,7 +209,12 @@ onMounted(async () => {
 
 // 监听配置项变化，写入 localStorage
 watch(conf, (v) => {
-  localStorage.setItem("config", JSON.stringify(v));
+  localStorage.setItem(
+    "config",
+    JSON.stringify(v, (key, value) => {
+      return key.startsWith("_") ? undefined : value;
+    })
+  );
 });
 
 function handleError(e: Error, side: Side) {
@@ -385,8 +390,7 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side, isClick?: boole
   }
 
   // 暂时关闭同步滚动
-  const old = conf.syncScroll;
-  conf.syncScroll = false;
+  conf._disableSyncScroll = true;
 
   const [ldiff, rdiff] = dd;
   if (side !== diff.LEFT || !isClick) {
@@ -398,7 +402,7 @@ function scrollToDiff(dd: diff.DiffPair | undefined, side: Side, isClick?: boole
 
   // 需要延迟设置
   setTimeout(() => {
-    conf.syncScroll = old;
+    conf._disableSyncScroll = false;
   }, 100);
 
   if (side === diff.LEFT) {
