@@ -263,19 +263,15 @@ describe("char-by-char compare", () => {
       ],
     ]);
 
-    const l = `[
-      "The hello",
-      "The hello",
-      "The world",
-      "The world"
-    ]`;
+    compareDiffs(`[{ "id": 6666666666666666666 }]`, `[{ "id": "6666666666666666666" }]`, [
+      [
+        { index: 3, pointer: "/0/id", diffType: diff.DEL, charDiffs: [] },
+        { index: 3, pointer: "/0/id", diffType: diff.INS, charDiffs: [] },
+      ],
+    ]);
 
-    const r = `[
-      "The world",
-      "The world",
-      "The hello",
-      "The hello"
-    ]`;
+    const l = `[ "The hello", "The hello", "The world", "The world" ]`;
+    const r = `[ "The world", "The world", "The hello", "The hello" ]`;
     compareDiffs(l, r, [
       [
         { index: 4, pointer: "/2", diffType: diff.DEL, charDiffs: [] },

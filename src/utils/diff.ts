@@ -379,8 +379,8 @@ function charDiff(
 }
 
 function myerDiffArray(ldata: Array<any>, rdata: Array<any>): [Array<DiffType>, Array<DiffType>] {
-  const llines = ldata.map((o) => jsonStableStringify(o));
-  const rlines = rdata.map((o) => jsonStableStringify(o));
+  const llines = ldata.map((o) => stringify4diff(o));
+  const rlines = rdata.map((o) => stringify4diff(o));
 
   let lineArray = [""];
   let lineHash: any = {};
@@ -470,7 +470,7 @@ function isNeedDiffKey(ldata: any, rdata: any, lkey: string, rkey: string): bool
     return true;
   }
 
-  return jsonStableStringify(val1) === jsonStableStringify(val2);
+  return stringify4diff(val1) === stringify4diff(val2);
 }
 
 function isNeedDiffVal(a: any, b: any): boolean {
@@ -487,10 +487,17 @@ function ignoreBlankEqual(a: string, b: string): boolean {
   return a.replaceAll(/\s/g, "") === b.replaceAll(/\s/g, "");
 }
 
-function jsonStableStringify(o: any): string {
+// WARNING: bigint 末尾会加 n，string 类型末尾会加 s
+function stringify4diff(o: any): string {
   return stringify(o, {
     replacer: (key: any, value: any) => {
-      return typeof value === "bigint" ? value.toString() : value;
+      if (typeof value === "bigint") {
+        return value.toString() + "n";
+      } else if (typeof value === "string") {
+        return value + "s";
+      } else {
+        return value;
+      }
     },
   });
 }
