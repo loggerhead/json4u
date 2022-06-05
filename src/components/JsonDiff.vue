@@ -108,8 +108,8 @@
 
 // 实现前景色效果
 .selected-line {
-  outline: 10px inset #00000010;
-  outline-offset: -12px;
+  outline: 10.5px inset #00000010;
+  outline-offset: -10.5px;
 }
 </style>
 
