@@ -4,14 +4,15 @@ import { t } from "../utils/i18n.ts";
 
 export interface Props {
   lang: string;
+  title: string;
 }
 
-const { lang } = Astro.props;
+let { lang, title } = Astro.props;
 
+title = title || t("title");
 const version = "0.2.0";
 const name = "JSON For You";
 
-const title = t("title");
 const description = t("description");
 const logo = "/favicon.svg";
 const twitter = {
