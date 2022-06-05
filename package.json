@@ -16,6 +16,7 @@
   "devDependencies": {
     "@astrojs/renderer-vue": "^0.4.0",
     "@babel/preset-env": "^7.16.11",
+    "@tailwindcss/typography": "^0.5.2",
     "@types/codemirror": "^5.60.5",
     "@types/jest": "^27.4.0",
     "@types/json-pointer": "^1.0.31",

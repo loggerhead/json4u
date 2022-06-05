@@ -8,14 +8,17 @@ const { lang } = Astro.props;
 
 <div class="text-center text-[12px]">
   {lang === "zh-CN" ? (
-    <a href="https://beian.miit.gov.cn" target="_blank">
-      粤ICP备16007488号 ·
-    </a>
-    <a href="mailto:lloggerhead@gmail.com?subject=json4u反馈&body=左右两侧的输入分别是什么？%0A%0A%0A%0A%0A问题的现象是什么？">
-      发送反馈
-    </a>
+  <a href="/">Json For You ·</a>
+  <a href="https://beian.miit.gov.cn" target="_blank">
+    粤ICP备16007488号 ·
+  </a>
+  <a href="/guide">使用指南 ·</a>
+  <a href="https://github.com/loggerhead/json4u-issue/issues">
+    Feedback
+  </a>
 ) : (
-  <a href="mailto:lloggerhead@gmail.com?subject=Feedback%20of%20json4u&body=What%20are%20you%20input%20on%20left%20and%20right%20side?%0A%0A%0A%0A%0AWhat%20do%20you%20see%20of%20the%20problem?">
+  <a href="/">Json For You ·</a>
+  <a href="https://github.com/loggerhead/json4u-issue/issues">
     Feedback
   </a>
 )}

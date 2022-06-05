@@ -1,0 +1,40 @@
+---
+import Header from "../layouts/Header.astro";
+import Footer from "../layouts/Footer.astro";
+import HeadCommon from "../components/HeadCommon.astro";
+import HeadSEO from "../components/HeadSEO.astro";
+import { setupLang } from "../utils/i18n.ts";
+
+export interface Props {
+  lang: string;
+}
+
+const { content, lang = "zh-CN" } = Astro.props;
+setupLang(lang);
+---
+
+<html {lang}>
+  <head>
+    <HeadCommon />
+    <HeadSEO {lang} title={content.title} />
+    <link rel="stylesheet" href={Astro.resolve("../styles/global.css")} />
+    <style lang="scss">
+      .wrapper {
+        background-color: #e2e2e2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="space-y-2 wrapper">
+      <Header />
+      <div
+        class="relative w-full px-6 py-12 bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5 md:max-w-3xl md:mx-auto lg:max-w-4xl lg:pt-16 lg:pb-28"
+      >
+        <div class="mt-8 prose prose-slate mx-auto lg:prose-lg">
+          <slot />
+        </div>
+      </div>
+      <Footer {lang} />
+    </div>
+  </body>
+</html>
