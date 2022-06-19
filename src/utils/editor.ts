@@ -11,14 +11,12 @@ import { Config } from "./config";
 export default class Editor {
   cm: CodeMirror.Editor;
   clickFn: null | ((_: CodeMirror.Editor) => void);
-  markLines: number[];
   static changeVersion = ref(0);
   static compareVersion = ref(0);
 
   constructor() {
     this.cm = <CodeMirror.Editor>(<unknown>null);
     this.clickFn = null;
-    this.markLines = [];
   }
 
   async init(id: string) {
@@ -171,19 +169,14 @@ export default class Editor {
     this.cm.removeLineClass(lineno - 1, "wrap", cls);
   }
 
-  mark(lineno: OptionNum, startPos?: number, endPos?: number, cls?: string) {
+  mark(lineno: OptionNum, startPos: number, endPos: number, cls: string) {
     if (lineno === undefined) {
       return;
     }
 
-    const from = { line: lineno - 1, ch: startPos ? startPos : 0 };
-    const to = { line: lineno - 1, ch: endPos ? endPos : 0 };
-
-    if (cls) {
-      this.cm.markText(from, to, { className: cls });
-    } else {
-      this.markLines.push(lineno);
-    }
+    const from = { line: lineno - 1, ch: startPos };
+    const to = { line: lineno - 1, ch: endPos };
+    this.cm.markText(from, to, { className: cls });
   }
 
   scrollTo(lineno: OptionNum) {
@@ -209,15 +202,13 @@ export default class Editor {
   }
 
   reset() {
-    for (const lineno of this.markLines) {
-      this.removeClass(lineno);
+    for (let i = 1; i < this.getText().length; i++) {
+      this.removeClass(i);
     }
 
     this.cm.getAllMarks().forEach((marker) => {
       marker.clear();
     });
-
-    this.markLines = [];
 
     if (this.clickFn) {
       this.cm.off("cursorActivity", this.clickFn);
