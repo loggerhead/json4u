@@ -218,7 +218,7 @@ export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean):
   let llines = ltext.split("\n");
   let rlines = rtext.split("\n");
 
-  // 将文本比较结果转成行比较结果
+  // 将文本比较结果转成行比较结果，段 -> 行
   const partDiffs2diffPairs = function (partDiffs: PartDiff[], text: string, side: Side): Diff[] {
     // 行起始位置
     let start = 0;
@@ -278,13 +278,15 @@ export function textCompare(ltext: string, rtext: string, ignoreBlank: boolean):
 
       let needCleanup = true;
 
-      // 检查是否需要清理 char-by-char 高亮
+      // 检查是否需要清理本段的 char-by-char 高亮
       for (let j = prev; j <= i; j++) {
         const diff = diffs[j];
         const line = (side === LEFT ? llines : rlines)[diff.index - 1];
+
         const charDiffs = diff.charDiffs?.filter((d) => {
           if (ignoreBlank) {
-            return !ignoreBlankEqual(line.slice(d.start, d.end), line);
+            const charDiff = line.slice(d.start, d.end);
+            return !ignoreBlankEqual(charDiff, line);
           } else {
             return d.end - d.start < line.length;
           }

@@ -19,7 +19,7 @@ export default class Editor {
     this.clickFn = null;
   }
 
-  async init(id: string) {
+  async init(id: string, conf: Config) {
     var CodeMirror = await import("codemirror");
     await Promise.all([
       // @ts-ignore
@@ -37,14 +37,15 @@ export default class Editor {
     this.cm = CodeMirror.fromTextArea(el, {
       mode: "application/json",
       theme: "idea",
-      smartIndent: true,
-      lineNumbers: true,
+      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
       // 显示折叠箭头
       foldGutter: true,
-      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+      smartIndent: true,
+      lineNumbers: true,
     });
 
     this.cm.setSize("100%", "100%");
+    this.setLineWrapping(conf.lineWrapping);
     this.setupFocusAndDropHandler();
 
     el.classList.remove("hidden");
@@ -62,6 +63,12 @@ export default class Editor {
 
     this.cm.setOption("lint", true);
     return true;
+  }
+
+  setLineWrapping(enable: boolean) {
+    if (this.cm) {
+      this.cm.setOption("lineWrapping", enable);
+    }
   }
 
   setClickListener(fn: (_: number) => void) {
