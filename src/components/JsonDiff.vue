@@ -335,8 +335,6 @@ function processDiffs() {
 
     leftEditor.addClass(lline, getDiffClass(ldiff?.diffType));
     rightEditor.addClass(rline, getDiffClass(rdiff?.diffType));
-    leftEditor.mark(lline);
-    rightEditor.mark(rline);
 
     for (const cdiff of ldiff?.charDiffs || []) {
       leftEditor.mark(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
