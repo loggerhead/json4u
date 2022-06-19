@@ -43,6 +43,12 @@
           </li>
           <li>
             <label class="flex cursor-pointer w-full space-x-1">
+              <input type="checkbox" class="toggle toggle-sm" v-model="conf.lineWrapping" />
+              <span class="label-text">{{ t("lineWrapping") }}</span>
+            </label>
+          </li>
+          <li>
+            <label class="flex cursor-pointer w-full space-x-1">
               <input type="checkbox" class="toggle toggle-sm" v-model="conf.ignoreBlank" />
               <span class="label-text">{{ t("ignoreBlank") }}</span>
             </label>
@@ -158,8 +164,8 @@ onMounted(async () => {
     Object.assign(conf, JSON.parse(localStorage.getItem("config") as string));
   }
 
-  await leftEditor.init("left-editor");
-  await rightEditor.init("right-editor");
+  await leftEditor.init("left-editor", conf);
+  await rightEditor.init("right-editor", conf);
 
   function leftPasteHandler() {
     if (conf.autoFormat) {
@@ -209,6 +215,9 @@ onMounted(async () => {
 
 // 监听配置项变化，写入 localStorage
 watch(conf, (v) => {
+  leftEditor.setLineWrapping(conf.lineWrapping);
+  rightEditor.setLineWrapping(conf.lineWrapping);
+
   localStorage.setItem(
     "config",
     JSON.stringify(v, (key, value) => {
