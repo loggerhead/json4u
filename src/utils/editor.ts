@@ -11,17 +11,15 @@ import { Config } from "./config";
 export default class Editor {
   cm: CodeMirror.Editor;
   clickFn: null | ((_: CodeMirror.Editor) => void);
-  markLines: number[];
   static changeVersion = ref(0);
   static compareVersion = ref(0);
 
   constructor() {
     this.cm = <CodeMirror.Editor>(<unknown>null);
     this.clickFn = null;
-    this.markLines = [];
   }
 
-  async init(id: string) {
+  async init(id: string, conf: Config) {
     var CodeMirror = await import("codemirror");
     await Promise.all([
       // @ts-ignore
@@ -39,14 +37,15 @@ export default class Editor {
     this.cm = CodeMirror.fromTextArea(el, {
       mode: "application/json",
       theme: "idea",
-      smartIndent: true,
-      lineNumbers: true,
+      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
       // 显示折叠箭头
       foldGutter: true,
-      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+      smartIndent: true,
+      lineNumbers: true,
     });
 
     this.cm.setSize("100%", "100%");
+    this.setLineWrapping(conf.lineWrapping);
     this.setupFocusAndDropHandler();
 
     el.classList.remove("hidden");
@@ -64,6 +63,16 @@ export default class Editor {
 
     this.cm.setOption("lint", true);
     return true;
+  }
+
+  // 设置软换行。如果设置成功，返回 true
+  setLineWrapping(enable: boolean): boolean {
+    if (this.cm && this.cm.getOption("lineWrapping") != enable) {
+      this.cm.setOption("lineWrapping", enable);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   setClickListener(fn: (_: number) => void) {
@@ -171,19 +180,14 @@ export default class Editor {
     this.cm.removeLineClass(lineno - 1, "wrap", cls);
   }
 
-  mark(lineno: OptionNum, startPos?: number, endPos?: number, cls?: string) {
+  mark(lineno: OptionNum, startPos: number, endPos: number, cls: string) {
     if (lineno === undefined) {
       return;
     }
 
-    const from = { line: lineno - 1, ch: startPos ? startPos : 0 };
-    const to = { line: lineno - 1, ch: endPos ? endPos : 0 };
-
-    if (cls) {
-      this.cm.markText(from, to, { className: cls });
-    } else {
-      this.markLines.push(lineno);
-    }
+    const from = { line: lineno - 1, ch: startPos };
+    const to = { line: lineno - 1, ch: endPos };
+    this.cm.markText(from, to, { className: cls });
   }
 
   scrollTo(lineno: OptionNum) {
@@ -209,15 +213,13 @@ export default class Editor {
   }
 
   reset() {
-    for (const lineno of this.markLines) {
-      this.removeClass(lineno);
+    for (let i = 1; i < this.getText().length; i++) {
+      this.removeClass(i);
     }
 
     this.cm.getAllMarks().forEach((marker) => {
       marker.clear();
     });
-
-    this.markLines = [];
 
     if (this.clickFn) {
       this.cm.off("cursorActivity", this.clickFn);
