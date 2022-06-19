@@ -146,6 +146,7 @@ const jdd = shallowReactive({
   currentDiff: 0,
   errmsg: "",
   isTextCompared: false,
+  resizeObservers: [] as ResizeObserver[],
 });
 
 let conf = reactive(new Config());
@@ -218,8 +219,9 @@ onMounted(async () => {
 
 // 监听配置项变化，写入 localStorage
 watch(conf, (v) => {
+  // 如果 lineWrapping 设置发生了变化，codemirror 可能会删除 DOM 重新创建，导致 resizeObservers 监听失效
   if (leftEditor.setLineWrapping(conf.lineWrapping) || rightEditor.setLineWrapping(conf.lineWrapping)) {
-    processDiffs();
+    listenAndSetLineHeight();
   }
 
   localStorage.setItem(
@@ -311,6 +313,9 @@ function resetJdd() {
   jdd.currentDiff = 0;
   jdd.errmsg = "";
   jdd.isTextCompared = false;
+
+  jdd.resizeObservers.forEach((o) => o.disconnect());
+  jdd.resizeObservers = [];
 }
 
 function compare() {
@@ -333,16 +338,18 @@ function compare() {
   measure("render", () => {
     leftEditor.startOperation();
     rightEditor.startOperation();
-    processDiffs();
+
+    const classes = processDiffs();
+
     Editor.incCompareVersion();
     leftEditor.endOperation();
     rightEditor.endOperation();
+
+    listenAndSetLineHeight();
   });
 }
 
 function processDiffs() {
-  let classes = new Set<string>();
-
   jdd.diffs.forEach((dd) => {
     const [ldiff, rdiff] = dd;
     const lline = ldiff?.index;
@@ -352,8 +359,6 @@ function processDiffs() {
 
     leftEditor.addClass(lline, lclass);
     rightEditor.addClass(rline, rclass);
-    classes.add(lclass);
-    classes.add(rclass);
 
     for (const cdiff of ldiff?.charDiffs || []) {
       leftEditor.mark(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
@@ -364,22 +369,38 @@ function processDiffs() {
     }
   });
 
-  // 给所有的 diff 设置 --line-height。因为 addClass() 不是及时生效的，所以需要延迟设置
-  setTimeout(() => {
-    for (const cls of classes) {
-      const elements = document.getElementsByClassName(cls);
-
-      for (let i = 0; i < elements.length; i++) {
-        const e = elements[i] as HTMLElement;
-        const h = e.getBoundingClientRect().height;
-        e.style.setProperty("--line-height", `${h}px`);
-      }
-    }
-  }, 100);
-
   if (!jdd.isTextCompared) {
     addClickHandler();
     scrollToDiff(jdd.diffs[0], diff.RIGHT);
+  }
+}
+
+// 监听所有 diff 的 height 变化，并设置 --line-height property，用于计算 selected height
+function listenAndSetLineHeight() {
+  jdd.resizeObservers.forEach((o) => o.disconnect());
+  jdd.resizeObservers = [];
+
+  let classes = new Set<string>();
+  jdd.diffs.forEach(([ldiff, rdiff]) => {
+    classes.add(getDiffClass(ldiff?.diffType));
+    classes.add(getDiffClass(rdiff?.diffType));
+  });
+
+  for (const cls of classes) {
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const e = entry.target as HTMLElement;
+        const h = e.getBoundingClientRect().height;
+        e.style.setProperty("--line-height", `${h}px`);
+      }
+    });
+
+    jdd.resizeObservers.push(observer);
+
+    const elements = document.getElementsByClassName(cls);
+    for (let i = 0; i < elements.length; i++) {
+      observer.observe(elements[i] as HTMLElement);
+    }
   }
 }
 
