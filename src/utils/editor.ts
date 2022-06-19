@@ -65,9 +65,13 @@ export default class Editor {
     return true;
   }
 
-  setLineWrapping(enable: boolean) {
-    if (this.cm) {
+  // 设置软换行。如果设置成功，返回 true
+  setLineWrapping(enable: boolean): boolean {
+    if (this.cm && this.cm.getOption("lineWrapping") != enable) {
       this.cm.setOption("lineWrapping", enable);
+      return true;
+    } else {
+      return false;
     }
   }
 
