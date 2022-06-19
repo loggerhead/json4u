@@ -114,8 +114,11 @@
 
 // 实现前景色效果
 .selected-line {
-  outline: 10.5px inset #00000010;
-  outline-offset: -10.5px;
+  // --line-height 由 processDiffs() 动态计算得到
+  --outline-width: calc(var(--line-height) / 2);
+
+  outline: var(--outline-width) inset #00000010;
+  outline-offset: calc(var(--outline-width) * -1);
 }
 </style>
 
@@ -215,8 +218,9 @@ onMounted(async () => {
 
 // 监听配置项变化，写入 localStorage
 watch(conf, (v) => {
-  leftEditor.setLineWrapping(conf.lineWrapping);
-  rightEditor.setLineWrapping(conf.lineWrapping);
+  if (leftEditor.setLineWrapping(conf.lineWrapping) || rightEditor.setLineWrapping(conf.lineWrapping)) {
+    processDiffs();
+  }
 
   localStorage.setItem(
     "config",
@@ -337,13 +341,19 @@ function compare() {
 }
 
 function processDiffs() {
+  let classes = new Set<string>();
+
   jdd.diffs.forEach((dd) => {
     const [ldiff, rdiff] = dd;
     const lline = ldiff?.index;
     const rline = rdiff?.index;
+    const lclass = getDiffClass(ldiff?.diffType);
+    const rclass = getDiffClass(rdiff?.diffType);
 
-    leftEditor.addClass(lline, getDiffClass(ldiff?.diffType));
-    rightEditor.addClass(rline, getDiffClass(rdiff?.diffType));
+    leftEditor.addClass(lline, lclass);
+    rightEditor.addClass(rline, rclass);
+    classes.add(lclass);
+    classes.add(rclass);
 
     for (const cdiff of ldiff?.charDiffs || []) {
       leftEditor.mark(lline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
@@ -353,6 +363,19 @@ function processDiffs() {
       rightEditor.mark(rline, cdiff.start, cdiff.end, getDiffClass(cdiff.diffType));
     }
   });
+
+  // 给所有的 diff 设置 --line-height。因为 addClass() 不是及时生效的，所以需要延迟设置
+  setTimeout(() => {
+    for (const cls of classes) {
+      const elements = document.getElementsByClassName(cls);
+
+      for (let i = 0; i < elements.length; i++) {
+        const e = elements[i] as HTMLElement;
+        const h = e.getBoundingClientRect().height;
+        e.style.setProperty("--line-height", `${h}px`);
+      }
+    }
+  }, 100);
 
   if (!jdd.isTextCompared) {
     addClickHandler();
