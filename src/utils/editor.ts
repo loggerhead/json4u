@@ -3,6 +3,7 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css";
 import "codemirror/addon/fold/foldgutter.css";
 import "codemirror/addon/lint/lint.css";
+import "codemirror/addon/dialog/dialog.css";
 // @ts-ignore
 import jsonlint from "jsonlint-mod";
 import { OptionNum } from "./typeHelper";
@@ -20,18 +21,29 @@ export default class Editor {
   }
 
   async init(id: string, conf: Config) {
-    var CodeMirror = await import("codemirror");
-    await Promise.all([
-      // @ts-ignore
-      import("codemirror/mode/javascript/javascript.js"),
-      import("codemirror/addon/display/placeholder.js"),
-      import("codemirror/addon/fold/foldgutter.js"),
-      import("codemirror/addon/fold/foldcode.js"),
-      import("codemirror/addon/fold/brace-fold.js"),
-      import("codemirror/addon/lint/lint.js"),
-      import("codemirror/addon/lint/json-lint.js"),
-    ]);
-    (window as any).jsonlint = jsonlint;
+    var CodeMirror;
+    await import("codemirror").then(async (obj) => {
+      CodeMirror = obj;
+      (window as any).CodeMirror = CodeMirror;
+
+      await Promise.all([
+        // @ts-ignore
+        import("codemirror/mode/javascript/javascript.js"),
+        import("codemirror/addon/display/placeholder.js"),
+        import("codemirror/addon/fold/foldgutter.js"),
+        import("codemirror/addon/fold/foldcode.js"),
+        import("codemirror/addon/fold/brace-fold.js"),
+        import("codemirror/addon/lint/lint.js"),
+        import("codemirror/addon/lint/json-lint.js"),
+        import("codemirror/addon/search/searchcursor.js"),
+        import("codemirror/addon/scroll/annotatescrollbar.js"),
+        import("codemirror/addon/search/matchesonscrollbar.js"),
+        // https://github.com/zhuhs/codemirror-search-replace
+        import("codemirror-search-replace/src/search.js"),
+      ]);
+
+      (window as any).jsonlint = jsonlint;
+    });
 
     const el = document.getElementById(id) as HTMLTextAreaElement;
     this.cm = CodeMirror.fromTextArea(el, {
@@ -121,6 +133,10 @@ export default class Editor {
   // 拖拽时展示 hover 效果
   private setupFocusAndDropHandler() {
     const hoverHandler = (e: Event) => {
+      if (!e) {
+        return;
+      }
+
       const el = (e.target as HTMLElement).closest(".CodeMirror");
 
       if (e.type === "dragover" || e.type === "focus") {

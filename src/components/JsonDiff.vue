@@ -117,7 +117,7 @@
   // --line-height 由 processDiffs() 动态计算得到
   --outline-width: calc(var(--line-height) / 2);
 
-  outline: var(--outline-width) inset #00000010;
+  outline: var(--outline-width) inset #00000020;
   outline-offset: calc(var(--outline-width) * -1);
 }
 </style>
@@ -377,29 +377,25 @@ function processDiffs() {
 
 // 监听所有 diff 的 height 变化，并设置 --line-height property，用于计算 selected height
 function listenAndSetLineHeight() {
-  jdd.resizeObservers.forEach((o) => o.disconnect());
-  jdd.resizeObservers = [];
-
-  let classes = new Set<string>();
-  jdd.diffs.forEach(([ldiff, rdiff]) => {
-    classes.add(getDiffClass(ldiff?.diffType));
-    classes.add(getDiffClass(rdiff?.diffType));
+  const observer = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const e = entry.target as HTMLElement;
+      const h = e.getBoundingClientRect().height;
+      e.style.setProperty("--line-height", `${h}px`);
+    }
   });
 
-  for (const cls of classes) {
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const e = entry.target as HTMLElement;
-        const h = e.getBoundingClientRect().height;
-        e.style.setProperty("--line-height", `${h}px`);
-      }
-    });
+  jdd.resizeObservers.forEach((o) => o.disconnect());
+  jdd.resizeObservers = [observer];
 
-    jdd.resizeObservers.push(observer);
+  const cms = document.getElementsByClassName("CodeMirror-code");
 
-    const elements = document.getElementsByClassName(cls);
-    for (let i = 0; i < elements.length; i++) {
-      observer.observe(elements[i] as HTMLElement);
+  for (let i = 0; i < cms.length; i++) {
+    const cm = cms[i];
+
+    for (let j = 0; j < cm.children.length; j++) {
+      const e = cm.children[j] as HTMLElement;
+      observer.observe(e);
     }
   }
 }
