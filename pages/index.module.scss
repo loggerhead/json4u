@@ -1,0 +1,99 @@
+$background-color: #faf9f8;
+$pure-background: #fff;
+$text-color: #333;
+$border-color: #eee;
+$background-minor-highlight-color: #fcfcfc;
+$inline-code-background-color: #f1f1fe;
+$link-color: #235a97;
+$raised-background-color: #fff;
+$alt-text-color: #000;
+$raised-box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+$sidebar-background-color: #eee;
+$sidebar-list-active-background-color: #e3e8ec;
+$sidebar-list-background-color: #e4e4e4;
+$sidebar-link-border-color: #000;
+$sidebar-item-border-color: #dfdfdf;
+$sidebar-active-button-background-color: #dfdfdf;
+$playground-divider: #4e4e4f;
+$playground-dropdown-bg: #fff;
+$playground-dropdown-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+$playground-dropdown-border: #f2f2f2;
+$playground-toolbar-hover-bg: #f2f2f2;
+$playground-dragbar-bg: #fff;
+$playground-dragbar-border: #c4c4c4;
+$playground-pre-color: #000;
+$playground-pre-bg: #f7f7f7;
+$table-border-color: #f1f1f1;
+$blue-tinged-bg: #e6f2fb;
+$blue-tinged-strong: #cce4f6;
+$fade-gradient: linear-gradient(0deg, #fff, hsla(0, 0%, 100%, 0.2));
+$code-font: "Cascadia Mono-SemiLight", Menlo, Monaco, Consolas, monospace;
+$body-font: "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue",
+  sans-serif;
+$vscode-sash-size: 4px;
+$chinese-caption-line-opacity: 1;
+$vscode-editorCodeLens-lineHeight: 15px;
+$vscode-editorCodeLens-fontSize: 10px;
+$vscode-editorCodeLens-fontFeatureSettings: "liga" on, "calt" on;
+$code-editorInlayHintsFontFamily: $code-font;
+
+.raised {
+  font-family: $body-font;
+  font-size: 16px;
+  line-height: 1.4;
+  background-color: $raised-background-color;
+  box-shadow: $raised-box-shadow;
+  color: $alt-text-color;
+  padding-top: 0;
+  margin-top: 0;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+}
+
+.playground_container {
+  display: flex;
+  height: 861px;
+}
+
+.editor_container {
+  background-color: $playground-dropdown-bg;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
+  width: calc(100% - 360px);
+}
+
+.editor_toolbar {
+  background-color: $playground-dropdown-bg;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
+  width: calc(100% - 360px);
+}
+
+.dragbar {
+  background-color: $playground-dragbar-bg;
+  border-left: 1px solid $playground-dragbar-border;
+  cursor: col-resize;
+  margin-left: 2px;
+  padding: 3px;
+}
+
+.editor {
+  height: 100%;
+}
+
+.sidebar {
+  background-color: $playground-dropdown-bg;
+  flex-basis: 320px;
+  flex-direction: column;
+  max-width: 320px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding: 0 1em 0 0.5rem;
+  width: 320px;
+  z-index: 1;
+  display: block;
+}
