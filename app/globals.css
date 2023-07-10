@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind utilities;
 @tailwind components;
+
+@layer components {
+  .button-action {
+    @apply btn btn-sm	btn-outline rounded normal-case;
+  }
+
+  .alert-info {
+    @apply px-4 py-2 text-sm text-blue-700 bg-blue-100 rounded w-fit;
+  }
+
+  .alert-error {
+    @apply px-4 py-2 text-sm text-red-700 bg-red-100 rounded w-fit;
+  }
+}
+
+.editor-hover {
+  border: 1px solid #2099d180;
+}
