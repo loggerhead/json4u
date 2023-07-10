@@ -5,10 +5,10 @@ export default function Home() {
   return (
     <main>
       <div className={styles.raised}>
-        <div id="playground-container" className={styles.playground_container}>
-          <div id="editor-container" className={styles.editor_container}>
-            <div id="editor-toolbar" className="relative">
-              <ul>
+        <div id="playground-container" className="flex">
+          <div id="editor-container" className="flex flex-col	grow relative w-calc-editor">
+            <div id="editor-toolbar" className="flex relative justify-between	clear-both">
+              <ul className="flex">
                 <li>
                   <a id="run-button" href="#">
                     运行
@@ -35,7 +35,7 @@ export default function Home() {
                   </a>
                 </li>
               </ul>
-              <ul className="absolute inset-y-0 right-0 w-16">
+              <ul className="flex right">
                 <li>
                   <a id="sidebar-toggle" href="#">
                     ⇥
@@ -47,8 +47,8 @@ export default function Home() {
               <MyEditor></MyEditor>
             </div>
           </div>
-          <div className={styles.dragbar}></div>
-          <div className={styles.sidebar}>
+          <div id="playground-dragbar" className="border-solid border-l-2 ml-0.5 p-1 cursor-col-resize"></div>
+          <div id="playground-sidecar" className="flex flex-col basis-80 w-80	max-w-xs z-10">
             <div id="playground-plugin-tabbar"></div>
             <div className="playground-plugin-container"></div>
           </div>
