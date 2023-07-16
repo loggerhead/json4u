@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-    mdxRs: true, // Using the Rust-based MDX compiler
-  },
+  experimental: {},
 };
 
 const withMDX = require("@next/mdx")({

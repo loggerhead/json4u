@@ -8,7 +8,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="zh">
-      <body>{children}</body>
+      <body>
+        <main>{children}</main>
+        <div className="text-center text-[12px]">
+          <a href="/">Json For You ·</a>
+          <a href="https://beian.miit.gov.cn" target="_blank">
+            粤ICP备16007488号 ·
+          </a>
+          <a href="/guide">使用指南 ·</a>
+          <a href="https://github.com/loggerhead/json4u-issue/issues">Feedback</a>
+        </div>
+      </body>
     </html>
   );
 }
