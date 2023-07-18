@@ -1,11 +1,17 @@
+"use client";
 import MyEditor from "../components/editor";
 import MyButton from "../components/button";
+import Dragbar from "../components/dragbar";
+import styles from "./page.module.scss";
+import { useRef } from "react";
 
 export default function Home() {
+  const editorRef = useRef(null);
+
   return (
-    <div className="gap-2">
+    <div className="gap-2 mx-5 my-2">
       <div id="playground-container" className="flex">
-        <div id="editor-container" className="flex flex-col	grow relative w-calc-editor gap-2">
+        <div id="editor-container" ref={editorRef} className="flex flex-col	shrink min-w-fit basis-9/12 relative gap-2">
           <div id="editor-toolbar" className="flex relative justify-between	clear-both">
             <ul className="flex space-x-2">
               <li className="flex">
@@ -29,16 +35,16 @@ export default function Home() {
               </li>
             </ul>
           </div>
-          <div id="monaco-editor-embed">
+          <div className={styles.editor}>
             <MyEditor></MyEditor>
           </div>
         </div>
-        <div id="playground-dragbar" className="border-solid border-l-2 ml-0.5 p-1 cursor-col-resize"></div>
-        <div id="playground-sidecar" className="flex flex-col basis-80 w-80	max-w-xs z-10 gap-2">
+        <Dragbar id="playground-dragbar" resizeRef={editorRef}></Dragbar>
+        <div id="playground-sidecar" className="flex flex-col grow shrink min-w-fit gap-2">
           <div id="playground-plugin-tabbar">
             <MyButton>比较</MyButton>
           </div>
-          <div className="playground-plugin-container">
+          <div className={styles.editor}>
             <MyEditor enableMinimap={false}></MyEditor>
           </div>
         </div>

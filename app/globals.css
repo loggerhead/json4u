@@ -16,6 +16,12 @@
   }
 }
 
+/* TODO */
 .editor-hover {
   border: 1px solid #2099d180;
+}
+
+/* fix monaco 根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */
+.monaco-editor {
+  position: absolute !important;
 }
