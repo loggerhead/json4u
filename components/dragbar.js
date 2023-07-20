@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useCallback } from "react";
 
 export default function Dragbar({ resizeRef }) {
   const isMouseDown = useRef(false);

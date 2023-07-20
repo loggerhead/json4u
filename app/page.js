@@ -36,7 +36,7 @@ export default function Home() {
             </ul>
           </div>
           <div className={styles.editor}>
-            <MyEditor></MyEditor>
+            <MyEditor name="leftEditor"></MyEditor>
           </div>
         </div>
         <Dragbar id="playground-dragbar" resizeRef={editorRef}></Dragbar>
@@ -45,7 +45,7 @@ export default function Home() {
             <MyButton>比较</MyButton>
           </div>
           <div className={styles.editor}>
-            <MyEditor enableMinimap={false}></MyEditor>
+            <MyEditor name="rightEditor"></MyEditor>
           </div>
         </div>
       </div>
