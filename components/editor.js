@@ -8,11 +8,9 @@ loader.config({ paths: { vs: "https://cdn.staticfile.org/monaco-editor/0.40.0/mi
 
 export default function MyEditor({ name }) {
   const editorRef = useRef(null);
-  const height = "calc(100vh - 6rem)";
   // TODO:
-  const defaultValue = `{
-  "foo": "bar"
-}`;
+  const height = "calc(100vh - 6rem)";
+  const defaultValue = ``;
 
   return (
     <Editor
@@ -31,12 +29,20 @@ export default function MyEditor({ name }) {
       onMount={(editor, monaco) => {
         editorRef.current = editor;
         editor.name = name;
+        registerOnPaste(editor);
         registerAutoShowMinimap(editor);
         registerDropFileHandler(editor);
       }}
       // onChange={(e) => handleEditorChange(editorRef.current, e)}
     />
   );
+}
+
+function registerOnPaste(editor) {
+  editor.onDidPaste((e) => {
+    console.log(`${editor.name} paste`);
+    format(editor);
+  });
 }
 
 // 支持拖拽文件到编辑器上
@@ -48,7 +54,10 @@ function registerDropFileHandler(editor) {
     if (file) {
       // 读取拖拽的文件内容，并设置为编辑器的内容
       var reader = new FileReader();
-      reader.onload = (e) => editor.setValue(e.target.result);
+      reader.onload = (e) => {
+        editor.setValue(e.target.result);
+        format(editor);
+      };
       reader.readAsText(file);
     }
   });
@@ -78,6 +87,12 @@ function registerAutoShowMinimap(editor) {
       });
     }
   });
+}
+
+function format(editor) {
+  var formatDocumentAction = editor.getAction("editor.action.formatDocument");
+  console.log(`${editor.name} format`);
+  formatDocumentAction.run();
 }
 
 function highlightLine(editor, lineNumber, colorClass) {
