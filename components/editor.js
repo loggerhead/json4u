@@ -4,7 +4,17 @@ import * as monaco from "monaco-editor";
 import { Editor, loader } from "@monaco-editor/react";
 
 // TODO: 指定 CDN 地址，改为 npm
-loader.config({ paths: { vs: "https://cdn.staticfile.org/monaco-editor/0.40.0/min/vs" } });
+loader.config({
+  paths: {
+    vs: "https://cdn.staticfile.org/monaco-editor/0.40.0/min/vs",
+  },
+  // 配置右键菜单使用中文
+  "vs/nls": {
+    availableLanguages: {
+      "*": "zh-cn",
+    },
+  },
+});
 
 export default function MyEditor({ name }) {
   const editorRef = useRef(null);
@@ -22,9 +32,7 @@ export default function MyEditor({ name }) {
         scrollBeyondLastLine: false, // 行数超过一屏时才展示滚动条
         automaticLayout: true, // 当编辑器所在的父容器的大小改变时，编辑器会自动重新计算并调整大小
         wordWrap: "on",
-        minimap: {
-          enabled: false,
-        },
+        minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
         editorRef.current = editor;
