@@ -1,5 +1,4 @@
 "use client";
-import { useRef } from "react";
 import * as monaco from "monaco-editor";
 import { Editor, loader } from "@monaco-editor/react";
 
@@ -16,8 +15,7 @@ loader.config({
   },
 });
 
-export default function MyEditor({ name }) {
-  const editorRef = useRef(null);
+export default function MyEditor({ name, editorRef }) {
   // TODO:
   const height = "calc(100vh - 6rem)";
   const defaultValue = ``;
@@ -35,72 +33,127 @@ export default function MyEditor({ name }) {
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = editor;
-        editor.name = name;
-        registerOnPaste(editor);
-        registerAutoShowMinimap(editor);
-        registerDropFileHandler(editor);
+        editorRef.current = new EditorRef(name, editor, monaco);
+        editorRef.current.registerAll();
       }}
-      // onChange={(e) => handleEditorChange(editorRef.current, e)}
     />
   );
 }
 
-function registerOnPaste(editor) {
-  editor.onDidPaste((e) => {
-    console.log(`${editor.name} paste`);
-    format(editor);
-  });
-}
+class EditorRef {
+  constructor(name, editor, monaco) {
+    this.name = name;
+    this.editor = editor;
+    this.monaco = monaco;
+  }
 
-// 支持拖拽文件到编辑器上
-function registerDropFileHandler(editor) {
-  editor.getDomNode().addEventListener("drop", (e) => {
-    e.preventDefault();
-    var file = e.dataTransfer.files[0];
+  text() {
+    return this.editor.getValue().trim();
+  }
 
-    if (file) {
-      // 读取拖拽的文件内容，并设置为编辑器的内容
-      var reader = new FileReader();
-      reader.onload = (e) => {
-        editor.setValue(e.target.result);
-        format(editor);
-      };
-      reader.readAsText(file);
+  setText(text) {
+    this.editor.setValue(text);
+  }
+
+  format() {
+    this.editor.getAction("editor.action.formatDocument").run();
+    console.log(`${this.name} format`);
+  }
+
+  minify() {
+    try {
+      const obj = JSON.parse(this.text());
+      const text = JSON.stringify(obj, null, 0);
+      this.setText(text);
+      console.log(`${this.name} minify`);
+    } catch (e) {
+      // TODO:
+      console.log(`${this.name} minify failed: ${e}`);
+      // handleError(e, editor === leftEditor ? diff.LEFT : diff.RIGHT);
     }
-  });
-}
+  }
 
-// 宽度改变时自动展示或隐藏 minimap
-function registerAutoShowMinimap(editor) {
-  const widthThreshold = 800;
+  escape() {
+    const text = this.text()
+      .replace(/[\\]/g, "\\\\")
+      .replace(/[\"]/g, '\\"')
+      .replace(/[\/]/g, "\\/")
+      .replace(/[\b]/g, "\\b")
+      .replace(/[\f]/g, "\\f")
+      .replace(/[\n]/g, "\\n")
+      .replace(/[\r]/g, "\\r")
+      .replace(/[\t]/g, "\\t");
+    this.setText(text);
+  }
 
-  editor.onDidLayoutChange((e) => {
-    const enabled = editor.getOption(monaco.editor.EditorOption.minimap).enabled;
-    const width = e.width;
+  unescape() {
+    const text = this.text()
+      .replace(/[\\]n/g, "\n")
+      .replace(/[\\]'/g, "'")
+      .replace(/[\\]"/g, '"')
+      .replace(/[\\]&/g, "&")
+      .replace(/[\\]r/g, "\r")
+      .replace(/[\\]t/g, "\t")
+      .replace(/[\\]b/g, "\b")
+      .replace(/[\\]f/g, "\f");
+    this.setText(text);
+  }
 
-    if (width > widthThreshold && !enabled) {
-      console.log(`${editor.name} enable minimap`);
-      editor.updateOptions({
-        minimap: {
-          enabled: true,
-        },
-      });
-    } else if (width < widthThreshold && enabled) {
-      console.log(`${editor.name} disable minimap`);
-      editor.updateOptions({
-        minimap: {
-          enabled: false,
-        },
-      });
-    }
-  });
-}
+  registerAll() {
+    this.registerOnPaste();
+    this.registerAutoShowMinimap();
+    this.registerDropFileHandler();
+  }
 
-function format(editor) {
-  var formatDocumentAction = editor.getAction("editor.action.formatDocument");
-  console.log(`${editor.name} format`);
-  formatDocumentAction.run();
+  // 注册粘贴事件处理器
+  registerOnPaste() {
+    this.editor.onDidPaste((e) => {
+      console.log(`${this.name} paste`);
+      this.format();
+    });
+  }
+
+  // 注册拖拽事件处理器，支持拖拽文件到编辑器上
+  registerDropFileHandler() {
+    this.editor.getDomNode().addEventListener("drop", (e) => {
+      e.preventDefault();
+      var file = e.dataTransfer.files[0];
+
+      if (file) {
+        // 读取拖拽的文件内容，并设置为编辑器的内容
+        var reader = new FileReader();
+        reader.onload = (e) => {
+          this.editor.setValue(e.target.result);
+          this.format();
+        };
+        reader.readAsText(file);
+      }
+    });
+  }
+
+  // 宽度改变时自动展示或隐藏 minimap
+  registerAutoShowMinimap() {
+    const widthThreshold = 800;
+
+    this.editor.onDidLayoutChange((e) => {
+      const enabled = this.editor.getOption(monaco.editor.EditorOption.minimap).enabled;
+      const width = e.width;
+
+      if (width > widthThreshold && !enabled) {
+        console.log(`${this.name} enable minimap`);
+        this.editor.updateOptions({
+          minimap: {
+            enabled: true,
+          },
+        });
+      } else if (width < widthThreshold && enabled) {
+        console.log(`${this.name} disable minimap`);
+        this.editor.updateOptions({
+          minimap: { enabled: false },
+        });
+      }
+    });
+  }
 }
 
 function highlightLine(editor, lineNumber, colorClass) {
