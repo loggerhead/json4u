@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useCallback } from "react";
 
-export default function Dragbar({ resizeRef }) {
+export default function Dragbar({ containerRef }) {
   const isMouseDown = useRef(false);
   const prevX = useRef(0);
 
@@ -25,11 +25,11 @@ export default function Dragbar({ resizeRef }) {
     if (isMouseDown.current) {
       event.preventDefault();
       // 根据相对位置计算需要改变多少宽度
-      const width = resizeRef.current.offsetWidth;
+      const width = containerRef.current.offsetWidth;
       const dx = event.clientX - prevX.current;
       const x = width + dx;
       prevX.current = event.clientX;
-      resizeRef.current.style.flexBasis = `${x}px`;
+      containerRef.current.style.flexBasis = `${x}px`;
     }
   });
 
