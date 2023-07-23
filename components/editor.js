@@ -59,11 +59,6 @@ class EditorRef {
     this.editor.setValue(text);
   }
 
-  text2node(format = false) {
-    const text = format ? this.format() : this.text();
-    this.rootNode = jsonc.parseTree(text);
-  }
-
   // 校验 json valid
   validate(markers) {
     if (markers?.length > 0) {
@@ -128,17 +123,29 @@ class EditorRef {
     this.setText(text);
   }
 
+  doPaste(format = false) {
+    const text = format ? this.format() : this.text();
+    this.rootNode = jsonc.parseTree(text);
+  }
+
   registerAll() {
     this.registerOnPaste();
     this.registerAutoShowMinimap();
     this.registerDropFileHandler();
     this.registerPositionChange();
+
+    // TODO: 监听滚动事件实现同步滚动
+    const editor = this.editor;
+    this.editor.onDidScrollChange(function (e) {
+      console.log("滚动位置：", e.scrollTop);
+      // editor.setScrollTop(e._oldScrollTop);
+    });
   }
 
   // 注册粘贴事件处理器
   registerOnPaste() {
     this.editor.onDidPaste(() => {
-      this.text2node(true);
+      this.doPaste(true);
     });
   }
 
@@ -153,7 +160,7 @@ class EditorRef {
         var reader = new FileReader();
         reader.onload = (e) => {
           this.editor.setValue(e.target.result);
-          this.text2node(true);
+          this.doPaste(true);
         };
         reader.readAsText(file);
       }
