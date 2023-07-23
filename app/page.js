@@ -1,12 +1,15 @@
 "use client";
 import MyEditor from "../components/editor";
 import MyButton from "../components/button";
+import MyAlert from "../components/alert";
 import Dragbar from "../components/dragbar";
 import styles from "./page.module.scss";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function Home() {
   const editorContainerRef = useRef(null);
+  const [leftMsg, setLeftMsg] = useState("");
+  const [rightMsg, setRightMsg] = useState("");
   const leftEditorRef = useRef(null);
   const rightEditorRef = useRef(null);
 
@@ -19,7 +22,7 @@ export default function Home() {
           className="flex flex-col	shrink min-w-fit basis-9/12 relative gap-2"
         >
           <div id="editor-toolbar" className="flex relative justify-between	clear-both">
-            <ul className="flex space-x-2">
+            <ul className="flex space-x-2 items-center">
               <li>
                 <FormatButton editorRef={leftEditorRef}></FormatButton>
               </li>
@@ -32,6 +35,9 @@ export default function Home() {
               <li>
                 <UnescapeButton editorRef={leftEditorRef}></UnescapeButton>
               </li>
+              <li>
+                <MyAlert message={leftMsg}></MyAlert>
+              </li>
             </ul>
             <ul className="flex right">
               <li>
@@ -42,16 +48,21 @@ export default function Home() {
             </ul>
           </div>
           <div className={styles.editor}>
-            <MyEditor name="leftEditor" editorRef={leftEditorRef}></MyEditor>
+            <MyEditor name="leftEditor" editorRef={leftEditorRef} setAlertMsg={setLeftMsg}></MyEditor>
           </div>
         </div>
         <Dragbar id="playground-dragbar" containerRef={editorContainerRef}></Dragbar>
         <div id="playground-sidecar" className="flex flex-col grow shrink min-w-fit gap-2">
-          <div id="playground-plugin-tabbar">
-            <MyButton>比较</MyButton>
-          </div>
+          <ul className="flex space-x-2 items-center">
+            <li>
+              <MyButton>比较</MyButton>
+            </li>
+            <li>
+              <MyAlert message={rightMsg}></MyAlert>
+            </li>
+          </ul>
           <div className={styles.editor}>
-            <MyEditor name="rightEditor" editorRef={rightEditorRef}></MyEditor>
+            <MyEditor name="rightEditor" editorRef={rightEditorRef} setAlertMsg={setRightMsg}></MyEditor>
           </div>
         </div>
       </div>

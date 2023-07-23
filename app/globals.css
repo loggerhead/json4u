@@ -4,15 +4,15 @@
 
 @layer components {
   .button-action {
-    @apply btn btn-sm	btn-outline rounded normal-case;
+    @apply btn btn-xs	btn-outline rounded normal-case;
   }
 
   .alert-info {
-    @apply px-4 py-2 text-sm text-blue-700 bg-blue-100 rounded w-fit;
+    @apply px-2 py-0.5 text-sm text-blue-700 bg-blue-100 rounded w-fit;
   }
 
   .alert-error {
-    @apply px-4 py-2 text-sm text-red-700 bg-red-100 rounded w-fit;
+    @apply px-2 py-0.5 text-sm text-red-700 bg-red-100 rounded w-fit;
   }
 }
 
@@ -21,7 +21,7 @@
   border: 1px solid #2099d180;
 }
 
-/* fix monaco 根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */
+/* fix monaco 不能根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */
 .monaco-editor {
   position: absolute !important;
 }

@@ -1,6 +1,7 @@
 "use client";
 import * as monaco from "monaco-editor";
 import { Editor, loader } from "@monaco-editor/react";
+import * as acorn from "acorn";
 
 // TODO: 指定 CDN 地址，改为 npm
 loader.config({
@@ -15,16 +16,13 @@ loader.config({
   },
 });
 
-export default function MyEditor({ name, editorRef }) {
-  // TODO:
-  const height = "calc(100vh - 6rem)";
-  const defaultValue = ``;
+export default function MyEditor({ name, editorRef, setAlertMsg }) {
+  console.log(acorn.parse("1 + 1", { ecmaVersion: "latest" }));
 
   return (
     <Editor
-      height={height}
       language="json"
-      value={defaultValue}
+      height="calc(100vh - 6rem)"
       options={{
         fontSize: 14, // 设置初始字体大小
         scrollBeyondLastLine: false, // 行数超过一屏时才展示滚动条
@@ -33,18 +31,20 @@ export default function MyEditor({ name, editorRef }) {
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = new EditorRef(name, editor, monaco);
+        editorRef.current = new EditorRef(name, editor, monaco, setAlertMsg);
         editorRef.current.registerAll();
       }}
+      onValidate={(markers) => editorRef.current.validate(markers)}
     />
   );
 }
 
 class EditorRef {
-  constructor(name, editor, monaco) {
+  constructor(name, editor, monaco, setAlertMsg) {
     this.name = name;
     this.editor = editor;
     this.monaco = monaco;
+    this.setAlertMsg = setAlertMsg;
   }
 
   text() {
@@ -154,8 +154,19 @@ class EditorRef {
       }
     });
   }
+
+  // 校验 json valid
+  validate(markers) {
+    if (markers?.length > 0) {
+      const m = markers[0];
+      this.setAlertMsg(`!JSON 解析错误：第 ${m.startLineNumber} 行，第 ${m.startColumn} 列`);
+    } else {
+      this.setAlertMsg("");
+    }
+  }
 }
 
+// TODO: -----------------------------------------------------------------------------------------------------------
 function highlightLine(editor, lineNumber, colorClass) {
   const endColumn = editor.getModel().getLineMaxColumn(lineNumber);
 
