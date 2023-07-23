@@ -16,7 +16,7 @@ loader.config({
   },
 });
 
-export default function MyEditor({ name, editorRef, setAlertMsg }) {
+export default function MyEditor({ name, editorRef, setAlert }) {
   return (
     <Editor
       language="json"
@@ -29,7 +29,7 @@ export default function MyEditor({ name, editorRef, setAlertMsg }) {
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = new EditorRef(name, editor, monaco, setAlertMsg);
+        editorRef.current = new EditorRef(name, editor, monaco, setAlert);
         editorRef.current.registerAll();
       }}
       onValidate={(markers) => editorRef.current.validate(markers)}
@@ -38,7 +38,7 @@ export default function MyEditor({ name, editorRef, setAlertMsg }) {
 }
 
 class EditorRef {
-  constructor(name, editor, monaco, setAlertMsg) {
+  constructor(name, editor, monaco, setAlert) {
     // 编辑器名字。用于输出日志时区分左右两侧的编辑器
     this.name = name;
     // monaco editor 实例
@@ -46,7 +46,7 @@ class EditorRef {
     // monaco 实例
     this.monaco = monaco;
     // 设置编辑器上方的 alert 信息
-    this.setAlertMsg = setAlertMsg;
+    this.setAlert = setAlert;
     // json 字符串解析成 tree 以后的根节点。Node 类型定义见文档：https://github.com/microsoft/node-jsonc-parser
     this.rootNode = null;
   }
@@ -63,9 +63,13 @@ class EditorRef {
   validate(markers) {
     if (markers?.length > 0) {
       const m = markers[0];
-      this.setAlertMsg(`!JSON 解析错误：第 ${m.startLineNumber} 行，第 ${m.startColumn} 列`);
+      const props = {
+        msg: `JSON 解析错误：第 ${m.startLineNumber} 行，第 ${m.startColumn} 列`,
+        color: "red",
+      };
+      this.setAlert(props);
     } else {
-      this.setAlertMsg("");
+      this.setAlert({});
     }
   }
 

@@ -1,15 +1,10 @@
 "use client";
 
-// ! 开头的 message 表示错误
-export default function MyAlert({ message }) {
-  const isError = message?.startsWith("!");
-  var className = "alert-info";
+// 需要将枚举值定义出来，否则编译器不知道使用了哪些 class，就不会编译，导致样式不生效
+const _ = ["alert-blue", "alert-green", "alert-yellow", "alert-red"];
 
-  if (isError) {
-    className = "alert-error";
-    message = message?.slice(1);
-  }
-
-  className += " " + (message?.length > 0 ? "" : "hidden");
-  return <div className={className}>{message}</div>;
+export default function MyAlert({ props }) {
+  const { msg, color } = props;
+  const className = msg?.length > 0 ? `alert-${color}` : "hidden";
+  return <div className={className}>{msg}</div>;
 }

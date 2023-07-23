@@ -8,8 +8,8 @@ import { useRef, useState } from "react";
 
 export default function Home() {
   const editorContainerRef = useRef(null);
-  const [leftMsg, setLeftMsg] = useState("");
-  const [rightMsg, setRightMsg] = useState("");
+  const [leftAlert, setLeftAlert] = useState({ msg: "", color: "" });
+  const [rightAlert, setRightAlert] = useState({ msg: "", color: "" });
   const leftEditorRef = useRef(null);
   const rightEditorRef = useRef(null);
 
@@ -36,7 +36,7 @@ export default function Home() {
                 <UnescapeButton editorRef={leftEditorRef}></UnescapeButton>
               </li>
               <li>
-                <MyAlert message={leftMsg}></MyAlert>
+                <MyAlert props={leftAlert}></MyAlert>
               </li>
             </ul>
             <ul className="flex right">
@@ -48,7 +48,7 @@ export default function Home() {
             </ul>
           </div>
           <div className={styles.editor}>
-            <MyEditor name="leftEditor" editorRef={leftEditorRef} setAlertMsg={setLeftMsg}></MyEditor>
+            <MyEditor name="leftEditor" editorRef={leftEditorRef} setAlert={setLeftAlert}></MyEditor>
           </div>
         </div>
         <Dragbar id="playground-dragbar" containerRef={editorContainerRef}></Dragbar>
@@ -58,11 +58,11 @@ export default function Home() {
               <MyButton>比较</MyButton>
             </li>
             <li>
-              <MyAlert message={rightMsg}></MyAlert>
+              <MyAlert props={rightAlert}></MyAlert>
             </li>
           </ul>
           <div className={styles.editor}>
-            <MyEditor name="rightEditor" editorRef={rightEditorRef} setAlertMsg={setRightMsg}></MyEditor>
+            <MyEditor name="rightEditor" editorRef={rightEditorRef} setAlert={setRightAlert}></MyEditor>
           </div>
         </div>
       </div>
