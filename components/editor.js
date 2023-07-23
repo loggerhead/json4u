@@ -1,7 +1,7 @@
 "use client";
 import * as monaco from "monaco-editor";
 import { Editor, loader } from "@monaco-editor/react";
-import * as acorn from "acorn";
+import * as jsonc from "jsonc-parser";
 
 // TODO: 指定 CDN 地址，改为 npm
 loader.config({
@@ -17,8 +17,6 @@ loader.config({
 });
 
 export default function MyEditor({ name, editorRef, setAlertMsg }) {
-  console.log(acorn.parse("1 + 1", { ecmaVersion: "latest" }));
-
   return (
     <Editor
       language="json"
@@ -41,10 +39,16 @@ export default function MyEditor({ name, editorRef, setAlertMsg }) {
 
 class EditorRef {
   constructor(name, editor, monaco, setAlertMsg) {
+    // 编辑器名字。用于输出日志时区分左右两侧的编辑器
     this.name = name;
+    // monaco editor 实例
     this.editor = editor;
+    // monaco 实例
     this.monaco = monaco;
+    // 设置编辑器上方的 alert 信息
     this.setAlertMsg = setAlertMsg;
+    // json 字符串解析成 tree 以后的根节点。Node 类型定义见文档：https://github.com/microsoft/node-jsonc-parser
+    this.rootNode = null;
   }
 
   text() {
@@ -55,9 +59,34 @@ class EditorRef {
     this.editor.setValue(text);
   }
 
+  text2node(format = false) {
+    const text = format ? this.format() : this.text();
+    this.rootNode = jsonc.parseTree(text);
+  }
+
+  // 校验 json valid
+  validate(markers) {
+    if (markers?.length > 0) {
+      const m = markers[0];
+      this.setAlertMsg(`!JSON 解析错误：第 ${m.startLineNumber} 行，第 ${m.startColumn} 列`);
+    } else {
+      this.setAlertMsg("");
+    }
+  }
+
+  // 格式化，并返回格式化后的文本。支持格式化非 JSON 字符串
   format() {
-    this.editor.getAction("editor.action.formatDocument").run();
+    var text = this.text();
+    const edits = jsonc.format(text, undefined, {
+      tabSize: 4,
+      insertSpaces: true,
+      eol: "",
+    });
+
+    text = jsonc.applyEdits(text, edits);
+    this.setText(text);
     console.log(`${this.name} format`);
+    return text;
   }
 
   minify() {
@@ -103,13 +132,13 @@ class EditorRef {
     this.registerOnPaste();
     this.registerAutoShowMinimap();
     this.registerDropFileHandler();
+    this.registerPositionChange();
   }
 
   // 注册粘贴事件处理器
   registerOnPaste() {
-    this.editor.onDidPaste((e) => {
-      console.log(`${this.name} paste`);
-      this.format();
+    this.editor.onDidPaste(() => {
+      this.text2node(true);
     });
   }
 
@@ -124,7 +153,7 @@ class EditorRef {
         var reader = new FileReader();
         reader.onload = (e) => {
           this.editor.setValue(e.target.result);
-          this.format();
+          this.text2node(true);
         };
         reader.readAsText(file);
       }
@@ -155,14 +184,20 @@ class EditorRef {
     });
   }
 
-  // 校验 json valid
-  validate(markers) {
-    if (markers?.length > 0) {
-      const m = markers[0];
-      this.setAlertMsg(`!JSON 解析错误：第 ${m.startLineNumber} 行，第 ${m.startColumn} 列`);
-    } else {
-      this.setAlertMsg("");
-    }
+  // 监听光标改变事件。显示光标停留位置的 json path
+  registerPositionChange() {
+    this.editor.onDidChangeCursorPosition((e) => {
+      // 获取当前光标在整个文档中的偏移量（offset）
+      const offset = this.editor.getModel().getOffsetAt(e.position);
+      const loc = jsonc.getLocation(this.text(), offset);
+
+      // TODO:
+      if (loc.path.length > 0) {
+        const node = jsonc.findNodeAtOffset(this.rootNode, offset);
+        const value = jsonc.getNodeValue(node);
+        console.log("cursor position: ", offset, loc.path, node, value);
+      }
+    });
   }
 }
 
