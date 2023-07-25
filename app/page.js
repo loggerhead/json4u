@@ -1,9 +1,10 @@
 "use client";
+import styles from "./page.module.scss";
 import MyEditor from "../components/editor";
 import MyButton from "../components/button";
 import MyAlert from "../components/alert";
 import Dragbar from "../components/dragbar";
-import styles from "./page.module.scss";
+import { diffEditors } from "../lib/diff";
 import { useRef, useState } from "react";
 
 export default function Home() {
@@ -55,7 +56,7 @@ export default function Home() {
         <div id="playground-sidecar" className="flex flex-col grow shrink min-w-fit gap-2">
           <ul className="flex space-x-2 items-center">
             <li>
-              <MyButton>比较</MyButton>
+              <CompareButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></CompareButton>
             </li>
             <li>
               <MyAlert props={rightAlert}></MyAlert>
@@ -84,4 +85,9 @@ function EscapeButton({ editorRef }) {
 
 function UnescapeButton({ editorRef }) {
   return <MyButton onClick={() => editorRef.current.unescape()}>去转义</MyButton>;
+}
+
+function CompareButton({ leftEditorRef, rightEditorRef }) {
+  // TODO:
+  return <MyButton onClick={() => diffEditors(leftEditorRef.current, rightEditorRef.current)}>比较</MyButton>;
 }

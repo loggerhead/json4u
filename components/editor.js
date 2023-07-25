@@ -47,8 +47,6 @@ class EditorRef {
     this.monaco = monaco;
     // 设置编辑器上方的 alert 信息
     this.setAlert = setAlert;
-    // json 字符串解析成 tree 以后的根节点。Node 类型定义见文档：https://github.com/microsoft/node-jsonc-parser
-    this.rootNode = null;
   }
 
   text() {
@@ -84,7 +82,6 @@ class EditorRef {
 
     text = jsonc.applyEdits(text, edits);
     this.setText(text);
-    console.log(`${this.name} format`);
     return text;
   }
 
@@ -128,8 +125,7 @@ class EditorRef {
   }
 
   doPaste(format = false) {
-    const text = format ? this.format() : this.text();
-    this.rootNode = jsonc.parseTree(text);
+    return format ? this.format() : this.text();
   }
 
   registerAll() {
@@ -141,16 +137,14 @@ class EditorRef {
     // TODO: 监听滚动事件实现同步滚动
     const editor = this.editor;
     this.editor.onDidScrollChange(function (e) {
-      console.log("滚动位置：", e.scrollTop);
+      // console.log("滚动位置：", e.scrollTop);
       // editor.setScrollTop(e._oldScrollTop);
     });
   }
 
   // 注册粘贴事件处理器
   registerOnPaste() {
-    this.editor.onDidPaste(() => {
-      this.doPaste(true);
-    });
+    this.editor.onDidPaste(() => this.doPaste(true));
   }
 
   // 注册拖拽事件处理器，支持拖拽文件到编辑器上
@@ -202,11 +196,8 @@ class EditorRef {
       const offset = this.editor.getModel().getOffsetAt(e.position);
       const loc = jsonc.getLocation(this.text(), offset);
 
-      // TODO:
-      if (loc.path.length > 0) {
-        const node = jsonc.findNodeAtOffset(this.rootNode, offset);
-        const value = jsonc.getNodeValue(node);
-        console.log("cursor position: ", offset, loc.path, node, value);
+      if (loc.path) {
+        console.log("cursor position: ", offset, loc.path);
       }
     });
   }
