@@ -233,8 +233,3 @@ function highlight(editor, range, options) {
   var decorations = editor.deltaDecorations([], [decoration]);
   return decorations;
 }
-
-function handleEditorChange(editor, value, e) {
-  console.log("editor onchange", e);
-  highlightLine(editorRef.current, 2, "bg-green-100");
-}

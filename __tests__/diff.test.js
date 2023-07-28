@@ -22,7 +22,7 @@ describe("utils", () => {
 
   test("arrayDiff", () => {
     expect(
-      diff.arrayDiff(
+      diff.compareArray(
         [{ a: { aa: 1 } }, { b: { bb: 2 } }, { c: { cc: 3 } }],
         [{ a: { aa: 1 } }, { c: { cc: 3 } }, { d: { dd: 4 } }]
       )
@@ -32,13 +32,11 @@ describe("utils", () => {
 
 describe("Tree", () => {
   test("getNode", () => {
-    const tree = new diff.Tree(
-      newEditor(`{
+    const tree = new diff.Tree(`{
         "a": 7777777777777777777,
         "b": "7777777777777777777",
         "c": true,
-      }`)
-    );
+    }`);
     const node = tree.getNode(["a"]);
     expect(node.type).toEqual("number");
     expect(node.value).toBeGreaterThan(0);
@@ -47,13 +45,11 @@ describe("Tree", () => {
   });
 
   test("getValue", () => {
-    const tree = new diff.Tree(
-      newEditor(`{
+    const tree = new diff.Tree(`{
         "a": 7777777777777777777,
         "b": "7777777777777777777",
         "c": true,
-      }`)
-    );
+    }`);
     expect(tree.getValue(["a"])).toEqual("7777777777777777777");
     expect(tree.getValue(["b"])).toEqual(`"7777777777777777777"`);
     expect(tree.getValue(["c"])).toEqual("true");
@@ -61,49 +57,49 @@ describe("Tree", () => {
 });
 
 describe("Comparer", () => {
+  expectEq = (ltext, rtext, expected) => {
+    const c = new diff.Comparer(new diff.Tree(ltext), new diff.Tree(rtext));
+    const diffs = c.compare();
+    expect(diffs).toEqual(expected);
+  };
+
   test("diffVal", () => {
-    const c = newComparer(`{ "foo": "abc" }`, `{ "foo": "adc" }`);
-    c.compare();
-    expect(c.diffs).toEqual([
+    expectEq(`{ "foo": "abc" }`, `{ "foo": "adc" }`, [
       new diff.Diff(11, 1, diff.DEL, false, ["foo"]),
       new diff.Diff(11, 1, diff.INS, false, ["foo"]),
     ]);
   });
 
   test("diffArray", () => {
-    const c = newComparer(`[ "foo", "abc" ]`, `[ "foo", "adc" ]`);
-    c.compare();
-    expect(c.diffs).toEqual([new diff.Diff(11, 1, diff.DEL, false, [1]), new diff.Diff(11, 1, diff.INS, false, [1])]);
+    expectEq(`[ "foo", "abc" ]`, `[ "foo", "adc" ]`, [
+      new diff.Diff(11, 1, diff.DEL, false, [1]),
+      new diff.Diff(11, 1, diff.INS, false, [1]),
+    ]);
   });
 
   // TODO: 补充更多 case
   test("diffObject", () => {
-    const c = newComparer(
+    expectEq(
       `{
   "foo": "abc"
 }`,
       `{
   "foo": "adc"
-}`
+}`,
+      [new diff.Diff(11, 1, diff.DEL, false, ["foo"]), new diff.Diff(11, 1, diff.INS, false, ["foo"])]
     );
-    c.compare();
-    expect(c.diffs).toEqual([
-      new diff.Diff(11, 1, diff.DEL, false, ["foo"]),
-      new diff.Diff(11, 1, diff.INS, false, ["foo"]),
-    ]);
   });
 });
 
-function newComparer(ltext, rtext) {
-  const lt = new diff.Tree(newEditor(ltext));
-  const rt = new diff.Tree(newEditor(rtext));
-  return new diff.Comparer(lt, rt);
-}
-
-function newEditor(text) {
-  return {
-    text: () => {
-      return text;
-    },
-  };
-}
+describe("semanticCompare", () => {
+  test("charDiff", () => {
+    const r = diff.semanticCompare(`  "foo": "abc" }`, `{ "foo": "adc" }`);
+    expect(r.isTextCompare).toEqual(true);
+    expect(r.diffs).toEqual([
+      new diff.Diff(0, 1, diff.DEL, false),
+      new diff.Diff(0, 1, diff.INS, false),
+      new diff.Diff(11, 1, diff.DEL, false),
+      new diff.Diff(11, 1, diff.INS, false),
+    ]);
+  });
+});
