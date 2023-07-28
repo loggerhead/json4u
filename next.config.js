@@ -6,6 +6,7 @@ const nextConfig = {
   },
 };
 
+// 支持 posts 目录下 markdown 文件的编译
 const withMDX = require("@next/mdx")({
   options: {
     remarkPlugins: [],
@@ -15,4 +16,9 @@ const withMDX = require("@next/mdx")({
   },
 });
 
-module.exports = withMDX(nextConfig);
+//
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+module.exports = withBundleAnalyzer(withMDX(nextConfig));
