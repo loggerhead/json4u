@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --env=node --colors",
-    "test:coverage": "yarn test --coverage"
+    "test:coverage": "yarn test --coverage",
+    "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
     "@mdx-js/loader": "^2.3.0",
@@ -36,12 +37,11 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.22.9",
+    "@next/bundle-analyzer": "^13.4.12",
     "@tailwindcss/typography": "^0.5.9",
     "daisyui": "^3.2.1",
     "fs": "^0.0.1-security",
     "jest": "^29.6.1",
-    "path": "^0.12.7",
-    "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.1"
+    "path": "^0.12.7"
   }
 }
