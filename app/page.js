@@ -4,7 +4,7 @@ import MyEditor from "../components/editor";
 import MyButton from "../components/button";
 import MyAlert from "../components/alert";
 import Dragbar from "../components/dragbar";
-import { diffEditors } from "../lib/diff";
+import { semanticCompare, DEL, INS } from "../lib/diff";
 import { useRef, useState } from "react";
 
 export default function Home() {
@@ -88,6 +88,60 @@ function UnescapeButton({ editorRef }) {
 }
 
 function CompareButton({ leftEditorRef, rightEditorRef }) {
-  // TODO:
-  return <MyButton onClick={() => diffEditors(leftEditorRef.current, rightEditorRef.current)}>比较</MyButton>;
+  const getColorClass = (diffType, highlightLine) => {
+    const lineClasses = new Map([
+      [INS, "bg-green-100"],
+      [DEL, "bg-red-100"],
+    ]);
+    const inlineClasses = new Map([
+      [INS, "bg-green-300"],
+      [DEL, "bg-red-300"],
+    ]);
+
+    const classes = highlightLine ? lineClasses : inlineClasses;
+    return classes.get(diffType);
+  };
+
+  const compare = () => {
+    const leftEditor = leftEditorRef.current;
+    const rightEditor = rightEditorRef.current;
+
+    // 进行比较
+    const ltext = leftEditor.text();
+    const rtext = rightEditor.text();
+    const { diffs, isTextCompare } = semanticCompare(ltext, rtext);
+
+    // 高亮
+    const leftDecorations = [];
+    const rightDecorations = [];
+
+    for (const { diffType, offset, length, highlightLine } of diffs) {
+      if (!(diffType == DEL || diffType == INS)) {
+        continue;
+      }
+
+      const editor = diffType == DEL ? leftEditor : rightEditor;
+      const decorations = diffType == DEL ? leftDecorations : rightDecorations;
+
+      // 如果是行内高亮，还需要高亮当前行
+      if (!highlightLine) {
+        const c = getColorClass(diffType, true);
+        const d = editor.newHighlight(offset, length, true, c);
+        decorations.push(d);
+      }
+
+      const c = getColorClass(diffType, highlightLine);
+      const d = editor.newHighlight(offset, length, highlightLine, c);
+      decorations.push(d);
+    }
+
+    leftEditor.applyDecorations(leftDecorations);
+    rightEditor.applyDecorations(rightDecorations);
+
+    // TODO: 如果是文本比较，提示用户无效的 json
+    if (isTextCompare) {
+    }
+  };
+
+  return <MyButton onClick={compare}>比较</MyButton>;
 }
