@@ -33,6 +33,7 @@ export default function MyEditor({ name, editorRef, setAlert }) {
         editorRef.current.registerAll();
       }}
       onValidate={(markers) => editorRef.current.validate(markers)}
+      onChange={() => editorRef.current.clearDecorations()}
     />
   );
 }
@@ -47,6 +48,10 @@ class EditorRef {
     this.monaco = monaco;
     // 设置编辑器上方的 alert 信息
     this.setAlert = setAlert;
+  }
+
+  model() {
+    return this.editor.getModel();
   }
 
   text() {
@@ -192,44 +197,51 @@ class EditorRef {
   // 监听光标改变事件。显示光标停留位置的 json path
   registerPositionChange() {
     this.editor.onDidChangeCursorPosition((e) => {
+      const model = this.model();
       // 获取当前光标在整个文档中的偏移量（offset）
-      const offset = this.editor.getModel().getOffsetAt(e.position);
+      const offset = model.getOffsetAt(e.position);
       const loc = jsonc.getLocation(this.text(), offset);
 
       if (loc.path) {
-        console.log("cursor position: ", offset, loc.path);
+        console.log("cursor position: ", loc.path);
       }
     });
   }
-}
 
-// TODO: -----------------------------------------------------------------------------------------------------------
-function highlightLine(editor, lineNumber, colorClass) {
-  const endColumn = editor.getModel().getLineMaxColumn(lineNumber);
+  // 生成高亮的装饰
+  newHighlight(offset, length, highlightLine, colorClass) {
+    const model = this.model();
+    // 从偏移量和长度生成 Range 对象
+    const range = monaco.Range.fromPositions(model.getPositionAt(offset), model.getPositionAt(offset + length));
+    // https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
+    const options = {
+      isWholeLine: highlightLine,
+    };
 
-  highlight(
-    editor,
-    {
-      startLine: lineNumber,
-      startColumn: 1,
-      endLine: lineNumber,
-      endColumn: endColumn,
-    },
-    {
-      isWholeLine: true,
-      linesDecorationsClassName: colorClass,
+    // https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
+    if (highlightLine) {
+      options.className = colorClass;
+    } else {
+      // 文本内容的装饰 class
+      options.inlineClassName = colorClass;
     }
-  );
-}
 
-function highlight(editor, range, options) {
-  // 定义装饰的选项
-  var decoration = {
-    range: new monaco.Range(range.startLine, range.startColumn, range.endLine, range.endColumn),
-    options: options,
-  };
+    return {
+      range: range,
+      options: options,
+    };
+  }
 
   // 应用装饰
-  var decorations = editor.deltaDecorations([], [decoration]);
-  return decorations;
+  applyDecorations(decorations) {
+    return this.editor.deltaDecorations([], decorations);
+  }
+
+  // 清空装饰
+  clearDecorations() {
+    const ids = this.model()
+      .getAllDecorations()
+      .map((d) => d.id);
+    return this.editor.deltaDecorations(ids, []);
+  }
 }
