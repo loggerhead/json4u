@@ -22,7 +22,7 @@ export default function MyEditor({ name, editorRef, setAlert }) {
   return (
     <Editor
       language="json"
-      height="calc(100vh - 6rem)"
+      height="calc(100vh - 5rem)"
       options={{
         fontSize: 14, // 设置初始字体大小
         scrollBeyondLastLine: false, // 行数超过一屏时才展示滚动条
