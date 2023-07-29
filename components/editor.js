@@ -57,11 +57,16 @@ class EditorRef {
   }
 
   text() {
-    return this.editor.getValue().trim();
+    return this.editor.getValue();
   }
 
   setText(text) {
     this.editor.setValue(text);
+  }
+
+  range(offset, length) {
+    const model = this.model();
+    return monaco.Range.fromPositions(model.getPositionAt(offset), model.getPositionAt(offset + length));
   }
 
   // 校验 json valid
@@ -209,7 +214,7 @@ class EditorRef {
   newHighlightDecorations(offset, length, highlightLine, colorClass) {
     const model = this.model();
     // 从偏移量和长度生成 Range 对象
-    const range = monaco.Range.fromPositions(model.getPositionAt(offset), model.getPositionAt(offset + length));
+    const range = this.range(offset, length);
     // 示例：https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
     // 参数定义：https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
     const options = {

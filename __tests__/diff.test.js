@@ -89,23 +89,44 @@ describe("Comparer", () => {
 });
 
 describe("semanticCompare", () => {
-  test("char compare", () => {
-    const r = diff.semanticCompare(`  "foo": "abc" }`, `{ "foo": "adc" }`);
+  expectEq = (ltext, rtext, expected) => {
+    const r = diff.semanticCompare(ltext, rtext);
     expect(r.isTextCompare).toEqual(true);
-    expect(r.diffs).toEqual([
-      new diff.Diff(0, 1, diff.DEL, false),
-      new diff.Diff(0, 1, diff.INS, false),
-      new diff.Diff(11, 1, diff.DEL, false),
-      new diff.Diff(11, 1, diff.INS, false),
-    ]);
+    expect(r.diffs).toEqual(expected);
+    return r.isTextCompare;
+  };
+
+  test("char compare", () => {
+    {
+      const isTextCompare = expectEq(`  "foo": "abc" }`, `{ "foo": "adc" }`, [
+        new diff.Diff(0, 1, diff.DEL, false),
+        new diff.Diff(0, 1, diff.INS, false),
+        new diff.Diff(11, 1, diff.DEL, false),
+        new diff.Diff(11, 1, diff.INS, false),
+      ]);
+      expect(isTextCompare).toEqual(true);
+    }
+    {
+      const isTextCompare = expectEq(
+        `[
+
+    2
+`,
+        `[
+    1,
+    2
+]`,
+        [new diff.Diff(26, 11, diff.DEL, false), new diff.Diff(111, 1, diff.INS, false)]
+      );
+      expect(isTextCompare).toEqual(true);
+    }
   });
 
   test("key compare", () => {
-    const r = diff.semanticCompare(`{ "foo": { "bar": 123 } }`, `{ "foo": { "bzr": 123 } }`);
-    expect(r.isTextCompare).toEqual(false);
-    expect(r.diffs).toEqual([
+    const isTextCompare = expectEq(`{ "foo": { "bar": 123 } }`, `{ "foo": { "bzr": 123 } }`, [
       new diff.Diff(13, 1, diff.DEL, false, ["foo", "bar"]),
       new diff.Diff(13, 1, diff.INS, false, ["foo", "bzr"]),
     ]);
+    expect(isTextCompare).toEqual(false);
   });
 });

@@ -93,15 +93,20 @@ function UnescapeButton({ editorRef }) {
 }
 
 function CompareButton({ leftEditorRef, rightEditorRef, setAlert }) {
+  const leftEditor = leftEditorRef.current;
+  const rightEditor = rightEditorRef.current;
+
   const compare = () => {
-    const leftEditor = leftEditorRef.current;
-    const rightEditor = rightEditorRef.current;
     const ltext = leftEditor.text();
     const rtext = rightEditor.text();
 
     // 进行比较
     let { diffs, isTextCompare } = semanticCompare(ltext, rtext);
     diffs = diffs.filter((d) => d.diffType == DEL || d.diffType == INS);
+
+    if (isTextCompare) {
+      adjustForHighlight(diffs);
+    }
 
     showResultMsg(diffs, isTextCompare);
     highlight(diffs);
@@ -132,10 +137,22 @@ function CompareButton({ leftEditorRef, rightEditorRef, setAlert }) {
     setAlert({ msg: msg, color: c });
   };
 
+  // 调整 diff 以便高亮
+  const adjustForHighlight = (diffs) => {
+    for (const diff of diffs) {
+      const editor = diff.diffType == DEL ? leftEditor : rightEditor;
+      const range = editor.range(diff.offset, diff.length);
+      const text = editor.model().getValueInRange(range);
+
+      // 末尾换行符不进行高亮，避免接下来一行没有差异但被高亮
+      if (text.endsWith("\n")) {
+        diff.length--;
+      }
+    }
+  };
+
   // 高亮
   const highlight = (diffs) => {
-    const leftEditor = leftEditorRef.current;
-    const rightEditor = rightEditorRef.current;
     const leftDecorations = [];
     const rightDecorations = [];
 
