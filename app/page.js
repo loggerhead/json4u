@@ -5,6 +5,7 @@ import MyButton from "../components/button";
 import MyAlert from "../components/alert";
 import Dragbar from "../components/dragbar";
 import { semanticCompare, DEL, INS } from "../lib/diff";
+import { getColorClass } from "../lib/color";
 import { useRef, useState } from "react";
 
 export default function Home() {
@@ -88,20 +89,6 @@ function UnescapeButton({ editorRef }) {
 }
 
 function CompareButton({ leftEditorRef, rightEditorRef }) {
-  const getColorClass = (diffType, highlightLine) => {
-    const lineClasses = new Map([
-      [INS, "bg-green-100"],
-      [DEL, "bg-red-100"],
-    ]);
-    const inlineClasses = new Map([
-      [INS, "bg-green-300"],
-      [DEL, "bg-red-300"],
-    ]);
-
-    const classes = highlightLine ? lineClasses : inlineClasses;
-    return classes.get(diffType);
-  };
-
   const compare = () => {
     const leftEditor = leftEditorRef.current;
     const rightEditor = rightEditorRef.current;
@@ -122,17 +109,9 @@ function CompareButton({ leftEditorRef, rightEditorRef }) {
 
       const editor = diffType == DEL ? leftEditor : rightEditor;
       const decorations = diffType == DEL ? leftDecorations : rightDecorations;
-
-      // 如果是行内高亮，还需要高亮当前行
-      if (!highlightLine) {
-        const c = getColorClass(diffType, true);
-        const d = editor.newHighlight(offset, length, true, c);
-        decorations.push(d);
-      }
-
-      const c = getColorClass(diffType, highlightLine);
-      const d = editor.newHighlight(offset, length, highlightLine, c);
-      decorations.push(d);
+      const colorClass = getColorClass(diffType, highlightLine);
+      const dd = editor.newHighlightDecorations(offset, length, highlightLine, colorClass);
+      decorations.push(...dd);
     }
 
     leftEditor.applyDecorations(leftDecorations);
