@@ -37,3 +37,20 @@
 .monaco-editor {
   position: absolute !important;
 }
+
+/* 增加透明度以 fix 选中区分背景色不变的问题：https://github.com/Microsoft/monaco-editor/issues/902 */
+.line-del {
+  background-color: rgba(252, 165, 165, 0.3);
+}
+
+.line-ins {
+  background-color: rgba(134, 239, 172, 0.3);
+}
+
+.inline-del {
+  background-color: rgb(252, 165, 165);
+}
+
+.inline-ins {
+  background-color: rgb(134, 239, 172);
+}

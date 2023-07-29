@@ -2,6 +2,7 @@
 import * as monaco from "monaco-editor";
 import { Editor, loader } from "@monaco-editor/react";
 import * as jsonc from "jsonc-parser";
+import * as color from "../lib/color";
 
 // TODO: 指定 CDN 地址，改为 npm
 loader.config({
@@ -172,7 +173,7 @@ class EditorRef {
 
   // 宽度改变时自动展示或隐藏 minimap
   registerAutoShowMinimap() {
-    const widthThreshold = 800;
+    const widthThreshold = 480;
 
     this.editor.onDidLayoutChange((e) => {
       const enabled = this.editor.getOption(monaco.editor.EditorOption.minimap).enabled;
@@ -209,32 +210,55 @@ class EditorRef {
   }
 
   // 生成高亮的装饰
-  newHighlight(offset, length, highlightLine, colorClass) {
+  newHighlightDecorations(offset, length, highlightLine, colorClass) {
     const model = this.model();
     // 从偏移量和长度生成 Range 对象
     const range = monaco.Range.fromPositions(model.getPositionAt(offset), model.getPositionAt(offset + length));
-    // https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
+    // 示例：https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
+    // 参数定义：https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
     const options = {
-      isWholeLine: highlightLine,
+      // 高亮整行
+      isWholeLine: true,
+      // 整行文本的装饰 class
+      className: color.getLineColorClass(colorClass),
+      // 高亮右侧的 minimap
+      minimap: {
+        // monaco bug: color 参数不生效
+        color: color.getMinimapColor(colorClass),
+        // monaco bug: Inline 枚举下 minimap 内容不准确
+        position: monaco.editor.MinimapPosition.Gutter,
+      },
+      // 高亮 minimap 右侧的 overview ruler
+      overviewRuler: {
+        color: color.getOverviewRulerColor(colorClass),
+        position: monaco.editor.OverviewRulerLane.Full,
+      },
     };
 
-    // https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
-    if (highlightLine) {
-      options.className = colorClass;
-    } else {
-      // 文本内容的装饰 class
-      options.inlineClassName = colorClass;
+    const decorations = [
+      {
+        range: range,
+        options: options,
+      },
+    ];
+
+    if (!highlightLine) {
+      decorations.push({
+        range: range,
+        options: {
+          // 行内文本的装饰 class
+          inlineClassName: colorClass,
+        },
+      });
     }
 
-    return {
-      range: range,
-      options: options,
-    };
+    return decorations;
   }
 
   // 应用装饰
   applyDecorations(decorations) {
-    return this.editor.deltaDecorations([], decorations);
+    this.clearDecorations();
+    return this.editor.createDecorationsCollection(decorations);
   }
 
   // 清空装饰
