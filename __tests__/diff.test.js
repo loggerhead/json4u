@@ -31,13 +31,26 @@ describe("utils", () => {
 });
 
 describe("Tree", () => {
-  test("getNode", () => {
-    const tree = new diff.Tree(`{
+  const tree = new diff.Tree(`{
         "a": 7777777777777777777,
         "b": "7777777777777777777",
         "c": true,
     }`);
-    const node = tree.getNode(["a"]);
+
+  test("getKeyNode", () => {
+    const node = tree.getKeyNode(["a"]);
+    expect(node.length).toBeGreaterThan(0);
+    expect(node.offset).toBeGreaterThan(0);
+  });
+
+  test("getKey", () => {
+    expect(tree.getKey(["a"])).toEqual(`"a"`);
+    expect(tree.getKey(["b"])).toEqual(`"b"`);
+    expect(tree.getKey(["c"])).toEqual(`"c"`);
+  });
+
+  test("getValueNode", () => {
+    const node = tree.getValueNode(["a"]);
     expect(node.type).toEqual("number");
     expect(node.value).toBeGreaterThan(0);
     expect(node.length).toBeGreaterThan(0);
@@ -45,11 +58,6 @@ describe("Tree", () => {
   });
 
   test("getValue", () => {
-    const tree = new diff.Tree(`{
-        "a": 7777777777777777777,
-        "b": "7777777777777777777",
-        "c": true,
-    }`);
     expect(tree.getValue(["a"])).toEqual("7777777777777777777");
     expect(tree.getValue(["b"])).toEqual(`"7777777777777777777"`);
     expect(tree.getValue(["c"])).toEqual("true");
@@ -75,24 +83,13 @@ describe("Comparer", () => {
       new diff.Diff(11, 1, diff.DEL, false, [1]),
       new diff.Diff(11, 1, diff.INS, false, [1]),
     ]);
-  });
 
-  // TODO: 补充更多 case
-  test("diffObject", () => {
-    expectEq(
-      `{
-  "foo": "abc"
-}`,
-      `{
-  "foo": "adc"
-}`,
-      [new diff.Diff(11, 1, diff.DEL, false, ["foo"]), new diff.Diff(11, 1, diff.INS, false, ["foo"])]
-    );
+    expectEq(`[12, 34]`, `[12, 23, 34]`, [new diff.Diff(5, 2, diff.INS, true, [1])]);
   });
 });
 
 describe("semanticCompare", () => {
-  test("charDiff", () => {
+  test("char compare", () => {
     const r = diff.semanticCompare(`  "foo": "abc" }`, `{ "foo": "adc" }`);
     expect(r.isTextCompare).toEqual(true);
     expect(r.diffs).toEqual([
@@ -100,6 +97,15 @@ describe("semanticCompare", () => {
       new diff.Diff(0, 1, diff.INS, false),
       new diff.Diff(11, 1, diff.DEL, false),
       new diff.Diff(11, 1, diff.INS, false),
+    ]);
+  });
+
+  test("key compare", () => {
+    const r = diff.semanticCompare(`{ "foo": { "bar": 123 } }`, `{ "foo": { "bzr": 123 } }`);
+    expect(r.isTextCompare).toEqual(false);
+    expect(r.diffs).toEqual([
+      new diff.Diff(13, 1, diff.DEL, false, ["foo", "bar"]),
+      new diff.Diff(13, 1, diff.INS, false, ["foo", "bzr"]),
     ]);
   });
 });
