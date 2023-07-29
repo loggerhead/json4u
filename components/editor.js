@@ -3,6 +3,7 @@ import * as monaco from "monaco-editor";
 import { Editor, loader } from "@monaco-editor/react";
 import * as jsonc from "jsonc-parser";
 import * as color from "../lib/color";
+import * as jsonPointer from "../lib/json-pointer";
 
 // TODO: 指定 CDN 地址，改为 npm
 loader.config({
@@ -98,9 +99,7 @@ class EditorRef {
       this.setText(text);
       console.log(`${this.name} minify`);
     } catch (e) {
-      // TODO:
-      console.log(`${this.name} minify failed: ${e}`);
-      // handleError(e, editor === leftEditor ? diff.LEFT : diff.RIGHT);
+      this.setAlert({ msg: `最小化失败：${e}`, color: "red" });
     }
   }
 
@@ -180,14 +179,12 @@ class EditorRef {
       const width = e.width;
 
       if (width > widthThreshold && !enabled) {
-        console.log(`${this.name} enable minimap`);
         this.editor.updateOptions({
           minimap: {
             enabled: true,
           },
         });
       } else if (width < widthThreshold && enabled) {
-        console.log(`${this.name} disable minimap`);
         this.editor.updateOptions({
           minimap: { enabled: false },
         });
@@ -204,7 +201,7 @@ class EditorRef {
       const loc = jsonc.getLocation(this.text(), offset);
 
       if (loc.path) {
-        console.log("cursor position: ", loc.path);
+        this.setAlert({ msg: `${jsonPointer.toPointer(loc.path)}`, color: "blue" });
       }
     });
   }
