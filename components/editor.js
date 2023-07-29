@@ -97,7 +97,6 @@ class EditorRef {
       const obj = JSON.parse(this.text());
       const text = JSON.stringify(obj, null, 0);
       this.setText(text);
-      console.log(`${this.name} minify`);
     } catch (e) {
       this.setAlert({ msg: `最小化失败：${e}`, color: "red" });
     }
