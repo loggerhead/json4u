@@ -1,12 +1,12 @@
 "use client";
+import { useRef, useState } from "react";
 import styles from "./page.module.scss";
 import MyEditor from "../components/editor";
 import MyButton from "../components/button";
 import MyAlert from "../components/alert";
 import Dragbar from "../components/dragbar";
 import { semanticCompare, DEL, INS } from "../lib/diff";
-import { getColorClass } from "../lib/color";
-import { useRef, useState } from "react";
+import * as color from "../lib/color";
 
 export default function Home() {
   const editorContainerRef = useRef(null);
@@ -21,7 +21,7 @@ export default function Home() {
         <div
           id="editor-container"
           ref={editorContainerRef}
-          className="flex flex-col	shrink min-w-fit basis-9/12 relative gap-2"
+          className="flex flex-col shrink min-w-fit basis-6/12 relative gap-2"
         >
           <div id="editor-toolbar" className="flex relative justify-between	clear-both">
             <ul className="flex space-x-2 items-center">
@@ -57,7 +57,11 @@ export default function Home() {
         <div id="playground-sidecar" className="flex flex-col grow shrink min-w-fit gap-2">
           <ul className="flex space-x-2 items-center">
             <li>
-              <CompareButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></CompareButton>
+              <CompareButton
+                leftEditorRef={leftEditorRef}
+                rightEditorRef={rightEditorRef}
+                setAlert={setRightAlert}
+              ></CompareButton>
             </li>
             <li>
               <MyAlert props={rightAlert}></MyAlert>
@@ -88,38 +92,63 @@ function UnescapeButton({ editorRef }) {
   return <MyButton onClick={() => editorRef.current.unescape()}>去转义</MyButton>;
 }
 
-function CompareButton({ leftEditorRef, rightEditorRef }) {
+function CompareButton({ leftEditorRef, rightEditorRef, setAlert }) {
   const compare = () => {
     const leftEditor = leftEditorRef.current;
     const rightEditor = rightEditorRef.current;
-
-    // 进行比较
     const ltext = leftEditor.text();
     const rtext = rightEditor.text();
-    const { diffs, isTextCompare } = semanticCompare(ltext, rtext);
 
-    // 高亮
+    // 进行比较
+    let { diffs, isTextCompare } = semanticCompare(ltext, rtext);
+    diffs = diffs.filter((d) => d.diffType == DEL || d.diffType == INS);
+
+    showResultMsg(diffs, isTextCompare);
+    highlight(diffs);
+  };
+
+  // 提示用户差异数量
+  const showResultMsg = (diffs, isTextCompare) => {
+    let msgs = [];
+    let colors = [];
+
+    if (isTextCompare) {
+      msgs.push("无效 JSON，进行文本比较。");
+      colors.push("yellow");
+    }
+
+    if (diffs.length == 0) {
+      msgs.push("两边没有差异");
+      colors.push("green");
+    } else {
+      const delN = diffs.filter((d) => d.diffType == DEL)?.length;
+      const insN = diffs.filter((d) => d.diffType == INS)?.length;
+      msgs.push(`${delN} 删除，${insN} 新增`);
+      colors.push("blue");
+    }
+
+    const msg = msgs.join(" ");
+    const c = color.max(colors);
+    setAlert({ msg: msg, color: c });
+  };
+
+  // 高亮
+  const highlight = (diffs) => {
+    const leftEditor = leftEditorRef.current;
+    const rightEditor = rightEditorRef.current;
     const leftDecorations = [];
     const rightDecorations = [];
 
     for (const { diffType, offset, length, highlightLine } of diffs) {
-      if (!(diffType == DEL || diffType == INS)) {
-        continue;
-      }
-
       const editor = diffType == DEL ? leftEditor : rightEditor;
       const decorations = diffType == DEL ? leftDecorations : rightDecorations;
-      const colorClass = getColorClass(diffType, highlightLine);
+      const colorClass = color.getColorClass(diffType, highlightLine);
       const dd = editor.newHighlightDecorations(offset, length, highlightLine, colorClass);
       decorations.push(...dd);
     }
 
     leftEditor.applyDecorations(leftDecorations);
     rightEditor.applyDecorations(rightDecorations);
-
-    // TODO: 如果是文本比较，提示用户无效的 json
-    if (isTextCompare) {
-    }
   };
 
   return <MyButton onClick={compare}>比较</MyButton>;
