@@ -5,6 +5,7 @@ import * as jsonc from "jsonc-parser";
 import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
 
+// TODO: 删除所有内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
 // TODO: 指定 CDN 地址，改为 npm
 loader.config({
   paths: {
@@ -50,6 +51,9 @@ class EditorRef {
     this.monaco = monaco;
     // 设置编辑器上方的 alert 信息
     this.setAlert = setAlert;
+
+    // 注入引用到编辑器
+    this.editor._ref = this;
   }
 
   model() {
@@ -149,6 +153,33 @@ class EditorRef {
       // console.log("滚动位置：", e.scrollTop);
       // editor.setScrollTop(e._oldScrollTop);
     });
+
+    this.registerMenuItems();
+  }
+
+  // NOTICE: 删除不了内置的菜单项：https://github.com/microsoft/monaco-editor/issues/1567
+  registerMenuItems() {
+    let order = -100;
+
+    const register = (name, fnName) => {
+      order++;
+
+      this.editor.addAction({
+        id: `my.${fnName}`,
+        label: name,
+        contextMenuGroupId: "navigation",
+        contextMenuOrder: order,
+        // 只能通过引用来调用，否则不生效
+        run: function (ed) {
+          ed._ref[fnName]();
+        },
+      });
+    };
+
+    register("格式化", "format");
+    register("最小化", "minify");
+    register("转义", "escape");
+    register("去转义", "unescape");
   }
 
   // 注册粘贴事件处理器
