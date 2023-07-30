@@ -9,26 +9,36 @@ import { semanticCompare, DEL, INS } from "../lib/diff";
 import * as color from "../lib/color";
 
 export default function Home() {
-  const leftContainerRef = useRef(null);
-  const rightContainerRef = useRef(null);
   const [hidden, setHidden] = useState(false);
   const [leftAlert, setLeftAlert] = useState({ msg: "", color: "" });
   const [rightAlert, setRightAlert] = useState({ msg: "", color: "" });
+  const leftContainerRef = useRef(null);
+  const rightContainerRef = useRef(null);
   const leftEditorRef = useRef(null);
   const rightEditorRef = useRef(null);
 
-  const toggle = (hidden) => {
-    const next = !hidden;
+  // 将左右两侧编辑器平分
+  const halfLeftEditor = () => {
+    leftContainerRef.current.style.flexBasis = "50%";
+    rightContainerRef.current.style.display = "";
+  };
 
-    if (next) {
-      leftContainerRef.current.style.flexBasis = "100%";
-      rightContainerRef.current.style.display = "none";
+  // 隐藏右侧编辑器
+  const hiddenRightEditor = () => {
+    leftContainerRef.current.style.flexBasis = "100%";
+    rightContainerRef.current.style.display = "none";
+  };
+
+  const toggle = (hidden) => {
+    const nextState = !hidden;
+
+    if (nextState) {
+      hiddenRightEditor();
     } else {
-      leftContainerRef.current.style.flexBasis = "50%";
-      rightContainerRef.current.style.display = "";
+      halfLeftEditor();
     }
 
-    return next;
+    return nextState;
   };
 
   return (
@@ -74,6 +84,7 @@ export default function Home() {
                 leftEditorRef={leftEditorRef}
                 rightEditorRef={rightEditorRef}
                 setAlert={setRightAlert}
+                halfLeftEditor={halfLeftEditor}
               ></CompareButton>
             </li>
             <li>
@@ -113,7 +124,7 @@ function UnescapeButton({ editorRef }) {
   return <MyButton onClick={() => editorRef.current.unescape()}>去转义</MyButton>;
 }
 
-function CompareButton({ leftEditorRef, rightEditorRef, setAlert }) {
+function CompareButton({ leftEditorRef, rightEditorRef, setAlert, halfLeftEditor }) {
   const leftEditor = leftEditorRef.current;
   const rightEditor = rightEditorRef.current;
 
@@ -131,6 +142,7 @@ function CompareButton({ leftEditorRef, rightEditorRef, setAlert }) {
 
     showResultMsg(diffs, isTextCompare);
     highlight(diffs);
+    halfLeftEditor();
   };
 
   // 提示用户差异数量
