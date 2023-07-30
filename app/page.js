@@ -125,10 +125,9 @@ function UnescapeButton({ editorRef }) {
 }
 
 function CompareButton({ leftEditorRef, rightEditorRef, setAlert, halfLeftEditor }) {
-  const leftEditor = leftEditorRef.current;
-  const rightEditor = rightEditorRef.current;
-
   const compare = () => {
+    const leftEditor = leftEditorRef.current;
+    const rightEditor = rightEditorRef.current;
     const ltext = leftEditor.text();
     const rtext = rightEditor.text();
 
@@ -172,6 +171,9 @@ function CompareButton({ leftEditorRef, rightEditorRef, setAlert, halfLeftEditor
 
   // 调整 diff 以便高亮
   const adjustForHighlight = (diffs) => {
+    const leftEditor = leftEditorRef.current;
+    const rightEditor = rightEditorRef.current;
+
     for (const diff of diffs) {
       const editor = diff.diffType == DEL ? leftEditor : rightEditor;
       const range = editor.range(diff.offset, diff.length);
@@ -186,6 +188,8 @@ function CompareButton({ leftEditorRef, rightEditorRef, setAlert, halfLeftEditor
 
   // 高亮
   const highlight = (diffs) => {
+    const leftEditor = leftEditorRef.current;
+    const rightEditor = rightEditorRef.current;
     const leftDecorations = [];
     const rightDecorations = [];
 

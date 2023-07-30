@@ -52,7 +52,7 @@ class EditorRef {
     // 设置编辑器上方的 alert 信息
     this.setAlert = setAlert;
 
-    // 注入引用到编辑器
+    // 注入引用到编辑器，供 registerMenuItems 使用
     this.editor._ref = this;
   }
 
