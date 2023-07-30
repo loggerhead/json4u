@@ -1,7 +1,8 @@
 "use client";
 import { useRef, useCallback } from "react";
 
-export default function Dragbar({ containerRef }) {
+export default function Dragbar({ containerRef, className }) {
+  const classes = `relative cursor-col-resize select-none px-[3px] mx-0.5 ${className}`;
   const isMouseDown = useRef(false);
   const prevX = useRef(0);
 
@@ -33,10 +34,5 @@ export default function Dragbar({ containerRef }) {
     }
   });
 
-  return (
-    <div
-      className="relative border-solid border-8 border-[#c4c4c400] cursor-col-resize select-none"
-      onMouseDown={handleMouseDown}
-    ></div>
-  );
+  return <div className={classes} onMouseDown={handleMouseDown}></div>;
 }

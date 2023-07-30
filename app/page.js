@@ -9,21 +9,33 @@ import { semanticCompare, DEL, INS } from "../lib/diff";
 import * as color from "../lib/color";
 
 export default function Home() {
-  const editorContainerRef = useRef(null);
+  const leftContainerRef = useRef(null);
+  const rightContainerRef = useRef(null);
+  const [hidden, setHidden] = useState(false);
   const [leftAlert, setLeftAlert] = useState({ msg: "", color: "" });
   const [rightAlert, setRightAlert] = useState({ msg: "", color: "" });
   const leftEditorRef = useRef(null);
   const rightEditorRef = useRef(null);
 
+  const toggle = (hidden) => {
+    const next = !hidden;
+
+    if (next) {
+      leftContainerRef.current.style.flexBasis = "100%";
+      rightContainerRef.current.style.display = "none";
+    } else {
+      leftContainerRef.current.style.flexBasis = "50%";
+      rightContainerRef.current.style.display = "";
+    }
+
+    return next;
+  };
+
   return (
     <div className="gap-2 mx-5 my-2">
-      <div id="playground-container" className="flex">
-        <div
-          id="editor-container"
-          ref={editorContainerRef}
-          className="flex flex-col shrink min-w-fit basis-6/12 relative gap-2"
-        >
-          <div id="editor-toolbar" className="flex relative justify-between	clear-both">
+      <div className="flex">
+        <div ref={leftContainerRef} className="flex flex-col shrink min-w-fit basis-6/12 relative gap-2">
+          <div className="flex relative justify-between	clear-both">
             <ul className="flex space-x-2 items-center">
               <li>
                 <FormatButton editorRef={leftEditorRef}></FormatButton>
@@ -43,9 +55,7 @@ export default function Home() {
             </ul>
             <ul className="flex right">
               <li>
-                <a id="sidebar-toggle" href="#">
-                  ⇥
-                </a>
+                <SidebarToggler hidden={hidden} setHidden={setHidden} toggle={toggle}></SidebarToggler>
               </li>
             </ul>
           </div>
@@ -53,8 +63,8 @@ export default function Home() {
             <MyEditor name="leftEditor" editorRef={leftEditorRef} setAlert={setLeftAlert}></MyEditor>
           </div>
         </div>
-        <Dragbar id="playground-dragbar" containerRef={editorContainerRef}></Dragbar>
-        <div id="playground-sidecar" className="flex flex-col grow shrink min-w-fit gap-2">
+        <Dragbar containerRef={leftContainerRef} className={hidden ? "hidden" : ""}></Dragbar>
+        <div ref={rightContainerRef} className="flex flex-col grow shrink min-w-fit gap-2">
           <ul className="flex space-x-2 items-center">
             <li>
               <CompareButton
@@ -73,6 +83,14 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SidebarToggler({ hidden, setHidden, toggle }) {
+  return (
+    <a href="#" onClick={() => setHidden(toggle)}>
+      {hidden ? "⇤" : "⇥"}
+    </a>
   );
 }
 
