@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <div className="gap-2 mx-5 my-2">
       <div className="flex">
-        <div ref={leftContainerRef} className="flex flex-col shrink min-w-fit basis-6/12 relative gap-2">
+        <div ref={leftContainerRef} className="flex flex-col shrink min-w-fit basis-9/12 relative gap-2">
           <div className="flex relative justify-between	clear-both">
             <ul className="flex space-x-2 items-center">
               <li>
@@ -63,7 +63,10 @@ export default function Home() {
             <MyEditor name="leftEditor" editorRef={leftEditorRef} setAlert={setLeftAlert}></MyEditor>
           </div>
         </div>
-        <Dragbar containerRef={leftContainerRef} className={hidden ? "hidden" : ""}></Dragbar>
+        <div className="flex flex-col gap-2">
+          <div className="invisible h-6 my-px"></div>
+          <Dragbar containerRef={leftContainerRef} className={hidden ? "hidden" : ""}></Dragbar>
+        </div>
         <div ref={rightContainerRef} className="flex flex-col grow shrink min-w-fit gap-2">
           <ul className="flex space-x-2 items-center">
             <li>

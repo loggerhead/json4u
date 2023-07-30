@@ -2,7 +2,7 @@
 import { useRef, useCallback } from "react";
 
 export default function Dragbar({ containerRef, className }) {
-  const classes = `relative cursor-col-resize select-none px-[3px] mx-0.5 ${className}`;
+  const classes = `relative grow cursor-col-resize select-none hover:bg-gray-200 w-2 mx-px ${className}`;
   const isMouseDown = useRef(false);
   const prevX = useRef(0);
 
