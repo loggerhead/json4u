@@ -1,6 +1,6 @@
 "use client";
 import { monaco, Editor } from "../lib/monaco";
-import * as jsonc from "jsonc-parser";
+import * as jsonc from "../lib/jsonc-parser/main";
 import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
 

@@ -15,24 +15,26 @@ export default function Dragbar({ containerRef, className }) {
     prevX.current = event.clientX;
   }, []);
 
-  document.addEventListener("mouseup", (event) => {
-    if (isMouseDown.current) {
-      event.preventDefault();
-      isMouseDown.current = false;
-    }
-  });
+  if (typeof window !== "undefined") {
+    document.addEventListener("mouseup", (event) => {
+      if (isMouseDown.current) {
+        event.preventDefault();
+        isMouseDown.current = false;
+      }
+    });
 
-  document.addEventListener("mousemove", (event) => {
-    if (isMouseDown.current) {
-      event.preventDefault();
-      // 根据相对位置计算需要改变多少宽度
-      const width = containerRef.current.offsetWidth;
-      const dx = event.clientX - prevX.current;
-      const x = width + dx;
-      prevX.current = event.clientX;
-      containerRef.current.style.flexBasis = `${x}px`;
-    }
-  });
+    document.addEventListener("mousemove", (event) => {
+      if (isMouseDown.current) {
+        event.preventDefault();
+        // 根据相对位置计算需要改变多少宽度
+        const width = containerRef.current.offsetWidth;
+        const dx = event.clientX - prevX.current;
+        const x = width + dx;
+        prevX.current = event.clientX;
+        containerRef.current.style.flexBasis = `${x}px`;
+      }
+    });
+  }
 
   return <div className={classes} onMouseDown={handleMouseDown}></div>;
 }

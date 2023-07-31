@@ -1,8 +1,7 @@
 "use client";
-// import dynamic from "next/dynamic";
-// const MyEditor = dynamic(() => import("../components/editor"), { ssr: false });
-
-import MyEditor from "../components/editor";
+import dynamic from "next/dynamic";
+const MyEditor = dynamic(() => import("../components/editor"), { ssr: false });
+// import MyEditor from "../components/editor";
 import { useRef, useState } from "react";
 import styles from "./page.module.scss";
 import MyAlert from "../components/alert";
