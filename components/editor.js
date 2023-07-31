@@ -1,20 +1,8 @@
 "use client";
-import * as monaco from "monaco-editor";
-import { Editor, loader } from "@monaco-editor/react";
+import { monaco, Editor } from "../lib/monaco";
 import * as jsonc from "jsonc-parser";
 import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
-
-// TODO: 删除所有内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
-loader.config({
-  ...monaco,
-  // 配置右键菜单使用中文
-  "vs/nls": {
-    availableLanguages: {
-      "*": "zh-cn",
-    },
-  },
-});
 
 export default function MyEditor({ name, editorRef, setAlert }) {
   return (
