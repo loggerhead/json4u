@@ -6,11 +6,8 @@ import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
 
 // TODO: 删除所有内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
-// TODO: 指定 CDN 地址，改为 npm
 loader.config({
-  paths: {
-    vs: "https://cdn.staticfile.org/monaco-editor/0.40.0/min/vs",
-  },
+  ...monaco,
   // 配置右键菜单使用中文
   "vs/nls": {
     availableLanguages: {
