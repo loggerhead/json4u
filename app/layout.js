@@ -10,12 +10,12 @@ export default function RootLayout({ children }) {
     <html lang="zh">
       <body>
         <main>{children}</main>
-        <div className="text-center text-[12px]">
-          <a href="/">Json For You ·</a>
+        <div className="my-3 text-center text-[12px]">
+          <a href="/">Json For You · </a>
           <a href="https://beian.miit.gov.cn" target="_blank">
-            粤ICP备16007488号 ·
+            粤ICP备16007488号 ·{" "}
           </a>
-          <a href="/guide">使用指南 ·</a>
+          <a href="/guide">使用指南 · </a>
           <a href="https://github.com/loggerhead/json4u-issue/issues">Feedback</a>
         </div>
       </body>
