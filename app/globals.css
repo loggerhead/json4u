@@ -49,3 +49,8 @@
 .inline-ins {
   background-color: rgb(134, 239, 172);
 }
+
+.markdown-body {
+  box-sizing: border-box;
+  margin: 1.25rem auto !important;
+}
