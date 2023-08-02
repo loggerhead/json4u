@@ -4,12 +4,13 @@ import { loader, Editor } from "@monaco-editor/react";
 import * as jsonc from "../lib/jsonc-parser/main";
 import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
+import { semanticCompare, DEL, INS } from "../lib/diff";
 import Loading from "../components/loading";
 
 // NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
 loader.config({ monaco });
 
-export default function MyEditor({ name, height, editorRef, setAlert }) {
+export default function MyEditor({ height, editorRef, setAlert, callback }) {
   return (
     <Editor
       language="json"
@@ -23,8 +24,8 @@ export default function MyEditor({ name, height, editorRef, setAlert }) {
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = new EditorRef(name, editor, monaco, setAlert);
-        editorRef.current.registerAll();
+        editorRef.current = new EditorRef(editor, monaco, setAlert).registerAll();
+        callback();
       }}
       onValidate={(markers) => editorRef.current.validate(markers)}
       onChange={() => editorRef.current.clearDecorations()}
@@ -33,9 +34,7 @@ export default function MyEditor({ name, height, editorRef, setAlert }) {
 }
 
 class EditorRef {
-  constructor(name, editor, monaco, setAlert) {
-    // 编辑器名字。用于输出日志时区分左右两侧的编辑器
-    this.name = name;
+  constructor(editor, monaco, setAlert) {
     // monaco editor 实例
     this.editor = editor;
     // monaco 实例
@@ -128,8 +127,86 @@ class EditorRef {
     this.setText(text);
   }
 
+  compare(callback) {
+    const ltext = this.leftEditor.text();
+    const rtext = this.rightEditor.text();
+
+    // 进行比较
+    let { diffs, isTextCompare } = semanticCompare(ltext, rtext);
+    diffs = diffs.filter((d) => d.diffType == DEL || d.diffType == INS);
+
+    if (isTextCompare) {
+      this.adjustForHighlight(this.leftEditor, this.rightEditor, diffs);
+    }
+
+    this.showResultMsg(diffs, isTextCompare);
+    this.highlight(this.leftEditor, this.rightEditor, diffs);
+    callback(diffs, isTextCompare);
+  }
+
+  // 提示用户差异数量
+  showResultMsg(diffs, isTextCompare) {
+    let msgs = [];
+    let colors = [];
+
+    if (isTextCompare) {
+      msgs.push("无效 JSON，进行文本比较。");
+      colors.push("yellow");
+    }
+
+    if (diffs.length == 0) {
+      msgs.push("两边没有差异");
+      colors.push("green");
+    } else {
+      const delN = diffs.filter((d) => d.diffType == DEL)?.length;
+      const insN = diffs.filter((d) => d.diffType == INS)?.length;
+      msgs.push(`${delN} 删除，${insN} 新增`);
+      colors.push("blue");
+    }
+
+    const msg = msgs.join(" ");
+    const c = color.max(colors);
+    this.setAlert({ msg: msg, color: c });
+  }
+
+  // 调整 diff 以便高亮
+  adjustForHighlight(leftEditor, rightEditor, diffs) {
+    for (const diff of diffs) {
+      const editor = diff.diffType == DEL ? leftEditor : rightEditor;
+      const range = editor.range(diff.offset, diff.length);
+      const text = editor.model().getValueInRange(range);
+
+      // 末尾换行符不进行高亮，避免接下来一行没有差异但被高亮
+      if (text.endsWith("\n")) {
+        diff.length--;
+      }
+    }
+  }
+
+  // 高亮
+  highlight(leftEditor, rightEditor, diffs) {
+    const leftDecorations = [];
+    const rightDecorations = [];
+
+    for (const { diffType, offset, length, highlightLine } of diffs) {
+      const editor = diffType == DEL ? leftEditor : rightEditor;
+      const decorations = diffType == DEL ? leftDecorations : rightDecorations;
+      const colorClass = color.getColorClass(diffType, highlightLine);
+      const dd = editor.newHighlightDecorations(offset, length, highlightLine, colorClass);
+      decorations.push(...dd);
+    }
+
+    leftEditor.applyDecorations(leftDecorations);
+    rightEditor.applyDecorations(rightDecorations);
+  }
+
   doPaste(format = false) {
     return format ? this.format() : this.text();
+  }
+
+  pair(leftEditor, rightEditor) {
+    this.leftEditor = leftEditor;
+    this.rightEditor = rightEditor;
   }
 
   registerAll() {
@@ -146,6 +223,7 @@ class EditorRef {
     });
 
     this.registerMenuItems();
+    return this;
   }
 
   // NOTICE: 删除不了内置的菜单项：https://github.com/microsoft/monaco-editor/issues/1567
