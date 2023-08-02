@@ -1,14 +1,20 @@
 "use client";
-import { monaco, Editor } from "../lib/monaco";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import { loader, Editor } from "@monaco-editor/react";
 import * as jsonc from "../lib/jsonc-parser/main";
 import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
+import Loading from "../components/loading";
 
-export default function MyEditor({ name, editorRef, setAlert }) {
+// NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
+loader.config({ monaco });
+
+export default function MyEditor({ name, height, editorRef, setAlert }) {
   return (
     <Editor
       language="json"
-      height="calc(100vh - 5rem)"
+      height={height}
+      loading={<Loading height={height}></Loading>}
       options={{
         fontSize: 14, // 设置初始字体大小
         scrollBeyondLastLine: false, // 行数超过一屏时才展示滚动条
