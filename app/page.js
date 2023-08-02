@@ -1,8 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-const MyEditor = dynamic(() => import("../components/editor"), { ssr: false });
-
 import { useRef, useState } from "react";
 import styles from "./page.module.scss";
 import MyAlert from "../components/alert";
@@ -10,6 +8,14 @@ import Dragbar from "../components/dragbar";
 import { FormatButton, MinifyButton, EscapeButton, UnescapeButton } from "../components/button";
 import CompareButton from "../components/compare-button";
 import Toggler from "../components/toggler";
+import Loading from "../components/loading";
+
+const editorHeight = "calc(100vh - 5rem)";
+
+const MyEditor = dynamic(() => import("../components/editor"), {
+  ssr: false,
+  loading: () => <Loading height={editorHeight}></Loading>,
+});
 
 export default function Home() {
   const [hidden, setHidden] = useState(0);
@@ -60,7 +66,12 @@ export default function Home() {
             </ul>
           </div>
           <div className={styles.editor}>
-            <MyEditor name="leftEditor" editorRef={leftEditorRef} setAlert={setLeftAlert}></MyEditor>
+            <MyEditor
+              name="leftEditor"
+              height={editorHeight}
+              editorRef={leftEditorRef}
+              setAlert={setLeftAlert}
+            ></MyEditor>
           </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -82,7 +93,12 @@ export default function Home() {
             </li>
           </ul>
           <div className={styles.editor}>
-            <MyEditor name="rightEditor" editorRef={rightEditorRef} setAlert={setRightAlert}></MyEditor>
+            <MyEditor
+              name="rightEditor"
+              height={editorHeight}
+              editorRef={rightEditorRef}
+              setAlert={setRightAlert}
+            ></MyEditor>
           </div>
         </div>
       </div>
