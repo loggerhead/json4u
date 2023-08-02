@@ -23,3 +23,13 @@ export function EscapeButton({ editorRef }) {
 export function UnescapeButton({ editorRef }) {
   return <MyButton onClick={() => editorRef.current.unescape()}>去转义</MyButton>;
 }
+
+export function CompareButton({ editorRef, setHidden }) {
+  const onClick = () => {
+    editorRef.current.compare((diffs, isTextCompare) => {
+      setHidden(false);
+    });
+  };
+
+  return <MyButton onClick={onClick}>比较</MyButton>;
+}
