@@ -78,7 +78,8 @@ export default function Home() {
               height={editorHeight}
               editorRef={leftEditorRef}
               setAlert={setLeftAlert}
-              callback={pair}
+              adjustAfterCompare={() => setHidden(false)}
+              doPair={pair}
             ></MyEditor>
           </div>
         </div>
@@ -89,7 +90,7 @@ export default function Home() {
         <div ref={rightContainerRef} className={`flex flex-col grow shrink min-w-fit gap-2 ${hidden ? "hidden" : ""}`}>
           <ul className="flex space-x-2 items-center">
             <li>
-              <CompareButton editorRef={rightEditorRef} setHidden={setHidden}></CompareButton>
+              <CompareButton editorRef={rightEditorRef}></CompareButton>
             </li>
             <li>
               <MyAlert props={rightAlert}></MyAlert>
@@ -100,7 +101,8 @@ export default function Home() {
               height={editorHeight}
               editorRef={rightEditorRef}
               setAlert={setRightAlert}
-              callback={pair}
+              adjustAfterCompare={() => setHidden(false)}
+              doPair={pair}
             ></MyEditor>
           </div>
         </div>
