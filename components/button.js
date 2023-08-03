@@ -25,11 +25,5 @@ export function UnescapeButton({ editorRef }) {
 }
 
 export function CompareButton({ editorRef, setHidden }) {
-  const onClick = () => {
-    editorRef.current.compare((diffs, isTextCompare) => {
-      setHidden(false);
-    });
-  };
-
-  return <MyButton onClick={onClick}>比较</MyButton>;
+  return <MyButton onClick={() => editorRef.current.compare()}>比较</MyButton>;
 }

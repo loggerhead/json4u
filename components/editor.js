@@ -10,7 +10,7 @@ import Loading from "../components/loading";
 // NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
 loader.config({ monaco });
 
-export default function MyEditor({ height, editorRef, setAlert, callback }) {
+export default function MyEditor({ height, editorRef, setAlert, adjustAfterCompare, doPair }) {
   return (
     <Editor
       language="json"
@@ -24,8 +24,9 @@ export default function MyEditor({ height, editorRef, setAlert, callback }) {
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = new EditorRef(editor, monaco, setAlert).registerAll();
-        callback();
+        editorRef.current = new EditorRef(editor, monaco, setAlert, adjustAfterCompare);
+        editorRef.current.init();
+        doPair();
       }}
       onValidate={(markers) => editorRef.current.validate(markers)}
       onChange={() => editorRef.current.clearDecorations()}
@@ -34,16 +35,15 @@ export default function MyEditor({ height, editorRef, setAlert, callback }) {
 }
 
 class EditorRef {
-  constructor(editor, monaco, setAlert) {
+  constructor(editor, monaco, setAlert, adjustAfterCompare) {
     // monaco editor 实例
     this.editor = editor;
     // monaco 实例
     this.monaco = monaco;
     // 设置编辑器上方的 alert 信息
     this.setAlert = setAlert;
-
-    // 注入引用到编辑器，供 registerMenuItems 使用
-    this.editor._ref = this;
+    // 完成比较后，对两边编辑器的位置做调整
+    this.adjustAfterCompare = adjustAfterCompare;
   }
 
   model() {
@@ -127,7 +127,7 @@ class EditorRef {
     this.setText(text);
   }
 
-  compare(callback) {
+  compare() {
     const ltext = this.leftEditor.text();
     const rtext = this.rightEditor.text();
 
@@ -141,7 +141,7 @@ class EditorRef {
 
     this.showResultMsg(diffs, isTextCompare);
     this.highlight(this.leftEditor, this.rightEditor, diffs);
-    callback(diffs, isTextCompare);
+    this.adjustAfterCompare();
   }
 
   // 提示用户差异数量
@@ -200,8 +200,14 @@ class EditorRef {
     rightEditor.applyDecorations(rightDecorations);
   }
 
-  doPaste(format = false) {
-    return format ? this.format() : this.text();
+  // 粘贴时执行的动作
+  doPaste() {
+    this.format();
+
+    // 当左右两侧编辑器都有内容时，才进行比较
+    if (this.leftEditor?.text().length && this.rightEditor?.text().length) {
+      this.compare();
+    }
   }
 
   pair(leftEditor, rightEditor) {
@@ -209,14 +215,16 @@ class EditorRef {
     this.rightEditor = rightEditor;
   }
 
-  registerAll() {
+  init() {
+    // 注入引用到编辑器，供 registerMenuItems 使用
+    this.editor._ref = this;
+
     this.registerOnPaste();
     this.registerAutoShowMinimap();
     this.registerDropFileHandler();
     this.registerPositionChange();
 
     // TODO: 监听滚动事件实现同步滚动
-    const editor = this.editor;
     this.editor.onDidScrollChange(function (e) {
       // console.log("滚动位置：", e.scrollTop);
       // editor.setScrollTop(e._oldScrollTop);
@@ -253,7 +261,7 @@ class EditorRef {
 
   // 注册粘贴事件处理器
   registerOnPaste() {
-    this.editor.onDidPaste(() => this.doPaste(true));
+    this.editor.onDidPaste(() => this.doPaste());
   }
 
   // 注册拖拽事件处理器，支持拖拽文件到编辑器上
@@ -267,7 +275,7 @@ class EditorRef {
         var reader = new FileReader();
         reader.onload = (e) => {
           this.editor.setValue(e.target.result);
-          this.doPaste(true);
+          this.doPaste();
         };
         reader.readAsText(file);
       }
