@@ -20,7 +20,7 @@ export default function MyEditor({ height, editorRef, setAlert, adjustAfterCompa
         fontSize: 14, // 设置初始字体大小
         scrollBeyondLastLine: false, // 行数超过一屏时才展示滚动条
         automaticLayout: true, // 当编辑器所在的父容器的大小改变时，编辑器会自动重新计算并调整大小
-        wordWrap: "on",
+        wordWrap: "off", // 关闭软换行。避免软换行时，点击出现不规则滚动的问题
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
@@ -44,6 +44,8 @@ class EditorRef {
     this.setAlert = setAlert;
     // 完成比较后，对两边编辑器的位置做调整
     this.adjustAfterCompare = adjustAfterCompare;
+    // 可以被同步滚动吗？
+    this.scrollable = false;
   }
 
   model() {
@@ -201,12 +203,15 @@ class EditorRef {
   }
 
   // 粘贴时执行的动作
-  doPaste() {
-    this.format();
+  doPaste(e = null) {
+    // 仅当粘贴替换全部文本时，才执行 paste 相关的动作
+    if (e === null || e.range.equalsRange(this.model().getFullModelRange())) {
+      this.format();
 
-    // 当左右两侧编辑器都有内容时，才进行比较
-    if (this.leftEditor?.text().length && this.rightEditor?.text().length) {
-      this.compare();
+      // 当左右两侧编辑器都有内容时，才进行比较
+      if (this.leftEditor?.text().length && this.rightEditor?.text().length) {
+        this.compare();
+      }
     }
   }
 
@@ -223,15 +228,45 @@ class EditorRef {
     this.registerAutoShowMinimap();
     this.registerDropFileHandler();
     this.registerPositionChange();
-
-    // TODO: 监听滚动事件实现同步滚动
-    this.editor.onDidScrollChange(function (e) {
-      // console.log("滚动位置：", e.scrollTop);
-      // editor.setScrollTop(e._oldScrollTop);
-    });
-
+    this.registerOnFocus();
+    this.registerOnScroll();
     this.registerMenuItems();
     return this;
+  }
+
+  scrollTo(e) {
+    if (e.scrollTopChanged || e.scrollLeftChanged) {
+      this.editor.setScrollTop(e.scrollTop);
+      this.editor.setScrollLeft(e.scrollLeft);
+    }
+  }
+
+  // 监听 focus 事件以支持同步滚动
+  registerOnFocus() {
+    const self = this;
+
+    this.editor.onDidFocusEditorText((e) => {
+      self.scrollable = true;
+
+      if (self === self.leftEditor && self.rightEditor) {
+        self.rightEditor.scrollable = false;
+      } else if (self === self.rightEditor && self.leftEditor) {
+        self.leftEditor.scrollable = false;
+      }
+    });
+  }
+
+  // 监听滚动事件实现同步滚动
+  registerOnScroll() {
+    const self = this;
+
+    this.editor.onDidScrollChange((e) => {
+      if (self.scrollable && self === self.leftEditor) {
+        self.rightEditor?.scrollTo(e);
+      } else if (self.scrollable && self === self.rightEditor) {
+        self.leftEditor?.scrollTo(e);
+      }
+    });
   }
 
   // NOTICE: 删除不了内置的菜单项：https://github.com/microsoft/monaco-editor/issues/1567
@@ -261,7 +296,7 @@ class EditorRef {
 
   // 注册粘贴事件处理器
   registerOnPaste() {
-    this.editor.onDidPaste(() => this.doPaste());
+    this.editor.onDidPaste((e) => this.doPaste(e));
   }
 
   // 注册拖拽事件处理器，支持拖拽文件到编辑器上
