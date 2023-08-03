@@ -19,7 +19,6 @@ const nextConfig = {
             "bracketMatching", // 高亮匹配的括号
             "contextmenu", // 右键菜单
             "indentation", // 缩进
-            "quickCommand", // 命令面板
             "unusualLineTerminators", // invalid 换行符提示
             "wordHighlighter", // 高亮光标停留位置的词
           ],
