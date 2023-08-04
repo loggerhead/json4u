@@ -12,8 +12,6 @@ const nextConfig = {
         new MonacoWebpackPlugin({
           languages: ["json"],
           features: [
-            "quickOutline", // 折叠、查询等按钮的 css 样式
-            "coreCommands", // 影响折叠按钮的展示
             "find", // 查找
             "folding", // 折叠
             "bracketMatching", // 高亮匹配的括号

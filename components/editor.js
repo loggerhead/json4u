@@ -6,6 +6,9 @@ import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
 import { semanticCompare, DEL, INS } from "../lib/diff";
 import Loading from "../components/loading";
+// 查询框的 icon 图标以及折叠图标
+import "monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles";
+import "monaco-editor/esm/vs/editor/contrib/symbolIcons/browser/symbolIcons.js";
 
 // NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
 loader.config({ monaco });
