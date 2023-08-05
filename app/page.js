@@ -30,7 +30,6 @@ export default function Home() {
     if (leftEditorRef.current && rightEditorRef.current) {
       leftEditorRef.current.pair(leftEditorRef.current, rightEditorRef.current);
       rightEditorRef.current.pair(leftEditorRef.current, rightEditorRef.current);
-      console.log("pair succ.");
     }
   };
 
