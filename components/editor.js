@@ -47,8 +47,12 @@ class EditorRef {
     this.setAlert = setAlert;
     // 完成比较后，对两边编辑器的位置做调整
     this.adjustAfterCompare = adjustAfterCompare;
-    // 可以被同步滚动吗？
-    this.scrollable = false;
+    // 滚动中吗？
+    this.scrolling = false;
+    // 启用同步滚动？
+    this.enableSyncScroll = true;
+    // 菜单项。key: value => 函数名: 菜单属性
+    this.menuItems = new Map();
   }
 
   model() {
@@ -80,6 +84,25 @@ class EditorRef {
     } else {
       this.setAlert({});
     }
+  }
+
+  scrollable() {
+    return this.scrolling && this.enableSyncScroll;
+  }
+
+  toggleSyncScroll() {
+    this.leftEditor.enableSyncScroll = !this.enableSyncScroll;
+    this.rightEditor.enableSyncScroll = !this.enableSyncScroll;
+    this.leftEditor.updateToggleSyncScrollMenu();
+    this.rightEditor.updateToggleSyncScrollMenu();
+  }
+
+  updateToggleSyncScrollMenu() {
+    const action = this.menuItems.get("toggleSyncScroll");
+    const label = this.enableSyncScroll ? "关闭同步滚动" : "打开同步滚动";
+    // 删除之前的菜单项，再创建新的菜单项
+    action.disposable.dispose();
+    this.registerMenuItem(label, "toggleSyncScroll", "modification", action.order);
   }
 
   // 格式化，并返回格式化后的文本。支持格式化非 JSON 字符串
@@ -233,12 +256,12 @@ class EditorRef {
     const self = this;
 
     this.editor.onDidFocusEditorText((e) => {
-      self.scrollable = true;
+      self.scrolling = true;
 
       if (self === self.leftEditor && self.rightEditor) {
-        self.rightEditor.scrollable = false;
+        self.rightEditor.scrolling = false;
       } else if (self === self.rightEditor && self.leftEditor) {
-        self.leftEditor.scrollable = false;
+        self.leftEditor.scrolling = false;
       }
     });
   }
@@ -248,37 +271,39 @@ class EditorRef {
     const self = this;
 
     this.editor.onDidScrollChange((e) => {
-      if (self.scrollable && self === self.leftEditor) {
+      if (self.scrollable() && self === self.leftEditor) {
         self.rightEditor?.scrollTo(e);
-      } else if (self.scrollable && self === self.rightEditor) {
+      } else if (self.scrollable() && self === self.rightEditor) {
         self.leftEditor?.scrollTo(e);
       }
     });
   }
 
+  registerMenuItem(name, fnName, groupName, order) {
+    const item = {
+      id: fnName,
+      label: name,
+      contextMenuGroupId: groupName,
+      contextMenuOrder: order,
+      // 只能通过引用来调用，否则不生效
+      run: function (ed) {
+        ed._ref[fnName]();
+      },
+    };
+
+    // 用于删除 action
+    item.disposable = this.editor.addAction(item);
+    this.menuItems.set(fnName, item);
+  }
+
   // NOTICE: 删除不了内置的菜单项：https://github.com/microsoft/monaco-editor/issues/1567
   registerMenuItems() {
     let order = -100;
-
-    const register = (name, fnName) => {
-      order++;
-
-      this.editor.addAction({
-        id: `my.${fnName}`,
-        label: name,
-        contextMenuGroupId: "navigation",
-        contextMenuOrder: order,
-        // 只能通过引用来调用，否则不生效
-        run: function (ed) {
-          ed._ref[fnName]();
-        },
-      });
-    };
-
-    register("格式化", "format");
-    register("最小化", "minify");
-    register("转义", "escape");
-    register("去转义", "unescape");
+    this.registerMenuItem("格式化", "format", "navigation", order++);
+    this.registerMenuItem("最小化", "minify", "navigation", order++);
+    this.registerMenuItem("转义", "escape", "navigation", order++);
+    this.registerMenuItem("去转义", "unescape", "navigation", order++);
+    this.registerMenuItem("关闭同步滚动", "toggleSyncScroll", "modification", order++);
   }
 
   // 注册粘贴事件处理器
