@@ -28,11 +28,17 @@
   }
 }
 
+.markdown-body {
+  box-sizing: border-box;
+  margin: 1.25rem auto !important;
+}
+
 /* fix monaco 不能根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */
 .monaco-editor {
   position: absolute !important;
 }
 
+/* 以下部分需要同步修改 lib/color.js */
 /* 增加透明度以 fix 选中区分背景色不变的问题：https://github.com/Microsoft/monaco-editor/issues/902 */
 .line-del {
   background-color: rgba(252, 165, 165, 0.3);
@@ -43,14 +49,9 @@
 }
 
 .inline-del {
-  background-color: rgb(252, 165, 165);
+  background-color: rgba(251, 108, 108, 0.5);
 }
 
 .inline-ins {
-  background-color: rgb(134, 239, 172);
-}
-
-.markdown-body {
-  box-sizing: border-box;
-  margin: 1.25rem auto !important;
+  background-color: rgba(34, 222, 102, 0.5);
 }
