@@ -1,6 +1,13 @@
 // jest 文档：https://jestjs.io/docs/expect
 import * as diff from "../lib/diff";
 
+function expectEq(ltext, rtext, expected, isTextCompare = false) {
+  const r = diff.semanticCompare(ltext, rtext);
+  expect(r.isTextCompare).toEqual(isTextCompare);
+  expect(r.diffs).toEqual(expected);
+  return r.isTextCompare;
+}
+
 describe("utils", () => {
   test("stringify4diff", () => {
     expect(
@@ -65,12 +72,6 @@ describe("Tree", () => {
 });
 
 describe("Comparer", () => {
-  expectEq = (ltext, rtext, expected) => {
-    const c = new diff.Comparer(new diff.Tree(ltext), new diff.Tree(rtext));
-    const diffs = c.compare();
-    expect(diffs).toEqual(expected);
-  };
-
   test("diffVal", () => {
     expectEq(`{ "foo": "abc" }`, `{ "foo": "adc" }`, [
       new diff.Diff(11, 1, diff.DEL, false, ["foo"]),
@@ -89,44 +90,82 @@ describe("Comparer", () => {
 });
 
 describe("semanticCompare", () => {
-  expectEq = (ltext, rtext, expected) => {
-    const r = diff.semanticCompare(ltext, rtext);
-    expect(r.isTextCompare).toEqual(true);
-    expect(r.diffs).toEqual(expected);
-    return r.isTextCompare;
-  };
-
   test("char compare", () => {
-    {
-      const isTextCompare = expectEq(`  "foo": "abc" }`, `{ "foo": "adc" }`, [
-        new diff.Diff(0, 1, diff.DEL, false),
+    expectEq(
+      `  "foo": "abc" }`,
+      `{ "foo": "adc" }`,
+      [
         new diff.Diff(0, 1, diff.INS, false),
         new diff.Diff(11, 1, diff.DEL, false),
         new diff.Diff(11, 1, diff.INS, false),
-      ]);
-      expect(isTextCompare).toEqual(true);
-    }
-    {
-      const isTextCompare = expectEq(
-        `[
-
+      ],
+      true
+    );
+    expectEq(
+      `[
+     ,
     2
 `,
-        `[
+      `[
     1,
     2
 ]`,
-        [new diff.Diff(26, 11, diff.DEL, false), new diff.Diff(111, 1, diff.INS, false)]
-      );
-      expect(isTextCompare).toEqual(true);
-    }
+      [new diff.Diff(6, 1, diff.INS, false), new diff.Diff(15, 1, diff.INS, false)],
+      true
+    );
   });
 
   test("key compare", () => {
-    const isTextCompare = expectEq(`{ "foo": { "bar": 123 } }`, `{ "foo": { "bzr": 123 } }`, [
+    expectEq(`{ "foo": { "bar": 123 } }`, `{ "foo": { "bzr": 123 } }`, [
       new diff.Diff(13, 1, diff.DEL, false, ["foo", "bar"]),
       new diff.Diff(13, 1, diff.INS, false, ["foo", "bzr"]),
     ]);
-    expect(isTextCompare).toEqual(false);
+  });
+
+  test("compare array", () => {
+    expectEq(
+      `[
+    {
+      "foo": 1,
+      "bar": "baz",
+      "values": [
+        "1777777777777777"
+      ]
+    },
+    {
+      "foo": 9,
+      "bar": "qux",
+      "values": [
+        "1690848000000",
+        "1691193600000"
+      ]
+    }
+]`,
+      `[
+    {
+      "foo": 7,
+      "bar": "baz",
+      "values": [
+        "1777777777777777"
+      ]
+    },
+    {
+      "foo": 9,
+      "bar": "qux",
+      "values": [
+        "0xc000c6e720",
+        "0xc000c6e728"
+      ]
+    }
+]`,
+      [
+        new diff.Diff(21, 1, diff.DEL, false, [0, "foo"]),
+        new diff.Diff(21, 1, diff.INS, false, [0, "foo"]),
+        new diff.Diff(173, 12, diff.DEL, false, [1, "values", 0]),
+        new diff.Diff(173, 11, diff.INS, false, [1, "values", 0]),
+        new diff.Diff(198, 13, diff.DEL, false, [1, "values", 1]),
+        new diff.Diff(197, 12, diff.INS, false, [1, "values", 1]),
+      ]
+    );
   });
 });

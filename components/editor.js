@@ -4,7 +4,7 @@ import { loader, Editor } from "@monaco-editor/react";
 import * as jsonc from "../lib/jsonc-parser/main";
 import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
-import { semanticCompare, DEL, INS } from "../lib/diff";
+import { semanticCompare, DEL, INS, Diff } from "../lib/diff";
 import Loading from "../components/loading";
 // 查询框的 icon 图标以及折叠图标
 import "monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles";
@@ -138,11 +138,9 @@ class EditorRef {
 
     // 进行比较
     let { diffs, isTextCompare } = semanticCompare(ltext, rtext);
+    // 防御性编程。没 bug 的话只有 DEL 和 INS
     diffs = diffs.filter((d) => d.diffType == DEL || d.diffType == INS);
-
-    if (isTextCompare) {
-      this.adjustForHighlight(this.leftEditor, this.rightEditor, diffs);
-    }
+    // console.log(Diff.fillText(diffs, this.leftEditor, this.rightEditor));
 
     this.showResultMsg(diffs, isTextCompare);
     this.highlight(this.leftEditor, this.rightEditor, diffs);
@@ -172,20 +170,6 @@ class EditorRef {
     const msg = msgs.join(" ");
     const c = color.max(colors);
     this.setAlert({ msg: msg, color: c });
-  }
-
-  // 调整 diff 以便高亮
-  adjustForHighlight(leftEditor, rightEditor, diffs) {
-    for (const diff of diffs) {
-      const editor = diff.diffType == DEL ? leftEditor : rightEditor;
-      const range = editor.range(diff.offset, diff.length);
-      const text = editor.model().getValueInRange(range);
-
-      // 末尾换行符不进行高亮，避免接下来一行没有差异但被高亮
-      if (text.endsWith("\n")) {
-        diff.length--;
-      }
-    }
   }
 
   // 高亮
