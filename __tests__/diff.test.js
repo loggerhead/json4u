@@ -163,8 +163,8 @@ describe("semanticCompare", () => {
         new diff.Diff(21, 1, diff.INS, false, [0, "foo"]),
         new diff.Diff(173, 12, diff.DEL, false, [1, "values", 0]),
         new diff.Diff(173, 11, diff.INS, false, [1, "values", 0]),
-        new diff.Diff(198, 13, diff.DEL, false, [1, "values", 1]),
         new diff.Diff(197, 12, diff.INS, false, [1, "values", 1]),
+        new diff.Diff(198, 13, diff.DEL, false, [1, "values", 1]),
       ]
     );
   });
