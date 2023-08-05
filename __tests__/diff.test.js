@@ -168,4 +168,108 @@ describe("semanticCompare", () => {
       ]
     );
   });
+
+  // copy from https://github.com/zgrossbart/jdd/blob/main/jdd_test.js
+  test("jdd cases", () => {
+    expectEq(
+      `{ "akey": [] }`,
+      `{ "akey": null }`,
+      [new diff.Diff(10, 2, diff.DEL, false, []), new diff.Diff(10, 4, diff.INS, false, [])],
+      true
+    );
+
+    expectEq(
+      `{ "akey": null }`,
+      `{ "akey": [] }`,
+      [new diff.Diff(10, 4, diff.DEL, false, []), new diff.Diff(10, 2, diff.INS, false, [])],
+      true
+    );
+
+    expectEq(`{ "akey": {} }`, `{ "akey": null }`, [
+      new diff.Diff(10, 2, diff.DEL, true, []),
+      new diff.Diff(10, 4, diff.INS, true, []),
+    ]);
+
+    expectEq(`{ "akey": null }`, `{ "akey": {} }`, [
+      new diff.Diff(10, 4, diff.DEL, true, []),
+      new diff.Diff(10, 2, diff.INS, true, []),
+    ]);
+
+    expectEq(
+      `{"link": "<a href=\\"http://google.com/\\">Google</a>"}`,
+      `{"link": "<a href=\\"http://googlex.com/\\">Google</a>"}`,
+      [new diff.Diff(33, 1, diff.INS, false, ["link"])]
+    );
+
+    expectEq(
+      `{"editor.detectIndentation": false,"editor.tabSize": 2,"files.exclude": {".vscode/": true,"foo": "bar"}}`,
+      `{"editor.detectIndentation": false,"editor.tabSize": 2,"files.exclude": {".slash/": true,"foo": "bar"}}`,
+      [
+        new diff.Diff(75, 6, diff.DEL, false, ["files.exclude", ".vscode/"]),
+        new diff.Diff(75, 5, diff.INS, false, ["files.exclude", ".slash/"]),
+      ]
+    );
+
+    expectEq(
+      `{"editor.detectIndentation": false,"editor.tabSize": 2,"files.exclude": {"bas":".vscode/","foo": "bar"}}`,
+      `{"editor.detectIndentation": false,"editor.tabSize": 2,"files.exclude": {"bas":".slash/","foo": "bar"}}`,
+      [
+        new diff.Diff(81, 6, diff.DEL, false, ["files.exclude", "bas"]),
+        new diff.Diff(81, 5, diff.INS, false, ["files.exclude", "bas"]),
+      ]
+    );
+
+    expectEq(
+      `{"newline": "a\\nb","slash": "a\\\\b","quotes": "a\\"b","backspace": "a\\bb","formfeed": "a\\fb","carriagereturn": "a\\rb","tab": "a\\tb","a\\nb": "newline","a\\\\b": "slash","a\\"b": "quotes","a\\bb": "backspace","a\\fb": "formfeed","a\\rb": "carriagereturn","a\\tb": "tab"}`,
+      `{"newline": "a\\nbx","slash": "a\\\\bx","quotes": "a\\"bx","backspace": "a\\bbx","formfeed": "a\\fbx","carriagereturn": "a\\rbx","tab": "a\\tbx","a\\nb": "newline","a\\\\bx": "slash","a\\"bx": "quotes","a\\bbx": "backspace","a\\fbx": "formfeed","a\\rbx": "carriagereturn","a\\tbx": "tab"}`,
+      [
+        new diff.Diff(17, 1, diff.INS, false, ["newline"]),
+        new diff.Diff(34, 1, diff.INS, false, ["slash"]),
+        new diff.Diff(52, 1, diff.INS, false, ["quotes"]),
+        new diff.Diff(73, 1, diff.INS, false, ["backspace"]),
+        new diff.Diff(93, 1, diff.INS, false, ["formfeed"]),
+        new diff.Diff(119, 1, diff.INS, false, ["carriagereturn"]),
+        new diff.Diff(134, 1, diff.INS, false, ["tab"]),
+        new diff.Diff(160, 1, diff.INS, false, ["a\\bx"]),
+        new diff.Diff(177, 1, diff.INS, false, ['a"bx']),
+        new diff.Diff(195, 1, diff.INS, false, ["a\bbx"]),
+        new diff.Diff(216, 1, diff.INS, false, ["a\fbx"]),
+        new diff.Diff(236, 1, diff.INS, false, ["a\rbx"]),
+        new diff.Diff(262, 1, diff.INS, false, ["a\tbx"]),
+      ]
+    );
+
+    expectEq(
+      `{"foo":[{  "OBJ_ID": "CN=Kate Smith,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "b3067a77-875b-4208-9ee3-39128adeb654",  "lastLogon": "0",  "sAMAccountName": "ksmith",  "userPrincipalName": "ksmith@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Kate Smith,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"},{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]}`,
+      `[{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]`,
+      [new diff.Diff(0, 1020, diff.DEL, true, []), new diff.Diff(0, 475, diff.INS, true, [])]
+    );
+
+    expectEq(
+      `{"Aidan Gillen": {"array": ["Game of Thron\\"es","The Wire"],"string": "some string","int": 2,"aboolean": true, "boolean": true, "null": null, "a_null": null, "another_null": "null check", "object": {"foo": "bar","object1": {"new prop1": "new prop value"},"object2": {"new prop1": "new prop value"},"object3": {"new prop1": "new prop value"},"object4": {"new prop1": "new prop value"}}},"Amy Ryan": {"one": "In Treatment","two": "The Wire"},"Annie Fitzgerald": ["Big Love","True Blood"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsgard": ["Generation Kill","True Blood"], "Clarke Peters": null}`,
+      `{"Aidan Gillen": {"array": ["Game of Thrones","The Wire"],"string": "some string","int": "2","otherint": 4, "aboolean": "true", "boolean": false, "null": null, "a_null":88, "another_null": null, "object": {"foo": "bar"}},"Amy Ryan": ["In Treatment","The Wire"],"Annie Fitzgerald": ["True Blood","Big Love","The Sopranos","Oz"],"Anwan Glover": ["Treme","The Wire"],"Alexander Skarsg?rd": ["Generation Kill","True Blood"],"Alice Farmer": ["The Corner","Oz","The Wire"]}`,
+      [
+        new diff.Diff(81, 6, diff.DEL, false, ["files.exclude", "bas"]),
+        new diff.Diff(81, 5, diff.INS, false, ["files.exclude", "bas"]),
+      ]
+    );
+
+    expectEq(
+      `[{  "OBJ_ID": "CN=Kate Smith,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "b3067a77-875b-4208-9ee3-39128adeb654",  "lastLogon": "0",  "sAMAccountName": "ksmith",  "userPrincipalName": "ksmith@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Kate Smith,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"},{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]`,
+      `{"foo":[{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]}`,
+      [
+        new diff.Diff(81, 6, diff.DEL, false, ["files.exclude", "bas"]),
+        new diff.Diff(81, 5, diff.INS, false, ["files.exclude", "bas"]),
+      ]
+    );
+
+    expectEq(
+      `[{  "OBJ_ID": "CN=Kate Smith,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "b3067a77-875b-4208-9ee3-39128adeb654",  "lastLogon": "0",  "sAMAccountName": "ksmith",  "userPrincipalName": "ksmith@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Kate Smith,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"},{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]`,
+      `[{  "OBJ_ID": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com",  "userAccountControl": "512",  "objectGUID": "c3f7dae9-9b4f-4d55-a1ec-bf9ef45061c3",  "lastLogon": "130766915788304915",  "sAMAccountName": "tswan",  "userPrincipalName": "tswan@cloudaddc.qalab.cam.novell.com",  "distinguishedName": "CN=Timothy Swan,OU=Users,OU=Willow,DC=cloudaddc,DC=qalab,DC=cam,DC=novell,DC=com"}]`,
+      [
+        new diff.Diff(81, 6, diff.DEL, false, ["files.exclude", "bas"]),
+        new diff.Diff(81, 5, diff.INS, false, ["files.exclude", "bas"]),
+      ]
+    );
+  });
 });
