@@ -6,6 +6,11 @@ const nextConfig = {
     // 除了 jest 使用 babel 编译以外，其它场景强制使用 SWC 编译：https://nextjs.org/docs/messages/swc-disabled
     forceSwcTransforms: true,
   },
+  // 生成静态文件，方便托管在 CDN 上。https://nextjs.org/docs/pages/building-your-application/deploying/static-exports
+  output: "export",
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
+  distDir: "dist",
   webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
     if (!isServer) {
       config.plugins.push(

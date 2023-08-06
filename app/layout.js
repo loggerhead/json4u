@@ -54,7 +54,9 @@ export default function RootLayout({ children }) {
           <a href="https://beian.miit.gov.cn" target="_blank">
             粤ICP备16007488号 ·{" "}
           </a>
-          <Link href="/guide">使用指南 · </Link>
+          <Link prefetch={false} href="/guide">
+            使用指南 ·{" "}
+          </Link>
           <a href="https://github.com/loggerhead/json4u-issue/issues">Feedback</a>
         </div>
         <GoogleTagManagerBody></GoogleTagManagerBody>
