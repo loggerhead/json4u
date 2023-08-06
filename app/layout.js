@@ -1,4 +1,6 @@
+import Head from "next/head";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 
 const title = "JSON For You";
@@ -41,7 +43,10 @@ export function generateMetadata({ params, searchParams }, parent) {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="zh">
+    <html>
+      <Head>
+        <GoogleTagManagerHead></GoogleTagManagerHead>
+      </Head>
       <body>
         <main>{children}</main>
         <div className="my-3 text-center text-[12px]">
@@ -52,7 +57,40 @@ export default function RootLayout({ children }) {
           <Link href="/guide">使用指南 · </Link>
           <a href="https://github.com/loggerhead/json4u-issue/issues">Feedback</a>
         </div>
+        <GoogleTagManagerBody></GoogleTagManagerBody>
       </body>
     </html>
+  );
+}
+
+function GoogleTagManagerHead() {
+  return (
+    <Script
+      id="gtm-head"
+      strategy="lazyOnload"
+      dangerouslySetInnerHTML={{
+        __html: `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-T58W8WZ4');</script>`,
+      }}
+    />
+  );
+}
+
+function GoogleTagManagerBody() {
+  return (
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-T58W8WZ4"
+        height="0"
+        width="0"
+        style={{
+          display: "none",
+          visibility: "hidden",
+        }}
+      ></iframe>
+    </noscript>
   );
 }
