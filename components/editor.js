@@ -162,8 +162,7 @@ class EditorRef {
     // 进行比较
     let { diffs, isTextCompare } = semanticCompare(ltext, rtext);
     // 防御性编程。没 bug 的话只有 DEL 和 INS
-    diffs = diffs.filter((d) => d.diffType == DEL || d.diffType == INS);
-    // console.log(Diff.fillText(diffs, this.leftEditor, this.rightEditor));
+    diffs = diffs.filter((d) => d.type == DEL || d.type == INS);
 
     this.showResultMsg(diffs, isTextCompare);
     this.highlight(this.leftEditor, this.rightEditor, diffs);
@@ -184,8 +183,8 @@ class EditorRef {
       msgs.push("两边没有差异");
       colors.push("green");
     } else {
-      const delN = diffs.filter((d) => d.diffType == DEL)?.length;
-      const insN = diffs.filter((d) => d.diffType == INS)?.length;
+      const delN = diffs.filter((d) => d.type == DEL)?.length;
+      const insN = diffs.filter((d) => d.type == INS)?.length;
       msgs.push(`${delN} 删除，${insN} 新增`);
       colors.push("blue");
     }
@@ -200,10 +199,10 @@ class EditorRef {
     const leftDecorations = [];
     const rightDecorations = [];
 
-    for (const { diffType, offset, length, highlightLine } of diffs) {
-      const editor = diffType == DEL ? leftEditor : rightEditor;
-      const decorations = diffType == DEL ? leftDecorations : rightDecorations;
-      const colorClass = color.getColorClass(diffType, highlightLine);
+    for (const { type, offset, length, highlightLine } of diffs) {
+      const editor = type == DEL ? leftEditor : rightEditor;
+      const decorations = type == DEL ? leftDecorations : rightDecorations;
+      const colorClass = color.getColorClass(type, highlightLine);
       const dd = editor.newHighlightDecorations(offset, length, highlightLine, colorClass);
       decorations.push(...dd);
     }
