@@ -4,7 +4,8 @@ import { loader, Editor } from "@monaco-editor/react";
 import * as jsonc from "../lib/jsonc-parser/main";
 import * as color from "../lib/color";
 import * as jsonPointer from "../lib/json-pointer";
-import { semanticCompare, DEL, INS, Diff } from "../lib/diff";
+import { semanticCompare, Diff, DEL, INS } from "../lib/diff";
+import * as parser from "../lib/parser";
 import Loading from "../components/loading";
 // 查询框的 icon 图标以及折叠图标
 import "monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles";
@@ -53,6 +54,10 @@ class EditorRef {
     this.enableSyncScroll = true;
     // 菜单项。key: value => 函数名: 菜单属性
     this.menuItems = new Map();
+    // 比较后的差异（仅当前侧的差异）
+    this.diffs = [];
+    // 查看上一个差异或下一个差异时，记录的 diff 下标
+    this.diffPosition = 0;
   }
 
   model() {
@@ -63,8 +68,12 @@ class EditorRef {
     return this.editor.getValue();
   }
 
+  // 文本发生变更时，清空 diff 高亮和 diffs 信息
   setText(text) {
     this.editor.setValue(text);
+    this.clearDecorations();
+    this.diffs = [];
+    this.diffPosition = 0;
   }
 
   range(offset, length) {
@@ -107,16 +116,19 @@ class EditorRef {
 
   // 格式化，并返回格式化后的文本。支持格式化非 JSON 字符串
   format() {
-    var text = this.text();
+    const text = this.doFormat(this.text());
+    this.setText(text);
+    return text;
+  }
+
+  doFormat(text) {
     const edits = jsonc.format(text, undefined, {
       tabSize: 4,
       insertSpaces: true,
       eol: "",
     });
 
-    text = jsonc.applyEdits(text, edits);
-    this.setText(text);
-    return text;
+    return jsonc.applyEdits(text, edits);
   }
 
   minify() {
@@ -161,12 +173,57 @@ class EditorRef {
 
     // 进行比较
     let { diffs, isTextCompare } = semanticCompare(ltext, rtext);
-    // 防御性编程。没 bug 的话只有 DEL 和 INS
-    diffs = diffs.filter((d) => d.type == DEL || d.type == INS);
+    const [delDiffs, insDiffs] = Diff.classify(diffs);
+    this.leftEditor.diffs = delDiffs;
+    this.rightEditor.diffs = insDiffs;
 
+    // 高亮 diff
     this.showResultMsg(diffs, isTextCompare);
     this.highlight(this.leftEditor, this.rightEditor, diffs);
     this.adjustAfterCompare();
+
+    // 滚动到第一个 diff
+    this.leftEditor.scrollToDiff(delDiffs[0]);
+    this.rightEditor.scrollToDiff(insDiffs[0]);
+  }
+
+  // 滚动到上一个差异
+  scrollToPrevDiff() {
+    if (--this.diffPosition < 0) {
+      this.diffPosition = this.diffs.length - 1;
+    }
+    this.scrollToDiff(this.diffs[this.diffPosition]);
+  }
+
+  // 滚动到下一个差异
+  scrollToNextDiff() {
+    if (++this.diffPosition > this.diffs.length - 1) {
+      this.diffPosition = 0;
+    }
+    this.scrollToDiff(this.diffs[this.diffPosition]);
+  }
+
+  scrollToDiff(diff) {
+    if (diff) {
+      const range = this.range(diff.offset, 1);
+      const lineNumber = range.startLineNumber;
+      this.editor.revealPositionInCenter({ lineNumber: lineNumber, column: 1 });
+    }
+  }
+
+  sort(reverse = false) {
+    let text = this.text();
+    const [tree, errors] = parser.parseJSON(text);
+
+    if (!errors?.length) {
+      text = tree.stringify(reverse ? "desc" : "asc");
+      text = this.doFormat(text);
+      this.setText(text);
+    }
+  }
+
+  sortReverse() {
+    this.sort(true);
   }
 
   // 提示用户差异数量
@@ -278,12 +335,13 @@ class EditorRef {
     });
   }
 
-  registerMenuItem(name, fnName, groupName, order) {
+  registerMenuItem(name, fnName, groupName, order, keybindings = []) {
     const item = {
       id: fnName,
       label: name,
       contextMenuGroupId: groupName,
       contextMenuOrder: order,
+      keybindings: keybindings,
       // 只能通过引用来调用，否则不生效
       run: function (ed) {
         ed._ref[fnName]();
@@ -298,11 +356,19 @@ class EditorRef {
   // NOTICE: 删除不了内置的菜单项：https://github.com/microsoft/monaco-editor/issues/1567
   registerMenuItems() {
     let order = -100;
-    this.registerMenuItem("格式化", "format", "navigation", order++);
-    this.registerMenuItem("最小化", "minify", "navigation", order++);
-    this.registerMenuItem("转义", "escape", "navigation", order++);
-    this.registerMenuItem("去转义", "unescape", "navigation", order++);
-    this.registerMenuItem("关闭同步滚动", "toggleSyncScroll", "modification", order++);
+    this.registerMenuItem("上一个差异", "scrollToPrevDiff", "navigation", order++, [
+      monaco.KeyMod.Alt | monaco.KeyCode.KeyP,
+    ]);
+    this.registerMenuItem("下一个差异", "scrollToNextDiff", "navigation", order++, [
+      monaco.KeyMod.Alt | monaco.KeyCode.KeyN,
+    ]);
+    this.registerMenuItem("格式化", "format", "modification", order++);
+    this.registerMenuItem("最小化", "minify", "modification", order++);
+    this.registerMenuItem("转义", "escape", "modification", order++);
+    this.registerMenuItem("去转义", "unescape", "modification", order++);
+    this.registerMenuItem("排序（顺序）", "sort", "modification", order++);
+    this.registerMenuItem("排序（逆序）", "sortReverse", "modification", order++);
+    this.registerMenuItem("关闭同步滚动", "toggleSyncScroll", "settings", order++);
   }
 
   // 注册粘贴事件处理器
@@ -314,11 +380,11 @@ class EditorRef {
   registerDropFileHandler() {
     this.editor.getDomNode().addEventListener("drop", (e) => {
       e.preventDefault();
-      var file = e.dataTransfer.files[0];
+      const file = e.dataTransfer.files[0];
 
       if (file) {
         // 读取拖拽的文件内容，并设置为编辑器的内容
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = (e) => {
           this.editor.setValue(e.target.result);
           this.doPaste();
