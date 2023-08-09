@@ -4,7 +4,8 @@ import { loader, Editor } from "@monaco-editor/react";
 import * as jsonc from "../lib/jsonc-parser/main";
 import * as color from "../lib/color";
 import { urlToJsonString } from "../lib/url";
-import * as jsonPointer from "../lib/json-pointer";
+import * as format from "../lib/format";
+import * as pointer from "../lib/pointer";
 import { semanticCompare, Diff, DEL, INS } from "../lib/diff";
 import * as parser from "../lib/parser";
 import Loading from "../components/loading";
@@ -117,19 +118,7 @@ class EditorRef {
 
   // 格式化，并返回格式化后的文本。支持格式化非 JSON 字符串
   format() {
-    const text = this.doFormat(this.text());
-    this.setText(text);
-    return text;
-  }
-
-  doFormat(text) {
-    const edits = jsonc.format(text, undefined, {
-      tabSize: 4,
-      insertSpaces: true,
-      eol: "",
-    });
-
-    return jsonc.applyEdits(text, edits);
+    this.setText(format.format(this.text()));
   }
 
   minify() {
@@ -171,7 +160,7 @@ class EditorRef {
   // URL 转 JSON
   urlToJSON() {
     const text = urlToJsonString(this.text());
-    this.setText(this.doFormat(text));
+    this.setText(format.format(text));
   }
 
   compare() {
@@ -224,7 +213,7 @@ class EditorRef {
 
     if (!errors?.length) {
       text = tree.stringify(reverse ? "desc" : "asc");
-      text = this.doFormat(text);
+      text = format.format(text);
       this.setText(text);
     }
   }
@@ -279,7 +268,8 @@ class EditorRef {
   doPaste(e = null) {
     // 仅当粘贴替换全部文本时，才执行 paste 相关的动作
     if (e === null || e.range.equalsRange(this.model().getFullModelRange())) {
-      this.format();
+      const text = format.tryFormat(this.text());
+      this.setText(text);
 
       // 当左右两侧编辑器都有内容时，才进行比较
       if (this.leftEditor?.text().length && this.rightEditor?.text().length) {
@@ -439,7 +429,7 @@ class EditorRef {
       const loc = jsonc.getLocation(this.text(), offset);
 
       if (loc.path) {
-        this.setAlert({ msg: `${jsonPointer.toPointer(loc.path)}`, color: "blue" });
+        this.setAlert({ msg: `${pointer.toPointer(loc.path)}`, color: "blue" });
       }
     });
   }
