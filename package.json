@@ -12,14 +12,14 @@
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.5.1",
     "diff-match-patch": "^1.0.5",
     "json-stable-stringify": "^1.0.2",
+    "monaco-editor": "^0.40.0",
     "next": "13.4.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "tailwindcss": "3.3.2",
-    "@monaco-editor/react": "^4.5.1",
-    "monaco-editor": "^0.40.0"
+    "tailwindcss": "3.3.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.22.9",

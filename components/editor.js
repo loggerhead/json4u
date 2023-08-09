@@ -3,6 +3,7 @@ import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { loader, Editor } from "@monaco-editor/react";
 import * as jsonc from "../lib/jsonc-parser/main";
 import * as color from "../lib/color";
+import { urlToJsonString } from "../lib/url";
 import * as jsonPointer from "../lib/json-pointer";
 import { semanticCompare, Diff, DEL, INS } from "../lib/diff";
 import * as parser from "../lib/parser";
@@ -165,6 +166,12 @@ class EditorRef {
       .replace(/[\\]b/g, "\b")
       .replace(/[\\]f/g, "\f");
     this.setText(text);
+  }
+
+  // URL 转 JSON
+  urlToJSON() {
+    const text = urlToJsonString(this.text());
+    this.setText(this.doFormat(text));
   }
 
   compare() {
@@ -344,7 +351,11 @@ class EditorRef {
       keybindings: keybindings,
       // 只能通过引用来调用，否则不生效
       run: function (ed) {
-        ed._ref[fnName]();
+        try {
+          ed._ref[fnName]();
+        } catch (e) {
+          console.error(e);
+        }
       },
     };
 
@@ -355,20 +366,23 @@ class EditorRef {
 
   // NOTICE: 删除不了内置的菜单项：https://github.com/microsoft/monaco-editor/issues/1567
   registerMenuItems() {
-    let order = -100;
-    this.registerMenuItem("上一个差异", "scrollToPrevDiff", "navigation", order++, [
-      monaco.KeyMod.Alt | monaco.KeyCode.KeyP,
-    ]);
-    this.registerMenuItem("下一个差异", "scrollToNextDiff", "navigation", order++, [
-      monaco.KeyMod.Alt | monaco.KeyCode.KeyN,
-    ]);
-    this.registerMenuItem("格式化", "format", "modification", order++);
-    this.registerMenuItem("最小化", "minify", "modification", order++);
-    this.registerMenuItem("转义", "escape", "modification", order++);
-    this.registerMenuItem("去转义", "unescape", "modification", order++);
-    this.registerMenuItem("排序（顺序）", "sort", "modification", order++);
-    this.registerMenuItem("排序（逆序）", "sortReverse", "modification", order++);
-    this.registerMenuItem("关闭同步滚动", "toggleSyncScroll", "settings", order++);
+    const register = (() => {
+      let order = -100;
+      return (name, fnName, groupName, keybindings = []) => {
+        this.registerMenuItem(name, fnName, groupName, order++, keybindings);
+      };
+    })();
+
+    register("上一个差异", "scrollToPrevDiff", "navigation", [monaco.KeyMod.Alt | monaco.KeyCode.KeyP]);
+    register("下一个差异", "scrollToNextDiff", "navigation", [monaco.KeyMod.Alt | monaco.KeyCode.KeyN]);
+    register("格式化", "format", "modification");
+    register("最小化", "minify", "modification");
+    register("转义", "escape", "modification");
+    register("去转义", "unescape", "modification");
+    register("排序（顺序）", "sort", "modification");
+    register("排序（逆序）", "sortReverse", "modification");
+    register("URL转JSON", "urlToJSON", "modification");
+    register("关闭同步滚动", "toggleSyncScroll", "settings");
   }
 
   // 注册粘贴事件处理器
