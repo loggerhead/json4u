@@ -72,7 +72,19 @@ class EditorRef {
 
   // 文本发生变更时，清空 diff 高亮和 diffs 信息
   setText(text) {
-    this.editor.setValue(text);
+    // 避免 executeEdits 里面 null 导致的报错
+    this.editor.setSelection(new monaco.Range(0, 0, 0, 0));
+    // 全量替换成新文本
+    this.editor.executeEdits(null, [
+      {
+        text: text,
+        range: this.editor.getModel().getFullModelRange(),
+      },
+    ]);
+    // Indicates the above edit is a complete undo/redo change.
+    this.editor.pushUndoStop();
+
+    // 重置 diff 高亮状态
     this.clearDecorations();
     this.diffs = [];
     this.diffPosition = 0;
