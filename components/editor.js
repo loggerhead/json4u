@@ -16,7 +16,7 @@ import "monaco-editor/esm/vs/editor/contrib/symbolIcons/browser/symbolIcons.js";
 // NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
 loader.config({ monaco });
 
-export default function MyEditor({ height, editorRef, setAlert, adjustAfterCompare, doPair }) {
+export default function MyEditor({ height, editorRef, setAlert, setStatusText, adjustAfterCompare, doPair }) {
   return (
     <Editor
       language="json"
@@ -30,7 +30,7 @@ export default function MyEditor({ height, editorRef, setAlert, adjustAfterCompa
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = new EditorRef(editor, monaco, setAlert, adjustAfterCompare);
+        editorRef.current = new EditorRef(editor, monaco, setAlert, setStatusText, adjustAfterCompare);
         editorRef.current.init();
         doPair();
       }}
@@ -41,13 +41,15 @@ export default function MyEditor({ height, editorRef, setAlert, adjustAfterCompa
 }
 
 class EditorRef {
-  constructor(editor, monaco, setAlert, adjustAfterCompare) {
+  constructor(editor, monaco, setAlert, setStatusText, adjustAfterCompare) {
     // monaco editor 实例
     this.editor = editor;
     // monaco 实例
     this.monaco = monaco;
-    // 设置编辑器上方的 alert 信息
+    // 设置编辑器上方的 alert 文本
     this.setAlert = setAlert;
+    // 设置编辑器下方的 status bar 文本
+    this.setStatusText = setStatusText;
     // 完成比较后，对两边编辑器的位置做调整
     this.adjustAfterCompare = adjustAfterCompare;
     // 滚动中吗？
@@ -246,12 +248,12 @@ class EditorRef {
 
     if (diffs.length == 0) {
       msgs.push("两边没有差异");
-      colors.push("green");
+      colors.push("blue");
     } else {
       const delN = diffs.filter((d) => d.type == DEL)?.length;
       const insN = diffs.filter((d) => d.type == INS)?.length;
       msgs.push(`${delN} 删除，${insN} 新增`);
-      colors.push("blue");
+      colors.push("yellow");
     }
 
     const msg = msgs.join(" ");
@@ -441,7 +443,7 @@ class EditorRef {
       const loc = jsonc.getLocation(this.text(), offset);
 
       if (loc.path) {
-        this.setAlert({ msg: `${pointer.toPointer(loc.path)}`, color: "blue" });
+        this.setStatusText(pointer.toPointer(loc.path));
       }
     });
   }

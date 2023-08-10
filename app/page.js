@@ -2,14 +2,14 @@
 
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
-import styles from "./page.module.scss";
 import MyAlert from "../components/alert";
 import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
+import StatusBar from "../components/statusbar";
 import { FormatButton, MinifyButton, EscapeButton, UnescapeButton, CompareButton } from "../components/button";
 
-const editorHeight = "calc(100vh - 5rem)";
+const editorHeight = "calc(100vh - 6rem)";
 
 const MyEditor = dynamic(() => import("../components/editor"), {
   ssr: false,
@@ -18,6 +18,7 @@ const MyEditor = dynamic(() => import("../components/editor"), {
 
 export default function Home() {
   const [hidden, setHidden] = useState(0);
+  const [statusText, setStatusText] = useState("");
   const [leftAlert, setLeftAlert] = useState({ msg: "", color: "" });
   const [rightAlert, setRightAlert] = useState({ msg: "", color: "" });
   const leftContainerRef = useRef(null);
@@ -34,7 +35,7 @@ export default function Home() {
   };
 
   return (
-    <div className="gap-2 mx-5 my-2">
+    <div className="gap-2 mx-5 mt-2">
       <div className="flex">
         <div
           ref={leftContainerRef}
@@ -72,11 +73,12 @@ export default function Home() {
               </li>
             </ul>
           </div>
-          <div className={styles.editor}>
+          <div className="border border-solid border-color">
             <MyEditor
               height={editorHeight}
               editorRef={leftEditorRef}
               setAlert={setLeftAlert}
+              setStatusText={setStatusText}
               adjustAfterCompare={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
@@ -95,17 +97,19 @@ export default function Home() {
               <MyAlert props={rightAlert}></MyAlert>
             </li>
           </ul>
-          <div className={styles.editor}>
+          <div className="border border-solid border-color">
             <MyEditor
               height={editorHeight}
               editorRef={rightEditorRef}
               setAlert={setRightAlert}
+              setStatusText={setStatusText}
               adjustAfterCompare={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
           </div>
         </div>
       </div>
+      <StatusBar>{statusText}</StatusBar>
     </div>
   );
 }

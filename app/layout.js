@@ -1,6 +1,6 @@
 import Head from "next/head";
-import Link from "next/link";
 import Script from "next/script";
+import Footer from "../components/footer";
 import "./globals.css";
 
 const title = "JSON For You";
@@ -49,16 +49,7 @@ export default function RootLayout({ children }) {
       </Head>
       <body>
         <main>{children}</main>
-        <div className="my-3 text-center text-[12px]">
-          <a href="/">Json For You · </a>
-          <a href="https://beian.miit.gov.cn" target="_blank">
-            粤ICP备16007488号 ·{" "}
-          </a>
-          <Link prefetch={false} href="/guide">
-            使用指南 ·{" "}
-          </Link>
-          <a href="https://github.com/loggerhead/json4u-issue/issues">Feedback</a>
-        </div>
+        <Footer></Footer>
         <GoogleTagManagerBody></GoogleTagManagerBody>
       </body>
     </html>

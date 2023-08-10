@@ -7,11 +7,7 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      width: {
-        "calc-editor": "calc(100% - 360px)",
-      },
-    },
+    extend: {},
   },
   plugins: [require("daisyui"), require("@tailwindcss/typography")],
   daisyui: {
