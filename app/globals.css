@@ -26,6 +26,14 @@
   .alert-red {
     @apply my-alert text-red-900 bg-red-100;
   }
+
+  .border-color {
+    border-color: #c4c4c4;
+  }
+}
+
+.statusbar-color {
+  color: #0451a5;
 }
 
 .markdown-body {
