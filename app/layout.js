@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Script from "next/script";
 import Footer from "../components/footer";
-import "./globals.css";
+import "./globals.scss";
 
 const title = "JSON For You";
 const description =
