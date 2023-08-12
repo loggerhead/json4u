@@ -73,7 +73,7 @@ class EditorRef {
   }
 
   // 文本发生变更时，清空 diff 高亮和 diffs 信息
-  setText(text) {
+  setText(text, reset = true) {
     // 避免 executeEdits 里面 null 导致的报错
     this.editor.setSelection(new monaco.Range(0, 0, 0, 0));
     // 全量替换成新文本
@@ -86,7 +86,13 @@ class EditorRef {
     // Indicates the above edit is a complete undo/redo change.
     this.editor.pushUndoStop();
 
-    // 重置 diff 高亮状态
+    if (reset) {
+      this.resetDiffDecorations();
+    }
+  }
+
+  // 重置 diff 高亮状态
+  resetDiffDecorations() {
     this.clearDecorations();
     this.diffs = [];
     this.diffPosition = 0;
@@ -100,14 +106,10 @@ class EditorRef {
   // 校验 json valid
   validate(markers) {
     if (markers?.length > 0) {
-      const m = markers[0];
-      const props = {
-        msg: `JSON 解析错误：第 ${m.startLineNumber} 行，第 ${m.startColumn} 列`,
-        color: "red",
-      };
-      this.setAlert(props);
+      const { startLineNumber, startColumn } = markers[0];
+      this.setAlert(`<red>JSON 解析错误：第 ${startLineNumber} 行，第 ${startColumn} 列</red>`);
     } else {
-      this.setAlert({});
+      this.setAlert("");
     }
   }
 
@@ -136,13 +138,20 @@ class EditorRef {
   }
 
   minify() {
-    try {
-      const obj = JSON.parse(this.text());
-      const text = JSON.stringify(obj, null, 0);
-      this.setText(text);
-    } catch (e) {
-      this.setAlert({ msg: `最小化失败：${e}`, color: "red" });
+    let text = this.text();
+    const [node, errors] = parser.parseJSON(text);
+
+    if (errors?.length) {
+      this.setAlert(`<yellow>无效 JSON，尝试最小化：${errors}</yellow>`);
     }
+
+    if (node?.length == text.length || !errors?.length) {
+      text = node.stringify();
+    } else {
+      text = text.replace(/\s/g, "");
+    }
+
+    this.setText(text);
   }
 
   escape() {
@@ -182,13 +191,13 @@ class EditorRef {
     const rtext = this.rightEditor.text();
 
     // 进行比较
-    let { diffs, isTextCompare } = semanticCompare(ltext, rtext);
+    let { diffs, isTextCompare, errors } = semanticCompare(ltext, rtext);
     const [delDiffs, insDiffs] = Diff.classify(diffs);
     this.leftEditor.diffs = delDiffs;
     this.rightEditor.diffs = insDiffs;
 
     // 高亮 diff
-    this.showResultMsg(diffs, isTextCompare);
+    this.showResultMsg(diffs, isTextCompare, errors);
     this.highlight(this.leftEditor, this.rightEditor, diffs);
     this.adjustAfterCompare();
 
@@ -237,28 +246,22 @@ class EditorRef {
   }
 
   // 提示用户差异数量
-  showResultMsg(diffs, isTextCompare) {
-    let msgs = [];
-    let colors = [];
+  showResultMsg(diffs, isTextCompare, errors) {
+    const msgs = [];
 
     if (isTextCompare) {
-      msgs.push("无效 JSON，进行文本比较。");
-      colors.push("yellow");
+      msgs.push("<yellow>无效 JSON，进行文本比较。</yellow>");
     }
 
     if (diffs.length == 0) {
-      msgs.push("两边没有差异");
-      colors.push("blue");
+      msgs.push("<blue>两边没有差异</blue>");
     } else {
       const delN = diffs.filter((d) => d.type == DEL)?.length;
       const insN = diffs.filter((d) => d.type == INS)?.length;
-      msgs.push(`${delN} 删除，${insN} 新增`);
-      colors.push("yellow");
+      msgs.push(`<yellow>${delN} 删除，${insN} 新增</yellow>`);
     }
 
-    const msg = msgs.join(" ");
-    const c = color.max(colors);
-    this.setAlert({ msg: msg, color: c });
+    this.setAlert(msgs.join(" "));
   }
 
   // 高亮

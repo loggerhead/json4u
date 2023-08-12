@@ -19,8 +19,8 @@ const MyEditor = dynamic(() => import("../components/editor"), {
 export default function Home() {
   const [hidden, setHidden] = useState(0);
   const [statusText, setStatusText] = useState("");
-  const [leftAlert, setLeftAlert] = useState({ msg: "", color: "" });
-  const [rightAlert, setRightAlert] = useState({ msg: "", color: "" });
+  const [leftAlert, setLeftAlert] = useState("");
+  const [rightAlert, setRightAlert] = useState("");
   const leftContainerRef = useRef(null);
   const rightContainerRef = useRef(null);
   const leftEditorRef = useRef(null);
@@ -58,7 +58,7 @@ export default function Home() {
                 <UnescapeButton editorRef={leftEditorRef}></UnescapeButton>
               </li>
               <li>
-                <MyAlert props={leftAlert}></MyAlert>
+                <MyAlert richText={leftAlert}></MyAlert>
               </li>
             </ul>
             <ul className="flex right">
@@ -94,7 +94,7 @@ export default function Home() {
               <CompareButton editorRef={rightEditorRef}></CompareButton>
             </li>
             <li>
-              <MyAlert props={rightAlert}></MyAlert>
+              <MyAlert richText={rightAlert}></MyAlert>
             </li>
           </ul>
           <div className="border border-solid border-color">

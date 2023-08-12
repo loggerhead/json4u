@@ -7,24 +7,20 @@
     @apply btn btn-xs	btn-outline rounded normal-case;
   }
 
-  .my-alert {
-    @apply px-2 py-0.5 text-sm rounded w-fit;
-  }
-
   .alert-blue {
-    @apply my-alert text-blue-900 bg-blue-100;
+    @apply text-blue-900 bg-blue-100;
   }
 
   .alert-green {
-    @apply my-alert text-green-900 bg-green-100;
+    @apply text-green-900 bg-green-100;
   }
 
   .alert-yellow {
-    @apply my-alert text-yellow-900 bg-yellow-100;
+    @apply text-yellow-900 bg-yellow-100;
   }
 
   .alert-red {
-    @apply my-alert text-red-900 bg-red-100;
+    @apply text-red-900 bg-red-100;
   }
 
   .border-color {
@@ -48,6 +44,12 @@
 
 /* 以下部分需要同步修改 lib/color.js */
 /* 增加透明度以 fix 选中区分背景色不变的问题：https://github.com/Microsoft/monaco-editor/issues/902 */
+$hl-red: rgba(251, 108, 108, 0.5);
+
+.alert-hl-red {
+  background-color: $hl-red;
+}
+
 .line-del {
   background-color: rgba(252, 165, 165, 0.3);
 }
@@ -57,7 +59,7 @@
 }
 
 .inline-del {
-  background-color: rgba(251, 108, 108, 0.5);
+  background-color: $hl-red;
 }
 
 .inline-ins {
