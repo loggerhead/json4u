@@ -64,15 +64,17 @@ class EditorRef {
     this.diffPosition = 0;
   }
 
+  // 获取 monaco.editor.model
   model() {
     return this.editor.getModel();
   }
 
+  // 获取 monaco.editor.value
   text() {
     return this.editor.getValue();
   }
 
-  // 文本发生变更时，清空 diff 高亮和 diffs 信息
+  // 设置 monaco.editor.value。文本发生变更时，清空 diff 高亮和 diffs 信息
   setText(text, reset = true) {
     // 避免 executeEdits 里面 null 导致的报错
     this.editor.setSelection(new monaco.Range(0, 0, 0, 0));
@@ -98,6 +100,7 @@ class EditorRef {
     this.diffPosition = 0;
   }
 
+  // 生成 monaco.Range
   range(offset, length) {
     const model = this.model();
     return monaco.Range.fromPositions(model.getPositionAt(offset), model.getPositionAt(offset + length));
@@ -113,30 +116,12 @@ class EditorRef {
     }
   }
 
-  scrollable() {
-    return this.scrolling && this.enableSyncScroll;
-  }
-
-  toggleSyncScroll() {
-    this.leftEditor.enableSyncScroll = !this.enableSyncScroll;
-    this.rightEditor.enableSyncScroll = !this.enableSyncScroll;
-    this.leftEditor.updateToggleSyncScrollMenu();
-    this.rightEditor.updateToggleSyncScrollMenu();
-  }
-
-  updateToggleSyncScrollMenu() {
-    const action = this.menuItems.get("toggleSyncScroll");
-    const label = this.enableSyncScroll ? "关闭同步滚动" : "打开同步滚动";
-    // 删除之前的菜单项，再创建新的菜单项
-    action.disposable.dispose();
-    this.registerMenuItem(label, "toggleSyncScroll", "modification", action.order);
-  }
-
-  // 格式化，并返回格式化后的文本。支持格式化非 JSON 字符串
+  // 格式化
   format() {
     this.setText(format.format(this.text()));
   }
 
+  // 最小化
   minify() {
     let text = this.text();
     const [node, errors] = parser.parseJSON(text);
@@ -154,6 +139,7 @@ class EditorRef {
     this.setText(text);
   }
 
+  // 对 JSON 字符串做转义
   escape() {
     const text = this.text()
       .replace(/[\\]/g, "\\\\")
@@ -167,6 +153,7 @@ class EditorRef {
     this.setText(text);
   }
 
+  // 对 JSON 字符串做反转义
   unescape() {
     const text = this.text()
       .replace(/[\\]n/g, "\n")
@@ -186,6 +173,7 @@ class EditorRef {
     this.setText(format.format(text));
   }
 
+  // 对两侧文本做语义化比较
   compare() {
     const ltext = this.leftEditor.text();
     const rtext = this.rightEditor.text();
@@ -206,23 +194,24 @@ class EditorRef {
     this.rightEditor.scrollToDiff(insDiffs[0]);
   }
 
-  // 滚动到上一个差异
-  scrollToPrevDiff() {
+  // 跳转到上一个差异
+  jumpToPrevDiff() {
     if (--this.diffPosition < 0) {
       this.diffPosition = this.diffs.length - 1;
     }
-    this.scrollToDiff(this.diffs[this.diffPosition]);
+    this.jumpToDiff(this.diffs[this.diffPosition]);
   }
 
-  // 滚动到下一个差异
-  scrollToNextDiff() {
+  // 跳转到下一个差异
+  jumpToNextDiff() {
     if (++this.diffPosition > this.diffs.length - 1) {
       this.diffPosition = 0;
     }
-    this.scrollToDiff(this.diffs[this.diffPosition]);
+    this.jumpToDiff(this.diffs[this.diffPosition]);
   }
 
-  scrollToDiff(diff) {
+  // 跳转到指定差异
+  jumpToDiff(diff) {
     if (diff) {
       const range = this.range(diff.offset, 1);
       const lineNumber = range.startLineNumber;
@@ -230,6 +219,7 @@ class EditorRef {
     }
   }
 
+  // 对 JSON 按 key 升序排序
   sort(reverse = false) {
     let text = this.text();
     const [tree, errors] = parser.parseJSON(text);
@@ -241,6 +231,7 @@ class EditorRef {
     }
   }
 
+  // 对 JSON 按 key 降序排序
   sortReverse() {
     this.sort(true);
   }
@@ -295,11 +286,13 @@ class EditorRef {
     }
   }
 
+  // 将两侧编辑器互相关联
   pair(leftEditor, rightEditor) {
     this.leftEditor = leftEditor;
     this.rightEditor = rightEditor;
   }
 
+  // 编辑器初始化
   init() {
     // 注入引用到编辑器，供 registerMenuItems 使用
     this.editor._ref = this;
@@ -314,41 +307,7 @@ class EditorRef {
     return this;
   }
 
-  scrollTo(e) {
-    if (e.scrollTopChanged || e.scrollLeftChanged) {
-      this.editor.setScrollTop(e.scrollTop);
-      this.editor.setScrollLeft(e.scrollLeft);
-    }
-  }
-
-  // 监听 focus 事件以支持同步滚动
-  registerOnFocus() {
-    const self = this;
-
-    this.editor.onDidFocusEditorText((e) => {
-      self.scrolling = true;
-
-      if (self === self.leftEditor && self.rightEditor) {
-        self.rightEditor.scrolling = false;
-      } else if (self === self.rightEditor && self.leftEditor) {
-        self.leftEditor.scrolling = false;
-      }
-    });
-  }
-
-  // 监听滚动事件实现同步滚动
-  registerOnScroll() {
-    const self = this;
-
-    this.editor.onDidScrollChange((e) => {
-      if (self.scrollable() && self === self.leftEditor) {
-        self.rightEditor?.scrollTo(e);
-      } else if (self.scrollable() && self === self.rightEditor) {
-        self.leftEditor?.scrollTo(e);
-      }
-    });
-  }
-
+  // 注册右键菜单项
   registerMenuItem(name, fnName, groupName, order, keybindings = []) {
     const item = {
       id: fnName,
@@ -371,6 +330,7 @@ class EditorRef {
     this.menuItems.set(fnName, item);
   }
 
+  // 注册所有的右键菜单项
   // NOTICE: 删除不了内置的菜单项：https://github.com/microsoft/monaco-editor/issues/1567
   registerMenuItems() {
     const register = (() => {
@@ -380,8 +340,8 @@ class EditorRef {
       };
     })();
 
-    register("上一个差异", "scrollToPrevDiff", "navigation", [monaco.KeyMod.Alt | monaco.KeyCode.KeyP]);
-    register("下一个差异", "scrollToNextDiff", "navigation", [monaco.KeyMod.Alt | monaco.KeyCode.KeyN]);
+    register("上一个差异", "jumpToPrevDiff", "navigation", [monaco.KeyMod.Alt | monaco.KeyCode.KeyP]);
+    register("下一个差异", "jumpToNextDiff", "navigation", [monaco.KeyMod.Alt | monaco.KeyCode.KeyN]);
     register("格式化", "format", "modification");
     register("最小化", "minify", "modification");
     register("转义", "escape", "modification");
@@ -449,6 +409,64 @@ class EditorRef {
         this.setStatusText(pointer.toPointer(loc.path));
       }
     });
+  }
+
+  // 监听 focus 事件以支持同步滚动
+  registerOnFocus() {
+    const self = this;
+
+    this.editor.onDidFocusEditorText((e) => {
+      self.scrolling = true;
+
+      if (self === self.leftEditor && self.rightEditor) {
+        self.rightEditor.scrolling = false;
+      } else if (self === self.rightEditor && self.leftEditor) {
+        self.leftEditor.scrolling = false;
+      }
+    });
+  }
+
+  // 监听滚动事件实现同步滚动
+  registerOnScroll() {
+    const self = this;
+
+    this.editor.onDidScrollChange((e) => {
+      if (self.scrollable() && self === self.leftEditor) {
+        self.rightEditor?.scrollTo(e);
+      } else if (self.scrollable() && self === self.rightEditor) {
+        self.leftEditor?.scrollTo(e);
+      }
+    });
+  }
+
+  // 滚动到指定位置（类似鼠标滚动）
+  scrollTo(e) {
+    if (e.scrollTopChanged || e.scrollLeftChanged) {
+      this.editor.setScrollTop(e.scrollTop);
+      this.editor.setScrollLeft(e.scrollLeft);
+    }
+  }
+
+  // 可以滚动吗？
+  scrollable() {
+    return this.scrolling && this.enableSyncScroll;
+  }
+
+  // 打开或关闭同步滚动
+  toggleSyncScroll() {
+    this.leftEditor.enableSyncScroll = !this.enableSyncScroll;
+    this.rightEditor.enableSyncScroll = !this.enableSyncScroll;
+    this.leftEditor.updateToggleSyncScrollMenu();
+    this.rightEditor.updateToggleSyncScrollMenu();
+  }
+
+  // 更新「打开/关闭同步滚动」右键菜单项的文案
+  updateToggleSyncScrollMenu() {
+    const action = this.menuItems.get("toggleSyncScroll");
+    const label = this.enableSyncScroll ? "关闭同步滚动" : "打开同步滚动";
+    // 删除之前的菜单项，再创建新的菜单项
+    action.disposable.dispose();
+    this.registerMenuItem(label, "toggleSyncScroll", "modification", action.order);
   }
 
   // 生成高亮的装饰
