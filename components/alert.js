@@ -21,7 +21,14 @@ export default function MyAlert({ richText }) {
   }, [richText, prevAlert]);
 
   const { msg } = alert;
-  const node = typeof DOMParser ? new DOMParser().parseFromString(msg, "text/xml") : null;
+  let node =
+    typeof window != "undefined" && typeof DOMParser != "undefined"
+      ? new DOMParser().parseFromString(msg, "text/xml")
+      : undefined;
+  // 如果解析失败
+  if (node?.querySelector("parsererror")) {
+    node = undefined;
+  }
 
   return (
     <div className={`text-sm rounded ${msg?.length ? "" : "hidden"}`}>
@@ -30,6 +37,7 @@ export default function MyAlert({ richText }) {
   );
 }
 
+// 根据 dom 树生成 span 树
 function SpanNode({ node, level }) {
   // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
   if (node.nodeType === Node.DOCUMENT_NODE) {

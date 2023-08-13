@@ -1,3 +1,4 @@
+import { StrictMode } from "react";
 import Head from "next/head";
 import Script from "next/script";
 import Footer from "../components/footer";
@@ -43,16 +44,18 @@ export function generateMetadata({ params, searchParams }, parent) {
 
 export default function RootLayout({ children }) {
   return (
-    <html>
-      <Head>
-        <GoogleTagManagerHead></GoogleTagManagerHead>
-      </Head>
-      <body>
-        <main>{children}</main>
-        <Footer></Footer>
-        <GoogleTagManagerBody></GoogleTagManagerBody>
-      </body>
-    </html>
+    <StrictMode>
+      <html>
+        <Head>
+          <GoogleTagManagerHead></GoogleTagManagerHead>
+        </Head>
+        <body>
+          <main>{children}</main>
+          <Footer></Footer>
+          <GoogleTagManagerBody></GoogleTagManagerBody>
+        </body>
+      </html>
+    </StrictMode>
   );
 }
 
