@@ -108,12 +108,9 @@ class EditorRef {
 
   // 校验 json valid
   validate(markers) {
-    if (markers?.length > 0) {
-      const { startLineNumber, startColumn } = markers[0];
-      this.setAlert(`<red>JSON 解析错误：第 ${startLineNumber} 行，第 ${startColumn} 列</red>`);
-    } else {
-      this.setAlert("");
-    }
+    const [node, errors] = parser.parseJSON(this.text());
+    const errmsg = this.genErrorAlert(errors);
+    this.setAlert(errmsg);
   }
 
   // 格式化
@@ -125,9 +122,10 @@ class EditorRef {
   minify() {
     let text = this.text();
     const [node, errors] = parser.parseJSON(text);
+    const errmsg = this.genErrorAlert(errors);
 
-    if (errors?.length) {
-      this.setAlert(`<yellow>无效 JSON，尝试最小化：${errors}</yellow>`);
+    if (errmsg) {
+      this.setAlert(errmsg);
     }
 
     if (node?.length == text.length || !errors?.length) {
@@ -190,8 +188,8 @@ class EditorRef {
     this.adjustAfterCompare();
 
     // 滚动到第一个 diff
-    this.leftEditor.scrollToDiff(delDiffs[0]);
-    this.rightEditor.scrollToDiff(insDiffs[0]);
+    this.leftEditor.jumpToDiff(delDiffs[0]);
+    this.rightEditor.jumpToDiff(insDiffs[0]);
   }
 
   // 跳转到上一个差异
@@ -239,9 +237,13 @@ class EditorRef {
   // 提示用户差异数量
   showResultMsg(diffs, isTextCompare, errors) {
     const msgs = [];
+    const errmsg = this.genErrorAlert(errors);
+    if (errmsg) {
+      msgs.push(errmsg);
+    }
 
     if (isTextCompare) {
-      msgs.push("<yellow>无效 JSON，进行文本比较。</yellow>");
+      msgs.push("<yellow>进行文本比较。</yellow>");
     }
 
     if (diffs.length == 0) {
@@ -467,6 +469,18 @@ class EditorRef {
     // 删除之前的菜单项，再创建新的菜单项
     action.disposable.dispose();
     this.registerMenuItem(label, "toggleSyncScroll", "modification", action.order);
+  }
+
+  // 生成 JSON 解析错误时的提示文案
+  genErrorAlert(errors) {
+    if (!errors?.length) {
+      return "";
+    }
+
+    const { offset, length, contextTexts } = errors[0];
+    const [left, middle, right] = contextTexts;
+    const { startLineNumber, startColumn } = this.range(offset, length);
+    return `<red>${startLineNumber} 行 ${startColumn} 列解析错误: ${left}<hl-red>${middle}</hl-red>${right}</red>`;
   }
 
   // 生成高亮的装饰
