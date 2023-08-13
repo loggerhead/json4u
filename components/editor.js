@@ -175,6 +175,10 @@ class EditorRef {
 
   // 对两侧文本做语义化比较
   compare() {
+    // 清除上一次的提示
+    this.leftEditor.setAlert("");
+    this.rightEditor.setAlert("");
+
     const ltext = this.leftEditor.text();
     const rtext = this.rightEditor.text();
 
