@@ -2,7 +2,7 @@
 import { useRef, useMemo } from "react";
 
 // 需要将枚举值定义出来，否则编译器不知道使用了哪些 class，就不会编译，导致样式不生效
-const _ = ["alert-blue", "alert-green", "alert-yellow", "alert-red"];
+const _ = ["alert-blue", "alert-green", "alert-yellow", "alert-red", "alert-hl-red"];
 // 组件两次间隔不到 100ms 时，不更新组件
 const minUpdateInterval = 100;
 
@@ -21,27 +21,33 @@ export default function MyAlert({ richText }) {
   }, [richText, prevAlert]);
 
   const { msg } = alert;
-  const parts = msg
-    .split(/<\/\w+>/)
-    .filter((s) => s.length)
-    .map((s) => {
-      const m = [...s.matchAll(/<(\w+)>(.*)/g)][0];
-      return m ? [m[1], m[2]] : ["", s];
-    });
+  const node = typeof DOMParser ? new DOMParser().parseFromString(msg, "text/xml") : null;
 
   return (
     <div className={`text-sm rounded ${msg?.length ? "" : "hidden"}`}>
-      {parts.map((part, i) => {
-        const [color, msg] = part;
-        const pl = i === 0 ? "pl-2 " : "";
-        const pr = i === parts.length - 1 ? "pr-2" : "";
-
-        return (
-          <span key={i} className={`py-[3px] ${pl} ${pr} alert-${color}`}>
-            {msg}
-          </span>
-        );
-      })}
+      {node ? <SpanNode key={`00`} node={node} level={0}></SpanNode> : <></>}
     </div>
+  );
+}
+
+function SpanNode({ node, level }) {
+  // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+  if (node.nodeType === Node.DOCUMENT_NODE) {
+    node = node.childNodes[0];
+  }
+  const color = node.nodeName;
+
+  return (
+    <span key={`${level}0`} className={`py-[3px] ${level === 0 ? "px-2" : ""} alert-${color}`}>
+      {Array.from(node?.childNodes).map((node, i) => {
+        const key = `${level}${i + 1}`;
+
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          return <SpanNode key={key} node={node} level={level + 1}></SpanNode>;
+        } else {
+          return <span key={key}>{node.textContent}</span>;
+        }
+      })}
+    </span>
   );
 }
