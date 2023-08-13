@@ -62,6 +62,8 @@ class EditorRef {
     this.diffs = [];
     // 查看上一个差异或下一个差异时，记录的 diff 下标
     this.diffPosition = 0;
+    // 上一次编辑器生成的装饰集合
+    this.previousDecorations = null;
   }
 
   // 获取 monaco.editor.model
@@ -532,14 +534,11 @@ class EditorRef {
   // 应用装饰
   applyDecorations(decorations) {
     this.clearDecorations();
-    return this.editor.createDecorationsCollection(decorations);
+    this.previousDecorations = this.editor.createDecorationsCollection(decorations);
   }
 
-  // 清空装饰
+  // 清空装饰。NOTICE: 不能使用 model.getAllDecorations 全删了，会导致折叠按钮消失
   clearDecorations() {
-    const ids = this.model()
-      .getAllDecorations()
-      .map((d) => d.id);
-    return this.editor.deltaDecorations(ids, []);
+    this.previousDecorations?.clear();
   }
 }
