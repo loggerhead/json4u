@@ -35,7 +35,9 @@ const nextConfig = {
 };
 
 if (process.env.NEXT_BUILD === "vercel") {
+  console.log("enable vercel build.");
   nextConfig.output = undefined;
+  nextConfig.distDir = undefined;
 }
 
 // 支持 posts 目录下 markdown 文件的编译
