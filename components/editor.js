@@ -9,6 +9,7 @@ import * as pointer from "../lib/pointer";
 import { semanticCompare, Diff, DEL, INS } from "../lib/diff";
 import * as parser from "../lib/parser";
 import Loading from "../components/loading";
+import PlaceholderContentWidget from "../lib/placeholder-widget";
 // 查询框的 icon 图标以及折叠图标
 import "monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles";
 import "monaco-editor/esm/vs/editor/contrib/symbolIcons/browser/symbolIcons.js";
@@ -298,13 +299,27 @@ class EditorRef {
   pair(leftEditor, rightEditor) {
     this.leftEditor = leftEditor;
     this.rightEditor = rightEditor;
+
+    let lines;
+    if (this === this.leftEditor) {
+      lines = [
+        "- 输入自动触发 JSON 校验",
+        "- 支持拖拽上传文件",
+        "- 粘贴自动触发格式化",
+        "- Cmd+Z 撤销，复原成原始文本",
+        "- 更多功能点击右键菜单",
+      ];
+    } else if (this === this.rightEditor) {
+      lines = ["- 粘贴自动触发比较", "- 比较后触发左右窗口平分", "- 拖动左侧可调整窗口大小"];
+    }
+
+    new PlaceholderContentWidget(this.editor, lines);
   }
 
   // 编辑器初始化
   init() {
     // 注入引用到编辑器，供 registerMenuItems 使用
     this.editor._ref = this;
-
     this.registerOnPaste();
     this.registerAutoShowMinimap();
     this.registerDropFileHandler();
