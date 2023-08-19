@@ -34,6 +34,10 @@ const nextConfig = {
   },
 };
 
+if (process.env.NEXT_BUILD === "vercel") {
+  nextConfig.output = undefined;
+}
+
 // 支持 posts 目录下 markdown 文件的编译
 const withMDX = require("@next/mdx")({
   options: {
