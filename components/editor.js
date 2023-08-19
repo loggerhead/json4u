@@ -29,7 +29,7 @@ export default function MyEditor({ height, editorRef, setAlert, setStatusText, a
         doPair();
       }}
       onValidate={(markers) => editorRef.current.validate(markers)}
-      onChange={() => editorRef.current.clearDecorations()}
+      onChange={() => editorRef.current.onChange()}
     />
   );
 }
