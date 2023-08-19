@@ -305,13 +305,14 @@ class EditorRef {
       const text = format.tryFormat(this.text());
       this.setText(text);
 
-      // 当左右两侧编辑器都有内容时，才进行比较
-      if (this.leftEditor?.text().length && this.rightEditor?.text().length) {
-        this.compare();
-      }
-
-      // 如果是右侧编辑器粘贴文本，展开右侧编辑器
+      // 如果是右侧编辑器粘贴文本
       if (this === this.rightEditor) {
+        // 当左右两侧编辑器都不为空时，进行比较
+        if (this.leftEditor?.text().length && this.rightEditor?.text().length) {
+          this.compare();
+        }
+
+        // 展开右侧编辑器
         this.adjustWidth();
       }
     }
