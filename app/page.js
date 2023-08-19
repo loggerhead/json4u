@@ -18,7 +18,8 @@ const MyEditor = dynamic(() => import("../components/editor"), {
 
 export default function Home() {
   const [hidden, setHidden] = useState(0);
-  const [statusText, setStatusText] = useState("");
+  const [leftStatusText, setLeftStatusText] = useState("");
+  const [rightStatusText, setRightStatusText] = useState("");
   const [leftAlert, setLeftAlert] = useState("");
   const [rightAlert, setRightAlert] = useState("");
   const leftContainerRef = useRef(null);
@@ -78,7 +79,7 @@ export default function Home() {
               height={editorHeight}
               editorRef={leftEditorRef}
               setAlert={setLeftAlert}
-              setStatusText={setStatusText}
+              setStatusText={setLeftStatusText}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
@@ -102,14 +103,14 @@ export default function Home() {
               height={editorHeight}
               editorRef={rightEditorRef}
               setAlert={setRightAlert}
-              setStatusText={setStatusText}
+              setStatusText={setRightStatusText}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
           </div>
         </div>
       </div>
-      <StatusBar>{statusText}</StatusBar>
+      <StatusBar leftText={leftStatusText} rightText={rightStatusText}></StatusBar>
     </div>
   );
 }
