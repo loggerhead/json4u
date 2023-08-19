@@ -257,4 +257,24 @@ describe("semanticCompare", () => {
       );
     });
   });
+
+  describe("bug cases", () => {
+    test("highlight error", () => {
+      expectEq(
+        `{
+    "null": "nul check",
+    "num": 1
+}`,
+        `{
+    "null": null,
+    "num": 1
+}`,
+        [
+          new diff.Diff(14, 1, diff.DEL, false),
+          new diff.Diff(18, 7, diff.DEL, false),
+          new diff.Diff(17, 1, diff.INS, false),
+        ]
+      );
+    });
+  });
 });

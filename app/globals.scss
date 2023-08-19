@@ -44,14 +44,15 @@
 
 /* 以下部分需要同步修改 lib/color.js */
 /* 增加透明度以 fix 选中区分背景色不变的问题：https://github.com/Microsoft/monaco-editor/issues/902 */
-$hl-red: rgba(251, 108, 108, 0.5);
+$fg-red: rgba(251, 108, 108, 0.5);
+$bg-red: rgba(252, 165, 165, 0.3);
 
-.alert-hl-red {
-  background-color: $hl-red;
+.alert-fg-red {
+  background-color: $fg-red;
 }
 
 .line-del {
-  background-color: rgba(252, 165, 165, 0.3);
+  background-color: $bg-red;
 }
 
 .line-ins {
@@ -59,7 +60,7 @@ $hl-red: rgba(251, 108, 108, 0.5);
 }
 
 .inline-del {
-  background-color: $hl-red;
+  background-color: $fg-red;
 }
 
 .inline-ins {
