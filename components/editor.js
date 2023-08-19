@@ -96,6 +96,26 @@ class EditorRef {
     }
   }
 
+  alert(text, isCompare = false) {
+    if (!text) {
+      return;
+    }
+
+    const reTag = /<\/?\w+>/g;
+    // 计算需要展示的背景色
+    const colors = [...text.matchAll(reTag)].map((tag) =>
+      tag.toString().replace("<", "").replace(">", "").replace("/", "")
+    );
+    const tagColor = color.max(colors);
+    // 将背景色 tag 全删除（保留高亮 tag）
+    text = text.replace(reTag, "");
+    // 生成前缀
+    const prefix = isCompare ? "" : this === this.leftEditor ? "左侧" : "右侧";
+    text = `<${tagColor}>${prefix}${text}</${tagColor}>`;
+    const editor = isCompare ? this.rightEditor : this.leftEditor;
+    editor.setAlert(text);
+  }
+
   // 重置 diff 高亮状态
   resetDiffDecorations() {
     this.clearDecorations();
@@ -113,7 +133,7 @@ class EditorRef {
   validate(markers) {
     const [node, errors] = parser.parseJSON(this.text());
     const errmsg = this.genErrorAlert(errors);
-    this.setAlert(errmsg);
+    this.alert(errmsg);
   }
 
   // 格式化
@@ -128,7 +148,7 @@ class EditorRef {
     const errmsg = this.genErrorAlert(errors);
 
     if (errmsg) {
-      this.setAlert(errmsg);
+      this.alert(errmsg);
     }
 
     if (node?.length == text.length || !errors?.length) {
@@ -176,10 +196,6 @@ class EditorRef {
 
   // 对两侧文本做语义化比较
   compare() {
-    // 清除上一次的提示
-    this.leftEditor.setAlert("");
-    this.rightEditor.setAlert("");
-
     const ltext = this.leftEditor.text();
     const rtext = this.rightEditor.text();
 
@@ -243,14 +259,15 @@ class EditorRef {
 
   // 提示用户差异数量
   showResultMsg(diffs, isTextCompare, errors) {
-    const msgs = [];
     const errmsg = this.genErrorAlert(errors);
     if (errmsg) {
-      msgs.push(errmsg);
+      this.alert(errmsg);
     }
 
+    const msgs = [];
+
     if (isTextCompare) {
-      msgs.push("<yellow>进行文本比较。</yellow>");
+      msgs.push("<yellow>进行文本比较</yellow>");
     }
 
     if (diffs.length == 0) {
@@ -261,7 +278,8 @@ class EditorRef {
       msgs.push(`<yellow>${delN} 删除，${insN} 新增</yellow>`);
     }
 
-    this.setAlert(msgs.join(" "));
+    const msg = msgs.join("。");
+    this.alert(msg, true);
   }
 
   // 高亮
@@ -501,7 +519,7 @@ class EditorRef {
     const { offset, length, contextTexts } = errors[0];
     const [left, middle, right] = contextTexts;
     const { startLineNumber, startColumn } = this.range(offset, length);
-    return `<red>${startLineNumber} 行 ${startColumn} 列解析错误: ${left}<hl-red>${middle}</hl-red>${right}</red>`;
+    return `<red>${startLineNumber}行${startColumn}列解析错误: ${left}<hl-red>${middle}</hl-red>${right}</red>`;
   }
 
   // 生成高亮的装饰

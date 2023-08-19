@@ -25,8 +25,13 @@ export default function MyAlert({ richText }) {
     typeof window != "undefined" && typeof DOMParser != "undefined"
       ? new DOMParser().parseFromString(msg, "text/xml")
       : undefined;
+  const err = node?.querySelector("parsererror");
+
   // 如果解析失败
-  if (node?.querySelector("parsererror")) {
+  if (err) {
+    if (err && msg) {
+      console.error(`解析提示文案失败:\n\n${msg}\n\n`, err?.textContent);
+    }
     node = undefined;
   }
 
