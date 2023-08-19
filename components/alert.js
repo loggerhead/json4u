@@ -1,26 +1,24 @@
 "use client";
-import { useRef, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 // 需要将枚举值定义出来，否则编译器不知道使用了哪些 class，就不会编译，导致样式不生效
 const _ = ["alert-blue", "alert-green", "alert-yellow", "alert-red", "alert-hl-red"];
-// 组件两次间隔不到 100ms 时，不更新组件
-const minUpdateInterval = 100;
 
 export default function MyAlert({ richText }) {
-  const prevAlert = useRef({ msg: "", time: 0 });
+  const [msg, setMsg] = useState("");
 
-  const alert = useMemo(() => {
-    const now = Date.now();
-    const { time } = prevAlert.current;
+  // 防抖：https://www.ruanyifeng.com/blog/2020/09/react-hooks-useeffect-tutorial.html
+  useEffect(() => {
+    const timerID = setTimeout(() => {
+      setMsg(richText);
+    }, 100);
 
-    if (now - time > minUpdateInterval) {
-      prevAlert.current = { msg: richText, time: now };
-    }
+    // 下次渲染
+    return () => {
+      clearTimeout(timerID);
+    };
+  }, [richText, setMsg]);
 
-    return prevAlert.current;
-  }, [richText, prevAlert]);
-
-  const { msg } = alert;
   let node =
     typeof window != "undefined" && typeof DOMParser != "undefined"
       ? new DOMParser().parseFromString(msg, "text/xml")
