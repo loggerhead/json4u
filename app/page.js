@@ -79,7 +79,7 @@ export default function Home() {
               editorRef={leftEditorRef}
               setAlert={setLeftAlert}
               setStatusText={setStatusText}
-              adjustAfterCompare={() => setHidden(false)}
+              adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
           </div>
@@ -103,7 +103,7 @@ export default function Home() {
               editorRef={rightEditorRef}
               setAlert={setRightAlert}
               setStatusText={setStatusText}
-              adjustAfterCompare={() => setHidden(false)}
+              adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
           </div>

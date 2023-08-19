@@ -17,7 +17,7 @@ import "monaco-editor/esm/vs/editor/contrib/symbolIcons/browser/symbolIcons.js";
 // NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
 loader.config({ monaco });
 
-export default function MyEditor({ height, editorRef, setAlert, setStatusText, adjustAfterCompare, doPair }) {
+export default function MyEditor({ height, editorRef, setAlert, setStatusText, adjustWidth, doPair }) {
   return (
     <Editor
       language="json"
@@ -31,7 +31,7 @@ export default function MyEditor({ height, editorRef, setAlert, setStatusText, a
         minimap: { enabled: false },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = new EditorRef(editor, monaco, setAlert, setStatusText, adjustAfterCompare);
+        editorRef.current = new EditorRef(editor, monaco, setAlert, setStatusText, adjustWidth);
         editorRef.current.init();
         doPair();
       }}
@@ -42,7 +42,7 @@ export default function MyEditor({ height, editorRef, setAlert, setStatusText, a
 }
 
 class EditorRef {
-  constructor(editor, monaco, setAlert, setStatusText, adjustAfterCompare) {
+  constructor(editor, monaco, setAlert, setStatusText, adjustWidth) {
     // monaco editor 实例
     this.editor = editor;
     // monaco 实例
@@ -52,7 +52,7 @@ class EditorRef {
     // 设置编辑器下方的 status bar 文本
     this.setStatusText = setStatusText;
     // 完成比较后，对两边编辑器的位置做调整
-    this.adjustAfterCompare = adjustAfterCompare;
+    this.adjustWidth = adjustWidth;
     // 滚动中吗？
     this.scrolling = false;
     // 启用同步滚动？
@@ -208,7 +208,6 @@ class EditorRef {
     // 高亮 diff
     this.showResultMsg(diffs, isTextCompare, errors);
     this.highlight(this.leftEditor, this.rightEditor, diffs);
-    this.adjustAfterCompare();
 
     // 滚动到第一个 diff
     this.leftEditor.jumpToDiff(delDiffs[0]);
@@ -310,6 +309,11 @@ class EditorRef {
       if (this.leftEditor?.text().length && this.rightEditor?.text().length) {
         this.compare();
       }
+
+      // 如果是右侧编辑器粘贴文本，展开右侧编辑器
+      if (this === this.rightEditor) {
+        this.adjustWidth();
+      }
     }
   }
 
@@ -387,8 +391,8 @@ class EditorRef {
     register("最小化", "minify", "modification");
     register("转义", "escape", "modification");
     register("去转义", "unescape", "modification");
-    register("排序（顺序）", "sort", "modification");
-    register("排序（逆序）", "sortReverse", "modification");
+    register("排序（升序）", "sort", "modification");
+    register("排序（降序）", "sortReverse", "modification");
     register("URL转JSON", "urlToJSON", "modification");
     register("关闭同步滚动", "toggleSyncScroll", "settings");
   }
