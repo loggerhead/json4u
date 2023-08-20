@@ -13,13 +13,13 @@ export default function MyAlert({ msg }) {
       // 如果解析失败
       if (pureMsg && err) {
         node = undefined;
-        console.error(`解析提示文案失败:\n\n${msg}\n\n`, err?.textContent);
+        console.error(`文本节点解析错误:\n\n${msg}\n\n`, err?.textContent);
       }
     }
-  }
 
-  if (node === undefined) {
-    node = document.createTextNode(msg);
+    if (node === undefined) {
+      node = document.createTextNode(msg);
+    }
   }
 
   return <SpanNode key={`00`} node={node} level={0}></SpanNode>;
@@ -27,8 +27,9 @@ export default function MyAlert({ msg }) {
 
 // 根据 dom 树生成 span 树
 function SpanNode({ node, level }) {
-  if (node.nodeType == Node.TEXT_NODE) {
-    return <span key={`${level}`}>{node.textContent}</span>;
+  if (!node || node.nodeType == Node.TEXT_NODE) {
+    const text = node?.textContent || "";
+    return <span key={`${level}`}>{text}</span>;
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
