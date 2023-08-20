@@ -2,35 +2,22 @@
 @tailwind utilities;
 @tailwind components;
 
-@layer components {
-  .button-action {
-    @apply btn btn-xs	btn-outline rounded normal-case;
-  }
+/* 以下部分需要同步修改 lib/color.js */
+/* 增加透明度以 fix 选中区分背景色不变的问题：https://github.com/Microsoft/monaco-editor/issues/902 */
+$fg-red: #fb6c6c80;
+$bg-red: #fca5a54d;
+$fg-green: #22de6680;
+$bg-green: #86efac4d;
 
-  .alert-blue {
-    @apply text-blue-900 bg-blue-100;
-  }
-
-  .alert-green {
-    @apply text-green-900 bg-green-100;
-  }
-
-  .alert-yellow {
-    @apply text-yellow-900 bg-yellow-100;
-  }
-
-  .alert-red {
-    @apply text-red-900 bg-red-100;
-  }
-
-  .border-color {
-    border-color: #c4c4c4;
-  }
-}
-
-.statusbar-color {
-  color: #0451a5;
-}
+$border: #c4c4c4;
+$btn-bg: #fff;
+$box-shadow: #00000014;
+$bar-bg: #fafafa;
+$text: #171717;
+$text-red: #cb2a2f;
+$text-green: #319331;
+$text-blue: #0451a5;
+$text-yellow: #863b00;
 
 .markdown-body {
   box-sizing: border-box;
@@ -42,10 +29,9 @@
   position: absolute !important;
 }
 
-/* 以下部分需要同步修改 lib/color.js */
-/* 增加透明度以 fix 选中区分背景色不变的问题：https://github.com/Microsoft/monaco-editor/issues/902 */
-$fg-red: rgba(251, 108, 108, 0.5);
-$bg-red: rgba(252, 165, 165, 0.3);
+.statusbar {
+  background: $bar-bg;
+}
 
 .alert-fg-red {
   background-color: $fg-red;
@@ -56,7 +42,7 @@ $bg-red: rgba(252, 165, 165, 0.3);
 }
 
 .line-ins {
-  background-color: rgba(134, 239, 172, 0.3);
+  background-color: $bg-green;
 }
 
 .inline-del {
@@ -64,5 +50,45 @@ $bg-red: rgba(252, 165, 165, 0.3);
 }
 
 .inline-ins {
-  background-color: rgba(34, 222, 102, 0.5);
+  background-color: $fg-green;
+}
+
+.text-color {
+  color: $text;
+}
+
+.border-color {
+  border-color: $border;
+}
+
+.button-border {
+  border-radius: 4px;
+  box-shadow: 0 0 0 0.5px $box-shadow;
+  background: $btn-bg;
+}
+
+.alert-black {
+  color: $text;
+}
+
+.alert-green {
+  color: $text-green;
+}
+
+.alert-blue {
+  color: $text-blue;
+}
+
+.alert-yellow {
+  color: $text-yellow;
+}
+
+.alert-red {
+  color: $text-red;
+}
+
+@layer components {
+  .button-action {
+    @apply text-color button-border btn btn-xs normal-case;
+  }
 }

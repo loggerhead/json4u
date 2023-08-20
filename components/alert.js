@@ -1,9 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 
-// 需要将枚举值定义出来，否则编译器不知道使用了哪些 class，就不会编译，导致样式不生效
-const _ = ["alert-blue", "alert-green", "alert-yellow", "alert-red", "alert-fg-red"];
-
 export default function MyAlert({ richText }) {
   const [msg, setMsg] = useState("");
 
