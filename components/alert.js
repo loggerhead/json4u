@@ -1,44 +1,36 @@
-"use client";
-import { useState, useEffect } from "react";
+import * as color from "../lib/color";
 
-export default function MyAlert({ richText }) {
-  const [msg, setMsg] = useState("");
+export default function MyAlert({ msg }) {
+  let node;
 
-  // 防抖：https://www.ruanyifeng.com/blog/2020/09/react-hooks-useeffect-tutorial.html
-  useEffect(() => {
-    const timerID = setTimeout(() => {
-      setMsg(richText);
-    }, 100);
+  if (typeof window != "undefined" && typeof DOMParser != "undefined") {
+    const [pureMsg, colors] = color.matchColorTags(msg);
 
-    // 下次渲染
-    return () => {
-      clearTimeout(timerID);
-    };
-  }, [richText, setMsg]);
+    if (pureMsg && colors.length) {
+      node = new DOMParser().parseFromString(msg, "text/xml");
+      const err = node?.querySelector("parsererror");
 
-  let node =
-    typeof window != "undefined" && typeof DOMParser != "undefined"
-      ? new DOMParser().parseFromString(msg, "text/xml")
-      : undefined;
-  const err = node?.querySelector("parsererror");
-
-  // 如果解析失败
-  if (err) {
-    if (err && msg) {
-      console.error(`解析提示文案失败:\n\n${msg}\n\n`, err?.textContent);
+      // 如果解析失败
+      if (pureMsg && err) {
+        node = undefined;
+        console.error(`解析提示文案失败:\n\n${msg}\n\n`, err?.textContent);
+      }
     }
-    node = undefined;
   }
 
-  return (
-    <div className={`text-sm rounded ${msg?.length ? "" : "hidden"}`}>
-      {node ? <SpanNode key={`00`} node={node} level={0}></SpanNode> : <></>}
-    </div>
-  );
+  if (node === undefined) {
+    node = document.createTextNode(msg);
+  }
+
+  return <SpanNode key={`00`} node={node} level={0}></SpanNode>;
 }
 
 // 根据 dom 树生成 span 树
 function SpanNode({ node, level }) {
+  if (node.nodeType == Node.TEXT_NODE) {
+    return <span key={`${level}`}>{node.textContent}</span>;
+  }
+
   // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
   if (node.nodeType === Node.DOCUMENT_NODE) {
     node = node.childNodes[0];
@@ -46,7 +38,7 @@ function SpanNode({ node, level }) {
   const color = node.nodeName;
 
   return (
-    <span key={`${level}0`} className={`py-[3px] ${level === 0 ? "px-2" : ""} alert-${color}`}>
+    <span key={`${level}0`} className={`alert-${color}`}>
       {Array.from(node?.childNodes).map((node, i) => {
         const key = `${level}${i + 1}`;
 

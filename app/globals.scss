@@ -33,6 +33,10 @@ $text-yellow: #863b00;
   background: $bar-bg;
 }
 
+.statusbar-sep {
+  border-right: 1px solid $border;
+}
+
 .alert-fg-red {
   background-color: $fg-red;
 }

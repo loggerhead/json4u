@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
-import MyAlert from "../components/alert";
 import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
@@ -18,10 +17,7 @@ const MyEditor = dynamic(() => import("../components/editor"), {
 
 export default function Home() {
   const [hidden, setHidden] = useState(0);
-  const [leftStatusText, setLeftStatusText] = useState("");
-  const [rightStatusText, setRightStatusText] = useState("");
-  const [leftAlert, setLeftAlert] = useState("");
-  const [rightAlert, setRightAlert] = useState("");
+  const [statusBar, setStatusBar] = useState({});
   const leftContainerRef = useRef(null);
   const rightContainerRef = useRef(null);
   const leftEditorRef = useRef(null);
@@ -58,9 +54,6 @@ export default function Home() {
               <li>
                 <UnescapeButton editorRef={leftEditorRef}></UnescapeButton>
               </li>
-              <li>
-                <MyAlert richText={leftAlert}></MyAlert>
-              </li>
             </ul>
             <ul className="flex right">
               <li>
@@ -78,8 +71,8 @@ export default function Home() {
             <MyEditor
               height={editorHeight}
               editorRef={leftEditorRef}
-              setAlert={setLeftAlert}
-              setStatusText={setLeftStatusText}
+              statusBar={statusBar}
+              setStatusBar={setStatusBar}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
@@ -94,23 +87,20 @@ export default function Home() {
             <li>
               <CompareButton editorRef={rightEditorRef}></CompareButton>
             </li>
-            <li>
-              <MyAlert richText={rightAlert}></MyAlert>
-            </li>
           </ul>
           <div className="border border-solid border-color">
             <MyEditor
               height={editorHeight}
               editorRef={rightEditorRef}
-              setAlert={setRightAlert}
-              setStatusText={setRightStatusText}
+              statusBar={statusBar}
+              setStatusBar={setStatusBar}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
           </div>
         </div>
       </div>
-      <StatusBar leftText={leftStatusText} rightText={rightStatusText}></StatusBar>
+      <StatusBar texts={statusBar}></StatusBar>
     </div>
   );
 }
