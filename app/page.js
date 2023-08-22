@@ -71,7 +71,6 @@ export default function Home() {
             <MyEditor
               height={editorHeight}
               editorRef={leftEditorRef}
-              statusBar={statusBar}
               setStatusBar={setStatusBar}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
@@ -92,7 +91,6 @@ export default function Home() {
             <MyEditor
               height={editorHeight}
               editorRef={rightEditorRef}
-              statusBar={statusBar}
               setStatusBar={setStatusBar}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
