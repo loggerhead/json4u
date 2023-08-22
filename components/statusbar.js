@@ -5,9 +5,14 @@ export default function StatusBar({ texts }) {
   const cacheMap = useRef({});
   const textsMap = useMemo(() => {
     let obj = Object.assign(cacheMap.current, texts);
+
     obj = Object.entries(obj).reduce((obj, [key, value]) => {
-      if (value) {
-        obj[key] = value;
+      if (typeof value === "string") {
+        if (value) {
+          obj[key] = value;
+        } else {
+          delete obj[key];
+        }
       }
       return obj;
     }, {});
