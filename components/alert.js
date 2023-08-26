@@ -18,7 +18,7 @@ export default function MyAlert({ msg }) {
     }
 
     if (node === undefined) {
-      node = document.createTextNode(msg);
+      node = document.createTextNode(pureMsg);
     }
   }
 
