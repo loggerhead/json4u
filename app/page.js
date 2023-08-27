@@ -1,11 +1,12 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
 import StatusBar from "../components/statusbar";
 import { FormatButton, MinifyButton, EscapeButton, UnescapeButton, CompareButton } from "../components/button";
+import version from "../lib/version";
 
 const editorHeight = "calc(100vh - 6rem)";
 
@@ -29,6 +30,10 @@ export default function Home() {
       rightEditorRef.current.pair(leftEditorRef.current, rightEditorRef.current);
     }
   };
+
+  useEffect(() => {
+    console.log(`当前版本：${version}`);
+  });
 
   return (
     <div className="gap-2 mx-5 mt-2">
