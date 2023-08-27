@@ -1,4 +1,3 @@
-"use client";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { loader, Editor } from "@monaco-editor/react";
 import Loading from "../components/loading";
