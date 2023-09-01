@@ -33,7 +33,7 @@ export default function Home() {
 
   useEffect(() => {
     console.log(`当前版本：${version}`);
-  });
+  }, []);
 
   return (
     <div className="gap-2 mx-5 mt-2">
