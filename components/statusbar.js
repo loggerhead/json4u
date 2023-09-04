@@ -27,21 +27,27 @@ export default function StatusBar({ texts }) {
   }, [cacheMap, texts]);
 
   const keys = Object.keys(textsMap).sort();
+  const leftKeys = keys.filter((key) => key.startsWith("l"));
+  const rightKeys = keys.filter((key) => key.startsWith("r"));
+  const genAlerts = (keys) => {
+    return keys.map((key, i) => {
+      let classes = ["px-2.5 py-0.5"];
+      classes.push(i < keys.length - 1 ? "statusbar-sep" : "");
+      classes = classes.filter((c) => c);
+
+      return (
+        <div key={key} className={classes.join(" ")}>
+          <MyAlert msg={textsMap[key]}></MyAlert>
+        </div>
+      );
+    });
+  };
 
   return (
     <div className="flex h-[22px] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar">
-      {keys.map((key, i) => {
-        let classes = ["px-2.5 py-0.5"];
-        classes.push(i == 0 ? "grow" : "");
-        classes.push(0 < i && i < keys.length - 1 ? "statusbar-sep" : "");
-        classes = classes.filter((c) => c);
-
-        return (
-          <div key={key} className={classes.join(" ")}>
-            <MyAlert msg={textsMap[key]}></MyAlert>
-          </div>
-        );
-      })}
+      {genAlerts(leftKeys)}
+      <div className="grow"></div>
+      {genAlerts(rightKeys)}
     </div>
   );
 }
