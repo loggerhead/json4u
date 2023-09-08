@@ -32,7 +32,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log(`当前版本：${version}`);
+    console.log(`JSON For You 当前版本：${version}`);
   }, []);
 
   return (
