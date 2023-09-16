@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.5.1",
-    "diff-match-patch": "^1.0.5",
+    "diff": "^5.1.0",
     "json-stable-stringify": "^1.0.2",
     "monaco-editor": "^0.40.0",
     "next": "13.4.7",
