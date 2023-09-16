@@ -55,12 +55,12 @@ describe("semanticCompare", () => {
       `{ "int64": 12345678987654320, "kee": "value", "array": [12345678987654320, 0.1234567891111111110, 2, 3, 1]}`,
       [
         new diff.Diff(27, 1, diff.DEL, false),
-        new diff.Diff(33, 1, diff.DEL, false),
+        new diff.Diff(30, 14, diff.DEL, true),
         new diff.Diff(72, 1, diff.DEL, false),
         new diff.Diff(95, 1, diff.DEL, false),
         new diff.Diff(98, 1, diff.DEL, true),
         new diff.Diff(27, 1, diff.INS, false),
-        new diff.Diff(33, 1, diff.INS, false),
+        new diff.Diff(30, 14, diff.INS, true),
         new diff.Diff(72, 1, diff.INS, false),
         new diff.Diff(95, 1, diff.INS, false),
         new diff.Diff(104, 1, diff.INS, true),
@@ -174,7 +174,7 @@ describe("semanticCompare", () => {
       expectEq(
         `{"editor.detectIndentation": false,"editor.tabSize": 2,"files.exclude": {".vscode/": true,"foo": "bar"}}`,
         `{"editor.detectIndentation": false,"editor.tabSize": 2,"files.exclude": {".slash/": true,"foo": "bar"}}`,
-        [new diff.Diff(75, 6, diff.DEL, false), new diff.Diff(75, 5, diff.INS, false)]
+        [new diff.Diff(73, 16, diff.DEL, true), new diff.Diff(73, 15, diff.INS, true)]
       );
 
       expectEq(
@@ -189,6 +189,12 @@ describe("semanticCompare", () => {
         `{"newline": "a\\nb","slash": "a\\\\b","quotes": "a\\"b","backspace": "a\\bb","formfeed": "a\\fb","carriagereturn": "a\\rb","tab": "a\\tb","a\\nb": "newline","a\\\\b": "slash","a\\"b": "quotes","a\\bb": "backspace","a\\fb": "formfeed","a\\rb": "carriagereturn","a\\tb": "tab"}`,
         `{"newline": "a\\nbx","slash": "a\\\\bx","quotes": "a\\"bx","backspace": "a\\bbx","formfeed": "a\\fbx","carriagereturn": "a\\rbx","tab": "a\\tbx","a\\nb": "newline","a\\\\bx": "slash","a\\"bx": "quotes","a\\bbx": "backspace","a\\fbx": "formfeed","a\\rbx": "carriagereturn","a\\tbx": "tab"}`,
         [
+          new diff.Diff(148, 15, diff.DEL, true),
+          new diff.Diff(164, 16, diff.DEL, true),
+          new diff.Diff(181, 19, diff.DEL, true),
+          new diff.Diff(201, 18, diff.DEL, true),
+          new diff.Diff(220, 24, diff.DEL, true),
+          new diff.Diff(245, 13, diff.DEL, true),
           new diff.Diff(17, 1, diff.INS, false),
           new diff.Diff(34, 1, diff.INS, false),
           new diff.Diff(52, 1, diff.INS, false),
@@ -196,12 +202,12 @@ describe("semanticCompare", () => {
           new diff.Diff(93, 1, diff.INS, false),
           new diff.Diff(119, 1, diff.INS, false),
           new diff.Diff(134, 1, diff.INS, false),
-          new diff.Diff(160, 1, diff.INS, false),
-          new diff.Diff(177, 1, diff.INS, false),
-          new diff.Diff(195, 1, diff.INS, false),
-          new diff.Diff(216, 1, diff.INS, false),
-          new diff.Diff(236, 1, diff.INS, false),
-          new diff.Diff(262, 1, diff.INS, false),
+          new diff.Diff(155, 16, diff.INS, true),
+          new diff.Diff(172, 17, diff.INS, true),
+          new diff.Diff(190, 20, diff.INS, true),
+          new diff.Diff(211, 19, diff.INS, true),
+          new diff.Diff(231, 25, diff.INS, true),
+          new diff.Diff(257, 14, diff.INS, true),
         ]
       );
 
@@ -227,7 +233,7 @@ describe("semanticCompare", () => {
           new diff.Diff(341, 42, diff.DEL, true),
           new diff.Diff(398, 41, diff.DEL, true),
           new diff.Diff(461, 10, diff.DEL, true),
-          new diff.Diff(540, 1, diff.DEL, false),
+          new diff.Diff(523, 55, diff.DEL, true),
           new diff.Diff(580, 21, diff.DEL, true),
           new diff.Diff(89, 3, diff.INS, false),
           new diff.Diff(93, 13, diff.INS, true),
@@ -239,7 +245,7 @@ describe("semanticCompare", () => {
           new diff.Diff(295, 10, diff.INS, true),
           new diff.Diff(306, 14, diff.INS, true),
           new diff.Diff(321, 4, diff.INS, true),
-          new diff.Diff(381, 1, diff.INS, false),
+          new diff.Diff(364, 55, diff.INS, true),
           new diff.Diff(420, 46, diff.INS, true),
         ]
       );
