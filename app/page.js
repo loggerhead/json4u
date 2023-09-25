@@ -48,7 +48,7 @@ export default function Home() {
         <div
           ref={leftContainerRef}
           className={`flex flex-col shrink min-w-fit relative gap-2 ${
-            hidden === 0 ? "basis-1/2 md:basis-9/12" : hidden ? "basis-full" : "basis-1/2"
+            hidden === 0 ? "basis-1/2 md:basis-8/12" : hidden ? "basis-full" : "basis-1/2"
           }`}
         >
           <div className="flex relative justify-between	clear-both">
