@@ -1,11 +1,18 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useRef, useState, useEffect } from "react";
+import {useEffect, useRef, useState} from "react";
 import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
 import StatusBar from "../components/statusbar";
-import { FormatButton, MinifyButton, EscapeButton, UnescapeButton, CompareButton } from "../components/button";
+import {
+  CompareButton,
+  EscapeButton,
+  FormatButton,
+  MinifyButton,
+  TextCompareAfterSortButton,
+  UnescapeButton,
+} from "../components/button";
 import version from "../lib/version";
 
 const editorHeight = "calc(100vh - 6rem)";
@@ -89,6 +96,10 @@ export default function Home() {
           <ul className="flex space-x-2 items-center">
             <li>
               <CompareButton editorRef={rightEditorRef}></CompareButton>
+            </li>
+            <li>
+              <TextCompareAfterSortButton leftEditorRef={leftEditorRef}
+                                          rightEditorRef={rightEditorRef}></TextCompareAfterSortButton>
             </li>
           </ul>
           <div className="border border-solid border-color">
