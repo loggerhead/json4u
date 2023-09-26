@@ -4,10 +4,12 @@
 
 /* 以下部分需要同步修改 lib/color.js */
 /* 增加透明度以 fix 选中区分背景色不变的问题：https://github.com/Microsoft/monaco-editor/issues/902 */
-$fg-red: #fb6c6c80;
-$bg-red: #fca5a54d;
-$fg-green: #22de6680;
-$bg-green: #86efac4d;
+$fg-red: #ff818266;
+$bg-red: #ff9b9533;
+$fg-green: #2ddf5966;
+$bg-green: #82ffa433;
+$margin-red: #ffd7d5;
+$margin-green: #ccffd8;
 
 $border: #c4c4c4;
 $btn-bg: #fff;
@@ -51,17 +53,7 @@ $text-yellow: #863b00;
 
 // diff 填充块
 .diff-fill {
-  background-image: linear-gradient(
-    -45deg,
-    rgba(34, 34, 34, 0.2) 12.5%,
-    #0000 12.5%,
-    #0000 50%,
-    rgba(34, 34, 34, 0.2) 50%,
-    rgba(34, 34, 34, 0.2) 62.5%,
-    #0000 62.5%,
-    #0000 100%
-  );
-  background-size: 8px 8px;
+  background-color: #cdd7e033;
 }
 
 .statusbar {
@@ -74,6 +66,14 @@ $text-yellow: #863b00;
 
 .alert-fg-red {
   background-color: $fg-red;
+}
+
+.margin-del {
+  background-color: $margin-red;
+}
+
+.margin-ins {
+  background-color: $margin-green;
 }
 
 .line-del {
