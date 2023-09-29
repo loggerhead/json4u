@@ -294,7 +294,7 @@ describe("semanticCompare", () => {
       `{ "foo": "adc" }`,
       {
         inlines: [
-          new compare.Diff(1, 1, compare.DEL),
+          new compare.Diff(0, 1, compare.DEL),
           new compare.Diff(11, 1, compare.DEL),
           new compare.Diff(0, 1, compare.INS),
           new compare.Diff(11, 1, compare.INS),
@@ -311,12 +311,15 @@ describe("semanticCompare", () => {
     1,
     2
 ]`,
-      [
-        new compare.Diff(6, 1, compare.DEL, false),
-        new compare.Diff(6, 1, compare.INS, false),
-        new compare.Diff(15, 1, compare.INS, false),
-      ],
-      true,
+      {
+        inlines: [
+          new compare.Diff(6, 1, compare.DEL),
+          new compare.Diff(15, 1, compare.DEL),
+          new compare.Diff(6, 1, compare.INS),
+          new compare.Diff(15, 1, compare.INS),
+        ],
+        isTextCompare: true,
+      },
     );
   });
 
@@ -369,9 +372,8 @@ describe("semanticCompare", () => {
       `{"editor.detectIndentation": false,"editor.tabSize": 2,"files.exclude": {"bas":".slash/","foo": "bar"}}`,
       {
         inlines: [
-          new compare.Diff(81, 1, compare.DEL),
-          new compare.Diff(83, 4, compare.DEL),
-          new compare.Diff(82, 4, compare.INS),
+          new compare.Diff(81, 6, compare.DEL),
+          new compare.Diff(81, 5, compare.INS),
         ],
       },
     );
