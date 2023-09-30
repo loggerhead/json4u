@@ -63,6 +63,24 @@ describe("Comparer", () => {
         new compare.Diff(5, 2, compare.INS),
       ],
     });
+
+    expectEq(`[
+    12345678987654321,
+    0.1234567891111111111,
+    1,
+    2,
+    3
+]`, `[
+    12345678987654320,
+    0.1234567891111111110,
+    2,
+    3,
+    1
+]`, {
+      hunks: [
+        new compare.Diff(5, 2, compare.INS),
+      ],
+    });
   });
 
   test("human-readable case", () => {
