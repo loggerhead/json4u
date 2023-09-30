@@ -5,7 +5,7 @@ function expectEq(ltext, rtext, {hunks, inlines, isTextCompare}) {
   const r = compare.smartCompare(ltext, rtext);
   const gotInlineDiffs = compare.sort(r.inlineDiffs());
   const gotHunkDiffs = compare.sort(r.hunkDiffs()).map((d) => {
-    d.inlineDiffs = undefined;
+    d.inlineDiffs = [];
     return d;
   });
 
@@ -78,7 +78,18 @@ describe("Comparer", () => {
     1
 ]`, {
       hunks: [
-        new compare.Diff(5, 2, compare.INS),
+        new compare.Diff(6, 17, compare.DEL),
+        new compare.Diff(29, 21, compare.DEL),
+        new compare.Diff(56, 1, compare.DEL),
+        new compare.Diff(6, 17, compare.INS),
+        new compare.Diff(29, 21, compare.INS),
+        new compare.Diff(70, 1, compare.INS),
+      ],
+      inlines: [
+        new compare.Diff(22, 1, compare.DEL),
+        new compare.Diff(49, 1, compare.DEL),
+        new compare.Diff(22, 1, compare.INS),
+        new compare.Diff(49, 1, compare.INS),
       ],
     });
   });
@@ -196,7 +207,8 @@ describe("Comparer", () => {
           new compare.Diff(703, 82, compare.INS),
         ],
         inlines: [
-          new compare.Diff(69, 3, compare.DEL),
+          new compare.Diff(69, 2, compare.DEL),
+          new compare.Diff(72, 3, compare.DEL),
           new compare.Diff(207, 3, compare.DEL),
           new compare.Diff(253, 4, compare.DEL),
           new compare.Diff(283, 1, compare.DEL),
@@ -207,16 +219,12 @@ describe("Comparer", () => {
           new compare.Diff(761, 7, compare.DEL),
           new compare.Diff(782, 1, compare.DEL),
           new compare.Diff(841, 2, compare.DEL),
-          new compare.Diff(845, 2, compare.DEL),
-          new compare.Diff(849, 1, compare.DEL),
+          new compare.Diff(845, 5, compare.DEL),
           new compare.Diff(945, 1, compare.DEL),
-          new compare.Diff(1013, 1, compare.DEL),
-          new compare.Diff(1017, 1, compare.DEL),
-          new compare.Diff(1020, 1, compare.DEL),
-          new compare.Diff(1022, 1, compare.DEL),
-          new compare.Diff(1025, 1, compare.DEL),
-          new compare.Diff(1027, 1, compare.DEL),
+          new compare.Diff(1013, 5, compare.DEL),
+          new compare.Diff(1020, 6, compare.DEL),
           new compare.Diff(1029, 4, compare.DEL),
+          new compare.Diff(69, 2, compare.INS),
           new compare.Diff(156, 1, compare.INS),
           new compare.Diff(158, 1, compare.INS),
           new compare.Diff(170, 23, compare.INS),
@@ -227,19 +235,12 @@ describe("Comparer", () => {
           new compare.Diff(390, 1, compare.INS),
           new compare.Diff(439, 1, compare.INS),
           new compare.Diff(520, 1, compare.INS),
-          new compare.Diff(523, 1, compare.INS),
-          new compare.Diff(525, 4, compare.INS),
-          new compare.Diff(530, 1, compare.INS),
+          new compare.Diff(523, 8, compare.INS),
           new compare.Diff(532, 14, compare.INS),
           new compare.Diff(640, 1, compare.INS),
-          new compare.Diff(708, 1, compare.INS),
-          new compare.Diff(710, 5, compare.INS),
-          new compare.Diff(717, 1, compare.INS),
-          new compare.Diff(719, 3, compare.INS),
-          new compare.Diff(723, 13, compare.INS),
-          new compare.Diff(737, 5, compare.INS),
-          new compare.Diff(745, 2, compare.INS),
-          new compare.Diff(748, 37, compare.INS),
+          new compare.Diff(708, 4, compare.INS),
+          new compare.Diff(714, 6, compare.INS),
+          new compare.Diff(723, 62, compare.INS),
         ],
       },
     );
@@ -657,6 +658,7 @@ describe("semanticCompare", () => {
           new compare.Diff(838, 12, compare.DEL),
           new compare.Diff(927, 78, compare.DEL),
           new compare.Diff(1011, 21, compare.DEL),
+          new compare.Diff(55, 17, compare.INS),
           new compare.Diff(156, 3, compare.INS),
           new compare.Diff(169, 13, compare.INS),
           new compare.Diff(204, 6, compare.INS),
@@ -670,11 +672,13 @@ describe("semanticCompare", () => {
           new compare.Diff(707, 78, compare.INS),
         ],
         inlines: [
-          new compare.Diff(69, 2, compare.DEL),
+          new compare.Diff(69, 1, compare.DEL),
+          new compare.Diff(71, 3, compare.DEL),
           new compare.Diff(206, 3, compare.DEL),
           new compare.Diff(252, 4, compare.DEL),
           new compare.Diff(282, 1, compare.DEL),
           new compare.Diff(287, 7, compare.DEL),
+          new compare.Diff(69, 2, compare.INS),
           new compare.Diff(156, 1, compare.INS),
           new compare.Diff(158, 1, compare.INS),
           new compare.Diff(204, 1, compare.INS),
@@ -734,16 +738,11 @@ describe("semanticCompare", () => {
         ],
         inlines: [
           new compare.Diff(21, 1, compare.DEL),
-          new compare.Diff(173, 3, compare.DEL),
-          new compare.Diff(177, 3, compare.DEL),
-          new compare.Diff(184, 2, compare.DEL),
-          new compare.Diff(198, 8, compare.DEL),
-          new compare.Diff(210, 1, compare.DEL),
+          new compare.Diff(173, 12, compare.DEL),
+          new compare.Diff(198, 13, compare.DEL),
           new compare.Diff(21, 1, compare.INS),
-          new compare.Diff(174, 2, compare.INS),
-          new compare.Diff(179, 5, compare.INS),
-          new compare.Diff(198, 2, compare.INS),
-          new compare.Diff(203, 6, compare.INS),
+          new compare.Diff(173, 11, compare.INS),
+          new compare.Diff(197, 12, compare.INS),
         ],
       },
     );
@@ -802,10 +801,13 @@ describe("semanticCompare", () => {
     "num": 1
 }`,
         {
+          hunks: [
+            new compare.Diff(14, 11, compare.DEL),
+            new compare.Diff(14, 4, compare.INS),
+          ],
           inlines: [
-            new compare.Diff(14, 1, compare.DEL),
-            new compare.Diff(18, 7, compare.DEL),
-            new compare.Diff(17, 1, compare.INS),
+            new compare.Diff(14, 11, compare.DEL),
+            new compare.Diff(14, 4, compare.INS),
           ],
         },
       );
