@@ -213,7 +213,8 @@ describe("Comparer", () => {
           new compare.Diff(253, 4, compare.DEL),
           new compare.Diff(283, 1, compare.DEL),
           new compare.Diff(288, 7, compare.DEL),
-          new compare.Diff(341, 344, compare.DEL),
+          new compare.Diff(341, 1, compare.DEL),
+          new compare.Diff(343, 343, compare.DEL),
           new compare.Diff(719, 1, compare.DEL),
           new compare.Diff(730, 7, compare.DEL),
           new compare.Diff(761, 7, compare.DEL),
@@ -236,11 +237,13 @@ describe("Comparer", () => {
           new compare.Diff(439, 1, compare.INS),
           new compare.Diff(520, 1, compare.INS),
           new compare.Diff(523, 8, compare.INS),
-          new compare.Diff(532, 14, compare.INS),
+          new compare.Diff(532, 1, compare.INS),
+          new compare.Diff(534, 13, compare.INS),
           new compare.Diff(640, 1, compare.INS),
           new compare.Diff(708, 4, compare.INS),
           new compare.Diff(714, 6, compare.INS),
-          new compare.Diff(723, 62, compare.INS),
+          new compare.Diff(723, 1, compare.INS),
+          new compare.Diff(725, 61, compare.INS),
         ],
       },
     );
@@ -374,6 +377,34 @@ describe("semanticCompare", () => {
   });
 
   test("simple compare", () => {
+    expectEq(
+      `12345`,
+      ``,
+      {
+        isTextCompare: true,
+        hunks: [new compare.Diff(0, 5, compare.DEL)],
+      },
+    );
+
+    expectEq(
+      ``,
+      `12345`,
+      {
+        isTextCompare: true,
+        hunks: [new compare.Diff(0, 5, compare.INS)],
+      },
+    );
+
+    expectEq(
+      `a`,
+      `a2345`,
+      {
+        isTextCompare: true,
+        hunks: [new compare.Diff(0, 1, compare.DEL), new compare.Diff(0, 5, compare.INS)],
+        inlines: [new compare.Diff(1, 4, compare.INS)],
+      },
+    );
+
     expectEq(
       `{"link": "<a href=\\"http://google.com/\\">Google</a>"}`,
       `{"link": "<a href=\\"http://googlex.com/\\">Google</a>"}`,
@@ -808,6 +839,110 @@ describe("semanticCompare", () => {
           inlines: [
             new compare.Diff(14, 11, compare.DEL),
             new compare.Diff(14, 4, compare.INS),
+          ],
+        },
+      );
+    });
+
+    test("viewzone error", () => {
+      expectEq(`{
+
+  return tokens;
+}`, `{
+  return tokens;
+}`,
+        {
+          isTextCompare: true,
+          hunks: [
+            new compare.Diff(2, 1, compare.DEL),
+          ],
+        },
+      );
+
+      expectEq(
+        `wordDiff.tokenize = function(value) {
+  // All whitespace symbols except newline group into one token, each newline - in separate token
+  let tokens = value.split(/([^\\S\\r\\n]+|[()[\\]{}'"\\r\\n]|\\b)/);
+
+  // Join the boundary splits that we do not consider to be boundaries. This is primarily the extended Latin character set.
+  for (let i = 0; i < tokens.length - 1; i++) {
+    // If we have an empty string in the next field and we have only word chars before and after, merge
+    if (!tokens[i + 1] && tokens[i + 2]
+          && extendedWordChars.test(tokens[i])
+          && extendedWordChars.test(tokens[i + 2])) {
+      tokens[i] += tokens[i + 2];
+      tokens.splice(i + 1, 2);
+      i--;
+    }
+  }
+
+  return tokens;
+};`,
+        `wordDiff.tokenize = function(value) {
+  const tokens = [];
+  let prevCharType = '';
+  for (let i = 0; i < value.length; i++) {
+    const char = value[i];
+    if (spaceRegExp.test(char)) {
+      if(prevCharType === 'space') {
+        tokens[tokens.length - 1] += ' ';
+      } else {
+        tokens.push(' ');
+      }
+      prevCharType = 'space';
+    } else if (cannotBecomeWordRegExp.test(char)) {
+      tokens.push(char);
+      prevCharType = '';
+    } else {
+      if(prevCharType === 'word') {
+        tokens[tokens.length - 1] += char;
+      } else {
+        tokens.push(char);
+      }
+      prevCharType = 'word';
+    }
+  }
+  return tokens;
+};`,
+        {
+          isTextCompare: true,
+          hunks: [
+            new compare.Diff(38, 654, compare.DEL),
+            new compare.Diff(703, 1, compare.DEL),
+            new compare.Diff(38, 580, compare.INS),
+          ],
+        },
+      );
+    });
+
+    test("diff error", () => {
+      expectEq(
+        `hello
+
+
+b
+    }
+  }
+
+  return tokens;
+};`,
+        `world
+  
+a
+c
+            } ;
+        }
+    } return tokens;
+};`,
+        {
+          isTextCompare: true,
+          hunks: [
+            new compare.Diff(0, 5, compare.DEL),
+            new compare.Diff(7, 2, compare.DEL),
+            new compare.Diff(16, 21, compare.DEL),
+            new compare.Diff(0, 5, compare.INS),
+            new compare.Diff(9, 19, compare.INS),
+            new compare.Diff(39, 20, compare.INS),
           ],
         },
       );
