@@ -9,7 +9,7 @@ import "monaco-editor/esm/vs/editor/contrib/symbolIcons/browser/symbolIcons.js";
 // NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
 loader.config({ monaco });
 
-export default function MyEditor({ height, editorRef, setStatusBar, adjustWidth, doPair }) {
+export default function MyEditor({ height, editorRef, setStatusBar, enableAutoFormatRef, adjustWidth, doPair }) {
   return (
     <Editor
       language="json"
@@ -23,7 +23,7 @@ export default function MyEditor({ height, editorRef, setStatusBar, adjustWidth,
         minimap: { enabled: true },
       }}
       onMount={(editor, monaco) => {
-        editorRef.current = new EditorRef(editor, monaco, setStatusBar, adjustWidth);
+        editorRef.current = new EditorRef(editor, monaco, setStatusBar, enableAutoFormatRef, adjustWidth);
         editorRef.current.init();
         doPair();
       }}
