@@ -54,16 +54,16 @@ export default function Home() {
           <div className="flex relative justify-between	clear-both">
             <ul className="flex space-x-2 items-center">
               <li>
-                <FormatButton editorRef={leftEditorRef}></FormatButton>
+                <FormatButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></FormatButton>
               </li>
               <li>
-                <MinifyButton editorRef={leftEditorRef}></MinifyButton>
+                <MinifyButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></MinifyButton>
               </li>
               <li>
-                <EscapeButton editorRef={leftEditorRef}></EscapeButton>
+                <EscapeButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></EscapeButton>
               </li>
               <li>
-                <UnescapeButton editorRef={leftEditorRef}></UnescapeButton>
+                <UnescapeButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></UnescapeButton>
               </li>
             </ul>
             <ul className="flex right">
