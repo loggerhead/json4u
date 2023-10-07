@@ -31,6 +31,13 @@ $text-yellow: #863b00;
   position: absolute !important;
 }
 
+.switch-label {
+  display: flex;
+  user-select: none;
+  align-items: center;
+  justify-content: space-between;
+}
+
 // 「加载中」的动画特效
 .loader {
   border: 1.5rem solid #f2f1f1;

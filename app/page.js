@@ -5,6 +5,7 @@ import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
 import StatusBar from "../components/statusbar";
+import Switch from "../components/switch";
 import {
   CompareButton,
   EscapeButton,
@@ -29,6 +30,7 @@ export default function Home() {
   const rightContainerRef = useRef(null);
   const leftEditorRef = useRef(null);
   const rightEditorRef = useRef(null);
+  const enableAutoFormatRef = useRef(true);
 
   // 当左右两侧编辑器都完成初始化后，将两者关联
   const pair = () => {
@@ -65,6 +67,9 @@ export default function Home() {
               <li>
                 <UnescapeButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></UnescapeButton>
               </li>
+              <li>
+                <Switch text={"自动格式化"} onCheck={(checked) => enableAutoFormatRef.current = checked}></Switch>
+              </li>
             </ul>
             <ul className="flex right">
               <li>
@@ -83,6 +88,7 @@ export default function Home() {
               height={editorHeight}
               editorRef={leftEditorRef}
               setStatusBar={setStatusBar}
+              enableAutoFormatRef={enableAutoFormatRef}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
@@ -107,6 +113,7 @@ export default function Home() {
               height={editorHeight}
               editorRef={rightEditorRef}
               setStatusBar={setStatusBar}
+              enableAutoFormatRef={enableAutoFormatRef}
               adjustWidth={() => setHidden(false)}
               doPair={pair}
             ></MyEditor>
