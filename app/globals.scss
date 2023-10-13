@@ -38,26 +38,6 @@ $text-yellow: #863b00;
   justify-content: space-between;
 }
 
-// 「加载中」的动画特效
-.loader {
-  border: 1.5rem solid #f2f1f1;
-  border-top: 1.5rem solid #2c9ae3;
-  border-radius: 50%;
-  width: 5rem;
-  height: 5rem;
-  animation: spin 1s linear infinite;
-  margin: auto;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 // diff 填充块
 .diff-fill {
   background-color: #cdd7e033;
