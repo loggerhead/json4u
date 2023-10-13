@@ -1,8 +1,8 @@
 "use client";
-import { useRef, useMemo } from "react";
+import {useMemo, useRef} from "react";
 import * as color from "../lib/color";
 
-export default function StatusBar({ texts }) {
+export default function StatusBar({texts}) {
   const cacheMap = useRef({});
   const textsMap = useMemo(() => {
     let obj = Object.assign(cacheMap.current, texts);
@@ -44,7 +44,7 @@ export default function StatusBar({ texts }) {
   };
 
   return (
-    <div className="flex h-[22px] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar">
+    <div className="flex min-h-[22px] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar">
       {genAlerts(leftKeys)}
       <div className="grow"></div>
       {genAlerts(rightKeys)}
@@ -52,7 +52,7 @@ export default function StatusBar({ texts }) {
   );
 }
 
-function BarStub({ msg }) {
+function BarStub({msg}) {
   let node;
 
   if (typeof window != "undefined" && typeof DOMParser != "undefined") {
@@ -78,7 +78,7 @@ function BarStub({ msg }) {
 }
 
 // 根据 dom 树生成 span 树
-function BarStubNode({ node, level }) {
+function BarStubNode({node, level}) {
   if (!node || node.nodeType == Node.TEXT_NODE) {
     const text = node?.textContent || "";
     return <span key={`${level}`}>{text}</span>;
