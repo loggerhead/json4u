@@ -2,13 +2,12 @@
 import {useMemo, useRef} from "react";
 import * as color from "../lib/color";
 
+// texts 结构：[ { id: { text, blink }} ]
 export default function StatusBar({texts}) {
   const cacheMap = useRef({});
   const textsMap = useMemo(() => {
-    let obj = Object.assign(cacheMap.current, texts);
-
-    obj = Object.entries(obj).reduce((obj, [key, value]) => {
-      if (typeof value === "string") {
+    const obj = Object.entries(Object.assign(cacheMap.current, texts)).reduce((obj, [key, value]) => {
+      if (typeof value.text === "string") {
         if (value) {
           obj[key] = value;
         } else {
@@ -18,10 +17,6 @@ export default function StatusBar({texts}) {
       return obj;
     }, {});
 
-    if (obj[0] === undefined) {
-      obj[0] = "";
-    }
-
     cacheMap.current = obj;
     return obj;
   }, [cacheMap, texts]);
@@ -29,15 +24,20 @@ export default function StatusBar({texts}) {
   const keys = Object.keys(textsMap).sort();
   const leftKeys = keys.filter((key) => key.startsWith("l"));
   const rightKeys = keys.filter((key) => key.startsWith("r"));
+
   const genAlerts = (keys) => {
     return keys.map((key, i) => {
-      let classes = ["px-2.5 py-0.5"];
-      classes.push(i < keys.length - 1 ? "statusbar-sep" : "");
-      classes = classes.filter((c) => c);
+      const {text, blink} = textsMap[key];
+
+      const className = [
+        "px-2.5 py-0.5",
+        blink ? "blink" : "",
+        i < keys.length - 1 ? "statusbar-sep" : "",
+      ].filter((c) => c).join(" ");
 
       return (
-        <div key={key} className={classes.join(" ")}>
-          <BarStub msg={textsMap[key]}></BarStub>
+        <div key={key} className={className}>
+          <BarStub msg={text}></BarStub>
         </div>
       );
     });
