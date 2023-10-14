@@ -51,6 +51,16 @@ $text-yellow: #863b00;
   border-right: 1px solid $border;
 }
 
+.blink {
+  animation: 1s blink ease;
+}
+
+@keyframes blink {
+  50% {
+    background-color: $fg-green;
+  }
+}
+
 .alert-fg-red {
   background-color: $fg-red;
 }
