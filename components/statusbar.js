@@ -8,7 +8,7 @@ export default function StatusBar({texts}) {
   const textsMap = useMemo(() => {
     const obj = Object.entries(Object.assign(cacheMap.current, texts)).reduce((obj, [key, value]) => {
       if (typeof value.text === "string") {
-        if (value) {
+        if (value.text) {
           obj[key] = value;
         } else {
           delete obj[key];
