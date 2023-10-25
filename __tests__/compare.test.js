@@ -465,6 +465,13 @@ describe("semanticCompare", () => {
 }`,
       {
         hunks: [
+          new compare.Diff(17, 6, compare.DEL),
+          new compare.Diff(38, 6, compare.DEL),
+          new compare.Diff(60, 6, compare.DEL),
+          new compare.Diff(85, 6, compare.DEL),
+          new compare.Diff(109, 6, compare.DEL),
+          new compare.Diff(139, 6, compare.DEL),
+          new compare.Diff(158, 6, compare.DEL),
           new compare.Diff(193, 15, compare.DEL),
           new compare.Diff(214, 16, compare.DEL),
           new compare.Diff(236, 19, compare.DEL),
@@ -678,6 +685,8 @@ describe("semanticCompare", () => {
       {
         hunks: [
           new compare.Diff(55, 19, compare.DEL),
+          new compare.Diff(158, 1, compare.DEL),
+          new compare.Diff(181, 4, compare.DEL),
           new compare.Diff(206, 4, compare.DEL),
           new compare.Diff(252, 4, compare.DEL),
           new compare.Diff(282, 12, compare.DEL),
@@ -695,6 +704,7 @@ describe("semanticCompare", () => {
           new compare.Diff(204, 6, compare.INS),
           new compare.Diff(231, 5, compare.INS),
           new compare.Diff(278, 2, compare.INS),
+          new compare.Diff(306, 4, compare.INS),
           new compare.Diff(390, 50, compare.INS),
           new compare.Diff(476, 12, compare.INS),
           new compare.Diff(518, 14, compare.INS),
@@ -943,6 +953,35 @@ c
             new compare.Diff(0, 5, compare.INS),
             new compare.Diff(9, 19, compare.INS),
             new compare.Diff(39, 20, compare.INS),
+          ],
+        },
+      );
+    });
+
+    test("diff error 2", () => {
+      expectEq(
+        `[
+    {
+        "recharge": 9642800000
+    },
+    {
+        "available": 19700000
+    }
+]`,
+        `[
+    {
+        "recharge": 900000
+    },
+    {
+        "available": 0
+    }
+]`,
+        {
+          hunks: [
+            new compare.Diff(28, 10, compare.DEL),
+            new compare.Diff(73, 8, compare.DEL),
+            new compare.Diff(28, 6, compare.INS),
+            new compare.Diff(69, 1, compare.INS),
           ],
         },
       );
