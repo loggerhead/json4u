@@ -1,8 +1,8 @@
+import {Button} from '@arco-design/web-react';
+
 export default function MyButton({onClick, children}) {
   return (
-    <button onClick={onClick} className="button-action">
-      {children}
-    </button>
+    <Button size="mini" type="secondary" onClick={onClick}>{children}</Button>
   );
 }
 

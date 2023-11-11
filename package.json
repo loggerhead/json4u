@@ -12,6 +12,7 @@
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
+    "@arco-design/web-react": "^2.55.2",
     "@monaco-editor/react": "^4.5.1",
     "monaco-editor": "^0.40.0",
     "next": "13.4.7",
@@ -28,7 +29,6 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/mdx": "^2.0.5",
     "autoprefixer": "10.4.14",
-    "daisyui": "^3.2.1",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.7",
     "fs": "^0.0.1-security",
