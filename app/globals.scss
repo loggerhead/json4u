@@ -12,8 +12,6 @@ $margin-red: #ffd7d5;
 $margin-green: #ccffd8;
 
 $border: #c4c4c4;
-$btn-bg: #fff;
-$box-shadow: #00000014;
 $bar-bg: #fafafa;
 $text: #171717;
 $text-red: #cb2a2f;
@@ -29,13 +27,6 @@ $text-yellow: #863b00;
 /* fix monaco 不能根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */
 .monaco-editor {
   position: absolute !important;
-}
-
-.switch-label {
-  display: flex;
-  user-select: none;
-  align-items: center;
-  justify-content: space-between;
 }
 
 // diff 填充块
@@ -59,10 +50,6 @@ $text-yellow: #863b00;
   50% {
     background-color: $fg-green;
   }
-}
-
-.alert-fg-red {
-  background-color: $fg-red;
 }
 
 .margin-del {
@@ -97,10 +84,8 @@ $text-yellow: #863b00;
   border-color: $border;
 }
 
-.button-border {
-  border-radius: 4px;
-  box-shadow: 0 0 0 0.5px $box-shadow;
-  background: $btn-bg;
+.alert-fg-red {
+  background-color: $fg-red;
 }
 
 .alert-black {
@@ -121,10 +106,4 @@ $text-yellow: #863b00;
 
 .alert-red {
   color: $text-red;
-}
-
-@layer components {
-  .button-action {
-    @apply text-color button-border btn btn-xs normal-case;
-  }
 }

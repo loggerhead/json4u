@@ -1,6 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import {useEffect, useRef, useState} from "react";
+import "@arco-design/web-react/dist/css/arco.css";
 import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
