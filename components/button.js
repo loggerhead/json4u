@@ -1,8 +1,9 @@
 import {Button} from '@arco-design/web-react';
+import {getLastEditor} from './helper';
 
 export default function MyButton({onClick, children}) {
   return (
-    <Button size="mini" type="secondary" onClick={onClick}>{children}</Button>
+    <Button size="mini" style={{color: "black"}} onClick={onClick}>{children}</Button>
   );
 }
 
@@ -12,14 +13,6 @@ export function FormatButton({leftEditorRef, rightEditorRef}) {
 
 export function MinifyButton({leftEditorRef, rightEditorRef}) {
   return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).minify()}>最小化</MyButton>;
-}
-
-export function EscapeButton({leftEditorRef, rightEditorRef}) {
-  return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).escape()}>转义</MyButton>;
-}
-
-export function UnescapeButton({leftEditorRef, rightEditorRef}) {
-  return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).unescape()}>去转义</MyButton>;
 }
 
 export function CompareButton({editorRef}) {
@@ -32,9 +25,4 @@ export function TextCompareAfterSortButton({leftEditorRef, rightEditorRef}) {
     rightEditorRef.current.sort();
     rightEditorRef.current.compare(true);
   }}>排序后文本比较</MyButton>;
-}
-
-function getLastEditor(leftEditorRef, rightEditorRef) {
-  const [l, r] = [leftEditorRef.current, rightEditorRef.current];
-  return l.focusTime() >= r.focusTime() ? l : r;
 }

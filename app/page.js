@@ -7,14 +7,8 @@ import Toggler from "../components/toggler";
 import Loading from "../components/loading";
 import StatusBar from "../components/statusbar";
 import Switch from "../components/switch";
-import {
-  CompareButton,
-  EscapeButton,
-  FormatButton,
-  MinifyButton,
-  TextCompareAfterSortButton,
-  UnescapeButton,
-} from "../components/button";
+import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} from "../components/button";
+import {LeftMenu} from "../components/menu";
 import version from "../lib/version";
 
 const editorHeight = "calc(100vh - 6rem)";
@@ -63,10 +57,7 @@ export default function Home() {
                 <MinifyButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></MinifyButton>
               </li>
               <li>
-                <EscapeButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></EscapeButton>
-              </li>
-              <li>
-                <UnescapeButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></UnescapeButton>
+                <LeftMenu leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></LeftMenu>
               </li>
               <li>
                 <Switch text={"自动格式化"} onCheck={(checked) => enableAutoFormatRef.current = checked}></Switch>
