@@ -8,9 +8,9 @@ export default function Switch({text, onCheck}) {
   const [checked, setChecked] = useState(true);
 
   return (
-    <ArcoSwitch checkedText={text} uncheckedText={text} onClick={() => {
-      setChecked(!checked);
-      onCheck(!checked);
+    <ArcoSwitch defaultChecked checkedText={text} uncheckedText={text} onChange={(value, event) => {
+      setChecked(value);
+      onCheck(value);
     }}/>
   );
 }
