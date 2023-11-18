@@ -7,7 +7,13 @@ import Toggler from "../components/toggler";
 import Loading from "../components/loading";
 import StatusBar from "../components/statusbar";
 import Switch from "../components/switch";
-import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} from "../components/button";
+import {
+  CompareButton,
+  FormatButton,
+  MinifyButton,
+  TextCompareAfterSortButton,
+  UnescapeButton,
+} from "../components/button";
 import {LeftMenu} from "../components/menu";
 import version from "../lib/version";
 
@@ -55,6 +61,9 @@ export default function Home() {
               </li>
               <li>
                 <MinifyButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></MinifyButton>
+              </li>
+              <li>
+                <UnescapeButton leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></UnescapeButton>
               </li>
               <li>
                 <LeftMenu leftEditorRef={leftEditorRef} rightEditorRef={rightEditorRef}></LeftMenu>

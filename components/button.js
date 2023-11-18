@@ -3,7 +3,10 @@ import {getLastEditor} from './helper';
 
 export default function MyButton({onClick, children}) {
   return (
-    <Button size="mini" style={{color: "black"}} onClick={onClick}>{children}</Button>
+    <Button size="mini" style={{
+      color: "black",
+      fontWeight: "450",
+    }} onClick={onClick}>{children}</Button>
   );
 }
 
@@ -13,6 +16,10 @@ export function FormatButton({leftEditorRef, rightEditorRef}) {
 
 export function MinifyButton({leftEditorRef, rightEditorRef}) {
   return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).minify()}>最小化</MyButton>;
+}
+
+export function UnescapeButton({leftEditorRef, rightEditorRef}) {
+  return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).unescape()}>去转义</MyButton>;
 }
 
 export function CompareButton({editorRef}) {

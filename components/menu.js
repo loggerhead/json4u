@@ -15,7 +15,6 @@ export function LeftMenu({leftEditorRef, rightEditorRef}) {
   const dropList = (
     <Menu onClickMenuItem={onClick} style={{maxHeight: "400px"}}>
       <Menu.Item key="escape">转义</Menu.Item>
-      <Menu.Item key="unescape">去转义</Menu.Item>
       <Divider style={{margin: '4px 0'}}/>
       <Menu.Item key="sort">排序（升序）</Menu.Item>
       <Menu.Item key="sortReverse">排序（降序）</Menu.Item>
