@@ -2,7 +2,7 @@ import {Button} from '@arco-design/web-react';
 import {getLastEditor} from '@/features/ctxSlice';
 import {useSelector} from "react-redux";
 
-export default function MyButton({onClick, children}) {
+export function MyButton({onClick, children}) {
   return (
     <Button size="mini" style={{
       color: "black",
