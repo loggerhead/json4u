@@ -2,7 +2,7 @@
 import {useMemo, useRef} from "react";
 import * as color from "../lib/color";
 
-// texts 结构：[ { id: { text, blink }} ]
+// texts 结构：{ id: { text, blink }}
 export default function StatusBar({texts}) {
   const cacheMap = useRef({});
   const textsMap = useMemo(() => {
