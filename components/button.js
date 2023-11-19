@@ -1,5 +1,6 @@
 import {Button} from '@arco-design/web-react';
-import {getLastEditor} from './helper';
+import {getLastEditor} from '@/features/ctxSlice';
+import {useSelector} from "react-redux";
 
 export default function MyButton({onClick, children}) {
   return (
@@ -10,26 +11,32 @@ export default function MyButton({onClick, children}) {
   );
 }
 
-export function FormatButton({leftEditorRef, rightEditorRef}) {
-  return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).format()}>格式化</MyButton>;
+export function FormatButton() {
+  const ctx = useSelector((state) => state.ctx);
+  return <MyButton onClick={() => getLastEditor(ctx.leftEditor, ctx.rightEditor).format()}>格式化</MyButton>;
 }
 
-export function MinifyButton({leftEditorRef, rightEditorRef}) {
-  return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).minify()}>最小化</MyButton>;
+export function MinifyButton() {
+  const ctx = useSelector((state) => state.ctx);
+  return <MyButton onClick={() => getLastEditor(ctx.leftEditor, ctx.rightEditor).minify()}>最小化</MyButton>;
 }
 
-export function UnescapeButton({leftEditorRef, rightEditorRef}) {
-  return <MyButton onClick={() => getLastEditor(leftEditorRef, rightEditorRef).unescape()}>去转义</MyButton>;
+export function UnescapeButton() {
+  const ctx = useSelector((state) => state.ctx);
+  return <MyButton onClick={() => getLastEditor(ctx.leftEditor, ctx.rightEditor).unescape()}>去转义</MyButton>;
 }
 
-export function CompareButton({editorRef}) {
-  return <MyButton onClick={() => editorRef.current.compare()}>比较</MyButton>;
+export function CompareButton() {
+  const ctx = useSelector((state) => state.ctx);
+  return <MyButton onClick={() => ctx.rightEditor.compare()}>比较</MyButton>;
 }
 
-export function TextCompareAfterSortButton({leftEditorRef, rightEditorRef}) {
+export function TextCompareAfterSortButton() {
+  const ctx = useSelector((state) => state.ctx);
+
   return <MyButton onClick={() => {
-    leftEditorRef.current.sort();
-    rightEditorRef.current.sort();
-    rightEditorRef.current.compare(true);
+    ctx.leftEditor.sort();
+    ctx.rightEditor.sort();
+    ctx.rightEditor.compare(true);
   }}>排序后文本比较</MyButton>;
 }

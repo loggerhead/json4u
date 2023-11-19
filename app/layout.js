@@ -1,5 +1,6 @@
 import Script from "next/script";
 import Footer from "../components/footer";
+import {Providers} from "@/components/provider";
 import "./globals.scss";
 
 const title = "JSON For You";
@@ -8,7 +9,7 @@ const description =
 const creator = "loggerhead";
 
 // SEO: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
-export function generateMetadata({ params, searchParams }, parent) {
+export function generateMetadata({params, searchParams}, parent) {
   return {
     metadataBase: new URL("https://json4u.com"),
     alternates: {
@@ -40,15 +41,17 @@ export function generateMetadata({ params, searchParams }, parent) {
   };
 }
 
-export default function RootLayout({ children }) {
+export default function RootLayout({children}) {
   return (
     <html>
-      <GoogleTagManagerHead></GoogleTagManagerHead>
-      <body>
-        <main>{children}</main>
-        <Footer></Footer>
-        <GoogleTagManagerBody></GoogleTagManagerBody>
-      </body>
+    <GoogleTagManagerHead></GoogleTagManagerHead>
+    <body>
+    <Providers>
+      <main>{children}</main>
+    </Providers>
+    <Footer></Footer>
+    <GoogleTagManagerBody></GoogleTagManagerBody>
+    </body>
     </html>
   );
 }
