@@ -7,7 +7,7 @@ import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
 import StatusBar from "../components/statusbar";
-import Switch from "../components/switch";
+import {FormatSwitch, SortSwitch} from "@/components/switch";
 import {
   CompareButton,
   FormatButton,
@@ -17,7 +17,7 @@ import {
 } from "@/components/button";
 import {LeftMenu} from "@/components/menu";
 import version from "../lib/version";
-import {switchAutoFormat, switchHideRightEditor} from '@/features/ctxSlice';
+import {switchHideRightEditor} from '@/features/ctxSlice';
 
 const editorHeight = "calc(100vh - 6rem)";
 
@@ -46,23 +46,12 @@ export default function Home() {
         >
           <div className="flex relative justify-between	clear-both">
             <ul className="flex space-x-2 items-center">
-              <li>
-                <FormatButton></FormatButton>
-              </li>
-              <li>
-                <MinifyButton></MinifyButton>
-              </li>
-              <li>
-                <UnescapeButton></UnescapeButton>
-              </li>
-              <li>
-                <LeftMenu></LeftMenu>
-              </li>
-              <li>
-                <Switch text={"自动格式化"}
-                        checked={ctx.enableAutoFormat}
-                        onCheck={() => dispatch(switchAutoFormat())}></Switch>
-              </li>
+              <li><FormatButton></FormatButton></li>
+              <li><MinifyButton></MinifyButton></li>
+              <li><UnescapeButton></UnescapeButton></li>
+              <li><LeftMenu></LeftMenu></li>
+              <li><FormatSwitch></FormatSwitch></li>
+              <li><SortSwitch></SortSwitch></li>
             </ul>
             <ul className="flex right">
               <li>

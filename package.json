@@ -1,6 +1,6 @@
 {
   "name": "json4u-react",
-  "version": "2.9.2",
+  "version": "2.10.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
