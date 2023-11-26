@@ -26,8 +26,10 @@ export default function Home() {
   const leftContainerRef = useRef(null);
 
   useEffect(() => {
+    // 从 local storage 读默认配置
+    dispatch({type: "ctx/setSettings", payload: localStorage.getItem('settings')});
     console.log(`JSON For You 当前版本：${version}`);
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="gap-2 mx-5 mt-2">
