@@ -1,9 +1,9 @@
 // jest 文档：https://jestjs.io/docs/expect
 import * as format from "../lib/format";
 
-describe("tryFormat", () => {
+describe("format", () => {
   function expectEq(text, expected) {
-    const s = format.tryFormat(text);
+    const s = format.format(text);
     expect(s).toEqual(expected);
   }
 
@@ -36,18 +36,18 @@ describe("tryFormat", () => {
             }
         }
     }
-}`
+}`,
     );
   });
 
   test("end with }", () => {
     expectEq(
-`{"foo":"bar"}
+      `{"foo":"bar"}
 }}`,
       `{
     "foo": "bar"
 }
-}}`
+}}`,
     );
   });
 });
