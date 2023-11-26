@@ -8,7 +8,7 @@ export function FormatSwitch() {
   const dispatch = useDispatch();
 
   const name = "自动格式化";
-  const desc = "粘贴时，执行格式化";
+  const desc = "粘贴或拖拽上传文件时，执行格式化";
 
   return (
     <Popover position="bottom" content={desc}>
@@ -26,7 +26,7 @@ export function SortSwitch() {
   const dispatch = useDispatch();
 
   const name = "自动排序";
-  const desc = <span>粘贴时，执行 JSON 升序排序。<br/>比较时，进行文本比较。</span>;
+  const desc = <span>粘贴或拖拽上传文件时，执行 JSON 升序排序。<br/>比较时，进行文本比较。</span>;
 
   return (
     <Popover position="bottom" content={desc}>
