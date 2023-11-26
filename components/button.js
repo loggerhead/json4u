@@ -21,11 +21,6 @@ export function MinifyButton() {
   return <MyButton onClick={() => getLastEditor(ctx.leftEditor, ctx.rightEditor).minify()}>最小化</MyButton>;
 }
 
-export function UnescapeButton() {
-  const ctx = useSelector((state) => state.ctx);
-  return <MyButton onClick={() => getLastEditor(ctx.leftEditor, ctx.rightEditor).unescape()}>去转义</MyButton>;
-}
-
 export function CompareButton() {
   const ctx = useSelector((state) => state.ctx);
   return <MyButton onClick={() => ctx.rightEditor.compare()}>比较</MyButton>;

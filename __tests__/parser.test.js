@@ -2,10 +2,10 @@
 import * as parser from "../lib/parser";
 
 describe("parseJSON", () => {
-  function expectEq(text, expected, order = "") {
-    const [node, errors] = parser.parseJSON(text);
+  function expectEq(text, expected, nest = false) {
+    const [node, errors] = parser.parseJSON(text, nest);
     expect(errors).toEqual([]);
-    expect(node.stringify(order)).toEqual(expected);
+    expect(node.stringify()).toEqual(expected);
   }
 
   test("object", () => {
@@ -28,6 +28,11 @@ describe("parseJSON", () => {
     expectEq(`0.1234567891111111111`, `0.1234567891111111111`);
     expectEq(`true`, `true`);
     expectEq(`null`, `null`);
+  });
+
+  test("nest parse", () => {
+    expectEq(`{"a":"{\\"bb\\":\\"2\\"}"}`, `{"a":{"bb":"2"}}`, true);
+    expectEq(`{"a":"{\\"bb\\":\\"{\\\\\\"ccc\\\\\\":3}\\"}"}`, `{"a":{"bb":{"ccc":3}}}`, true);
   });
 });
 
