@@ -7,14 +7,8 @@ import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
 import StatusBar from "../components/statusbar";
-import {FormatSwitch, SortSwitch} from "@/components/switch";
-import {
-  CompareButton,
-  FormatButton,
-  MinifyButton,
-  TextCompareAfterSortButton,
-  UnescapeButton,
-} from "@/components/button";
+import {FormatSwitch, NestParseSwitch, SortSwitch} from "@/components/switch";
+import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} from "@/components/button";
 import {LeftMenu} from "@/components/menu";
 import version from "../lib/version";
 import {switchHideRightEditor} from '@/features/ctxSlice';
@@ -48,10 +42,10 @@ export default function Home() {
             <ul className="flex space-x-2 items-center">
               <li><FormatButton></FormatButton></li>
               <li><MinifyButton></MinifyButton></li>
-              <li><UnescapeButton></UnescapeButton></li>
               <li><LeftMenu></LeftMenu></li>
               <li><FormatSwitch></FormatSwitch></li>
               <li><SortSwitch></SortSwitch></li>
+              <li><NestParseSwitch></NestParseSwitch></li>
             </ul>
             <ul className="flex right">
               <li>
