@@ -22,6 +22,10 @@ $text-yellow: #863b00;
 .markdown-body {
   box-sizing: border-box;
   margin: 1.25rem auto !important;
+
+  ul {
+    list-style-type: disc;
+  }
 }
 
 /* fix monaco 不能根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */

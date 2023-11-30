@@ -1,5 +1,6 @@
 import "github-markdown-css";
 
+// 考虑替换成 https://remarkjs.github.io/react-markdown/
 export default async function MdxLayout({children}) {
   return (
     <div
