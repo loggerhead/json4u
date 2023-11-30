@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@arco-design/web-react": "^2.55.2",
+    "@elastic/micro-jq": "^1.7.0",
     "@monaco-editor/react": "^4.5.1",
     "@reduxjs/toolkit": "^1.9.7",
     "monaco-editor": "^0.40.0",
@@ -29,6 +30,7 @@
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^13.4.12",
     "@next/mdx": "^13.4.10",
+    "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.9",
     "@types/mdx": "^2.0.5",
     "autoprefixer": "10.4.14",

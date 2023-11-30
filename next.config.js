@@ -11,7 +11,7 @@ const nextConfig = {
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   distDir: "dist",
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
+  webpack: (config, {buildId, dev, isServer, defaultLoaders, nextRuntime, webpack}) => {
     if (!isServer) {
       config.plugins.push(
         new MonacoWebpackPlugin({
@@ -26,10 +26,14 @@ const nextConfig = {
             "wordHighlighter", // 高亮光标停留位置的词
           ],
           filename: "static/[name].worker.js",
-        })
+        }),
       );
     }
 
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
     return config;
   },
 };

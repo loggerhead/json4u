@@ -6,7 +6,7 @@ import "@arco-design/web-react/dist/css/arco.css";
 import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
-import StatusBar from "../components/statusbar";
+import StatusBar from "../components/statusBar";
 import {FormatSwitch, NestParseSwitch, SortSwitch} from "@/components/switch";
 import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} from "@/components/button";
 import {LeftMenu} from "@/components/menu";
@@ -83,7 +83,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <StatusBar texts={ctx.statusBar}></StatusBar>
+      <StatusBar></StatusBar>
     </div>
   );
 }

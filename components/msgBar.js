@@ -3,7 +3,7 @@ import {useMemo, useRef} from "react";
 import * as color from "../lib/color";
 
 // texts 结构：{ id: { text, blink }}
-export default function StatusBar({texts}) {
+export default function MsgBar({texts}) {
   const cacheMap = useRef({});
   const textsMap = useMemo(() => {
     const obj = Object.entries(Object.assign(cacheMap.current, texts)).reduce((obj, [key, value]) => {
@@ -44,11 +44,11 @@ export default function StatusBar({texts}) {
   };
 
   return (
-    <div className="flex min-h-[22px] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar">
+    <>
       {genAlerts(leftKeys)}
       <div className="grow"></div>
       {genAlerts(rightKeys)}
-    </div>
+    </>
   );
 }
 
