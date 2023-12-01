@@ -1,5 +1,5 @@
 "use client";
-import {Button, Input} from "@arco-design/web-react";
+import {Button, Input, Tooltip} from "@arco-design/web-react";
 import MsgBar from "./msgBar";
 import {useDispatch, useSelector} from "react-redux";
 import {getLastEditor, getPairEditor, setLastCmd, switchEnableCmdMode} from "@/features/ctxSlice";
@@ -13,6 +13,7 @@ export default function StatusBar({texts}) {
   const dispatch = useDispatch();
   const [parseFailed, setParseFailed] = useState(false);
   const [input, setInput] = useState('');
+  const [popVisible, setPopVisible] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -54,11 +55,15 @@ export default function StatusBar({texts}) {
   return (
     <div
       className={`flex items-center min-h-[${height}] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar`}>
-      <Button style={{width: height, height: height, border: 0, borderRadius: 0}}
-              type="primary"
-              icon=">"
-              status={ctx.enableCmdMode ? "success" : "default"}
-              onClick={() => dispatch(switchEnableCmdMode())}/>
+      <Tooltip mini popupVisible={ctx.enableCmdMode ? false : popVisible}
+               onVisibleChange={(visible) => setPopVisible(visible)}
+               content="点击按钮切换到命令模式，使用 jq 处理 JSON">
+        <Button style={{width: height, height: height, border: 0, borderRadius: 0}}
+                type="primary"
+                icon=">"
+                status={ctx.enableCmdMode ? "success" : "default"}
+                onClick={() => dispatch(switchEnableCmdMode())}/>
+      </Tooltip>
       {
         ctx.enableCmdMode ?
           <Input allowClear
