@@ -1,8 +1,9 @@
 "use client";
+import "@arco-design/web-react/dist/css/arco.css";
 import dynamic from "next/dynamic";
 import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from 'react-redux';
-import "@arco-design/web-react/dist/css/arco.css";
+import * as Sentry from "@sentry/react";
 import Dragbar from "../components/dragbar";
 import Toggler from "../components/toggler";
 import Loading from "../components/loading";
@@ -32,58 +33,60 @@ export default function Home() {
   }, [dispatch]);
 
   return (
-    <div className="gap-2 mx-5 mt-2">
-      <div className="flex">
-        <div
-          ref={leftContainerRef}
-          className={`flex flex-col shrink min-w-fit relative gap-2 ${
-            ctx.hideRightEditor === 0 ? "basis-1/2 md:basis-8/12" : ctx.hideRightEditor ? "basis-full" : "basis-1/2"
-          }`}
-        >
-          <div className="flex relative justify-between	clear-both">
+    <Sentry.ErrorBoundary>
+      <div className="gap-2 mx-5 mt-2">
+        <div className="flex">
+          <div
+            ref={leftContainerRef}
+            className={`flex flex-col shrink min-w-fit relative gap-2 ${
+              ctx.hideRightEditor === 0 ? "basis-1/2 md:basis-8/12" : ctx.hideRightEditor ? "basis-full" : "basis-1/2"
+            }`}
+          >
+            <div className="flex relative justify-between	clear-both">
+              <ul className="flex space-x-2 items-center">
+                <li><FormatButton></FormatButton></li>
+                <li><MinifyButton></MinifyButton></li>
+                <li><LeftMenu></LeftMenu></li>
+                <li><FormatSwitch></FormatSwitch></li>
+                <li><SortSwitch></SortSwitch></li>
+                <li><NestParseSwitch></NestParseSwitch></li>
+              </ul>
+              <ul className="flex right">
+                <li>
+                  <Toggler
+                    hidden={ctx.hideRightEditor}
+                    onClick={() => {
+                      leftContainerRef.current.style.flexBasis = "";
+                      dispatch(switchHideRightEditor());
+                    }}
+                  ></Toggler>
+                </li>
+              </ul>
+            </div>
+            <div className="border border-solid border-color">
+              <MyEditor name="left" height={editorHeight}></MyEditor>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="invisible h-6 my-px"></div>
+            <Dragbar containerRef={leftContainerRef} className={ctx.hideRightEditor ? "hidden" : ""}></Dragbar>
+          </div>
+          <div className={`flex flex-col grow shrink min-w-fit gap-2 ${ctx.hideRightEditor ? "hidden" : ""}`}>
             <ul className="flex space-x-2 items-center">
-              <li><FormatButton></FormatButton></li>
-              <li><MinifyButton></MinifyButton></li>
-              <li><LeftMenu></LeftMenu></li>
-              <li><FormatSwitch></FormatSwitch></li>
-              <li><SortSwitch></SortSwitch></li>
-              <li><NestParseSwitch></NestParseSwitch></li>
-            </ul>
-            <ul className="flex right">
               <li>
-                <Toggler
-                  hidden={ctx.hideRightEditor}
-                  onClick={() => {
-                    leftContainerRef.current.style.flexBasis = "";
-                    dispatch(switchHideRightEditor());
-                  }}
-                ></Toggler>
+                <CompareButton></CompareButton>
+              </li>
+              <li>
+                <TextCompareAfterSortButton></TextCompareAfterSortButton>
               </li>
             </ul>
-          </div>
-          <div className="border border-solid border-color">
-            <MyEditor name="left" height={editorHeight}></MyEditor>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="invisible h-6 my-px"></div>
-          <Dragbar containerRef={leftContainerRef} className={ctx.hideRightEditor ? "hidden" : ""}></Dragbar>
-        </div>
-        <div className={`flex flex-col grow shrink min-w-fit gap-2 ${ctx.hideRightEditor ? "hidden" : ""}`}>
-          <ul className="flex space-x-2 items-center">
-            <li>
-              <CompareButton></CompareButton>
-            </li>
-            <li>
-              <TextCompareAfterSortButton></TextCompareAfterSortButton>
-            </li>
-          </ul>
-          <div className="border border-solid border-color">
-            <MyEditor name="right" height={editorHeight}></MyEditor>
+            <div className="border border-solid border-color">
+              <MyEditor name="right" height={editorHeight}></MyEditor>
+            </div>
           </div>
         </div>
+        <StatusBar></StatusBar>
       </div>
-      <StatusBar></StatusBar>
-    </div>
+    </Sentry.ErrorBoundary>
   );
 }

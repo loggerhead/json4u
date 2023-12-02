@@ -1,5 +1,5 @@
 import Script from "next/script";
-import Footer from "../components/footer";
+import Footer from "@/components/footer";
 import {Providers} from "@/components/provider";
 import "./globals.scss";
 
@@ -47,7 +47,7 @@ export default function RootLayout({children}) {
     <GoogleTagManagerHead></GoogleTagManagerHead>
     <body>
     <Providers>
-      <main>{children}</main>
+        <main>{children}</main>
     </Providers>
     <Footer></Footer>
     <GoogleTagManagerBody></GoogleTagManagerBody>
