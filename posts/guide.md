@@ -62,6 +62,9 @@ JSON 语义化比较（又被称作 JSON 结构化比较）是指忽略 JSON 中
 
 ## 更新日志
 
+- 2023-12-04:
+    - 优化 inline diff 性能；
+    - fix 通过菜单项升序排序时未自动格式化的 bug；
 - 2023-12-02:
     - 支持 [jq](https://jqlang.github.io/jq/tutorial/) 核心功能；
     - 优化格式化算法；
