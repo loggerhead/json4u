@@ -1,4 +1,6 @@
+const TerserPlugin = require("terser-webpack-plugin");
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
+const isProd = process.env.NODE_ENV === 'production';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -29,6 +31,15 @@ const nextConfig = {
         }),
       );
     }
+
+    config.optimization = {
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          parallel: true,
+        }),
+      ],
+    };
 
     config.module.rules.push({
       test: /\.svg$/,
