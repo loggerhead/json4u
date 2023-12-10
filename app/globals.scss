@@ -12,6 +12,7 @@ $margin-red: #ffd7d5;
 $margin-green: #ccffd8;
 
 $border: #c4c4c4;
+$border-active: #60A5FAFF;
 $bar-bg: #fafafa;
 $text: #171717;
 $text-red: #cb2a2f;
@@ -87,6 +88,10 @@ $statusbar-error: #ffece8;
 
 .border-color {
   border-color: $border;
+}
+
+.border-active {
+  border-color: $border-active;
 }
 
 .alert-fg-red {

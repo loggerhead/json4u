@@ -63,7 +63,7 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            <div className="border border-solid border-color">
+            <div className={`border border-solid ${ctx.focusLeft ? "border-active" : "border-color"}`}>
               <MyEditor name="left" height={editorHeight}></MyEditor>
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function Home() {
                 <TextCompareAfterSortButton></TextCompareAfterSortButton>
               </li>
             </ul>
-            <div className="border border-solid border-color">
+            <div className={`border border-solid ${ctx.focusLeft ? "border-color" : "border-active"}`}>
               <MyEditor name="right" height={editorHeight}></MyEditor>
             </div>
           </div>

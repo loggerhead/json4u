@@ -37,6 +37,8 @@ export const ctxSlice = createSlice({
     leftEditor: null,
     // 右侧编辑器
     rightEditor: null,
+    // 聚焦在左侧编辑器吗？
+    focusLeft: true,
   },
   reducers: {
     setSettings(state, action) {
@@ -73,6 +75,12 @@ export const ctxSlice = createSlice({
     setRightEditor: (state, action) => {
       state.rightEditor = action.payload;
     },
+    setFocusLeft: (state) => {
+      state.focusLeft = true;
+    },
+    setFocusRight: (state) => {
+      state.focusLeft = false;
+    },
   },
 });
 
@@ -87,13 +95,14 @@ export const {
   setStatusBar,
   setLeftEditor,
   setRightEditor,
+  setFocusLeft,
+  setFocusRight,
 } = ctxSlice.actions;
 
 export const ctxReducer = ctxSlice.reducer;
 
 export function getLastEditor(ctx) {
-  const [l, r] = [ctx.leftEditor, ctx.rightEditor];
-  return l?.focusTime() >= r?.focusTime() ? l : r;
+  return ctx.focusLeft? ctx.leftEditor : ctx.rightEditor;
 }
 
 // 获取另一个编辑器
