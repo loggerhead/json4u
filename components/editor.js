@@ -8,7 +8,7 @@ import {ctx} from "@/lib/store";
 
 loader.config({
   paths: {
-    vs: "http://cdn.json4u.com/monaco-editor/0.45.0/min/vs",
+    vs: "https://cdn.json4u.com/monaco-editor/0.45.0/min/vs",
   },
 });
 
