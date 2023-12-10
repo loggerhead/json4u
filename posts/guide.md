@@ -45,10 +45,16 @@ JSON 语义化比较（又被称作 JSON 结构化比较）是指忽略 JSON 中
   diff 集中在一起，方便人眼查看；
 - **显示 JSON 路径**（JSON Pointer/Path）。鼠标点击任意处，会展示对应 token
   的 [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901)。和 minimap 搭配使用，能帮助快速理解 JSON 的结构；
-- **URL 转 JSON**。递归的解析 URL 转成一个 JSON。如果需要对比两个 URL 的 diff，先转成 JSON 再使用 diff 就非常方便。
+- **URL 转 JSON**。递归的解析 URL 转成一个 JSON。如果需要对比两个 URL 的 diff，先转成 JSON 再使用 diff 就非常方便；
 
   ![URL to JSON example](/guide/url2json-before.png)
   ![URL to JSON example](/guide/url2json-after.png)
+
+- **[jq 命令行工具](https://jqlang.github.io/jq/tutorial/)**。jq 是一个非常强大的 JSON 处理工具，JSON For You 通过 Wasm
+  支持了 [jq 的全部功能](https://jqlang.github.io/jq/manual/v1.7/)，以满足更复杂的 JSON 过滤、处理等需求；
+
+  ![jq example 1](/guide/jq1.png)
+  ![jq example 2](/guide/jq2.png)
 
 ## 编辑器功能
 
@@ -63,7 +69,7 @@ JSON 语义化比较（又被称作 JSON 结构化比较）是指忽略 JSON 中
 ## 更新日志
 
 - 2023-12-10:
-    - 支持 jq 1.7 全部功能；
+    - 支持 [jq 1.7](https://jqlang.github.io/jq/tutorial/) 全部功能；
     - 优化 inline diff 性能；
     - 优化 monaco CDN 缓存；
     - fix 通过菜单项升序排序时未自动格式化的 bug；
