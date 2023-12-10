@@ -32,34 +32,38 @@ export default function StatusBar({texts}) {
   };
 
   const execJq = async (filter, alert = false) => {
-    const text = getLastEditor(ctx)?.text();
-    if (!text) {
+    const editor = getLastEditor(ctx);
+    const text = editor?.text();
+
+    const print = (msg, isError = false) => {
+      if (alert) {
+        show(msg, isError);
+      } else {
+        console.log(msg);
+      }
+    };
+
+    if (!editor) {
+      return;
+    } else if (!text) {
+      print(`${editor.isLeft() ? "左侧编辑器" : "右侧编辑器"}输入为空`);
       return;
     }
 
     const [edited, err] = await jq.jq(text, filter);
+    setParseFailed(Boolean(err));
 
     if (err) {
-      setParseFailed(true);
-      const errmsg = `执行 jq 失败: ${err}`;
-
-      if (alert) {
-        Message.error({
-          content: errmsg,
-          style: {
-            whiteSpace: "pre-line",
-            textAlign: "left",
-          },
-          closable: true,
-        });
-      } else {
-        console.log(errmsg);
-      }
+      const msg = `执行 jq 失败: ${err}`;
+      print(msg, true);
     } else {
-      setParseFailed(false);
-      const editor = getPairEditor(ctx);
-      editor.setText(edited);
-      editor.revealLine(1);
+      if (edited.trim()) {
+        const editor = getPairEditor(ctx);
+        editor.setText(edited);
+        editor.revealLine(1);
+      } else {
+        print("执行 jq 成功，但输出为空");
+      }
     }
   };
 
@@ -97,18 +101,39 @@ export default function StatusBar({texts}) {
       {
         ctx.enableCmdMode ?
           <Input allowClear
-                 placeholder={`输入 jq 命令 (支持 jq ${jq.version})`}
+                 placeholder={`输入 jq filter (支持 jq ${jq.version})`}
                  size="mini"
                  style={{border: 0}}
                  className={`px-2.5 ${parseFailed ? "statusbar-error" : ""}`}
                  defaultValue={ctx.lastCmd}
                  onChange={onInputCmd}
-                 onPressEnter={(e) => {
+                 onPressEnter={async (e) => {
                    const filter = e.target.value;
-                   execJq(filter, true);
+                   await execJq(filter, true);
                  }}/> :
           <MsgBar texts={ctx.statusBar}></MsgBar>
       }
     </div>
   );
+}
+
+function show(msg, isError = false) {
+  let lines = msg.split("\n");
+
+  // 截断，仅保留前 10 行
+  if (lines.length > 10) {
+    lines = lines.slice(0, 10);
+    lines.push("...");
+  }
+
+  msg = lines.join("\n");
+
+  (isError ? Message.error : Message.info)({
+    content: msg,
+    style: {
+      whiteSpace: "pre-line",
+      textAlign: "left",
+    },
+    closable: true,
+  });
 }
