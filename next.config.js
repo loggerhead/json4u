@@ -1,5 +1,3 @@
-const TerserPlugin = require("terser-webpack-plugin");
-const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const isProd = process.env.NODE_ENV === 'production';
 
 /** @type {import('next').NextConfig} */
@@ -14,33 +12,6 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   distDir: "dist",
   webpack: (config, {buildId, dev, isServer, defaultLoaders, nextRuntime, webpack}) => {
-    if (!isServer) {
-      config.plugins.push(
-        new MonacoWebpackPlugin({
-          languages: ["json"],
-          features: [
-            "find", // 查找
-            "folding", // 折叠
-            "bracketMatching", // 高亮匹配的括号
-            "contextmenu", // 右键菜单
-            "indentation", // 缩进
-            "unusualLineTerminators", // invalid 换行符提示
-            "wordHighlighter", // 高亮光标停留位置的词
-          ],
-          filename: "static/[name].worker.js",
-        }),
-      );
-    }
-
-    config.optimization = {
-      minimize: true,
-      minimizer: [
-        new TerserPlugin({
-          parallel: true,
-        }),
-      ],
-    };
-
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],

@@ -1,17 +1,16 @@
 import {ReactReduxContext, useDispatch} from 'react-redux';
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import {Editor, loader} from "@monaco-editor/react";
 import Loading from "../components/loading";
 import {EditorRef} from "@/lib/editor/editor";
-// 查询框的 icon 图标以及折叠图标
-import "monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles";
-import "monaco-editor/esm/vs/editor/contrib/symbolIcons/browser/symbolIcons.js";
 import {useContext} from "react";
 import {getEditor, setLeftEditor, setRightEditor} from '@/features/ctxSlice';
 import {ctx} from "@/lib/store";
 
-// NOTICE: 目前删除不了内置的右键菜单项：https://github.com/microsoft/monaco-editor/issues/1567
-loader.config({monaco});
+loader.config({
+  paths: {
+    vs: "http://cdn.json4u.com/monaco-editor/0.45.0/min/vs",
+  },
+});
 
 export default function MyEditor({name, height}) {
   const {store} = useContext(ReactReduxContext);
