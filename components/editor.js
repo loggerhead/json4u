@@ -13,7 +13,7 @@ loader.config({
   },
 });
 
-export default function MyEditor({name, height}) {
+export default function MyEditor({name, timers, height}) {
   const {store} = useContext(ReactReduxContext);
   const dispatch = useDispatch();
 

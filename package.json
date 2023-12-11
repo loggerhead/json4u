@@ -1,11 +1,11 @@
 {
   "name": "json4u-react",
-  "version": "2.13.0",
+  "version": "2.13.1",
   "private": true,
   "scripts": {
     "serve": "lite-server --baseDir='dist'",
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest --env=node --colors",
@@ -41,6 +41,7 @@
     "github-markdown-css": "^5.2.0",
     "gray-matter": "^4.0.3",
     "jest": "^29.6.1",
+    "monaco-editor-webpack-plugin": "^7.1.0",
     "postcss": "^8.4.31",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
