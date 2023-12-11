@@ -13,6 +13,7 @@ import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} f
 import {LeftMenu} from "@/components/menu";
 import version from "../lib/version";
 import {switchHideRightEditor} from '@/features/ctxSlice';
+import {Message} from "@arco-design/web-react";
 
 const editorHeight = "calc(100vh - 6rem)";
 
@@ -25,12 +26,17 @@ export default function Home() {
   const ctx = useSelector((state) => state.ctx);
   const dispatch = useDispatch();
   const leftContainerRef = useRef(null);
+  const initTimers = useRef([]);
 
   useEffect(() => {
     // 从 local storage 读默认配置
     dispatch({type: "ctx/setSettings", payload: localStorage.getItem('settings')});
     console.log(`JSON For You 当前版本：${version}`);
-  }, [dispatch]);
+
+    initTimers.current.push(setTimeout(() => {
+      Message.warning("编辑器加载过慢，建议清除页面缓存后重试");
+    }, 5000));
+  }, []);
 
   return (
     <Sentry.ErrorBoundary>
@@ -64,7 +70,7 @@ export default function Home() {
               </ul>
             </div>
             <div className={`border border-solid ${ctx.focusLeft ? "border-active" : "border-color"}`}>
-              <MyEditor name="left" height={editorHeight}></MyEditor>
+              <MyEditor name="left" timers={initTimers} height={editorHeight}></MyEditor>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -81,7 +87,7 @@ export default function Home() {
               </li>
             </ul>
             <div className={`border border-solid ${ctx.focusLeft ? "border-color" : "border-active"}`}>
-              <MyEditor name="right" height={editorHeight}></MyEditor>
+              <MyEditor name="right" timers={initTimers} height={editorHeight}></MyEditor>
             </div>
           </div>
         </div>

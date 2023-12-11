@@ -43,6 +43,7 @@ export default function MyEditor({name, height}) {
           c.rightEditor.pair(c.leftEditor, c.rightEditor);
         }
 
+        timers.current.map(clearTimeout);
         const cost = performance.now() - now;
         console.log(`load ${name} editor cost: ${(cost / 1000).toFixed(2)}s`);
       }}
