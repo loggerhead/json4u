@@ -46,7 +46,7 @@ export default function StatusBar({texts}) {
     if (!editor) {
       return;
     } else if (!text) {
-      print(`${editor.isLeft() ? "左侧编辑器" : "右侧编辑器"}输入为空`);
+      print(`${editor.isLeft() ? "左侧" : "右侧"}输入为空`);
       return;
     }
 
@@ -87,7 +87,7 @@ export default function StatusBar({texts}) {
                   dispatch(switchEnableCmdMode());
 
                   if (!ctx.enableCmdMode) {
-                    const timer = setTimeout(() => setLoading(true), 500);
+                    const timer = setTimeout(() => setLoading(true), 50);
 
                     jq.init().catch(() => {
                       Message.error("加载 jq 失败");
@@ -101,7 +101,7 @@ export default function StatusBar({texts}) {
       {
         ctx.enableCmdMode ?
           <Input allowClear
-                 placeholder={`输入 jq filter (支持 jq ${jq.version})`}
+                 placeholder={`输入 jq 表达式处理${getLastEditor(ctx).isLeft() ? "左侧" : "右侧"}文本 (支持 jq ${jq.version})`}
                  size="mini"
                  style={{border: 0}}
                  className={`px-2.5 ${parseFailed ? "statusbar-error" : ""}`}

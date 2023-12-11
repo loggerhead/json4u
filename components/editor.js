@@ -6,6 +6,7 @@ import {useContext} from "react";
 import {getEditor, setLeftEditor, setRightEditor} from '@/features/ctxSlice';
 import {ctx} from "@/lib/store";
 
+const now = performance.now();
 loader.config({
   paths: {
     vs: "https://cdn.json4u.com/monaco-editor/0.45.0/min/vs",
@@ -41,6 +42,9 @@ export default function MyEditor({name, height}) {
           c.leftEditor.pair(c.leftEditor, c.rightEditor);
           c.rightEditor.pair(c.leftEditor, c.rightEditor);
         }
+
+        const cost = performance.now() - now;
+        console.log(`load ${name} editor cost: ${(cost / 1000).toFixed(2)}s`);
       }}
       onValidate={(markers) => getEditor(ctx(store), name).validate(markers)}
       onChange={() => getEditor(ctx(store), name).onChange()}
