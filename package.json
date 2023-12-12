@@ -1,6 +1,6 @@
 {
   "name": "json4u-react",
-  "version": "2.13.1",
+  "version": "2.13.2",
   "private": true,
   "scripts": {
     "serve": "lite-server --baseDir='dist'",

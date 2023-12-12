@@ -8,7 +8,7 @@ export function LeftMenu() {
   const ctx = useSelector((state) => state.ctx);
   const onClick = (key, event, keyPath) => {
     try {
-      const editor = getLastEditor(ctx.leftEditor, ctx.rightEditor);
+      const editor = getLastEditor(ctx);
       editor[key]();
     } catch (e) {
       console.error(e);

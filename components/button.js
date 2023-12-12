@@ -13,12 +13,12 @@ export function MyButton({onClick, children}) {
 
 export function FormatButton() {
   const ctx = useSelector((state) => state.ctx);
-  return <MyButton onClick={() => getLastEditor(ctx.leftEditor, ctx.rightEditor).format()}>格式化</MyButton>;
+  return <MyButton onClick={() => getLastEditor(ctx).format()}>格式化</MyButton>;
 }
 
 export function MinifyButton() {
   const ctx = useSelector((state) => state.ctx);
-  return <MyButton onClick={() => getLastEditor(ctx.leftEditor, ctx.rightEditor).minify()}>最小化</MyButton>;
+  return <MyButton onClick={() => getLastEditor(ctx).minify()}>最小化</MyButton>;
 }
 
 export function CompareButton() {
