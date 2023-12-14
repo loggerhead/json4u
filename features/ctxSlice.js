@@ -39,6 +39,8 @@ export const ctxSlice = createSlice({
     rightEditor: null,
     // 聚焦在左侧编辑器吗？
     focusLeft: true,
+    // 加载的 web worker
+    worker: null,
   },
   reducers: {
     setSettings(state, action) {
@@ -81,6 +83,9 @@ export const ctxSlice = createSlice({
     setFocusRight: (state) => {
       state.focusLeft = false;
     },
+    setWorker: (state, action) => {
+      state.worker = action.payload;
+    },
   },
 });
 
@@ -97,12 +102,13 @@ export const {
   setRightEditor,
   setFocusLeft,
   setFocusRight,
+  setWorker,
 } = ctxSlice.actions;
 
 export const ctxReducer = ctxSlice.reducer;
 
 export function getLastEditor(ctx) {
-  return ctx.focusLeft? ctx.leftEditor : ctx.rightEditor;
+  return ctx.focusLeft ? ctx.leftEditor : ctx.rightEditor;
 }
 
 // 获取另一个编辑器

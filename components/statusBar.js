@@ -56,14 +56,12 @@ export default function StatusBar({texts}) {
     if (err) {
       const msg = `执行 jq 失败: ${err}`;
       print(msg, true);
+    } else if (edited && edited.trim()) {
+      const editor = getPairEditor(ctx);
+      editor.setText(edited);
+      editor.revealLine(1);
     } else {
-      if (edited.trim()) {
-        const editor = getPairEditor(ctx);
-        editor.setText(edited);
-        editor.revealLine(1);
-      } else {
-        print("执行 jq 成功，但输出为空");
-      }
+      print("执行 jq 成功，但输出为空");
     }
   };
 

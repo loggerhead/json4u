@@ -1,7 +1,7 @@
 "use client";
 import "@arco-design/web-react/dist/css/arco.css";
 import dynamic from "next/dynamic";
-import {useEffect, useRef} from "react";
+import {useMemo, useRef} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import * as Sentry from "@sentry/react";
 import Dragbar from "../components/dragbar";
@@ -12,7 +12,7 @@ import {FormatSwitch, NestParseSwitch, SortSwitch} from "@/components/switch";
 import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} from "@/components/button";
 import {LeftMenu} from "@/components/menu";
 import version from "../lib/version";
-import {switchHideRightEditor} from '@/features/ctxSlice';
+import {setWorker, switchHideRightEditor} from '@/features/ctxSlice';
 import {Message} from "@arco-design/web-react";
 
 const editorHeight = "calc(100vh - 6rem)";
@@ -22,13 +22,12 @@ const MyEditor = dynamic(() => import("../components/editor"), {
   loading: () => <Loading height={editorHeight}></Loading>,
 });
 
-export default function Home() {
-  const ctx = useSelector((state) => state.ctx);
-  const dispatch = useDispatch();
-  const leftContainerRef = useRef(null);
-  const initTimers = useRef([]);
+function useInit({dispatch, initTimers}) {
+  return useMemo(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
 
-  useEffect(() => {
     // 从 local storage 读默认配置
     dispatch({type: "ctx/setSettings", payload: localStorage.getItem('settings')});
     console.log(`JSON For You 当前版本：${version}`);
@@ -36,7 +35,21 @@ export default function Home() {
     initTimers.current.push(setTimeout(() => {
       Message.warning("编辑器加载过慢，建议清除页面缓存后重试");
     }, 5000));
+
+    const worker = new Worker(new URL('../lib/worker.js', import.meta.url));
+    dispatch(setWorker(worker));
+    // TODO: 关闭 worker
+    return () => worker.terminate();
   }, []);
+}
+
+export default function Home() {
+  const ctx = useSelector((state) => state.ctx);
+  const dispatch = useDispatch();
+  const leftContainerRef = useRef(null);
+  const initTimers = useRef([]);
+
+  useInit({dispatch, initTimers});
 
   return (
     <Sentry.ErrorBoundary>
