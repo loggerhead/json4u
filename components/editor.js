@@ -1,17 +1,13 @@
 import {ReactReduxContext, useDispatch} from 'react-redux';
-import {Editor, loader} from "@monaco-editor/react";
+import {Editor} from "@monaco-editor/react";
 import Loading from "../components/loading";
-import {EditorRef} from "@/lib/editor/editor";
+import {init, EditorRef} from "@/lib/editor";
 import {useContext} from "react";
 import {getEditor, setLeftEditor, setRightEditor} from '@/features/ctxSlice';
 import {ctx} from "@/lib/store";
 
 const now = performance.now();
-loader.config({
-  paths: {
-    vs: "https://cdn.json4u.com/monaco-editor/0.45.0/min/vs",
-  },
-});
+init();
 
 export default function MyEditor({name, timers, height}) {
   const {store} = useContext(ReactReduxContext);

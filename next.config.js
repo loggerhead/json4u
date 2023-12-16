@@ -26,7 +26,7 @@ const nextConfig = {
             "unusualLineTerminators", // invalid 换行符提示
             "wordHighlighter", // 高亮光标停留位置的词
           ],
-          filename: "static/[name].worker.js",
+          filename: "static/[name].worker.bundle.js",
         }),
       );
     }
