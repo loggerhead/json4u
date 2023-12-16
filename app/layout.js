@@ -1,5 +1,6 @@
 import Script from "next/script";
 import Footer from "@/components/footer";
+import {prettierPluginsURLs, prettierURL} from "@/lib/prettier";
 import {Providers} from "@/components/provider";
 import "./globals.scss";
 
@@ -44,15 +45,25 @@ export function generateMetadata({params, searchParams}, parent) {
 export default function RootLayout({children}) {
   return (
     <html>
+    <Scripts></Scripts>
     <GoogleTagManagerHead></GoogleTagManagerHead>
     <body>
     <Providers>
-        <main>{children}</main>
+      <main>{children}</main>
     </Providers>
     <Footer></Footer>
     <GoogleTagManagerBody></GoogleTagManagerBody>
     </body>
     </html>
+  );
+}
+
+function Scripts() {
+  return (
+    <>
+      <Script src={prettierURL}></Script>
+      {prettierPluginsURLs.map((url, i) => <Script key={i} src={url}></Script>)}
+    </>
   );
 }
 
