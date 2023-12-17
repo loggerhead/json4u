@@ -1,7 +1,7 @@
 import {ReactReduxContext, useDispatch} from 'react-redux';
 import {Editor} from "@monaco-editor/react";
 import Loading from "../components/loading";
-import {init, EditorRef} from "@/lib/editor";
+import {EditorRef, init} from "@/lib/editor";
 import {useContext} from "react";
 import {getEditor, setLeftEditor, setRightEditor} from '@/features/ctxSlice';
 import {ctx} from "@/lib/store";
@@ -15,7 +15,6 @@ export default function MyEditor({name, timers, height}) {
 
   return (
     <Editor
-      id={`${name}Editor`}
       language="json"
       height={height}
       loading={<Loading height={height}></Loading>}
@@ -37,6 +36,12 @@ export default function MyEditor({name, timers, height}) {
         if (c.leftEditor && c.rightEditor) {
           c.leftEditor.pair(c.leftEditor, c.rightEditor);
           c.rightEditor.pair(c.leftEditor, c.rightEditor);
+
+          // 将编辑器注册到全局变量中，以供 e2e 框架使用
+          if (typeof window !== "undefined") {
+            window.leftEditor = c.leftEditor;
+            window.rightEditor = c.rightEditor;
+          }
         }
 
         timers.current.map(clearTimeout);

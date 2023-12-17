@@ -28,7 +28,7 @@ export function LeftMenu() {
     </Menu>
   );
 
-  return <div>
+  return <div id="leftMenu">
     <Dropdown droplist={dropList} trigger="click">
       <Button size="mini" icon={<IconMore/>}/>
     </Dropdown>

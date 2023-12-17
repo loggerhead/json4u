@@ -1,6 +1,6 @@
 {
   "name": "json4u-react",
-  "version": "2.13.2",
+  "version": "2.13.3",
   "private": true,
   "scripts": {
     "serve": "lite-server --baseDir='dist'",
@@ -9,26 +9,30 @@
     "bundle": "ENABLE_BUNDLE=1; NODE_ENV=production; rm -rf dist && next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --env=node --colors",
+    "analyze": "ANALYZE=true next build",
+    "test": "jest --env=node --no-colors",
     "test:coverage": "yarn test --coverage",
-    "analyze": "ANALYZE=true next build"
+    "cy:open": "yarn run cypress open",
+    "cy:run": "yarn run cypress run",
+    "cy:parallel": "cypress-parallel -s cy:run -t 4 -m false -d cypress/e2e",
+    "e2etest": "start-server-and-test dev http-get://localhost:3000 cy:run"
   },
   "dependencies": {
-    "@arco-design/web-react": "^2.55.2",
+    "@arco-design/web-react": "^2.57.1",
     "@biowasm/aioli": "^3.1.0",
     "@monaco-editor/react": "^4.5.1",
     "@reduxjs/toolkit": "^2.0.1",
-    "@sentry/nextjs": "^7.84.0",
-    "@sentry/react": "^7.84.0",
+    "@sentry/nextjs": "^7.89.0",
+    "@sentry/react": "^7.89.0",
     "monaco-editor": "^0.45.0",
     "next": "^14.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-redux": "^9.0.2",
+    "react-redux": "^9.0.4",
     "tailwindcss": "3.3.6"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.22.9",
+    "@babel/preset-env": "^7.23.6",
     "@mdx-js/loader": "^3.0.0",
     "@mdx-js/react": "^3.0.0",
     "@next/bundle-analyzer": "^14.0.4",
@@ -37,15 +41,20 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/mdx": "^2.0.5",
     "autoprefixer": "10.4.16",
-    "eslint": "8.55.0",
+    "cypress": "^13.6.1",
+    "cypress-multi-reporters": "^1.6.4",
+    "cypress-parallel": "^0.14.0",
+    "cypress-wait-until": "^3.0.1",
+    "eslint": "8.56.0",
     "eslint-config-next": "14.0.4",
-    "github-markdown-css": "^5.2.0",
+    "github-markdown-css": "^5.5.0",
     "gray-matter": "^4.0.3",
     "jest": "^29.6.1",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "postcss": "^8.4.31",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
-    "sass": "^1.63.6"
+    "sass": "^1.63.6",
+    "start-server-and-test": "^2.0.3"
   }
 }

@@ -71,7 +71,7 @@ export default function Home() {
                 <li><NestParseSwitch></NestParseSwitch></li>
               </ul>
               <ul className="flex right">
-                <li>
+                <li id="toggler">
                   <Toggler
                     hidden={ctx.hideRightEditor}
                     onClick={() => {
@@ -82,7 +82,7 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            <div className={`border border-solid ${ctx.focusLeft ? "border-active" : "border-color"}`}>
+            <div id="leftEditor" className={`border border-solid ${ctx.focusLeft ? "border-active" : "border-color"}`}>
               <MyEditor name="left" timers={initTimers} height={editorHeight}></MyEditor>
             </div>
           </div>
@@ -99,7 +99,7 @@ export default function Home() {
                 <TextCompareAfterSortButton></TextCompareAfterSortButton>
               </li>
             </ul>
-            <div className={`border border-solid ${ctx.focusLeft ? "border-color" : "border-active"}`}>
+            <div id="rightEditor" className={`border border-solid ${ctx.focusLeft ? "border-color" : "border-active"}`}>
               <MyEditor name="right" timers={initTimers} height={editorHeight}></MyEditor>
             </div>
           </div>

@@ -13,7 +13,7 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   distDir: "dist",
   webpack: (config, {buildId, dev, isServer, defaultLoaders, nextRuntime, webpack}) => {
-    if (!isServer && process.env.ENABLE_BUNDLE === "1") {
+    if (!isServer) {
       config.plugins.push(
         new MonacoWebpackPlugin({
           languages: ["json"],

@@ -68,6 +68,12 @@ JSON 语义化比较（又被称作 JSON 结构化比较）是指忽略 JSON 中
 
 ## 更新日志
 
+- 2023-12-17:
+    - 改进格式化算法；
+    - 使用 web worker 提升性能；
+    - 部分资源迁移到 CDN 域名，增加缓存时间；
+    - 增加 e2e 测试；
+    - fix jq 无法使用的问题；
 - 2023-12-10:
     - 支持 [jq 1.7](https://jqlang.github.io/jq/tutorial/) 全部功能；
     - 优化 inline diff 性能；

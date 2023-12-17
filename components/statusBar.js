@@ -76,7 +76,8 @@ export default function StatusBar({texts}) {
       <Tooltip mini popupVisible={ctx.enableCmdMode ? false : popVisible}
                onVisibleChange={(visible) => setPopVisible(visible)}
                content="点击按钮切换到命令模式，使用 jq 处理 JSON">
-        <Button style={{width: height, height: height, border: 0, borderRadius: 0}}
+        <Button id="cmd-mode-btn"
+                style={{width: height, height: height, border: 0, borderRadius: 0}}
                 type="primary"
                 icon=">"
                 loading={loading}
@@ -98,7 +99,8 @@ export default function StatusBar({texts}) {
       </Tooltip>
       {
         ctx.enableCmdMode ?
-          <Input allowClear
+          <Input id="cmd-mode-input"
+                 allowClear
                  placeholder={`输入 jq 表达式处理${getLastEditor(ctx).isLeft() ? "左侧" : "右侧"}文本 (支持 jq ${jq.version})`}
                  size="mini"
                  style={{border: 0}}

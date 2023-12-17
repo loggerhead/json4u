@@ -9,3 +9,7 @@
 2. node_modules/monaco-editor/
 3. https://biowasm.com/cdn/v3/jq/1.7
 4. https://prettier.io/docs/en/browser
+
+## 运行测试
+
+1. 关闭 VPN 全局代理，否则 cypress 会陷入无限加载；
