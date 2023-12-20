@@ -28,16 +28,16 @@ function useInit({dispatch, initTimers}) {
       return;
     }
 
+    const worker = new Worker(new URL('../lib/worker.js', import.meta.url));
     // 从 local storage 读默认配置
     dispatch({type: "ctx/setSettings", payload: localStorage.getItem('settings')});
+    dispatch(setWorker(worker));
     console.log(`JSON For You 当前版本：${version}`);
 
     initTimers.current.push(setTimeout(() => {
       Message.warning("编辑器加载过慢，建议清除页面缓存后重试");
     }, 5000));
 
-    const worker = new Worker(new URL('../lib/worker.js', import.meta.url));
-    dispatch(setWorker(worker));
     // TODO: 关闭 worker
     return () => worker.terminate();
   }, []);
