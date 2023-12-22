@@ -1,21 +1,19 @@
 {
   "name": "json4u-react",
-  "version": "2.13.3",
+  "version": "2.13.4",
   "private": true,
   "scripts": {
-    "serve": "lite-server --baseDir='dist'",
     "dev": "next dev",
     "build": "NODE_ENV=production rm -rf dist && next build",
+    "serve": "lite-server --baseDir='dist'",
     "bundle": "ENABLE_BUNDLE=1; NODE_ENV=production; rm -rf dist && next build",
     "start": "next start",
     "lint": "next lint",
     "analyze": "ANALYZE=true next build",
     "test": "jest --env=node --no-colors",
-    "test:coverage": "yarn test --coverage",
     "cy:open": "yarn run cypress open",
     "cy:run": "yarn run cypress run",
-    "cy:parallel": "cypress-parallel -s cy:run -t 4 -m false -d cypress/e2e",
-    "e2etest": "start-server-and-test dev http-get://localhost:3000 cy:run"
+    "cy:prun": "cypress-parallel -s cy:run -t 4 -m false -d cypress/e2e"
   },
   "dependencies": {
     "@arco-design/web-react": "^2.57.1",
@@ -40,6 +38,7 @@
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.9",
     "@types/mdx": "^2.0.5",
+    "@typescript-eslint/parser": "^6.15.0",
     "autoprefixer": "10.4.16",
     "cypress": "^13.6.1",
     "cypress-multi-reporters": "^1.6.4",
@@ -55,6 +54,7 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "sass": "^1.63.6",
-    "start-server-and-test": "^2.0.3"
+    "start-server-and-test": "^2.0.3",
+    "typescript": "^5.3.3"
   }
 }
