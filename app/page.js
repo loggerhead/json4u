@@ -13,7 +13,6 @@ import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} f
 import {LeftMenu} from "@/components/menu";
 import version from "../lib/version";
 import {setWorker, switchHideRightEditor} from '@/features/ctxSlice';
-import {Message} from "@arco-design/web-react";
 
 const editorHeight = "calc(100vh - 6rem)";
 
@@ -22,7 +21,7 @@ const MyEditor = dynamic(() => import("../components/editor"), {
   loading: () => <Loading height={editorHeight}></Loading>,
 });
 
-function useInit({dispatch, initTimers}) {
+function useInit({dispatch}) {
   return useMemo(() => {
     if (typeof window === "undefined") {
       return;
@@ -34,11 +33,6 @@ function useInit({dispatch, initTimers}) {
     dispatch(setWorker(worker));
     console.log(`JSON For You 当前版本：${version}`);
 
-    initTimers.current.push(setTimeout(() => {
-      Message.warning("编辑器加载过慢，建议清除页面缓存后重试");
-    }, 5000));
-
-    // TODO: 关闭 worker
     return () => worker.terminate();
   }, []);
 }
@@ -47,9 +41,8 @@ export default function Home() {
   const ctx = useSelector((state) => state.ctx);
   const dispatch = useDispatch();
   const leftContainerRef = useRef(null);
-  const initTimers = useRef([]);
 
-  useInit({dispatch, initTimers});
+  useInit({dispatch});
 
   return (
     <Sentry.ErrorBoundary>
@@ -83,7 +76,7 @@ export default function Home() {
               </ul>
             </div>
             <div id="leftEditor" className={`border border-solid ${ctx.focusLeft ? "border-active" : "border-color"}`}>
-              <MyEditor name="left" timers={initTimers} height={editorHeight}></MyEditor>
+              <MyEditor name="left" height={editorHeight}></MyEditor>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -100,7 +93,7 @@ export default function Home() {
               </li>
             </ul>
             <div id="rightEditor" className={`border border-solid ${ctx.focusLeft ? "border-color" : "border-active"}`}>
-              <MyEditor name="right" timers={initTimers} height={editorHeight}></MyEditor>
+              <MyEditor name="right" height={editorHeight}></MyEditor>
             </div>
           </div>
         </div>

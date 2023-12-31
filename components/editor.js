@@ -9,7 +9,7 @@ import {ctx} from "@/lib/store";
 const now = performance.now();
 init();
 
-export default function MyEditor({name, timers, height}) {
+export default function MyEditor({name, height}) {
   const {store} = useContext(ReactReduxContext);
   const dispatch = useDispatch();
 
@@ -44,7 +44,6 @@ export default function MyEditor({name, timers, height}) {
           }
         }
 
-        timers.current.map(clearTimeout);
         const cost = performance.now() - now;
         console.log(`load ${name} editor cost: ${(cost / 1000).toFixed(2)}s`);
       }}
