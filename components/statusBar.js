@@ -2,14 +2,25 @@
 import {Button, Input, Message, Tooltip} from "@arco-design/web-react";
 import MsgBar from "./msgBar";
 import {useDispatch, useSelector} from "react-redux";
-import {getLastEditor, getPairEditor, setLastCmd, switchEnableCmdMode} from "@/features/ctxSlice";
+import {setLastCmd, switchEnableCmdMode} from "@/reducers";
 import {useEffect, useState} from "react";
 import * as jq from "@/lib/jq";
+import {
+  enableCmdModeSelector,
+  lastCmdSelector,
+  lastEditorSelector,
+  pairEditorSelector,
+  statusBarSelector,
+} from "@/lib/store";
 
 const height = "22px";
 
 export default function StatusBar({texts}) {
-  const ctx = useSelector((state) => state.ctx);
+  const lastEditor = useSelector(lastEditorSelector);
+  const pairEditor = useSelector(pairEditorSelector);
+  const enableCmdMode = useSelector(enableCmdModeSelector);
+  const lastCmd = useSelector(lastCmdSelector);
+  const statusBar = useSelector(statusBarSelector);
   const dispatch = useDispatch();
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,7 +43,7 @@ export default function StatusBar({texts}) {
   };
 
   const execJq = async (filter, alert = false) => {
-    const editor = getLastEditor(ctx);
+    const editor = lastEditor;
     const text = editor?.text();
 
     const print = (msg, isError = false) => {
@@ -57,7 +68,7 @@ export default function StatusBar({texts}) {
       const msg = `执行 jq 失败: ${err}`;
       print(msg, true);
     } else if (edited && edited.trim()) {
-      const editor = getPairEditor(ctx);
+      const editor = pairEditor;
       editor.setText(edited);
       editor.revealLine(1);
     } else {
@@ -73,7 +84,7 @@ export default function StatusBar({texts}) {
   return (
     <div
       className={`flex items-center min-h-[${height}] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar`}>
-      <Tooltip mini popupVisible={ctx.enableCmdMode ? false : popVisible}
+      <Tooltip mini popupVisible={enableCmdMode ? false : popVisible}
                onVisibleChange={(visible) => setPopVisible(visible)}
                content="点击按钮切换到命令模式，使用 jq 处理 JSON">
         <Button id="cmd-mode-btn"
@@ -81,11 +92,11 @@ export default function StatusBar({texts}) {
                 type="primary"
                 icon=">"
                 loading={loading}
-                status={ctx.enableCmdMode ? "success" : "default"}
+                status={enableCmdMode ? "success" : "default"}
                 onClick={() => {
                   dispatch(switchEnableCmdMode());
 
-                  if (!ctx.enableCmdMode) {
+                  if (!enableCmdMode) {
                     const timer = setTimeout(() => setLoading(true), 50);
 
                     jq.init().catch(() => {
@@ -98,20 +109,20 @@ export default function StatusBar({texts}) {
                 }}/>
       </Tooltip>
       {
-        ctx.enableCmdMode ?
+        enableCmdMode ?
           <Input id="cmd-mode-input"
                  allowClear
-                 placeholder={`输入 jq 表达式处理${getLastEditor(ctx).isLeft() ? "左侧" : "右侧"}文本 (支持 jq ${jq.version})`}
+                 placeholder={`输入 jq 表达式处理${lastEditor.isLeft() ? "左侧" : "右侧"}文本 (支持 jq ${jq.version})`}
                  size="mini"
                  style={{border: 0}}
                  className={`px-2.5 ${parseFailed ? "statusbar-error" : ""}`}
-                 defaultValue={ctx.lastCmd}
+                 defaultValue={lastCmd}
                  onChange={onInputCmd}
                  onPressEnter={async (e) => {
                    const filter = e.target.value;
                    await execJq(filter, true);
                  }}/> :
-          <MsgBar texts={ctx.statusBar}></MsgBar>
+          <MsgBar texts={statusBar}></MsgBar>
       }
     </div>
   );

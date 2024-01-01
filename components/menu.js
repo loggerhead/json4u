@@ -1,17 +1,16 @@
 import {useSelector} from "react-redux";
 import {Button, Divider, Dropdown, Menu} from '@arco-design/web-react';
 import {IconMore} from '@arco-design/web-react/icon';
-import {getLastEditor} from '@/features/ctxSlice';
+import {lastEditorSelector} from "@/lib/store";
 
 // 放在左侧的菜单项
 export function LeftMenu() {
-  const ctx = useSelector((state) => state.ctx);
+  const lastEditor = useSelector(lastEditorSelector);
   const onClick = (key, event, keyPath) => {
     try {
-      const editor = getLastEditor(ctx);
-      editor[key]();
+      lastEditor[key]();
     } catch (e) {
-      console.error(e);
+      console.error(`call menu function "${key}" failed`, e);
     }
   };
 

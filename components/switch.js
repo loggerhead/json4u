@@ -1,10 +1,11 @@
 "use client";
 import {Switch, Tooltip} from "@arco-design/web-react";
-import {switchAutoFormat, switchAutoSort, switchNestParse} from "@/features/ctxSlice";
+import {switchAutoFormat, switchAutoSort, switchNestParse} from "@/reducers";
 import {useDispatch, useSelector} from "react-redux";
+import {enableAutoFormatSelector, enableAutoSortSelector, enableNestParseSelector} from "@/lib/store";
 
 export function FormatSwitch() {
-  const ctx = useSelector((state) => state.ctx);
+  const enableAutoFormat = useSelector(enableAutoFormatSelector);
   const dispatch = useDispatch();
 
   const name = "自动格式化";
@@ -12,8 +13,8 @@ export function FormatSwitch() {
 
   return (
     <Tooltip mini position="bottom" content={desc}>
-      <Switch checked={ctx.enableAutoFormat}
-              defaultChecked={ctx.enableAutoFormat}
+      <Switch checked={enableAutoFormat}
+              defaultChecked={enableAutoFormat}
               checkedText={name}
               uncheckedText={name}
               onChange={() => dispatch(switchAutoFormat())}/>
@@ -22,7 +23,7 @@ export function FormatSwitch() {
 }
 
 export function SortSwitch() {
-  const ctx = useSelector((state) => state.ctx);
+  const enableAutoSort = useSelector(enableAutoSortSelector);
   const dispatch = useDispatch();
 
   const name = "自动排序";
@@ -30,8 +31,8 @@ export function SortSwitch() {
 
   return (
     <Tooltip mini position="bottom" content={desc}>
-      <Switch checked={ctx.enableAutoSort}
-              defaultChecked={ctx.enableAutoSort}
+      <Switch checked={enableAutoSort}
+              defaultChecked={enableAutoSort}
               checkedText={name}
               uncheckedText={name}
               onChange={() => dispatch(switchAutoSort())}/>
@@ -40,7 +41,7 @@ export function SortSwitch() {
 }
 
 export function NestParseSwitch() {
-  const ctx = useSelector((state) => state.ctx);
+  const enableNestParse = useSelector(enableNestParseSelector);
   const dispatch = useDispatch();
 
   const name = "嵌套解析";
@@ -48,8 +49,8 @@ export function NestParseSwitch() {
 
   return (
     <Tooltip mini position="bottom" content={desc}>
-      <Switch checked={ctx.enableNestParse}
-              defaultChecked={ctx.enableNestParse}
+      <Switch checked={enableNestParse}
+              defaultChecked={enableNestParse}
               checkedText={name}
               uncheckedText={name}
               onChange={() => dispatch(switchNestParse())}/>
