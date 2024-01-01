@@ -41,7 +41,7 @@
     "@types/mdx": "^2.0.5",
     "@typescript-eslint/parser": "^6.15.0",
     "autoprefixer": "10.4.16",
-    "cypress": "^13.6.1",
+    "cypress": "13.6.2",
     "cypress-multi-reporters": "^1.6.4",
     "cypress-parallel": "^0.14.0",
     "cypress-wait-until": "^3.0.1",
