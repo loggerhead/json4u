@@ -13,6 +13,7 @@ import {FormatSwitch, NestParseSwitch, SortSwitch} from "@/components/switch";
 import {CompareButton, FormatButton, MinifyButton, TextCompareAfterSortButton} from "@/components/button";
 import {LeftMenu} from "@/components/menu";
 import version from "@/lib/version";
+import * as jq from "@/lib/jq";
 import {setWorker, switchHideRightEditor} from '@/reducers';
 import {
   focusLeftSelector,
@@ -35,6 +36,9 @@ function useInit({dispatch}) {
 
     const worker = new Worker(new URL('../lib/worker.js', import.meta.url));
     dispatch(setWorker(worker));
+
+    const _ = jq.init();
+
     return () => worker.terminate();
   }, []);
 }
