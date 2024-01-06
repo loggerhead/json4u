@@ -112,7 +112,7 @@ function Page({loaded}) {
           </div>
         </div>
       </div>
-      <StatusBar></StatusBar>
+      <StatusBar/>
     </div>
   </PersistGate>;
 }

@@ -8,16 +8,17 @@ import * as jq from "@/lib/jq";
 import {
   enableCmdModeSelector,
   lastCmdSelector,
-  lastEditorSelector,
-  pairEditorSelector,
+  leftEditorSelector,
+  rightEditorSelector,
   statusBarSelector,
 } from "@/lib/store";
 
 const height = "22px";
+const width = height;
 
-export default function StatusBar({texts}) {
-  const lastEditor = useSelector(lastEditorSelector);
-  const pairEditor = useSelector(pairEditorSelector);
+export default function StatusBar() {
+  const leftEditor = useSelector(leftEditorSelector);
+  const rightEditor = useSelector(rightEditorSelector);
   const enableCmdMode = useSelector(enableCmdModeSelector);
   const lastCmd = useSelector(lastCmdSelector);
   const statusBar = useSelector(statusBarSelector);
@@ -43,7 +44,7 @@ export default function StatusBar({texts}) {
   };
 
   const execJq = async (filter, alert = false) => {
-    const editor = lastEditor;
+    const editor = leftEditor;
     const text = editor?.text();
 
     const print = (msg, isError = false) => {
@@ -57,7 +58,7 @@ export default function StatusBar({texts}) {
     if (!editor) {
       return;
     } else if (!text) {
-      print(`${editor.isLeft() ? "左侧" : "右侧"}输入为空`);
+      print("左侧输入为空");
       return;
     }
 
@@ -68,7 +69,7 @@ export default function StatusBar({texts}) {
       const msg = `执行 jq 失败: ${err}`;
       print(msg, true);
     } else if (edited && edited.trim()) {
-      const editor = pairEditor;
+      const editor = rightEditor;
       editor.setText(edited);
       editor.revealLine(1);
     } else {
@@ -88,7 +89,7 @@ export default function StatusBar({texts}) {
                onVisibleChange={(visible) => setPopVisible(visible)}
                content="点击按钮切换到命令模式，使用 jq 处理 JSON">
         <Button id="cmd-mode-btn"
-                style={{width: height, height: height, border: 0, borderRadius: 0}}
+                style={{width: width, height: height, border: 0, borderRadius: 0}}
                 type="primary"
                 icon=">"
                 loading={loading}
@@ -112,7 +113,7 @@ export default function StatusBar({texts}) {
         enableCmdMode ?
           <Input id="cmd-mode-input"
                  allowClear
-                 placeholder={`输入 jq 表达式处理${lastEditor.isLeft() ? "左侧" : "右侧"}文本 (支持 jq ${jq.version})`}
+                 placeholder={`输入 jq 表达式 (左侧输入，右侧输出)`}
                  size="mini"
                  style={{border: 0}}
                  className={`px-2.5 ${parseFailed ? "statusbar-error" : ""}`}
