@@ -28,7 +28,7 @@ export default function MyEditor({name, height}) {
         minimap: {enabled: true},
       }}
       onMount={(editor, monaco) => {
-        const editorRef = new EditorRef(store, dispatch, editor, monaco);
+        const editorRef = new EditorRef(store, dispatch, editor);
         editorRef.init();
 
         dispatch((name === "left" ? setLeftEditor : setRightEditor)(editorRef));

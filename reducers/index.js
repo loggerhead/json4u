@@ -16,6 +16,6 @@ export const {
   switchAutoFormat,
   switchAutoSort,
   switchNestParse,
-  switchHideRightEditor,
-  showRightEditor,
+  setLeftWidth,
+  setPrevLeftWidth,
 } = settingsSlice.actions;

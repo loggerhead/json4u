@@ -1,10 +1,14 @@
 "use client";
 import {useCallback, useRef} from "react";
+import {setLeftWidth} from "@/reducers";
+import {useDispatch} from "react-redux";
 
 export default function Dragbar({containerRef, className}) {
   const classes = `dragbar w-[10px] relative flex grow cursor-col-resize select-none hover:bg-gray-200 fill-gray-500 ${className}`;
+  const dispatch = useDispatch();
   const isMouseDown = useRef(false);
   const prevX = useRef(0);
+  let timerID;
 
   // https://melkornemesis.medium.com/handling-javascript-mouseup-event-outside-element-b0a34090bb56
   const handleMouseDown = useCallback((event) => {
@@ -26,12 +30,23 @@ export default function Dragbar({containerRef, className}) {
     document.addEventListener("mousemove", (event) => {
       if (isMouseDown.current) {
         event.preventDefault();
+
         // 根据相对位置计算需要改变多少宽度
-        const width = containerRef.current.offsetWidth;
+        const leftContainer = containerRef.current;
+        const container = leftContainer.parentNode;
+
+        const width = leftContainer.offsetWidth;
         const dx = event.clientX - prevX.current;
         const x = width + dx;
+        const leftWidth = x * 100 / container.clientWidth;
         prevX.current = event.clientX;
-        containerRef.current.style.flexBasis = `${x}px`;
+
+        leftContainer.style.flexBasis = `${x}px`;
+
+        clearTimeout(timerID);
+        timerID = setTimeout(() => {
+          dispatch(setLeftWidth(leftWidth));
+        }, 50);
       }
     });
   }
