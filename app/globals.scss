@@ -121,3 +121,10 @@ $statusbar-error: #ffece8;
 .statusbar-error {
   background-color: $statusbar-error !important;
 }
+
+#sentry-feedback {
+  --left: auto;
+  --right: auto;
+  --top: auto;
+  --bottom: auto;
+}

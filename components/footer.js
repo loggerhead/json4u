@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Feedback from "./feedback";
 
 export default function Footer() {
   return (
@@ -10,7 +11,7 @@ export default function Footer() {
       <Link prefetch={false} href="/guide">
         使用指南 ·{" "}
       </Link>
-      <a href="https://github.com/loggerhead/json4u-issue/issues">Feedback</a>
+      <Feedback/>
     </div>
   );
 }
