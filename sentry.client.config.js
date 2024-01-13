@@ -10,7 +10,6 @@ const feedback = new Sentry.Feedback({
   autoInject: false,
   showName: false,
   showBranding: false,
-  colorScheme: "light",
   buttonLabel: "",
   formTitle: "",
   submitButtonLabel: "Send",
