@@ -12,9 +12,9 @@ import {
   rightEditorSelector,
   statusBarSelector,
 } from "@/lib/store";
+import {IconCodeSquare} from "@arco-design/web-react/icon";
 
-const height = "22px";
-const width = height;
+const width = "20px";
 
 export default function StatusBar() {
   const leftEditor = useSelector(leftEditorSelector);
@@ -84,16 +84,15 @@ export default function StatusBar() {
 
   return (
     <div
-      className={`flex items-center min-h-[${height}] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar`}>
+      className={`flex items-center min-h-[${width}] text-[12px] border-[0.5px] border-t-0 border-solid border-color statusbar`}>
       <Tooltip mini popupVisible={enableCmdMode ? false : popVisible}
                onVisibleChange={(visible) => setPopVisible(visible)}
                content="点击按钮切换到命令模式，使用 jq 处理 JSON">
         <Button id="cmd-mode-btn"
-                style={{width: width, height: height, border: 0, borderRadius: 0}}
-                type="primary"
-                icon=">"
+                style={{width: width, height: width, border: 0, borderRadius: 0}}
+                icon={<IconCodeSquare style={{fontSize: width}}/>}
                 loading={loading}
-                status={enableCmdMode ? "success" : "default"}
+                type={enableCmdMode ? "outline" : "secondary"}
                 onClick={() => {
                   dispatch(switchEnableCmdMode());
 
