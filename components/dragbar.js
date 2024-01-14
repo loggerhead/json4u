@@ -105,7 +105,7 @@ export default function Dragbar({leftContainerRef}) {
   }
 
   return (
-    <div className={`w-[10px] flex grow cursor-col-resize select-none hover:bg-gray-300 ${extraClass}`}
+    <div className={`dragbar w-[10px] flex grow cursor-col-resize select-none hover:bg-gray-300 ${extraClass}`}
          onMouseDown={handleMouseDown}>
       <svg focusable="false" aria-hidden="true" viewBox="0 0 12 24">
         <path
