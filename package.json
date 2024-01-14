@@ -1,6 +1,6 @@
 {
   "name": "json4u-react",
-  "version": "2.13.5",
+  "version": "2.14.0",
   "private": true,
   "scripts": {
     "dev": "SENTRY_ENVIRONMENT=development next dev",
