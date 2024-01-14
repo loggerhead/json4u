@@ -17,5 +17,4 @@ export const {
   switchAutoSort,
   switchNestParse,
   setLeftWidth,
-  setPrevLeftWidth,
 } = settingsSlice.actions;

@@ -1,5 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
 
+export const maxLeftWidth = 75;
+export const minLeftWidth = 25;
+
 export const settingsSlice = createSlice({
   name: 'settings',
   initialState: {
@@ -10,9 +13,7 @@ export const settingsSlice = createSlice({
     // 启用嵌套解析吗？
     enableNestParse: true,
     // 左侧编辑器宽度 (百分比)
-    leftWidth: 75,
-    // 用于折叠时还原
-    prevLeftWidth: 0,
+    leftWidth: maxLeftWidth,
   },
   reducers: {
     switchAutoFormat: (state) => {
@@ -26,9 +27,6 @@ export const settingsSlice = createSlice({
     },
     setLeftWidth: (state, action) => {
       state.leftWidth = action.payload;
-    },
-    setPrevLeftWidth: (state, action) => {
-      state.prevLeftWidth = action.payload;
     },
   },
 });

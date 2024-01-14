@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import * as Sentry from "@sentry/react";
 import Dragbar from "@/components/dragbar";
-import Toggler from "@/components/toggler";
 import Loading from "@/components/loading";
 import StatusBar from "@/components/statusBar";
 import {FormatSwitch, NestParseSwitch, SortSwitch} from "@/components/switch";
@@ -15,14 +14,7 @@ import {LeftMenu} from "@/components/menu";
 import version from "@/lib/version";
 import * as jq from "@/lib/jq";
 import {setWorker} from '@/reducers';
-import {
-  focusLeftSelector,
-  isRightEditorHidden,
-  leftEditorSelector,
-  leftWidthSelector,
-  persistor,
-  rightEditorSelector,
-} from '@/lib/store';
+import {focusLeftSelector, leftEditorSelector, leftWidthSelector, persistor, rightEditorSelector} from '@/lib/store';
 
 const now = performance.now();
 const MyEditor = dynamic(() => import("../components/editor"), {
@@ -72,12 +64,16 @@ function Page({loaded}) {
   const focusLeft = useSelector(focusLeftSelector);
   const leftContainerRef = useRef(null);
 
+  const activeLeftBorder = focusLeft && leftWidth < 100;
+  const activeRightBorder = !focusLeft && leftWidth > 0;
+
   return <PersistGate persistor={persistor}>
     <div className={`gap-2 mx-5 mt-2 ${loaded ? "" : "hidden"}`}>
       <div className="flex">
-        <div ref={leftContainerRef} className="flex flex-col shrink min-w-fit relative gap-2"
+        <div className="flex flex-col shrink min-w-fit relative gap-2"
+             ref={leftContainerRef}
              style={{flexBasis: `${leftWidth}%`}}>
-          <div className="flex relative justify-between	clear-both">
+          <div className={`left-el flex relative justify-between clear-both ${leftWidth === 0 ? "hidden" : ""}`}>
             <ul className="flex space-x-2 items-center">
               <li><FormatButton></FormatButton></li>
               <li><MinifyButton></MinifyButton></li>
@@ -86,19 +82,17 @@ function Page({loaded}) {
               <li><SortSwitch></SortSwitch></li>
               <li><NestParseSwitch></NestParseSwitch></li>
             </ul>
-            <ul className="flex right ml-2.5">
-              <li id="toggler"><Toggler/></li>
-            </ul>
           </div>
-          <div id="leftEditor" className={`border border-solid ${focusLeft ? "border-active" : "border-color"}`}>
+          <div id="leftEditor"
+               className={`left-el grow border border-solid ${activeLeftBorder ? "border-active" : "border-color"} ${leftWidth === 0 ? "hidden" : ""}`}>
             <MyEditor name="left" height={editorHeight}></MyEditor>
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <div className="invisible h-6 my-px"></div>
-          <Dragbar containerRef={leftContainerRef} className={isRightEditorHidden(leftWidth) ? "hidden" : ""}></Dragbar>
+        <div className="relative flex flex-col-reverse gap-2">
+          <Dragbar leftContainerRef={leftContainerRef}></Dragbar>
+          <div className="h-[24px]"></div>
         </div>
-        <div className={`flex flex-col grow shrink min-w-fit gap-2 ${isRightEditorHidden(leftWidth) ? "hidden" : ""}`}>
+        <div className={`right-el flex flex-col grow shrink min-w-fit gap-2 ${leftWidth === 100 ? "hidden" : ""}`}>
           <ul className="flex space-x-2 items-center">
             <li>
               <CompareButton></CompareButton>
@@ -107,7 +101,8 @@ function Page({loaded}) {
               <TextCompareAfterSortButton></TextCompareAfterSortButton>
             </li>
           </ul>
-          <div id="rightEditor" className={`border border-solid ${focusLeft ? "border-color" : "border-active"}`}>
+          <div id="rightEditor"
+               className={`border border-solid ${activeRightBorder ? "border-active" : "border-color"}`}>
             <MyEditor name="right" height={editorHeight}></MyEditor>
           </div>
         </div>
