@@ -18,9 +18,12 @@ export function LeftMenu() {
     <Menu onClickMenuItem={onClick} style={{maxHeight: "400px"}}>
       <Menu.Item key="escape">转义</Menu.Item>
       <Menu.Item key="unescape">去转义</Menu.Item>
-      <Divider style={{margin: '4px 0'}}/>
       <Menu.Item key="sort">排序（升序）</Menu.Item>
       <Menu.Item key="sortReverse">排序（降序）</Menu.Item>
+      <Divider style={{margin: '4px 0'}}/>
+      <Menu.Item key="csv2json">CSV 转 JSON（无表头）</Menu.Item>
+      <Menu.Item key="csv2jsonWithHeader">CSV 转 JSON（有表头）</Menu.Item>
+      <Menu.Item key="json2csv">JSON 转 CSV</Menu.Item>
       <Divider style={{margin: '4px 0'}}/>
       <Menu.Item key="urlToJSON">URL 转 JSON</Menu.Item>
       <Menu.Item key="pythonDict2JSON">Python Dict 转 JSON</Menu.Item>
