@@ -121,3 +121,18 @@ $statusbar-error: #ffece8;
 .statusbar-error {
   background-color: $statusbar-error !important;
 }
+
+#cmd-btn {
+  --cmd-color: black;
+  --background-color: var(--color-secondary);
+  --cmd-color-active: var(--color-white);
+  --background-color-active: rgb(var(--primary-6));
+
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 0;
+  font-weight: 450;
+  color: var(--cmd-color);
+  background-color: var(--background-color);
+}

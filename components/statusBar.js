@@ -1,36 +1,26 @@
 "use client";
 import {Button, Input, Message, Tooltip} from "@arco-design/web-react";
 import MsgBar from "./msgBar";
-import {useDispatch, useSelector} from "react-redux";
-import {setLastCmd, switchEnableCmdMode} from "@/reducers";
+import {useSelector} from "react-redux";
 import {useEffect, useState} from "react";
 import * as jq from "@/lib/jq";
-import {
-  enableCmdModeSelector,
-  lastCmdSelector,
-  leftEditorSelector,
-  rightEditorSelector,
-  statusBarSelector,
-} from "@/lib/store";
+import {leftEditorSelector, rightEditorSelector, statusBarSelector} from "@/lib/store";
 import {IconCodeSquare} from "@arco-design/web-react/icon";
-
-const width = "20px";
 
 export default function StatusBar() {
   const leftEditor = useSelector(leftEditorSelector);
   const rightEditor = useSelector(rightEditorSelector);
-  const enableCmdMode = useSelector(enableCmdModeSelector);
-  const lastCmd = useSelector(lastCmdSelector);
   const statusBar = useSelector(statusBarSelector);
-  const dispatch = useDispatch();
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [enableCmdMode, setEnableCmdMode] = useState(false);
+  const [lastCmd, setLastCmd] = useState("");
   const [parseFailed, setParseFailed] = useState(false);
   const [popVisible, setPopVisible] = useState(false);
 
   const onInputCmd = (text) => {
     text = text.trim();
-    dispatch(setLastCmd(text));
+    setLastCmd(text);
 
     if (text === "") {
       setParseFailed(false);
@@ -84,18 +74,18 @@ export default function StatusBar() {
 
   return (
     <div
-      className={`flex items-center min-h-[${width}] text-[12px] mt-px border-[0.5px] border-t-0 border-solid border-color statusbar`}>
+      className="statusbar flex items-center min-h-[20px] text-[12px] mt-px border-[0.5px] border-t-0 border-solid border-color">
       <Tooltip mini popupVisible={enableCmdMode ? false : popVisible}
                onVisibleChange={(visible) => setPopVisible(visible)}
                content="点击按钮切换到命令模式，使用 jq 处理 JSON">
-        <Button id="cmd-mode-btn"
-                style={{width: width, height: width, border: 0, borderRadius: 0}}
-                icon={<IconCodeSquare style={{fontSize: width}}/>}
+        <Button id="cmd-btn"
+                style={{
+                  color: `var(--cmd-color${enableCmdMode ? "-active" : ""})`,
+                  backgroundColor: `var(--background-color${enableCmdMode ? "-active" : ""})`,
+                }}
+                icon={<IconCodeSquare style={{fontSize: "20px"}}/>}
                 loading={loading}
-                type={enableCmdMode ? "outline" : "secondary"}
                 onClick={() => {
-                  dispatch(switchEnableCmdMode());
-
                   if (!enableCmdMode) {
                     const timer = setTimeout(() => setLoading(true), 50);
 
@@ -106,6 +96,8 @@ export default function StatusBar() {
                       setLoading(false);
                     });
                   }
+
+                  setEnableCmdMode(!enableCmdMode);
                 }}/>
       </Tooltip>
       {

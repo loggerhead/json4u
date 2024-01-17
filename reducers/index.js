@@ -2,8 +2,6 @@ import {ctxSlice} from './ctxSlice';
 import {settingsSlice} from './settingsSlice';
 
 export const {
-  switchEnableCmdMode,
-  setLastCmd,
   setStatusBar,
   setLeftEditor,
   setRightEditor,

@@ -3,10 +3,6 @@ import {createSlice} from '@reduxjs/toolkit';
 export const ctxSlice = createSlice({
   name: 'ctx',
   initialState: {
-    // 状态栏进入命令模式了吗？
-    enableCmdMode: false,
-    // 命令模式最后一次输入的命令
-    lastCmd: "",
     // 状态栏文案
     statusBar: {},
     // 左侧编辑器
@@ -19,12 +15,6 @@ export const ctxSlice = createSlice({
     worker: null,
   },
   reducers: {
-    switchEnableCmdMode: (state) => {
-      state.enableCmdMode = !state.enableCmdMode;
-    },
-    setLastCmd: (state, action) => {
-      state.lastCmd = action.payload;
-    },
     setStatusBar: (state, action) => {
       state.statusBar = action.payload;
     },
