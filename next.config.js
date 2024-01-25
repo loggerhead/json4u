@@ -1,5 +1,10 @@
+const {withSentryConfig} = require("@sentry/nextjs");
+const genRobotsFile = require("./robots");
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const isProd = process.env.NODE_ENV === 'production';
+const isVercel = process.env.NEXT_BUILD === "vercel";
+
+genRobotsFile(isVercel);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -39,7 +44,7 @@ const nextConfig = {
   },
 };
 
-if (process.env.NEXT_BUILD === "vercel") {
+if (isVercel) {
   console.log("enable vercel build.");
   nextConfig.output = undefined;
   nextConfig.distDir = undefined;
@@ -64,7 +69,6 @@ module.exports = withBundleAnalyzer(withMDX(nextConfig));
 
 
 // Injected content via Sentry wizard below
-const {withSentryConfig} = require("@sentry/nextjs");
 
 // https://github.com/getsentry/sentry-webpack-plugin#options
 module.exports = withSentryConfig(
