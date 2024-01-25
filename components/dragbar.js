@@ -3,7 +3,6 @@ import {useCallback, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {leftWidthSelector} from "@/lib/store";
 import {setLeftWidth} from "@/reducers";
-import {maxLeftWidth} from "@/reducers/settingsSlice";
 
 function hideElements(side) {
   for (const el of document.getElementsByClassName(`${side}-el`)) {
@@ -29,7 +28,7 @@ export default function Dragbar({leftContainerRef}) {
   // 左侧最大宽度（px）
   const maxWidth = useRef(9999);
   // 左侧宽度（百分比）
-  const newWidth = useRef(maxLeftWidth);
+  const newWidth = useRef(-1);
 
   // https://melkornemesis.medium.com/handling-javascript-mouseup-event-outside-element-b0a34090bb56
   const handleMouseDown = useCallback((event) => {
@@ -53,7 +52,9 @@ export default function Dragbar({leftContainerRef}) {
           leftContainerRef.current.style.flexBasis = "0";
         }
 
-        dispatch(setLeftWidth(newWidth.current));
+        if (newWidth.current >= 0) {
+          dispatch(setLeftWidth(newWidth.current));
+        }
       }
     });
 
