@@ -1,7 +1,7 @@
 "use client";
 import "@arco-design/web-react/dist/css/arco.css";
 import dynamic from "next/dynamic";
-import {useEffect, useMemo, useRef} from "react";
+import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import * as Sentry from "@sentry/react";
@@ -21,28 +21,21 @@ const MyEditor = dynamic(() => import("../components/editor"), {
   ssr: false,
 });
 
-function useInit({dispatch}) {
-  return useMemo(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const worker = new Worker(new URL('../lib/worker.js', import.meta.url));
-    dispatch(setWorker(worker));
-
-    const _ = jq.init();
-
-    return () => worker.terminate();
-  }, []);
-}
-
 export default function Home() {
   const dispatch = useDispatch();
   const leftEditor = useSelector(leftEditorSelector);
   const rightEditor = useSelector(rightEditorSelector);
   const loaded = Boolean(leftEditor && rightEditor);
+  const hasWindow = typeof window !== "undefined";
 
-  useInit({dispatch});
+  useEffect(() => {
+    if (hasWindow) {
+      const worker = new Worker(new URL('../lib/worker.js', import.meta.url));
+      dispatch(setWorker(worker));
+      const _ = jq.init();
+      return () => worker.terminate();
+    }
+  }, [dispatch, hasWindow]);
 
   useEffect(() => {
     if (loaded) {

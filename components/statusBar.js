@@ -2,7 +2,7 @@
 import {Button, Input, Message, Tooltip} from "@arco-design/web-react";
 import MsgBar from "./msgBar";
 import {useSelector} from "react-redux";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import * as jq from "@/lib/jq";
 import {leftEditorSelector, rightEditorSelector, statusBarSelector} from "@/lib/store";
 import {IconCodeSquare} from "@arco-design/web-react/icon";
@@ -33,7 +33,7 @@ export default function StatusBar() {
     setInput(text);
   };
 
-  const execJq = async (filter, alert = false) => {
+  const execJq = useCallback(async (filter, alert = false) => {
     const editor = leftEditor;
     const text = editor?.text();
 
@@ -65,7 +65,7 @@ export default function StatusBar() {
     } else {
       print("执行 jq 成功，但输出为空");
     }
-  };
+  }, [leftEditor, rightEditor]);
 
   useEffect(() => {
     const timer = setTimeout(() => execJq(input), 500);
