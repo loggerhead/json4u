@@ -3,10 +3,11 @@ import {useSelector} from "react-redux";
 import {leftEditorSelector, rightEditorSelector} from "@/lib/store";
 import Home from "@/app/page";
 import {useEffect, useState} from "react";
-import {notFound} from "next/navigation";
+import {notFound, useSearchParams} from "next/navigation";
 
-export default function SharePage({searchParams}) {
-  const {id} = searchParams;
+export default function SharePage() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const leftEditor = useSelector(leftEditorSelector);
   const rightEditor = useSelector(rightEditorSelector);
   const [loading, setLoading] = useState(true);
