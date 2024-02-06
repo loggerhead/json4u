@@ -69,9 +69,10 @@ export function ShareButton() {
     })
       .then((resp) => resp.json())
       .then(async ({id, ttl}) => {
+        const days = Math.floor(ttl / 86400);
+        const url = `${host}/share/${id}`;
+
         try {
-          const days = Math.floor(ttl / 86400);
-          const url = `${host}/share/${id}`;
           await navigator.clipboard.writeText(url);
           Message.success(`已复制分享链接（有效期${days}天）: ${url}`);
         } catch (e) {
