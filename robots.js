@@ -3,7 +3,7 @@ const fs = require("fs");
 const genRobotsFile = (isVercel = false) => {
   const sitemap = "https://json4u.com/sitemap.xml";
   let data = `User-agent: *
-Disallow:
+Disallow: https://json4u.com/share/*
 Sitemap: ${sitemap}`;
 
   if (isVercel) {
