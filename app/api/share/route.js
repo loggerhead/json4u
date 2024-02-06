@@ -2,6 +2,9 @@ import {kv} from "@vercel/kv";
 import {genError, genResp} from "@/app/api/util";
 import Joi from "joi";
 
+export const runtime = 'edge';
+// https://vercel.com/docs/edge-network/regions
+export const preferredRegion = ['sin1'];
 const expireSeconds = 7 * 86400;
 
 const schema = Joi.object({
@@ -77,7 +80,11 @@ export async function POST(req) {
     return genError(req, 500, "set kv failed");
   }
 
-  return genResp(req, {id: id, ttl: expireSeconds});
+  return genResp(req, {
+    id: id,
+    ttl: expireSeconds,
+    region: process.env.VERCEL_REGION,
+  });
 }
 
 export async function OPTIONS(req) {
