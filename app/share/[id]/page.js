@@ -17,13 +17,16 @@ export default function SharePage({params}) {
   useEffect(() => {
     fetch(`https://api.json4u.com/api/share/${id}`)
       .then((resp) => resp.json())
-      .then((data) => setData(data))
-      .catch((e) => {
-        console.error(`加载分享内容失败：${e}`);
+      .then((data) => {
+        const e = data?.error;
+        if (e) {
+          console.error(`加载分享内容失败：${e}`);
+        } else {
+          setData(data);
+        }
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .catch((e) => console.error(`加载分享内容失败：${e}`))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
