@@ -2,6 +2,7 @@ import {ctxSlice} from './ctxSlice';
 import {settingsSlice} from './settingsSlice';
 
 export const {
+  setLastAction,
   setStatusBar,
   setLeftEditor,
   setRightEditor,

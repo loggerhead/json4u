@@ -1,8 +1,8 @@
 const {withSentryConfig} = require("@sentry/nextjs");
 const genRobotsFile = require("./robots");
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
-const isProd = process.env.NODE_ENV === 'production';
 const isVercel = process.env.NEXT_BUILD === "vercel";
+const isProd = process.env.NODE_ENV === 'production';
 
 genRobotsFile(isVercel);
 

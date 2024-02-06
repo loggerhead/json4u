@@ -3,6 +3,8 @@
   "version": "2.16.0",
   "private": true,
   "scripts": {
+    "vercel:dev": "NEXT_BUILD=vercel yarn dev",
+    "vercel:build": "NEXT_BUILD=vercel yarn build",
     "dev": "SENTRY_ENVIRONMENT=development next dev",
     "build": "SENTRY_ENVIRONMENT=production NODE_ENV=production rm -rf dist && next build",
     "serve": "lite-server --baseDir='dist'",
@@ -22,6 +24,8 @@
     "@reduxjs/toolkit": "^2.0.1",
     "@sentry/nextjs": "^7.89.0",
     "@sentry/react": "^7.89.0",
+    "@vercel/kv": "^1.0.1",
+    "joi": "^17.12.1",
     "monaco-editor": "^0.45.0",
     "next": "^14.0.4",
     "papaparse": "^5.4.1",

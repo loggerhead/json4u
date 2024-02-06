@@ -13,6 +13,8 @@ export const ctxSlice = createSlice({
     focusLeft: true,
     // 加载的 web worker
     worker: null,
+    // 最后执行的动作
+    lastAction: null,
   },
   reducers: {
     setStatusBar: (state, action) => {
@@ -32,6 +34,9 @@ export const ctxSlice = createSlice({
     },
     setWorker: (state, action) => {
       state.worker = action.payload;
+    },
+    setLastAction: (state, action) => {
+      state.lastAction = action.payload;
     },
   },
 });
