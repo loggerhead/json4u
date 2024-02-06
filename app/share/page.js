@@ -5,8 +5,8 @@ import Home from "@/app/page";
 import {useEffect, useState} from "react";
 import {notFound} from "next/navigation";
 
-export default function SharePage({params}) {
-  const {id} = params;
+export default function SharePage({searchParams}) {
+  const {id} = searchParams;
   const leftEditor = useSelector(leftEditorSelector);
   const rightEditor = useSelector(rightEditorSelector);
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,7 @@ export default function SharePage({params}) {
   const initSucc = Boolean(editorInitialized && data);
 
   useEffect(() => {
-    fetch(`https://api.json4u.com/api/share/${id}`)
+    fetch(`https://api.json4u.com/api/share?id=${id}`)
       .then((resp) => resp.json())
       .then((data) => {
         const e = data?.error;

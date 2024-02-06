@@ -10,6 +10,25 @@ const schema = Joi.object({
   lastAction: Joi.object(),
 });
 
+// 获取分享页内容
+export async function GET(req) {
+  const {searchParams} = new URL(req.url);
+  const id = searchParams.get('id');
+  let data;
+
+  try {
+    data = await kv.get(id);
+  } catch (e) {
+    return genError(req, 500, `kv.get failed: ${e}`);
+  }
+
+  if (!data) {
+    return genError(req, 404, "data not found");
+  }
+
+  return genResp(req, data);
+}
+
 // 生成分享链接
 export async function POST(req) {
   let data;
