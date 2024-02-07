@@ -70,7 +70,7 @@ export function ShareButton() {
       .then((resp) => resp.json())
       .then(async ({id, ttl}) => {
         const days = Math.floor(ttl / 86400);
-        const url = `${host}/share?id=${id}`;
+        const url = `${host}?share=${id}`;
 
         try {
           await navigator.clipboard.writeText(url);

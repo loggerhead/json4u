@@ -1,7 +1,7 @@
 "use client";
 import "@arco-design/web-react/dist/css/arco.css";
 import dynamic from "next/dynamic";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import * as Sentry from "@sentry/react";
@@ -15,19 +15,26 @@ import version from "@/lib/version";
 import * as jq from "@/lib/jq";
 import {setWorker} from '@/reducers';
 import {focusLeftSelector, leftEditorSelector, leftWidthSelector, persistor, rightEditorSelector} from '@/lib/store';
+import {notFound, useSearchParams} from "next/navigation";
 
 const now = performance.now();
 const MyEditor = dynamic(() => import("../components/editor"), {
   ssr: false,
 });
 
-export default function Home({loading = false}) {
+export default function Home() {
   const dispatch = useDispatch();
   const leftEditor = useSelector(leftEditorSelector);
   const rightEditor = useSelector(rightEditorSelector);
-  const loaded = Boolean(leftEditor && rightEditor && !loading);
   const hasWindow = typeof window !== "undefined";
 
+  const searchParams = useSearchParams();
+  const shareID = searchParams.get('share') || '';
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [data, setData] = useState(null);
+  const loaded = Boolean(leftEditor && rightEditor && (dataLoaded || !shareID));
+
+  // 初始化 web worker
   useEffect(() => {
     if (hasWindow) {
       const worker = new Worker(new URL('../lib/worker.js', import.meta.url));
@@ -37,6 +44,7 @@ export default function Home({loading = false}) {
     }
   }, [dispatch, hasWindow]);
 
+  // 打印资源加载耗时
   useEffect(() => {
     if (loaded) {
       let cost = performance.now() - now;
@@ -44,6 +52,39 @@ export default function Home({loading = false}) {
       console.log(`JSON For You：版本 ${version}，加载耗时 ${cost}s`);
     }
   }, [loaded]);
+
+  // 加载页面数据
+  useEffect(() => {
+    if (shareID) {
+      fetch(`https://api.json4u.com/api/share?id=${shareID}`)
+        .then((resp) => resp.json())
+        .then((data) => {
+          const e = data?.error;
+          if (e) {
+            console.error(`加载分享内容失败：${e}`);
+          } else {
+            setData(data);
+          }
+        })
+        .catch((e) => console.error(`加载分享内容失败：${e}`))
+        .finally(() => setDataLoaded(true));
+    }
+  }, [shareID]);
+
+  // 执行初始化完成动作
+  useEffect(() => {
+    if (loaded && dataLoaded && data) {
+      const {left, right, lastAction} = data;
+      leftEditor.setText(left);
+      rightEditor.setText(right);
+
+      if (lastAction?.action === 'Compare') {
+        rightEditor.compare(lastAction.options);
+      }
+    } else if (loaded && dataLoaded && !data) {
+      notFound();
+    }
+  }, [loaded, dataLoaded, data]);
 
   return <Sentry.ErrorBoundary>
     {loaded ? <></> : <Loading/>}
