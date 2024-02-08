@@ -73,18 +73,24 @@ export default function Home() {
 
   // 执行初始化完成动作
   useEffect(() => {
+    if (loaded && dataLoaded && !data) {
+      notFound();
+    }
+
     if (loaded && dataLoaded && data) {
       const {left, right, lastAction} = data;
       leftEditor.setText(left.text);
       rightEditor.setText(right.text);
-      leftEditor.revealLine(left.lineNumber, left.column);
-      rightEditor.revealLine(right.lineNumber, right.column);
 
       if (lastAction?.action === 'Compare') {
-        rightEditor.compare(lastAction.options);
+        rightEditor.compare(lastAction.options, () => {
+          leftEditor.revealLine(left.lineNumber, 1);
+          rightEditor.revealLine(right.lineNumber, 1);
+        });
+      } else {
+        leftEditor.revealLine(left.lineNumber, 1);
+        rightEditor.revealLine(right.lineNumber, 1);
       }
-    } else if (loaded && dataLoaded && !data) {
-      notFound();
     }
   }, [loaded, dataLoaded, data]);
 
