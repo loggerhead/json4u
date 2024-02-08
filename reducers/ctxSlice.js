@@ -13,7 +13,7 @@ export const ctxSlice = createSlice({
     focusLeft: true,
     // 加载的 web worker
     worker: null,
-    // 最后执行的动作
+    // 编辑器最后执行的动作
     lastAction: null,
   },
   reducers: {

@@ -75,8 +75,10 @@ export default function Home() {
   useEffect(() => {
     if (loaded && dataLoaded && data) {
       const {left, right, lastAction} = data;
-      leftEditor.setText(left);
-      rightEditor.setText(right);
+      leftEditor.setText(left.text);
+      rightEditor.setText(right.text);
+      leftEditor.revealLine(left.lineNumber, left.column);
+      rightEditor.revealLine(right.lineNumber, right.column);
 
       if (lastAction?.action === 'Compare') {
         rightEditor.compare(lastAction.options);
@@ -120,7 +122,7 @@ function Page({loaded}) {
         </div>
         <div id="leftEditor"
              className={`left-el grow border border-solid ${activeLeftBorder ? "border-active" : "border-color"} ${leftWidth === 0 ? "hidden" : ""}`}>
-          <MyEditor name="left" height={editorHeight}></MyEditor>
+          <MyEditor side="left" height={editorHeight}></MyEditor>
         </div>
       </div>
       <div className="relative flex flex-col-reverse gap-2">
@@ -135,7 +137,7 @@ function Page({loaded}) {
         </ul>
         <div id="rightEditor"
              className={`border border-solid ${activeRightBorder ? "border-active" : "border-color"}`}>
-          <MyEditor name="right" height={editorHeight}></MyEditor>
+          <MyEditor side="right" height={editorHeight}></MyEditor>
         </div>
       </div>
     </div>

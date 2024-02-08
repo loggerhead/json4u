@@ -7,12 +7,12 @@ import {leftEditorSelector, rightEditorSelector} from "@/lib/store";
 
 init();
 
-function getEditor(store, name) {
+function getEditor(store, side) {
   const state = store.getState();
-  return name === "left" ? leftEditorSelector(state) : rightEditorSelector(state);
+  return side === "left" ? leftEditorSelector(state) : rightEditorSelector(state);
 }
 
-export default function MyEditor({name, height}) {
+export default function MyEditor({side, height}) {
   const {store} = useContext(ReactReduxContext);
   const dispatch = useDispatch();
 
@@ -28,10 +28,10 @@ export default function MyEditor({name, height}) {
         minimap: {enabled: true},
       }}
       onMount={(editor, monaco) => {
-        const editorRef = new EditorRef(name, store, dispatch, editor);
+        const editorRef = new EditorRef(side, store, dispatch, editor);
         editorRef.init();
 
-        dispatch((name === "left" ? setLeftEditor : setRightEditor)(editorRef));
+        dispatch((side === "left" ? setLeftEditor : setRightEditor)(editorRef));
 
         // 当左右两侧编辑器都完成初始化后，将两者关联
         const leftEditor = getEditor(store, "left");
@@ -48,8 +48,8 @@ export default function MyEditor({name, height}) {
           }
         }
       }}
-      onValidate={(markers) => getEditor(store, name).validate(markers)}
-      onChange={() => getEditor(store, name).onChange()}
+      onValidate={(markers) => getEditor(store, side).validate(markers)}
+      onChange={() => getEditor(store, side).onChange()}
     />
   );
 }

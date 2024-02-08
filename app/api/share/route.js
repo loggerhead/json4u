@@ -8,8 +8,16 @@ export const preferredRegion = ['sin1'];
 const expireSeconds = 7 * 86400;
 
 const schema = Joi.object({
-  left: Joi.string().allow('').required(),
-  right: Joi.string().allow('').required(),
+  left: {
+    text: Joi.string().allow('').required(),
+    lineNumber: Joi.number().min(0),
+    column: Joi.number().min(0),
+  },
+  right: {
+    text: Joi.string().allow('').required(),
+    lineNumber: Joi.number().min(0),
+    column: Joi.number().min(0),
+  },
   lastAction: Joi.object(),
 });
 

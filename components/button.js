@@ -44,7 +44,7 @@ export function ShareButton() {
   const host = process.env.NEXT_PUBLIC_HOST || "https://json4u.com";
   const leftEditor = useSelector(leftEditorSelector);
   const rightEditor = useSelector(rightEditorSelector);
-  const action = useSelector(lastActionSelector);
+  const lastAction = useSelector(lastActionSelector);
   const [loading, setLoading] = useState(false);
 
   return <MyButton loading={loading} onClick={async () => {
@@ -58,14 +58,26 @@ export function ShareButton() {
       return;
     }
 
+    const leftPosition = leftEditor.getPosition();
+    const rightPosition = rightEditor.getPosition();
+    const data = {
+      left: {
+        text: left,
+        lineNumber: leftPosition.lineNumber,
+        column: leftPosition.column,
+      },
+      right: {
+        text: right,
+        lineNumber: rightPosition.lineNumber,
+        column: rightPosition.column,
+      },
+      lastAction: lastAction || {},
+    };
+
     fetch('https://api.json4u.com/api/share', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        left: left,
-        right: right,
-        lastAction: action || {},
-      }),
+      body: JSON.stringify(data),
     })
       .then((resp) => resp.json())
       .then(async ({id, ttl}) => {
