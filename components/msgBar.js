@@ -1,6 +1,7 @@
 "use client";
 import {useMemo, useRef} from "react";
 import * as color from "../lib/color";
+import {IconRight} from "@arco-design/web-react/icon";
 
 // texts 结构：{ id: { text, blink }}
 export default function MsgBar({texts}) {
@@ -25,6 +26,7 @@ export default function MsgBar({texts}) {
   const leftKeys = keys.filter((key) => key.startsWith("l"));
   const rightKeys = keys.filter((key) => key.startsWith("r"));
 
+  // 生成状态栏文本节点
   const genAlerts = (keys) => {
     return keys.map((key, i) => {
       const {text, blink} = textsMap[key];
@@ -56,9 +58,9 @@ function BarStub({msg}) {
   let node;
 
   if (typeof window != "undefined" && typeof DOMParser != "undefined") {
-    const [pureMsg, colors] = color.matchColorTags(msg);
+    const [pureMsg, tags] = color.matchTags(msg);
 
-    if (pureMsg && colors.length) {
+    if (pureMsg && tags.length) {
       node = new DOMParser().parseFromString(msg, "text/xml");
       const err = node?.querySelector("parsererror");
 
@@ -79,7 +81,12 @@ function BarStub({msg}) {
 
 // 根据 dom 树生成 span 树
 function BarStubNode({node, level}) {
-  if (!node || node.nodeType == Node.TEXT_NODE) {
+  // 在此添加需要特殊支持的 tag
+  if (node.nodeName === "IconRight") {
+    return <IconRight className="bar-right"/>;
+  }
+
+  if (!node || node.nodeType === Node.TEXT_NODE) {
     const text = node?.textContent || "";
     return <span key={`${level}`}>{text}</span>;
   }

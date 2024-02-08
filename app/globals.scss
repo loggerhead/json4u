@@ -19,7 +19,8 @@ $text-red: #cb2a2f;
 $text-green: #319331;
 $text-blue: #0451a5;
 $text-yellow: #863b00;
-$statusbar-error: #ffece8;
+$bar-error: #ffece8;
+$bar-right: #94a3b8;
 
 .markdown-body {
   box-sizing: border-box;
@@ -118,8 +119,13 @@ $statusbar-error: #ffece8;
   color: $text-red;
 }
 
-.statusbar-error {
-  background-color: $statusbar-error !important;
+.bar-right {
+  color: $bar-right !important;
+  margin: 0 2px;
+}
+
+.bar-error {
+  background-color: $bar-error !important;
 }
 
 #cmd-btn {

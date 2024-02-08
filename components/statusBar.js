@@ -107,7 +107,7 @@ export default function StatusBar() {
                  placeholder={`输入 jq 表达式 (左侧输入，右侧输出)`}
                  size="mini"
                  style={{border: 0}}
-                 className={`px-2.5 ${parseFailed ? "statusbar-error" : ""}`}
+                 className={`px-2.5 ${parseFailed ? "bar-error" : ""}`}
                  defaultValue={lastCmd}
                  onChange={onInputCmd}
                  onPressEnter={async (e) => {
