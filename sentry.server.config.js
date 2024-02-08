@@ -7,7 +7,10 @@ import version from "./lib/version";
 
 Sentry.init({
   dsn: "https://d60bd8847a6d8afc72e3de0d9288fa4c@o4506325094236160.ingest.sentry.io/4506325157085184",
-  ignoreErrors: ["Invalid regular expression:"],
+  ignoreErrors: [
+    "Invalid regular expression:",
+    "ResizeObserver loop completed with undelivered notifications",
+  ],
 
   // Adjust this value in production, or use tracesSampler for greater control
   tracesSampleRate: 1,

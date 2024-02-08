@@ -74,13 +74,17 @@ module.exports = withBundleAnalyzer(withMDX(nextConfig));
 module.exports = withSentryConfig(
   module.exports,
   {
-    // Suppresses source map uploading logs during build
-    silent: true,
     org: "loggerhead",
     project: "json4u",
   },
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
   {
+    ignore: [
+      "cypress", "__tests__", "dist", "node_modules", "public", ".next",
+      ".vercel", ".vscode", ".idea", ".gitignore", ".DS_Store", "runner-results",
+      "*.log", ".env.*", "sentry.*.config.js", "README.md", "yarn.lock",
+      "multi-reporter-config.json",
+    ],
     // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,
     // Transpiles SDK to be compatible with IE11 (increases bundle size)
