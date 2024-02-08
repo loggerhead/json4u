@@ -7,6 +7,14 @@ import * as jq from "@/lib/jq";
 import {leftEditorSelector, rightEditorSelector, statusBarSelector} from "@/lib/store";
 import {IconCodeSquare} from "@arco-design/web-react/icon";
 
+export const StatusBarValidate = "r100"; // 虚拟状态栏 ID
+export const StatusBarPos = "l1";
+export const StatusBarPath = "l2";
+export const StatusBarLeftValidate = "r1";
+export const StatusBarRightValidate = "r2";
+export const StatusBarSetting = "r3";
+export const StatusBarCompare = "r4";
+
 export default function StatusBar() {
   const leftEditor = useSelector(leftEditorSelector);
   const rightEditor = useSelector(rightEditorSelector);
