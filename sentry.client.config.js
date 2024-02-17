@@ -5,18 +5,6 @@
 import * as Sentry from "@sentry/nextjs";
 import version from "./lib/version";
 
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/user-feedback/configuration/
-const feedback = new Sentry.Feedback({
-  autoInject: false,
-  showName: false,
-  showBranding: false,
-  buttonLabel: "",
-  formTitle: "",
-  submitButtonLabel: "Send",
-});
-
-feedback.attachTo(document.querySelector("#feedback"));
-
 Sentry.init({
   dsn: "https://d60bd8847a6d8afc72e3de0d9288fa4c@o4506325094236160.ingest.sentry.io/4506325157085184",
   ignoreErrors: [
@@ -40,7 +28,6 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 
   integrations: [
-    feedback,
     new Sentry.Replay({
       // Additional SDK configuration goes in here, for example:
       maskAllText: false,

@@ -1,9 +1,10 @@
 const fs = require("fs");
 
 const genRobotsFile = (isVercel = false) => {
-  const sitemap = "https://json4u.com/sitemap.xml";
+  const sitemap = `${process.env.NEXT_PUBLIC_HOST}/sitemap.xml`;
   let data = `User-agent: *
-Disallow: https://json4u.com/share/*
+Disallow: /share/*
+Disallow: www.json4u.com
 Sitemap: ${sitemap}`;
 
   if (isVercel) {

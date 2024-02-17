@@ -1,10 +1,7 @@
 "use client";
-import * as sentry from "@sentry/react";
 
 export default function Feedback() {
-  const client = sentry.getClient();
-  const feedback = client?.getIntegration(sentry.Feedback);
-  return <button id="feedback" onClick={() => feedback.openDialog()}>
+  return <a target="_blank" href="https://github.com/loggerhead/json4u-issue/issues">
     反馈
-  </button>;
+  </a>;
 }

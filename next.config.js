@@ -14,6 +14,7 @@ const nextConfig = {
   },
   // 生成静态文件，方便托管在 CDN 上。https://nextjs.org/docs/pages/building-your-application/deploying/static-exports
   output: "export",
+  reactStrictMode: false,
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   distDir: "dist",

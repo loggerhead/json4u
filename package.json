@@ -1,6 +1,6 @@
 {
   "name": "json4u-react",
-  "version": "2.16.1",
+  "version": "2.16.2",
   "private": true,
   "scripts": {
     "vercel:dev": "NEXT_BUILD=vercel yarn dev",
