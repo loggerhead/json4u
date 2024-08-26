@@ -1,0 +1,11 @@
+{
+  "trailingComma": "all",
+  "singleQuote": false,
+  "semi": true,
+  "printWidth": 120,
+  "tabWidth": 2,
+  "arrowParens": "always",
+  "importOrder": ["^(react/(.*)$)|^(react$)", "^(next/(.*)$)|^(next$)", "<THIRD_PARTY_MODULES>", "^src/(.*)$", "^[./]"],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+}

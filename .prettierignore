@@ -1,0 +1,8 @@
+src/components/ui/
+messages/
+.github
+.next
+node_modules/
+out
+public
+*-lock.json

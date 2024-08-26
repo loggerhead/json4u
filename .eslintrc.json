@@ -1,3 +1,38 @@
 {
-  "extends": "next/core-web-vitals"
+  "rules": {
+    "@next/next/no-img-element": "off",
+    "unused-imports/no-unused-imports": "error",
+    "no-empty": "error",
+    "no-multiple-empty-lines": "error",
+    "no-irregular-whitespace": "error",
+    "strict": ["error", "never"],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "double", { "avoidEscape": true }],
+    "prefer-const": "error",
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    // Avoid hardcoded labels in component markup
+    "react/jsx-no-literals": "warn",
+    // Consistently import navigation APIs from `@/navigation`
+    "no-restricted-imports": [
+      "error",
+      {
+        "name": "next/link",
+        "message": "Please import from `@/navigation` instead."
+      },
+      {
+        "name": "next/navigation",
+        "importNames": ["redirect", "permanentRedirect", "useRouter", "usePathname"],
+        "message": "Please import from `@/navigation` instead."
+      }
+    ]
+  },
+  "extends": ["next/core-web-vitals"],
+  "plugins": ["unused-imports"]
 }

@@ -1,6 +1,6 @@
+tsconfig.tsbuildinfo
+public/sw.js*
 .vscode
-# 编译时自动生成
-public/robots.txt
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 runner-results/
 cypress/screenshots/
@@ -13,9 +13,11 @@ dist/
 /node_modules
 /.pnp
 .pnp.js
+.yarn/install-state.gz
 
 # testing
-/coverage
+coverage/
+auto-imports.d.ts
 
 # next.js
 /.next/
@@ -45,3 +47,9 @@ next-env.d.ts
 
 # Sentry Config File
 .sentryclirc
+
+# Million Lint
+.million
+
+# Sentry Config File
+.env.sentry-build-plugin

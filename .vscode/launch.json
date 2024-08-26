@@ -1,13 +1,17 @@
 {
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Jest Tests",
       "type": "node",
       "request": "launch",
-      "args": ["${workspaceFolder}/node_modules/jest/bin/jest.js", "--runInBand", "--no-cache", "--watch", "--debug"],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "openOnSessionStart"
+      "name": "Debug Current Test File",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${relativeFile}"],
+      "smartStep": true,
+      "console": "integratedTerminal"
     }
   ]
 }

@@ -1,0 +1,442 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --btn-bg-active: #f2f2f2;
+    --btn-text-color: #666666;
+    --btn-input: #666;
+    --kbd-color: #171717;
+    --kbd-bg-color: #fafafa;
+    --command-width: 240px;
+
+    --max-header-width: 1280px;
+    /* height of <Container/> */
+    --container-height: 42px;
+    --statusbar-height: 24px;
+
+    --graph-font-size: 12px;
+    /* same value as --monaco-monospace-font */
+    --graph-font-family: "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "DejaVu Sans Mono",
+      "Courier New", monospace;
+    --max-key-length: 300px;
+    --max-value-length: 500px;
+    --tbl-th-bg-color: rgb(224, 224, 224, 0.3);
+    --tbl-border: 1px solid #e0e0e080;
+
+    --bg-key: #e0e0e04d;
+    --hl-key: #a31515;
+    --hl-string: #0451a5;
+    --hl-number: #098658;
+    --hl-null: #d1004d;
+    --hl-empty: #0000004d;
+    --hl-index: #0000004d;
+
+    --parse-error-red: #cb2a2f;
+    --diff-blank-hunk: #cdd7e033;
+    --diff-margin-red: #ffd7d5;
+    --diff-margin-green: #ccffd8;
+    --diff-fg-red: #ff818266;
+    --diff-bg-red: #ff9b9533;
+    --diff-fg-green: #2ddf5966;
+    --diff-bg-green: #82ffa433;
+  }
+
+  [data-theme="dark"] {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+html,
+body {
+  overscroll-behavior: none;
+  scroll-behavior: smooth !important;
+}
+
+.markdown-body {
+  box-sizing: border-box;
+  margin: 1.25rem auto !important;
+
+  ul {
+    list-style-type: disc;
+  }
+}
+
+.lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2px;
+}
+
+/* fix monaco 不能根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */
+.monaco-editor {
+  position: absolute !important;
+}
+
+.blank-hunk {
+  background-color: var(--diff-blank-hunk);
+}
+
+.margin-del {
+  background-color: var(--diff-margin-red);
+}
+
+.margin-ins {
+  background-color: var(--diff-margin-green);
+}
+
+.line-del {
+  background-color: var(--diff-bg-red);
+}
+
+.line-ins {
+  background-color: var(--diff-bg-green);
+}
+
+.inline-del {
+  background-color: var(--diff-fg-red);
+}
+
+.inline-ins {
+  background-color: var(--diff-fg-green);
+}
+
+.parse-error {
+  display: inline-block;
+  cursor: pointer;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: var(--parse-error-red);
+}
+
+.parse-error-ctx {
+  background-color: var(--diff-fg-red);
+}
+
+.react-flow {
+  .react-flow__controls {
+    margin-bottom: 25px;
+  }
+
+  .react-flow__handle-left {
+    width: 0px;
+    height: 0px;
+  }
+
+  .react-flow__handle-right {
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    cursor: pointer !important;
+  }
+}
+
+.graph-node {
+  min-width: fit-content;
+  border-width: 1px;
+  background-color: rgb(255 255 255);
+  font-size: var(--graph-font-size);
+  font-family: var(--graph-font-family);
+}
+
+.graph-array-edge {
+  position: absolute;
+  background: transparent;
+  color: var(--hl-empty);
+  font-size: var(--graph-font-size);
+  font-family: var(--graph-font-family);
+}
+
+.graph-kv {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.graph-k {
+  margin-right: 20px;
+  max-width: var(--max-key-length);
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.graph-v {
+  max-width: var(--max-value-length);
+  margin-left: auto;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.tbl {
+  border-spacing: 0;
+  margin-bottom: 6px;
+  box-shadow: 0 0 2px 2px rgba(176, 176, 176, 0.5);
+  border-collapse: collapse;
+
+  th {
+    background-color: var(--tbl-th-bg-color);
+    font-weight: normal;
+    text-align: left;
+    vertical-align: top;
+    padding: 0 6px;
+    border: var(--tbl-border);
+  }
+
+  tr {
+    border: var(--tbl-border);
+  }
+
+  td {
+    position: relative;
+    font-weight: normal;
+    text-align: left;
+    vertical-align: top;
+    padding: 0 6px;
+  }
+
+  .tbl-key {
+    display: flex;
+    align-items: center;
+
+    span {
+      display: inline-block;
+      max-width: var(--max-key-length);
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+
+    :not(:first-child) {
+      margin-left: 4px;
+    }
+  }
+
+  .tbl-expander {
+    cursor: pointer;
+  }
+
+  .tbl-index {
+    padding: 0 6px;
+    border: var(--tbl-border);
+    color: var(--hl-index);
+    font-family: var(--graph-font-family);
+
+    .tbl-no {
+      display: inline-block;
+      vertical-align: top;
+    }
+  }
+
+  .tbl-leaf {
+    margin-left: 6px;
+    padding: 0 12px;
+    border-left: var(--tbl-border);
+  }
+
+  .tbl-val {
+    display: inline-block;
+    max-width: var(--max-value-length);
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+}
+
+#tbl-tooltip {
+  width: 400px;
+  padding: 15px;
+  position: absolute;
+  z-index: 1;
+  color: #000000;
+  font-family: var(--graph-font-family);
+
+  /* copy from https://www.radix-ui.com/primitives/docs/components/popover */
+  border-radius: 4px;
+  background-color: white;
+  box-shadow:
+    hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+
+  .tooltip-object {
+    color: var(--hl-number);
+  }
+
+  .tooltip-array {
+    color: var(--hl-null);
+  }
+
+  .tooltip-key {
+    margin-left: 0.5rem;
+    color: #000000;
+  }
+}
+
+#tbl-tooltip[data-side="top"] {
+  animation-name: slideDownAndFade;
+}
+#tbl-tooltip[data-side="right"] {
+  animation-name: slideLeftAndFade;
+}
+#tbl-tooltip[data-side="bottom"] {
+  animation-name: slideUpAndFade;
+}
+#tbl-tooltip[data-side="left"] {
+  animation-name: slideRightAndFade;
+}
+
+.search-cmd-kbd {
+  background: var(--kbd-bg-color);
+  color: var(--kbd-color);
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 6px;
+  font-family: var(--graph-font-family);
+}
+
+#cmd-panel {
+  position: absolute;
+  display: flex;
+  background: hsl(var(--background));
+  border-top: 1px solid hsl(var(--border));
+  border-right: 1px solid hsl(var(--border));
+  width: fit-content;
+  height: fit-content;
+  transform: translateY(-100%);
+  overflow: hidden;
+}
+
+#cmd-panel[data-state="open"] {
+  animation: slideDown 300ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

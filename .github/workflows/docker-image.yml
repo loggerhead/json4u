@@ -1,0 +1,28 @@
+name: Docker Image CI
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set variables
+        run: |
+          VER=$(grep version package.json | cut -d '"' -f 4)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+      - name: Login to ACR
+        uses: aliyun/acr-login@v1
+        with:
+          login-server: https://registry.cn-heyuan.aliyuncs.com
+          username: "${{ secrets.ACR_REGISTRY_USERNAME }}"
+          password: "${{ secrets.ACR_REGISTRY_PASSWORD }}"
+      - name: Build and push image
+        run: |
+          IMAGE_NAME=registry.cn-heyuan.aliyuncs.com/json4u/json4u
+          docker build . --tag $IMAGE_NAME:${{ env.VERSION }}
+          docker tag $IMAGE_NAME:${{ env.VERSION }} $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:latest

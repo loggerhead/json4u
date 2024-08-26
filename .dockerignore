@@ -1,0 +1,12 @@
+__tests__
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+LICENSE
+README.md
+tsconfig.tsbuildinfo
+.next
+!.next/static
+!.next/standalone
+.git
