@@ -21,7 +21,6 @@ export interface Config {
   formatTabWidth: number;
   prettyFormat: boolean;
   enableSyncScroll: boolean; // the left and right side editors scroll in sync
-  sideNavCollapsed: boolean; // collapse status of side navigation bar
 }
 
 export const defaultConfig: Config = {
@@ -37,7 +36,6 @@ export const defaultConfig: Config = {
   formatTabWidth: 2,
   prettyFormat: true,
   enableSyncScroll: true,
-  sideNavCollapsed: true,
 };
 
 let globalStore: UseStore | undefined;

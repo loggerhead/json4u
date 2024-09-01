@@ -138,7 +138,7 @@ interface Path {
   lastComponent?: Component;
 }
 
-// copy from https://github.com/kpdecker/jsdiff
+// stolen from https://github.com/kpdecker/jsdiff
 function diff(
   oldString: string,
   newString: string,

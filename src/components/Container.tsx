@@ -2,7 +2,7 @@
 
 import { type ReactNode, type HTMLAttributes } from "react";
 import { Separator } from "@/components/ui/separator";
-import { type CommandMode } from "@/stores/status";
+import { type CommandMode } from "@/stores/statusStore";
 
 export function Container({ children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (

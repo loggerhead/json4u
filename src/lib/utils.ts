@@ -3,6 +3,13 @@ import { type ClassValue, clsx } from "clsx";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
+export function dateToYYYYMMDD(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function clone(o: any) {
   if (typeof structuredClone !== "undefined") {
     return structuredClone(o);
@@ -11,7 +18,7 @@ export function clone(o: any) {
   }
 }
 
-// copy from https://github.com/piotrwitek/utility-types/blob/master/src/mapped-types.ts#L77
+// stolen from https://github.com/piotrwitek/utility-types/blob/master/src/mapped-types.ts#L77
 export type FunctionKeys<T extends object> = {
   [K in keyof T]-?: T[K] extends Function ? K : never;
 }[keyof T];
@@ -20,7 +27,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function isApproximatelyEqual(a:number, b:number, tolerance:number) {
+export function isApproximatelyEqual(a: number, b: number, tolerance: number) {
   return Math.abs(a - b) < tolerance;
 }
 

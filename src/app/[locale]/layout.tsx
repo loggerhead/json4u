@@ -1,6 +1,8 @@
 import Script from "next/script";
 import "@/app/globals.css";
-import { host } from "@/app/sitemap";
+import { Toaster } from "@/components/ui/sonner";
+import { env, isCN } from "@/lib/env";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
@@ -9,13 +11,13 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
   return {
-    metadataBase: new URL(host),
+    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
     alternates: {
       canonical: "/",
       languages: {
         en: "https://json4u.com",
         zh: "https://json4u.cn",
-        "x-default": host.endsWith(".cn") ? "/zh" : "/en",
+        "x-default": isCN() ? "/zh" : "/en",
       },
     },
     applicationName: t("name"),
@@ -39,14 +41,14 @@ export async function generateMetadata({ params: { locale } }: { params: { local
       title: t("title"),
       description: t("description"),
       authors: ["loggerhead"],
-      images: [{ url: `${host}/apple-icon.png`, width: 512, height: 512, alt: t("name") }],
+      images: [{ url: `${env.NEXT_PUBLIC_APP_URL}/apple-icon.png`, width: 512, height: 512, alt: t("name") }],
     },
     twitter: {
       card: "summary",
       title: t("title"),
       description: t("description"),
       creator: "@1oggerhead",
-      images: [`${host}/apple-icon.png`],
+      images: [`${env.NEXT_PUBLIC_APP_URL}/apple-icon.png`],
     },
   };
 }
@@ -69,6 +71,8 @@ export default async function LocaleLayout({
           <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
           <GoogleTagManagerBody />
         </ThemeProvider>
+        <Toaster richColors position="bottom-right" />
+        <SpeedInsights />
       </body>
     </html>
   );

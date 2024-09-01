@@ -99,7 +99,6 @@ function doGenFlowNodes(
   return flowNode.data.depth;
 }
 
-// TODO support WAI-ARIA https://reactflow.dev/learn/advanced-use/accessibility#wai-aria
 function newFlowNode(node: Node, parentId: string, level: number): NodeWithData {
   return {
     id: node.id,
@@ -158,8 +157,8 @@ export class Layouter {
       if (level > 0) {
         node.position.x = levelMeta[level - 1].x + globalStyle.levelGap;
       }
-      levelMeta[level].x = Math.max(levelMeta[level].x, node.position.x + width);
 
+      levelMeta[level].x = Math.max(levelMeta[level].x, node.position.x + width);
       ordered.push(...node.data.childrenIds.map((id) => this.id2NodeMap[id]));
     }
 

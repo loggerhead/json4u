@@ -1,8 +1,6 @@
 import { Inter } from "next/font/google";
-import Head from "next/head";
-import Script from "next/script";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
+import { Footer } from "@/containers/landing/Footer";
+import { Header } from "@/containers/landing/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,14 +10,10 @@ export default function HomeLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className={`flex min-h-screen flex-col ${inter.className}`}>
-      <Head>
-        <link rel="stylesheet" href="https://cdn.sell.app/embed/style.css"></link>
-      </Head>
-      <Script src="https://cdn.sell.app/embed/script.js" type="module"></Script>
+    <main className={`flex flex-col items-center min-h-screen ${inter.className}`}>
       <Header />
-      <div className="flex flex-1 justify-center w-full">
-        <div className="flex w-full max-w-[1280px] h-full">{children}</div>
+      <div className="flex flex-col flex-1 justify-center items-center w-full">
+        <div className="relative flex flex-1 w-full max-w-[1280px] items-center">{children}</div>
       </div>
       <Footer />
     </main>

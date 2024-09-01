@@ -1,7 +1,7 @@
 import { classify, type DiffPair, newDiff } from "./diff";
 import { myersDiff } from "./myers";
 
-// copy from https://github.com/octavore/delta/blob/master/lib/histogram.go
+// stolen from https://github.com/octavore/delta/blob/master/lib/histogram.go
 // HistogramDiff uses the histogram diff algorithm to generate a line-based diff between two strings
 export function histogramDiff(a: string, b: string): DiffPair[] {
   if (a.length + b.length === 0) {

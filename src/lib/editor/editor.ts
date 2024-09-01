@@ -2,9 +2,13 @@ import { type ParsedTree } from "@/lib/command/parse";
 import { globalStyle as graphStyle } from "@/lib/graph/layout";
 import { toPointer } from "@/lib/idgen";
 import { getPath, ParseOptions, Tree } from "@/lib/parser";
-import { Stores } from "@/stores/types";
+import { getEditorState } from "@/stores/editorStore";
+import { getStatusState } from "@/stores/statusStore";
+import { getTreeState } from "@/stores/treeStore";
 import { debounce } from "lodash-es";
-import { editorApi, Kind, IScrollEvent } from "./types";
+import { editorApi, IScrollEvent } from "./types";
+
+export type Kind = "main" | "secondary";
 
 const parseWait = 500;
 
@@ -15,22 +19,20 @@ export class EditorWrapper {
   // 滚动中吗？
   scrolling: number;
   tree: Tree;
-  stores: Stores;
   delayParseAndSet: (text: string, extraOptions: ParseOptions, resetCursor: boolean, version: number) => void;
 
-  constructor(editor: editorApi.IStandaloneCodeEditor, kind: Kind, stores: Stores) {
+  constructor(editor: editorApi.IStandaloneCodeEditor, kind: Kind) {
     this.version = 0;
     this.editor = editor;
     this.kind = kind;
     this.scrolling = 0;
     this.tree = new Tree();
-    this.stores = stores;
     this.delayParseAndSet = debounce(this.parseAndSet, parseWait, { trailing: true });
   }
 
   init() {
     this.version = this.model().getVersionId();
-    this.editorState().setEditor(this);
+    getEditorState().setEditor(this);
     this.listenOnDidPaste();
     this.listenOnKeyDown();
     this.listenOnDropFile();
@@ -52,24 +54,12 @@ export class EditorWrapper {
     return this.editor.getValue();
   }
 
-  statusState() {
-    return this.stores.statusStore.getState();
-  }
-
-  treeState() {
-    return this.stores.treeStore.getState();
-  }
-
-  editorState() {
-    return this.stores.editorStore.getState();
-  }
-
   worker() {
-    return this.editorState().getWorker()!;
+    return getEditorState().getWorker()!;
   }
 
   getAnotherEditor() {
-    return this.editorState().getAnotherEditor(this.kind);
+    return getEditorState().getAnotherEditor(this.kind);
   }
 
   isTreeValid() {
@@ -117,14 +107,14 @@ export class EditorWrapper {
     // increase version to skip next onChange event which triggered by setText
     const tree = Tree.fromObject(treeObject);
     tree.version = this.incVersion();
-    this.editorState().resetHighlight();
+    getEditorState().resetHighlight();
 
     this.tree = tree;
-    this.treeState().setTree(tree, this.kind);
+    getTreeState().setTree(tree, this.kind);
 
     if (this.kind === "main") {
-      this.treeState().setGraph(graph);
-      this.treeState().setTableHTML(tableHTML);
+      getTreeState().setGraph(graph);
+      getTreeState().setTableHTML(tableHTML);
     }
 
     // 全量替换成新文本
@@ -155,7 +145,7 @@ export class EditorWrapper {
     }
 
     const options = {
-      ...this.statusState().parseOptions,
+      ...getStatusState().parseOptions,
       ...extraParseOptions,
       needTable: this.isMain(),
       needGraph: this.isMain(),
@@ -190,11 +180,6 @@ export class EditorWrapper {
       // increase version to skip next delayParseAndSet calling which triggered by onChange event
       this.incVersion();
       await this.parseAndSet(this.text());
-
-      // If the event that occurs on the secondary editor, then triggers compare
-      if (!this.isMain() && this.getAnotherEditor()?.text().length) {
-        await this.editorState().compare();
-      }
     });
   }
 
@@ -204,7 +189,7 @@ export class EditorWrapper {
       const model = this.model();
       const { lineNumber, column } = e.position;
       const selectionLength = model.getValueInRange(this.editor.getSelection()!).length;
-      this.statusState().setCursorPosition(lineNumber, column, selectionLength);
+      getStatusState().setCursorPosition(lineNumber, column, selectionLength);
 
       if (this.tree.valid()) {
         const text = this.text();
@@ -218,7 +203,7 @@ export class EditorWrapper {
         // TODO tree 改变时重新获取当前的 offset 计算展示的 path
         const node = this.tree.findNodeAtOffset(offset);
         if (node) {
-          this.statusState().setJsonPath(getPath(node));
+          getStatusState().setJsonPath(getPath(node));
         }
       }
     });
@@ -247,13 +232,12 @@ export class EditorWrapper {
       if (e.keyCode === window.monacoApi.KeyCode.KeyK && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         e.stopPropagation();
-        const state = this.statusState();
+        const state = getStatusState();
         state.setCommandOpen(!state.commandOpen);
       } else if (e.keyCode === window.monacoApi.KeyCode.Enter && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         e.stopPropagation();
-        const state = this.editorState();
-        state.callCommand("swapLeftRight");
+        getEditorState().callCommand("swapLeftRight");
       }
     });
   }
@@ -284,7 +268,7 @@ export class EditorWrapper {
 
   // 可以滚动吗？
   scrollable() {
-    return this.scrolling && this.statusState().enableSyncScroll;
+    return this.scrolling && getStatusState().enableSyncScroll;
   }
 }
 

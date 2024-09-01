@@ -8,8 +8,8 @@ import React from "react"
 export const typographyVariants = cva("text-xl", {
   variants: {
     variant: {
-      h1: "md:text-5xl scroll-m-20 text-3xl font-extrabold tracking-tight",
-      h2: "scroll-m-20 pb-2 md:text-3xl text-2xl font-semibold tracking-tight first:mt-0",
+      h1: "md:text-6xl scroll-m-20 text-4xl font-extrabold tracking-tight",
+      h2: "scroll-m-20 pb-2 md:text-5xl text-3xl font-semibold tracking-tight first:mt-0",
       h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
       h4: "scroll-m-20 text-xl font-semibold tracking-tight",
       h5: "scroll-m-18 text-lg tracking-tight text-minor",
@@ -21,7 +21,9 @@ export const typographyVariants = cva("text-xl", {
       large: "md:text-lg text-lg font-semibold",
       small: "md:text-sm text-sm font-medium leading-none",
       muted: "md:text-sm text-sm text-muted-foreground",
-      removePMargin: "[&:not(:first-child)]:mt-0"
+      xs: "md:text-xs text-xs text-muted-foreground",
+      removePMargin: "[&:not(:first-child)]:mt-0",
+      bold: "text-sm font-semibold",
     }
   },
   defaultVariants: {

@@ -324,7 +324,7 @@ describe("semanticCompare", () => {
     );
   });
 
-  // copy from https://github.com/zgrossbart/jdd/blob/main/jdd_test.js
+  // stolen from https://github.com/zgrossbart/jdd/blob/main/jdd_test.js
   test("inconsistent type", () => {
     expectEq('{ "akey": [] }', '{ "akey": null }', {
       hunks: [newDiff(10, 2, "del"), newDiff(10, 4, "ins")],

@@ -11,11 +11,3 @@ export interface MonacoApi {
   Range: typeof monaco.Range;
   RangeFromPositions: typeof monaco.Range.fromPositions;
 }
-
-declare global {
-  interface Window {
-    monacoApi: MonacoApi;
-  }
-}
-
-export type Kind = "main" | "secondary";

@@ -1,6 +1,6 @@
 import { type ParseOptions, getGenTabsFn } from "@/lib/parser";
 
-// copy from https://github.com/zgrossbart/jdd/blob/main/jsl/jsl.format.js
+// stolen from https://github.com/zgrossbart/jdd/blob/main/jsl/jsl.format.js
 export function format(json: string, options?: ParseOptions): string {
   const genTabs = getGenTabsFn(options?.tabWidth || 2);
   let i = 0;

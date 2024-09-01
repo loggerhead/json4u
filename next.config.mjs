@@ -2,17 +2,25 @@ import NextBundleAnalyzer from "@next/bundle-analyzer";
 import createMDX from "@next/mdx";
 import { withSentryConfig } from "@sentry/nextjs";
 import withSerwistInit from "@serwist/next";
+import createJiti from "jiti";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 import createNextIntlPlugin from "next-intl/plugin";
 import { fileURLToPath } from "node:url";
 import path from "path";
+
+// TODO: After the stable version of Million Lint is released, consider using it to further enhance performance.
+// Currently, there are bugs in it that can cause the popover component not work.
+
+// validate environment variables during build
+const jiti = createJiti(fileURLToPath(import.meta.url));
+jiti("./src/lib/env");
 
 const isDev = !!process && process.env.NODE_ENV === "development";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  // not affect auto batching, but it makes console.log output three times: https://github.com/facebook/react/issues/24570
+  // not affect auto batching, but it may cause console.log output three times: https://github.com/facebook/react/issues/24570
   reactStrictMode: true,
   swcMinify: true,
   poweredByHeader: false,
@@ -21,7 +29,22 @@ const nextConfig = {
   experimental: {
     typedRoutes: true,
     webVitalsAttribution: ["CLS", "LCP"],
-    optimizePackageImports: ["react-use", "lodash-es", "lucide-react", "monaco-editor", "@xyflow/react"],
+    optimizePackageImports: [
+      "react-use",
+      "@next/mdx",
+      "lodash-es",
+      "lucide-react",
+      "monaco-editor",
+      "@xyflow/react",
+      "@supabase/auth-ui-react",
+      "@supabase/auth-ui-shared",
+      "@supabase/supabase-js",
+      "@sentry/react",
+      "@sentry/nextjs",
+      "@sentry/utils",
+      "zod",
+      "usehooks-ts",
+    ],
   },
   webpack(config, { dev, isServer }) {
     if (!isServer) {
@@ -62,9 +85,7 @@ const withSerwist = withSerwistInit({
   additionalPrecacheEntries: ["jq/1.7/jq.js", "jq/1.7/jq.wasm"],
 });
 const withNextIntl = createNextIntlPlugin();
-const withMDX = createMDX({
-  // Add markdown plugins here, as desired
-});
+const withMDX = createMDX({});
 const withBundleAnalyzer = NextBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
@@ -76,6 +97,7 @@ export default withSentryConfig(config, {
   // https://github.com/getsentry/sentry-webpack-plugin#options
   org: "loggerhead",
   project: "json4u",
+  enable: !isDev,
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

@@ -129,10 +129,13 @@ body {
   }
 }
 
-.lucide {
+.mono-font {
+  font-family: var(--graph-font-family);
+}
+
+.icon {
   width: 16px;
   height: 16px;
-  stroke-width: 2px;
 }
 
 /* fix monaco 不能根据父容器改变大小的 bug：https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable */
@@ -315,7 +318,7 @@ body {
   color: #000000;
   font-family: var(--graph-font-family);
 
-  /* copy from https://www.radix-ui.com/primitives/docs/components/popover */
+  /* stolen from https://www.radix-ui.com/primitives/docs/components/popover */
   border-radius: 4px;
   background-color: white;
   box-shadow:

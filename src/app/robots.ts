@@ -1,15 +1,13 @@
 import { MetadataRoute } from "next";
-import { host } from "./sitemap";
+import { env } from "@/lib/env";
 
 // https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      // TODO: 正式上线后删除
-      // allow: "/",
-      disallow: "*",
+      allow: "/",
     },
-    sitemap: `${host}/sitemap.xml`,
+    sitemap: `${env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
   };
 }

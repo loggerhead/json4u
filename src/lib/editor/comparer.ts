@@ -1,12 +1,13 @@
-import { type Diff, type DiffPair, type DiffType, newRange, type Range } from "@/lib/compare";
+import type { Diff, DiffPair, DiffType, Range } from "@/lib/compare";
+import { newRange } from "@/lib/compare";
+import { getStatusState } from "@/stores/statusStore";
 import { getInlineClass, getLineClass, getMarginClass, getMinimapColor, getOverviewRulerColor } from "./color";
-import { type EditorWrapper } from "./editor";
-import { editorApi, Kind } from "./types";
+import type { EditorWrapper, Kind } from "./editor";
+import { editorApi } from "./types";
 
 export class Comparer {
   main: EditorWrapper;
   secondary: EditorWrapper;
-  diffPairs: DiffPair[];
   leftDecorations?: editorApi.IEditorDecorationsCollection;
   rightDecorations?: editorApi.IEditorDecorationsCollection;
   leftBlankHunkIDs?: string[];
@@ -15,7 +16,6 @@ export class Comparer {
   constructor(main: EditorWrapper, secondary: EditorWrapper) {
     this.main = main;
     this.secondary = secondary;
-    this.diffPairs = [];
     this.main.listenOnScroll();
     this.secondary.listenOnScroll();
   }
@@ -25,7 +25,7 @@ export class Comparer {
   }
 
   enableTextCompare() {
-    return this.main.statusState().enableTextCompare;
+    return getStatusState().enableTextCompare;
   }
 
   monacoEditor(kind: Kind) {
@@ -33,31 +33,33 @@ export class Comparer {
   }
 
   async compare() {
-    this.reset();
     const isTextCompare = this.enableTextCompare() || !(this.main.isTreeValid() && this.secondary.isTreeValid());
-    this.diffPairs = isTextCompare
+    const diffPairs = isTextCompare
       ? await this.worker().compareText(this.main.text(), this.secondary.text())
       : await this.worker().compareTree(this.main.tree, this.secondary.tree);
-    this.genRanges();
+    return { diffPairs, isTextCompare };
+  }
+
+  highlightDiff(diffPairs: DiffPair[], isTextCompare: boolean) {
+    this.reset();
+    this.genRanges(diffPairs);
 
     // 高亮 diff
-    const decorations = genHighlightDecorations(this.diffPairs);
+    const decorations = genHighlightDecorations(diffPairs);
     this.applyDecorations(decorations);
-    isTextCompare && this.fillBlankHunkDoms();
+    isTextCompare && this.fillBlankHunkDoms(diffPairs);
 
     // 滚动到第一个 diff pair
-    const hasDiff = this.diffPairs.length > 0;
+    const hasDiff = diffPairs.length > 0;
     if (hasDiff) {
-      const { left, right } = this.diffPairs[0];
+      const { left, right } = diffPairs[0];
       left && this.main.revealOffset(left.offset);
       right && this.secondary.revealOffset(right.offset);
     }
-
-    return { hasDiff, isTextCompare };
   }
 
   // 计算 diff 在 editor 中的 range，生成区域
-  genRanges() {
+  genRanges(diffPairs: DiffPair[]) {
     const newRangeFromDiff = (editor: EditorWrapper, diff: Diff) => {
       const range: Range = {
         ...editor.range(diff.offset, diff.length),
@@ -71,7 +73,7 @@ export class Comparer {
       return range;
     };
 
-    this.diffPairs.forEach(({ left, right }) => {
+    diffPairs.forEach(({ left, right }) => {
       if (left) {
         left.range = newRangeFromDiff(this.main, left);
         left.inlineDiffs?.forEach((d) => {
@@ -95,7 +97,7 @@ export class Comparer {
   }
 
   // 如果是对文本比较的结果进行高亮，则需要在相交的两个 diff 上生成空白块做填充，让左右两侧的 diff 看上去一样高
-  fillBlankHunkDoms() {
+  fillBlankHunkDoms(diffPairs: DiffPair[]) {
     const applyViewZones = (kind: Kind, ranges: Range[]) => {
       let ids: string[] = [];
 
@@ -112,7 +114,7 @@ export class Comparer {
       return ids;
     };
 
-    const { left, right } = genFillRanges(this.diffPairs);
+    const { left, right } = genFillRanges(diffPairs);
     this.leftBlankHunkIDs = applyViewZones("main", left);
     this.rightBlankHunkIDs = applyViewZones("secondary", right);
   }
@@ -137,7 +139,6 @@ export class Comparer {
     delete this.rightDecorations;
     delete this.leftBlankHunkIDs;
     delete this.rightBlankHunkIDs;
-    this.diffPairs = [];
   }
 }
 

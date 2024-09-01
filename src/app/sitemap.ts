@@ -1,6 +1,5 @@
 import { MetadataRoute } from "next";
 
-export const host = "https://json4u.com";
 export const locales = ["en", "zh"];
 
 // https://next-intl-docs.vercel.app/docs/environments/metadata-route-handlers
@@ -21,5 +20,6 @@ function getEntry(pathname: string) {
 }
 
 function getUrl(pathname: string, locale: string) {
+  const host = locale === "zh" ? "https://json4u.cn" : "https://json4u.com";
   return `${host}/${locale}${pathname === "/" ? "" : pathname}`;
 }
