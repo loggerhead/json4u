@@ -105,7 +105,7 @@ function genTableHeader(tree: Tree, node: Node, key: string, expanderId?: string
     .map(({ nodeType, key }, i) => {
       // last key in the path has no prefix
       const prefix = i < path.length - 1 ? nodeTypeToPrefixMap[nodeType!] + " " : "";
-      return `${prefix}${key.replace('"', "&quot;")}`;
+      return `${prefix}${key.replaceAll('"', "&quot;")}`;
     })
     .join("\n");
   const keyDom = h("span", key || '""').class(key ? "text-hl-key" : "text-hl-empty");
