@@ -15,7 +15,8 @@ export function unescape(key: string): string {
 }
 
 export function toPath(pointer: string): string[] {
-  return pointer.substring(2).split("/").map(unescape);
+  const p = pointer.substring(2);
+  return p ? p.split("/").map(unescape) : [];
 }
 
 export function toPointer(path: (string | number)[]): string {
@@ -69,8 +70,8 @@ if (import.meta.vitest) {
   });
 
   it("splitParentPointer", () => {
-    expect(splitParentPointer("")).toEqual({parent:undefined, lastKey: ""})
-    expect(splitParentPointer("$")).toEqual({parent:undefined, lastKey: "$"})
-    expect(splitParentPointer("$/")).toEqual({parent:"$", lastKey: ""})
+    expect(splitParentPointer("")).toEqual({ parent: undefined, lastKey: "" });
+    expect(splitParentPointer("$")).toEqual({ parent: undefined, lastKey: "$" });
+    expect(splitParentPointer("$/")).toEqual({ parent: "$", lastKey: "" });
   });
 }
