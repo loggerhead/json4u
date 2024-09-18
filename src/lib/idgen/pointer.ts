@@ -15,8 +15,11 @@ export function unescape(key: string): string {
 }
 
 export function toPath(pointer: string): string[] {
-  const p = pointer.substring(2);
-  return p ? p.split("/").map(unescape) : [];
+  if (pointer === rootMarker) {
+    return [];
+  } else {
+    return pointer.substring(2).split("/").map(unescape);
+  }
 }
 
 export function toPointer(path: (string | number)[]): string {
