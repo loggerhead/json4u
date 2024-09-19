@@ -28,7 +28,7 @@ export default function StatisticsPopover() {
   return (
     <BasePopover title="statistics">
       <div className="flex flex-col gap-2 w-60">
-        {isFree && (
+        {isFree && nextQuotaRefreshTime && (
           <Typography affects="xs">{t("stats_description", { date: dateToYYYYMMDD(nextQuotaRefreshTime) })}</Typography>
         )}
         {Object.entries(statistics).map(([key, cnt]) => (

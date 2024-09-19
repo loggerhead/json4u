@@ -22,7 +22,7 @@ export interface UserState {
   user: User | null;
   activeOrder: Order | null;
   statistics: Statistics;
-  nextQuotaRefreshTime: Date;
+  nextQuotaRefreshTime?: Date;
   fallbackKey: string;
 
   usable: (key: StatisticsKeys) => boolean;
@@ -38,7 +38,6 @@ const initialStates: Omit<UserState, FunctionKeys<UserState>> = {
   user: null,
   activeOrder: null,
   statistics: initialStatistics,
-  nextQuotaRefreshTime: new Date(),
   fallbackKey: "",
 };
 
