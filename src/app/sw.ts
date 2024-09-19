@@ -15,12 +15,24 @@ declare const self: ServiceWorkerGlobalScope;
 
 const extraRuntimeCaching = [
   {
+    matcher: /.+\.lemon\.js$/i,
+    handler: new CacheFirst({
+      cacheName: "lemonsqueezy",
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 5,
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+        }),
+      ],
+    }),
+  },
+  {
     matcher: /^https:\/\/cdn\.json4u\.com\/.*/i,
     handler: new CacheFirst({
       cacheName: "static-cdn-assets",
       plugins: [
         new ExpirationPlugin({
-          maxEntries: 32,
+          maxEntries: 5,
           maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
           maxAgeFrom: "last-used",
         }),
@@ -33,7 +45,7 @@ const extraRuntimeCaching = [
       cacheName: "next-jq-assets",
       plugins: [
         new ExpirationPlugin({
-          maxEntries: 32,
+          maxEntries: 5,
           maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
         }),
       ],
@@ -45,7 +57,7 @@ const extraRuntimeCaching = [
       cacheName: "next-monaco-assets",
       plugins: [
         new ExpirationPlugin({
-          maxEntries: 32,
+          maxEntries: 5,
           maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
         }),
       ],
@@ -57,7 +69,7 @@ const extraRuntimeCaching = [
       cacheName: "next-monaco-assets",
       plugins: [
         new ExpirationPlugin({
-          maxEntries: 32,
+          maxEntries: 5,
           maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
         }),
       ],
