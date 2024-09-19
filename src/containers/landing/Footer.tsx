@@ -42,14 +42,9 @@ function Legal() {
 
   return (
     <div className="flex items-center gap-8">
-      {isCN() ? (
-        <FooterLink nofollow href="https://beian.miit.gov.cn" title={"粤ICP备16007488号"} />
-      ) : (
-        <>
-          <FooterLink href="/terms" title={t("Terms")} />
-          <FooterLink href="/privacy" title={t("Privacy")} />
-        </>
-      )}
+      {isCN() && <FooterLink nofollow href="https://beian.miit.gov.cn" title={"粤ICP备16007488号"} />}
+      <FooterLink href="/terms" title={t("Terms")} />
+      <FooterLink href="/privacy" title={t("Privacy")} />
     </div>
   );
 }
