@@ -196,5 +196,9 @@
     "Changelog": "Changelog",
     "Terms": "Terms",
     "Privacy": "Privacy"
+  },
+  "NotFound": {
+    "not_found": "404 Not Found",
+    "go_back_home": "Click here to go back home page"
   }
 }

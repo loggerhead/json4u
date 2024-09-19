@@ -196,5 +196,9 @@
     "Changelog": "更新日志",
     "Terms": "服务协议",
     "Privacy": "隐私政策"
+  },
+  "NotFound": {
+    "not_found": "404 页面找不到",
+    "go_back_home": "点击返回首页"
   }
 }
