@@ -1,6 +1,6 @@
 {
-  "name": "My Awesome PWA app",
-  "short_name": "PWA App",
+  "name": "JSON For You",
+  "short_name": "JSON For You",
   "icons": [
     {
       "src": "/icon.svg",
