@@ -16,7 +16,8 @@
     "analyze": "ANALYZE=true next build",
     "unused": "npx knip",
     "cycle": "npx madge --circular --extensions ts ./",
-    "gentypes": "source .env && supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/lib/supabase/database.types.ts"
+    "gentypes": "source .env && supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/lib/supabase/database.types.ts",
+    "lighthouse": "lighthouse --view http://localhost:3000"
   },
   "dependencies": {
     "@biowasm/aioli": "^3.1.0",
