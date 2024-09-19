@@ -1,4 +1,4 @@
-import LinkButton from "@/components/LinkButton";
+import LinkButton, { type Href } from "@/components/LinkButton";
 import Typography from "@/components/ui/typography";
 import { ThumbsUp, UserRoundPlus, JapaneseYen } from "lucide-react";
 import { LucideIcon } from "lucide-react";
@@ -25,7 +25,7 @@ export default function Description() {
 
 interface BtnProps {
   Icon: LucideIcon;
-  href: string;
+  href: Href;
   text: string;
 }
 

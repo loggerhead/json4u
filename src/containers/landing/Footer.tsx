@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
+import { type Href } from "@/components/LinkButton";
 import GitHub from "@/components/icons/GitHub";
 import Logo from "@/components/icons/Logo";
 import Twitter from "@/components/icons/Twitter";
 import Weibo from "@/components/icons/Weibo";
 import { isCN } from "@/lib/env";
-import { Link } from "@/navigation";
 import { useTranslations } from "next-intl";
 
 export function Footer() {
@@ -57,7 +58,7 @@ function FooterLink({ href, title, nofollow }: { href: string; title: string | J
   return (
     <Link
       prefetch={false}
-      href={href}
+      href={href as Href}
       target={href.startsWith("/") ? "" : "_blank"}
       rel={nofollow ? "nofollow" : undefined}
       className="pointer block w-fit hover:text-slate-900"

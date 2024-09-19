@@ -27,7 +27,6 @@ const nextConfig = {
   output: "standalone",
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   experimental: {
-    typedRoutes: true,
     webVitalsAttribution: ["CLS", "LCP"],
     optimizePackageImports: [
       "react-use",
@@ -84,7 +83,7 @@ const withSerwist = withSerwistInit({
   maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
   additionalPrecacheEntries: ["jq/1.7/jq.js", "jq/1.7/jq.wasm"],
 });
-const withNextIntl = createNextIntlPlugin();
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const withMDX = createMDX({});
 const withBundleAnalyzer = NextBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",

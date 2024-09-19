@@ -42,7 +42,6 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.0.7",
-    "@rescale/nemo": "^1.2.2",
     "@sentry/nextjs": "^8",
     "@sentry/react": "^8.26.0",
     "@sentry/utils": "^8.27.0",

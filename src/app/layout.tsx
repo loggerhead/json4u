@@ -4,10 +4,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { env, isCN } from "@/lib/env";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+export async function generateMetadata() {
+  const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
   return {
@@ -53,13 +54,8 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   };
 }
 
-export default async function LocaleLayout({
-  children,
-  params: { locale },
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
+export default async function LocaleLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
   const messages = await getMessages();
 
   return (

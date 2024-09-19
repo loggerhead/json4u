@@ -1,10 +1,10 @@
 "use client";
 
-import LinkButton from "@/components/LinkButton";
+import Link from "next/link";
+import LinkButton, { type Href } from "@/components/LinkButton";
 import Logo from "@/components/icons/Logo";
 import Typography from "@/components/ui/typography";
 import AccountButton from "@/containers/editor/sidenav/AccountButton";
-import { Link } from "@/navigation";
 import StoresProvider from "@/stores/StoresProvider";
 import { useTranslations } from "next-intl";
 
@@ -37,7 +37,7 @@ function HeaderContainer() {
           {items.map((item) => (
             <Link
               prefetch={false}
-              href={item.href}
+              href={item.href as Href}
               key={item.title}
               className="pointer block w-fit hover:text-sky-500"
               target={item.href.startsWith("/") ? "" : "_blank"}

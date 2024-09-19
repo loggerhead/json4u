@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { getCheckoutURL } from "@/app/actions";
 import LoadingButton from "@/components/LoadingButton";
@@ -10,10 +11,9 @@ import CircleX from "@/components/icons/CircleX";
 import { Badge } from "@/components/ui/badge";
 import Typography from "@/components/ui/typography";
 import { MessageKey } from "@/global";
-import { env, isCN } from "@/lib/env";
+import { isCN } from "@/lib/env";
 import type { SubscriptionType } from "@/lib/shop/types";
 import { cn, toastErr } from "@/lib/utils";
-import { useRouter } from "@/navigation";
 import { UserStoreProvider, useUserStore } from "@/stores/userStore";
 import { useLocale, useTranslations } from "next-intl";
 import Description from "./Description.zh";
@@ -185,7 +185,7 @@ function CTA({ tier: { plan, highlighted, cta } }: CtaProps) {
 
     if (needPay && !needLogin) {
       try {
-        const redirectUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/editor`;
+        const redirectUrl = `${window.location.origin}/editor`;
         const checkoutUrl = await getCheckoutURL(plan, redirectUrl);
 
         if (checkoutUrl) {

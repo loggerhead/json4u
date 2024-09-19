@@ -2,7 +2,7 @@
 
 import Logo from "@/components/icons/Logo";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "@/navigation";
+import Link from "next/link";
 import { useStatusStore } from "@/stores/statusStore";
 import {
   ArrowDownNarrowWide,

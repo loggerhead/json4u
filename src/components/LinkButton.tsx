@@ -1,10 +1,12 @@
 import { forwardRef } from "react";
-import { Link } from "@/navigation";
-import { UrlObject } from "url";
+import Link, { LinkProps } from "next/link";
+import { Route } from "next/types";
 import { Button, ButtonProps } from "./ui/button";
 
+export type Href = LinkProps<Route<string>>["href"];
+
 export interface LinkButtonProps extends ButtonProps {
-  href: string | UrlObject;
+  href: Href;
   newWindow?: boolean;
 }
 

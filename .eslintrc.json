@@ -3,15 +3,6 @@
     "@next/next/no-img-element": "off",
     "no-unused-vars": "off",
     "unused-imports/no-unused-imports": "error",
-    "unused-imports/no-unused-vars": [
-      "warn",
-      {
-        "vars": "all",
-        "varsIgnorePattern": "^_",
-        "args": "after-used",
-        "argsIgnorePattern": "^_"
-      }
-    ],
     "import/no-cycle": "warn",
     "no-empty": "error",
     "no-multiple-empty-lines": "error",
@@ -29,20 +20,7 @@
       }
     ],
     // Avoid hardcoded labels in component markup
-    "react/jsx-no-literals": "warn",
-    // Consistently import navigation APIs from `@/navigation`
-    "no-restricted-imports": [
-      "error",
-      {
-        "name": "next/link",
-        "message": "Please import from `@/navigation` instead."
-      },
-      {
-        "name": "next/navigation",
-        "importNames": ["redirect", "permanentRedirect", "useRouter", "usePathname"],
-        "message": "Please import from `@/navigation` instead."
-      }
-    ]
+    "react/jsx-no-literals": "warn"
   },
   "extends": ["next/core-web-vitals"],
   "plugins": ["unused-imports"]

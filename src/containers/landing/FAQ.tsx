@@ -2,11 +2,11 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Section from "@/components/Section";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Typography from "@/components/ui/typography";
 import { MessageKey } from "@/global";
-import { Link } from "@/navigation";
 import { CircleX, CircleCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 

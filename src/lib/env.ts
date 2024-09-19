@@ -55,7 +55,8 @@ export const env = createEnv({
 });
 
 export function isCN() {
-  return env.NEXT_PUBLIC_APP_URL.endsWith(".cn");
+  const url = typeof window !== "undefined" ? window.location.hostname : env.NEXT_PUBLIC_APP_URL;
+  return url.endsWith(".cn");
 }
 
 export function isDev() {

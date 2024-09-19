@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useCallback } from "react";
+import { Suspense } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Background from "@/components/Background";
 import EmailLoginButton from "@/components/EmailLoginButton";
@@ -10,10 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Typography from "@/components/ui/typography";
-import { env } from "@/lib/env";
 import { supabase } from "@/lib/supabase/client";
 import { toastErr } from "@/lib/utils";
-import { Link } from "@/navigation";
 import StoresProvider from "@/stores/StoresProvider";
 import type { Provider } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
@@ -22,7 +22,9 @@ import { useLocale } from "next-intl";
 export default function LoginPage() {
   return (
     <StoresProvider>
-      <Login />
+      <Suspense>
+        <Login />
+      </Suspense>
       <Background size={40} />
     </StoresProvider>
   );
@@ -32,7 +34,7 @@ function Login() {
   const t = useTranslations("Home");
   const locale = useLocale();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? `${env.NEXT_PUBLIC_APP_URL}/${locale}/editor`;
+  const redirectTo = searchParams.get("redirectTo") ?? `${window.location.origin}/editor`;
 
   return (
     <Card className="mx-auto w-[400px] h-fit">

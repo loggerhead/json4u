@@ -1,6 +1,7 @@
 "use client";
 
 import React, { RefObject, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -10,7 +11,6 @@ import Typography from "@/components/ui/typography";
 import { env } from "@/lib/env";
 import { supabase } from "@/lib/supabase/client";
 import { toastErr, toastSucc } from "@/lib/utils";
-import { useRouter } from "@/navigation";
 import { useUserStore } from "@/stores/userStore";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -141,6 +141,7 @@ function useVerifyOTP(redirectTo: string) {
 
     toastSucc(t("login_succ"));
     setUser(session?.user ?? null);
+    // @ts-ignore
     router.push(redirectTo);
   };
 
