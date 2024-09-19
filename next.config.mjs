@@ -24,7 +24,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   poweredByHeader: false,
-  output: "standalone",
+  output: process.env.NEXT_PUBLIC_APP_URL.endsWith(".cn") ? "standalone" : undefined,
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   experimental: {
     webVitalsAttribution: ["CLS", "LCP"],
