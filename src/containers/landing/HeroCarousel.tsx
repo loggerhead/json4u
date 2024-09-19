@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Section from "@/components/Section";
 import {
   Carousel,
@@ -43,14 +42,7 @@ export default function HeroCarousel() {
         <CarouselContent>
           {examples.map(({ fileName, desc }, i) => (
             <CarouselItem key={i}>
-              <Image
-                width={1024}
-                height={632}
-                quality={100}
-                priority={i === 0}
-                alt={desc}
-                src={"/example/" + fileName}
-              />
+              <img width={1024} height={632} loading="lazy" decoding="async" alt={desc} src={"/example/" + fileName} />
             </CarouselItem>
           ))}
         </CarouselContent>
