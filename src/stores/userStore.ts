@@ -1,5 +1,5 @@
 import { getStatistics, reportStatistics } from "@/app/actions";
-import { env, isProd, type Statistics, type StatisticsKeys } from "@/lib/env";
+import { env, isCN, isDev, type Statistics, type StatisticsKeys } from "@/lib/env";
 import type { SubscriptionType } from "@/lib/shop/types";
 import { supabase } from "@/lib/supabase/client";
 import { OrderSchema, type Order } from "@/lib/supabase/table.types";
@@ -63,13 +63,13 @@ export const {
 
       count(key: StatisticsKeys) {
         const { fallbackKey, statistics, isPremium } = get();
+        statistics[key] += 1;
 
-        if (isPremium()) {
-          return;
+        // can't connect to supabase in China, so disable the function temporarily
+        if (!(isPremium() || isDev || isCN)) {
+          reportStatistics(fallbackKey, key);
         }
 
-        statistics[key] += 1;
-        isProd() && reportStatistics(fallbackKey, key);
         set({ statistics });
       },
 

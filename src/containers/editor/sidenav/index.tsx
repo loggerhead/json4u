@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import Logo from "@/components/icons/Logo";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
+import { isCN } from "@/lib/env";
 import { useStatusStore } from "@/stores/statusStore";
 import {
   ArrowDownNarrowWide,
@@ -99,7 +100,8 @@ export default function SideNav() {
           <PopoverBtn title={t("statistics")} icon={<BarChartBig className="icon" />} content={<StatisticsPopover />} />
           {/* TODO: consider to allow user custom some configs */}
           <Button className="hidden" icon={<Settings className="icon" />} title={t("Settings")} onClick={() => null} />
-          <AccountButton avatarClassName="w-6 h-6" buttonClassName="my-1.5" />
+          {/* can't connect to supabase in China, so disable the function temporarily */}
+          {!isCN && <AccountButton avatarClassName="w-6 h-6" buttonClassName="my-1.5" />}
         </ul>
       </nav>
     </div>

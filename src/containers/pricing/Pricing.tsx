@@ -106,7 +106,7 @@ export default function Pricing({ hideTitle, className }: PricingProps) {
           <div className={cn("w-full lg:w-auto mx-auto max-w-4xl lg:text-center", hideTitle && "hidden")}>
             <Typography variant="h2">{t("title")}</Typography>
           </div>
-          {isCN() ? (
+          {isCN ? (
             <div className="isolate mx-auto mt-4 max-w-md gap-8 lg:mx-0 lg:max-w-none">
               <Description />
             </div>

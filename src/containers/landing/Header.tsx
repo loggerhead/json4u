@@ -5,6 +5,7 @@ import LinkButton, { type Href } from "@/components/LinkButton";
 import Logo from "@/components/icons/Logo";
 import Typography from "@/components/ui/typography";
 import AccountButton from "@/containers/editor/sidenav/AccountButton";
+import { isCN } from "@/lib/env";
 import StoresProvider from "@/stores/StoresProvider";
 import { useTranslations } from "next-intl";
 
@@ -50,7 +51,7 @@ function HeaderContainer() {
         </div>
         <div className="ml-auto" />
         <div className="flex items-center gap-4">
-          <AccountButton notOnSideNav avatarClassName="w-8 h-8" />
+          {!isCN && <AccountButton notOnSideNav avatarClassName="w-8 h-8" />}
           <LinkButton variant="default" href="/editor">
             <Typography variant="p">{t("Editor")}</Typography>
           </LinkButton>

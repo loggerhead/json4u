@@ -15,7 +15,8 @@ import path from "path";
 const jiti = createJiti(fileURLToPath(import.meta.url));
 jiti("./src/lib/env");
 
-const isDev = !!process && process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV === "development";
+const isCN = /\.cn(:3000)?$/.test(process.env.NEXT_PUBLIC_APP_URL);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import("next").NextConfig} */
@@ -24,7 +25,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   poweredByHeader: false,
-  output: process.env.NEXT_PUBLIC_APP_URL.endsWith(".cn") ? "standalone" : undefined,
+  output: isCN ? "standalone" : undefined,
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   experimental: {
     webVitalsAttribution: ["CLS", "LCP"],

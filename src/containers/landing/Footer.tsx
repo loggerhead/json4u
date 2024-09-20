@@ -14,7 +14,7 @@ export function Footer() {
   const items = [
     { href: "https://www.trustpilot.com/review/json4u.com", title: t("Give a rating") },
     { href: "https://github.com/loggerhead/json4u/issues/new", title: t("Feedback") },
-    isCN()
+    isCN
       ? { href: "https://weibo.com/loggerhead", title: <Weibo className="w-5 h-5" /> }
       : { href: "https://x.com/1oggerhead", title: <Twitter className="icon" /> },
     { href: "https://github.com/loggerhead/json4u", title: <GitHub className="icon" /> },
@@ -42,7 +42,7 @@ function Legal() {
 
   return (
     <div className="flex items-center gap-8">
-      {isCN() && <FooterLink nofollow href="https://beian.miit.gov.cn" title={"粤ICP备16007488号"} />}
+      {isCN && <FooterLink nofollow href="https://beian.miit.gov.cn" title={"粤ICP备16007488号"} />}
       <FooterLink href="/terms" title={t("Terms")} />
       <FooterLink href="/privacy" title={t("Privacy")} />
     </div>

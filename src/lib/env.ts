@@ -54,15 +54,6 @@ export const env = createEnv({
   },
 });
 
-export function isCN() {
-  const url = typeof window !== "undefined" ? window.location.hostname : env.NEXT_PUBLIC_APP_URL;
-  return url.endsWith(".cn");
-}
-
-export function isDev() {
-  return process.env.NODE_ENV === "development";
-}
-
-export function isProd() {
-  return process.env.NODE_ENV === "production";
-}
+export const isCN = /\.cn(:3000)?$/.test(env.NEXT_PUBLIC_APP_URL);
+export const isDev = process.env.NODE_ENV === "development";
+export const isProd = process.env.NODE_ENV === "production";

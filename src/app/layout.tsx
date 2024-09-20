@@ -18,7 +18,7 @@ export async function generateMetadata() {
       languages: {
         en: "https://json4u.com",
         zh: "https://json4u.cn",
-        "x-default": isCN() ? "/zh" : "/en",
+        "x-default": isCN ? "/zh" : "/en",
       },
     },
     applicationName: t("name"),

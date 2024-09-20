@@ -53,7 +53,7 @@ export default function AccountPanel() {
         )}
       </div>
       <Button
-        className={cn("justify-start", isCN() && "hidden")}
+        className={cn("justify-start", isCN && "hidden")}
         onClick={async () => {
           const url = await getCustomerPortalURL();
           url && window.open(url, "_blank");
