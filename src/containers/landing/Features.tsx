@@ -1,6 +1,3 @@
-"use client";
-
-import React from "react";
 import Section from "@/components/Section";
 import Typography from "@/components/ui/typography";
 import { Diff, Braces, ScanEye, SquareTerminal, LucideIcon, ShieldCheck, SpellCheck2 } from "lucide-react";

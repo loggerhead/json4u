@@ -1,10 +1,3 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Script from "next/script";
-import { getCheckoutURL } from "@/app/actions";
-import LoadingButton from "@/components/LoadingButton";
 import Section from "@/components/Section";
 import CircleCheck from "@/components/icons/CircleCheck";
 import CircleX from "@/components/icons/CircleX";
@@ -12,24 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import Typography from "@/components/ui/typography";
 import { MessageKey } from "@/global";
 import { isCN } from "@/lib/env";
-import type { SubscriptionType } from "@/lib/shop/types";
-import { cn, toastErr } from "@/lib/utils";
-import { UserStoreProvider, useUserStore } from "@/stores/userStore";
-import { useLocale, useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { PricingTier, CtaButton, CtaScript } from "./CtaButton";
 import Description from "./Description.zh";
 import styles from "./pricing.module.css";
-
-export interface PricingTier {
-  plan: SubscriptionType;
-  price: string;
-  saveBadge?: MessageKey;
-  discountPrice?: string;
-  description: MessageKey;
-  features: MessageKey[];
-  featureEnables: boolean[];
-  highlighted: boolean;
-  cta: MessageKey;
-}
 
 export const tiers: PricingTier[] = [
   {
@@ -100,127 +80,65 @@ export default function Pricing({ hideTitle, className }: PricingProps) {
   const t = useTranslations("Pricing");
 
   return (
-    <UserStoreProvider>
-      <Section id="pricing" className={cn(styles.fancyOverlay, className)}>
-        <div className="flex flex-col items-center justify-center">
-          <div className={cn("w-full mx-auto max-w-4xl text-center", hideTitle && "hidden")}>
-            <Typography variant="h2">{t("title")}</Typography>
-          </div>
-          {isCN ? (
-            <div className="isolate mx-auto mt-4 max-w-md gap-8 lg:mx-0 lg:max-w-none">
-              <Description />
-            </div>
-          ) : (
-            <div className="isolate mx-auto mt-4 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-              {tiers.map((tier, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    "bg-white dark:bg-gray-900/80 ring-gray-300/70 dark:ring-gray-700 max-w-xs ring-1 rounded-3xl p-8 xl:p-10",
-                    tier.highlighted ? styles.fancyGlassContrast : "",
-                  )}
-                >
-                  <div className="flex items-center">
-                    <h3 className="text-black dark:text-white text-2xl font-bold tracking-tight">
-                      {t(tier.plan as MessageKey)}
-                    </h3>
-                    {tier.saveBadge && (
-                      <Badge className="ml-2 h-fit text-green-900 bg-green-200">{t(tier.saveBadge)}</Badge>
-                    )}
-                  </div>
-                  <p className="mt-6 flex items-baseline gap-x-1">
-                    <span
-                      className={cn(
-                        "text-black dark:text-white text-4xl font-bold tracking-tight",
-                        tier.discountPrice ? "line-through" : "",
-                      )}
-                    >
-                      {tier.price}
-                    </span>
-                    <span className="text-black dark:text-white">{tier.discountPrice}</span>
-                    <span className="text-muted-foreground">{`/ ${t("unit")}`}</span>
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm leading-6">{t(tier.description)}</p>
-                  <CTA tier={tier} />
-                  <ul className="text-gray-700 dark:text-gray-400 mt-8 space-y-3 text-sm leading-6 xl:mt-10">
-                    {tier.features.map((feature, i) => (
-                      <li key={feature} className="block">
-                        {tier.featureEnables[i] ? (
-                          <CircleCheck className="mr-2" aria-hidden="true" />
-                        ) : (
-                          <CircleX className="mr-2" aria-hidden="true" />
-                        )}
-                        {t(feature)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          )}
+    <Section id="pricing" className={cn(styles.fancyOverlay, className)}>
+      <div className="flex flex-col items-center justify-center">
+        <div className={cn("w-full mx-auto max-w-4xl text-center", hideTitle && "hidden")}>
+          <Typography variant="h2">{t("title")}</Typography>
         </div>
-      </Section>
-      <Script src="https://app.lemonsqueezy.com/js/lemon.js" onLoad={() => window.createLemonSqueezy()} />
-    </UserStoreProvider>
-  );
-}
-
-interface CtaProps {
-  tier: PricingTier;
-}
-
-function CTA({ tier: { plan, highlighted, cta } }: CtaProps) {
-  const t = useTranslations("Pricing");
-  const router = useRouter();
-  const locale = useLocale();
-  const [loading, setLoading] = useState(false);
-  const user = useUserStore((state) => state.user);
-
-  const email = user?.email ?? "";
-  const needLogin = !email;
-  const needPay = plan === "monthly" || plan === "yearly";
-
-  const onClick = async () => {
-    setLoading(true);
-
-    if (needPay && !needLogin) {
-      try {
-        const redirectUrl = `${window.location.origin}/editor`;
-        const checkoutUrl = await getCheckoutURL(plan, redirectUrl);
-
-        if (checkoutUrl) {
-          window.LemonSqueezy.Url.Open(checkoutUrl);
-        } else {
-          console.error("getCheckoutURL return a empty URL:", plan, email);
-          toastErr("getCheckoutURL return a empty URL");
-        }
-      } catch (error) {
-        toastErr(`getCheckoutURL failed: ${error}`);
-      }
-    } else if (needPay) {
-      router.push(`/login?redirectTo=${window.location.href}`);
-    } else {
-      router.push("/editor");
-    }
-
-    setLoading(false);
-  };
-
-  return (
-    <LoadingButton
-      size="lg"
-      className={cn(
-        "mt-6 w-full text-black dark:text-white hover:opacity-80 transition-opacity",
-        !highlighted
-          ? "bg-gray-100 dark:bg-gray-600"
-          : "bg-sky-300 hover:bg-sky-400 dark:bg-sky-600 dark:hover:bg-sky-700",
-        needPay && "lemonsqueezy-button",
-      )}
-      variant={highlighted ? "default" : "outline"}
-      loading={loading}
-      onClick={onClick}
-    >
-      {t(cta)}
-    </LoadingButton>
+        {isCN ? (
+          <div className="isolate mx-auto mt-4 max-w-md gap-8 lg:mx-0 lg:max-w-none">
+            <Description />
+          </div>
+        ) : (
+          <div className="isolate mx-auto mt-4 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+            {tiers.map((tier, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "bg-white dark:bg-gray-900/80 ring-gray-300/70 dark:ring-gray-700 max-w-xs ring-1 rounded-3xl p-8 xl:p-10",
+                  tier.highlighted ? styles.fancyGlassContrast : "",
+                )}
+              >
+                <div className="flex items-center">
+                  <h3 className="text-black dark:text-white text-2xl font-bold tracking-tight">
+                    {t(tier.plan as MessageKey)}
+                  </h3>
+                  {tier.saveBadge && (
+                    <Badge className="ml-2 h-fit text-green-900 bg-green-200">{t(tier.saveBadge)}</Badge>
+                  )}
+                </div>
+                <p className="mt-6 flex items-baseline gap-x-1">
+                  <span
+                    className={cn(
+                      "text-black dark:text-white text-4xl font-bold tracking-tight",
+                      tier.discountPrice ? "line-through" : "",
+                    )}
+                  >
+                    {tier.price}
+                  </span>
+                  <span className="text-black dark:text-white">{tier.discountPrice}</span>
+                  <span className="text-muted-foreground">{`/ ${t("unit")}`}</span>
+                </p>
+                <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm leading-6">{t(tier.description)}</p>
+                <CtaButton tier={tier} />
+                <ul className="text-gray-700 dark:text-gray-400 mt-8 space-y-3 text-sm leading-6 xl:mt-10">
+                  {tier.features.map((feature, i) => (
+                    <li key={feature} className="block">
+                      {tier.featureEnables[i] ? (
+                        <CircleCheck className="mr-2" aria-hidden="true" />
+                      ) : (
+                        <CircleX className="mr-2" aria-hidden="true" />
+                      )}
+                      {t(feature)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <CtaScript />
+    </Section>
   );
 }
