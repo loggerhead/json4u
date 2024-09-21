@@ -19,26 +19,8 @@ export default function Title() {
           {/* TODO: 改为 start free */}
           <Typography variant="h5">{t("try_now")}</Typography>
         </LinkButton>
-        <ProductHunk />
       </div>
       <Background size={40} />
     </Section>
-  );
-}
-
-function ProductHunk() {
-  return (
-    <a
-      href="https://www.producthunt.com/posts/json-for-you?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-json&#0045;for&#0045;you"
-      target="_blank"
-    >
-      <img
-        src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=490548&theme=light"
-        alt="JSON&#0032;For&#0032;You - Fastest&#0032;JSON&#0032;visualization&#0032;and&#0032;processing&#0032;tool | Product Hunt"
-        style={{ width: "250px", height: "54px" }}
-        width="250"
-        height="54"
-      />
-    </a>
   );
 }
