@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { type Href } from "@/components/LinkButton";
 import GitHub from "@/components/icons/GitHub";
@@ -9,7 +7,7 @@ import Weibo from "@/components/icons/Weibo";
 import { isCN } from "@/lib/env";
 import { useTranslations } from "next-intl";
 
-export function Footer() {
+export default function Footer() {
   const t = useTranslations("Home");
   const items = [
     { href: "https://www.trustpilot.com/review/json4u.com", title: t("Give a rating") },

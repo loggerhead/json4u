@@ -1,23 +1,12 @@
-"use client";
-
 import Link from "next/link";
 import LinkButton, { type Href } from "@/components/LinkButton";
 import Logo from "@/components/icons/Logo";
 import Typography from "@/components/ui/typography";
 import AccountButton from "@/containers/editor/sidenav/AccountButton";
 import { isCN } from "@/lib/env";
-import StoresProvider from "@/stores/StoresProvider";
 import { useTranslations } from "next-intl";
 
-export function Header() {
-  return (
-    <StoresProvider>
-      <HeaderContainer />
-    </StoresProvider>
-  );
-}
-
-function HeaderContainer() {
+export default function Header() {
   const t = useTranslations("Home");
   const items = [
     { href: "/#features", title: t("Features") },

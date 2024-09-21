@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
-import { Footer } from "@/containers/landing/Footer";
-import { Header } from "@/containers/landing/Header";
+import Footer from "@/containers/landing/Footer";
+import Header from "@/containers/landing/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 

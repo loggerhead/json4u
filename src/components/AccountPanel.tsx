@@ -1,3 +1,5 @@
+"use client";
+
 import { getCustomerPortalURL } from "@/app/actions";
 import LogoutButton from "@/components/LogoutButton";
 import { Button } from "@/components/ui/button";

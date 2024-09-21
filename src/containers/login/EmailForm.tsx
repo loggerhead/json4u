@@ -17,6 +17,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { useCountdown } from "usehooks-ts";
 import { z } from "zod";
+import useRedirectTo from "./useRedirectTo";
 
 const resendInterval = 30;
 const FormSchema = z.object({
@@ -26,20 +27,15 @@ const FormSchema = z.object({
 
 type FormData = z.infer<typeof FormSchema>;
 
-interface EmailLoginButtonProps {
-  redirectTo: string;
-}
-
-export default function EmailLoginButton({ redirectTo }: EmailLoginButtonProps) {
+export default function EmailForm() {
   const t = useTranslations("Home");
   const captchaRef = useRef<HCaptcha>(null);
-
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
   });
   const [email] = form.watch(["email"]);
   const { pending, isCounting, countdown, sendOTP } = useSendOTP(captchaRef, email);
-  const { loading, onVerifyOTP } = useVerifyOTP(redirectTo);
+  const { loading, onVerifyOTP } = useVerifyOTP();
 
   return (
     <>
@@ -99,24 +95,24 @@ export default function EmailLoginButton({ redirectTo }: EmailLoginButtonProps) 
                 <Typography>{t("login")}</Typography>
               </LoadingButton>
             </div>
-
-            <HCaptcha
-              ref={captchaRef}
-              sitekey={env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
-              size="invisible"
-              onError={(ev) => toastErr(t("captcha_error", { message: ev }))}
-            />
           </div>
         </form>
       </Form>
+      <HCaptcha
+        ref={captchaRef}
+        sitekey={env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
+        size="invisible"
+        onError={(ev) => toastErr(t("captcha_error", { message: ev }))}
+      />
     </>
   );
 }
 
-function useVerifyOTP(redirectTo: string) {
+function useVerifyOTP() {
   const t = useTranslations("Home");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const redirectTo = useRedirectTo();
 
   const onVerifyOTP = async ({ email, otp }: FormData) => {
     setLoading(true);
