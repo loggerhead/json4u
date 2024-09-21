@@ -72,7 +72,6 @@ export function highlightEdge(edge: EdgeWithData, enable: boolean): EdgeWithData
     (edge.data as any) = {};
   }
 
-  edge.animated = enable;
   edge.style = style;
   edge.data!.style = style;
   edge.data!.key = edge.data?.key ?? "";
