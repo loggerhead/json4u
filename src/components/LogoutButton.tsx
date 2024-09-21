@@ -1,22 +1,27 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import LoadingButton from "@/components/LoadingButton";
 import { supabase } from "@/lib/supabase/client";
 import { cn, toastErr, toastSucc } from "@/lib/utils";
 import { useTranslations } from "next-intl";
-import { Button, ButtonProps } from "./ui/button";
+import { ButtonProps } from "./ui/button";
 
 const LogoutButton = forwardRef<HTMLButtonElement, ButtonProps>(({ className, ...props }, ref) => {
   const t = useTranslations("Home");
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   return (
-    <Button
+    <LoadingButton
       ref={ref}
       className={cn("justify-start text-rose-600", className)}
+      loading={loading}
       onClick={async () => {
+        setLoading(true);
         const { error } = await supabase.auth.signOut();
+        setLoading(false);
         router.refresh();
 
         if (error) {
@@ -27,7 +32,7 @@ const LogoutButton = forwardRef<HTMLButtonElement, ButtonProps>(({ className, ..
       }}
     >
       {t("logout")}
-    </Button>
+    </LoadingButton>
   );
 });
 LogoutButton.displayName = "LogoutButton";

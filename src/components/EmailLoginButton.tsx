@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { useCountdown } from "usehooks-ts";
 import { z } from "zod";
 
-const initialSeconds = 30;
+const resendInterval = 30;
 const FormSchema = z.object({
   email: z.string().email(),
   otp: z.string().min(6),
@@ -144,7 +144,7 @@ function useSendOTP(captchaRef: RefObject<HCaptcha>, email: string) {
   const t = useTranslations("Home");
   const [pending, setPending] = useState(false);
   const [count, { startCountdown, resetCountdown }] = useCountdown({
-    countStart: initialSeconds,
+    countStart: resendInterval,
     intervalMs: 1000,
   });
 
@@ -174,7 +174,7 @@ function useSendOTP(captchaRef: RefObject<HCaptcha>, email: string) {
 
   return {
     pending,
-    isCounting: 0 < count && count < initialSeconds,
+    isCounting: 0 < count && count < resendInterval,
     countdown: count,
     sendOTP,
   };
