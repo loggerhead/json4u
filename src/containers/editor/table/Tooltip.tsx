@@ -8,7 +8,7 @@ import { type TooltipPosition, useTreeStore } from "@/stores/treeStore";
 import { capitalize } from "lodash-es";
 import { useTranslations } from "next-intl";
 
-export const intervalToShow = 500;
+export const intervalToShow = 1000;
 export const intervalToHide = 500;
 export const tableId = "json-table";
 export const tooltipId = "tbl-tooltip";
