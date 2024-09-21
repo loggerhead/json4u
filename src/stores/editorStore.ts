@@ -43,7 +43,7 @@ export const {
   useStore: useEditorStore,
 } = createContext("editorStore", () =>
   create<EditorState>()((set, get) => ({
-    // TODO: 给所有命令增加 icon
+    // TODO: add icon for all commands
     commands: [
       {
         name: "format",

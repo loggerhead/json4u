@@ -12,7 +12,7 @@ interface DiffStyle {
   rgba: Color;
 }
 
-// TODO: 考虑更好的 color 管理方式
+// TODO: use a more smart way to manage the color
 const hunkClasses: Readonly<DiffStyle[]> = [
   {
     type: "del",

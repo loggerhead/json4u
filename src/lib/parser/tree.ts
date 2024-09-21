@@ -37,7 +37,7 @@ export class Tree implements TreeObject {
   nodeMap: Record<string, Node>;
   text: string;
   nestNodeMap?: Record<string, Node>;
-  errors?: ContextError[]; // 解析错误
+  errors?: ContextError[];
   version?: number;
 
   constructor(text: string = "") {
