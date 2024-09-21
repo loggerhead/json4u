@@ -102,8 +102,8 @@ export default function Pricing({ hideTitle, className }: PricingProps) {
   return (
     <UserStoreProvider>
       <Section id="pricing" className={cn(styles.fancyOverlay, className)}>
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 flex flex-col items-center">
-          <div className={cn("w-full lg:w-auto mx-auto max-w-4xl lg:text-center", hideTitle && "hidden")}>
+        <div className="flex flex-col items-center justify-center">
+          <div className={cn("w-full mx-auto max-w-4xl text-center", hideTitle && "hidden")}>
             <Typography variant="h2">{t("title")}</Typography>
           </div>
           {isCN ? (

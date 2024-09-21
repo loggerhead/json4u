@@ -6,7 +6,7 @@ import { Pricing } from "@/containers/pricing";
 
 export default function Index() {
   return (
-    <div className="relative flex flex-col items-center w-full h-full pt-12 pb-36 px-32 gap-24 text-center">
+    <div className="relative flex flex-col items-center w-full h-full pt-12 pb-36 md:px-32 px-4 gap-24 text-center">
       <HeroTitle />
       <HeroCarousel />
       <Features />
@@ -20,7 +20,7 @@ export default function Index() {
 function ProductHunk() {
   return (
     <a
-      className="fixed bottom-0 right-0 m-4"
+      className="bottom-0 right-0 m-4 md:fixed hidden"
       href="https://www.producthunt.com/posts/json-for-you?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-json&#0045;for&#0045;you"
       target="_blank"
     >

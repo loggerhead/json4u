@@ -46,8 +46,8 @@ export default function HeroCarousel() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="lg:flex hidden" />
+        <CarouselNext className="lg:flex hidden" />
       </Carousel>
       <Typography className="mt-2 text-muted-foreground">{examples[current].desc}</Typography>
     </Section>

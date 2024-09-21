@@ -46,7 +46,7 @@ export default function Features() {
       <Typography variant="h2" className="text-center">
         {t("features_title")}
       </Typography>
-      <div className="grid grid-cols-3 gap-12">
+      <div className="grid lg:grid-cols-3 lg:gap-12 md:grid-cols-2 grid-cols-1 gap-6">
         {items.map(({ Icon, headline, description }, i) => (
           <Feature key={i} Icon={Icon} headline={headline} description={description} />
         ))}
@@ -63,7 +63,7 @@ interface FeatureProps {
 
 function Feature({ Icon, headline, description }: FeatureProps) {
   return (
-    <div className="flex flex-col gap-6 p-4 rounded-md max-w-72 bg-muted">
+    <div className="flex flex-col md:gap-6 md:p-4 p-2 gap-4 rounded-md bg-muted">
       <div className="flex gap-3 items-center">
         <div className="p-2 rounded-md border">
           <Icon style={{ width: 24, height: 24 }} color="rgb(248 113 113)" />

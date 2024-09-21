@@ -28,10 +28,11 @@ export function Footer() {
           <span>{"© 2024 JSON For You"}</span>
         </div>
         <Legal />
-        <div className="ml-auto" />
-        {items.map((item, i) => (
-          <FooterLink key={i} title={item.title} href={item.href} />
-        ))}
+        <div className="ml-auto lg:flex hidden gap-8">
+          {items.map((item, i) => (
+            <FooterLink key={i} title={item.title} href={item.href} />
+          ))}
+        </div>
       </div>
     </footer>
   );
@@ -41,7 +42,7 @@ function Legal() {
   const t = useTranslations("Home");
 
   return (
-    <div className="flex items-center gap-8">
+    <div className="flex items-center lg:gap-8 lg:ml-0 ml-auto gap-4">
       {isCN && <FooterLink nofollow href="https://beian.miit.gov.cn" title={"粤ICP备16007488号"} />}
       <FooterLink href="/terms" title={t("Terms")} />
       <FooterLink href="/privacy" title={t("Privacy")} />

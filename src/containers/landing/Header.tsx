@@ -29,12 +29,11 @@ function HeaderContainer() {
   return (
     <div className="flex md:h-12 h-14 items-center justify-center w-full border-b">
       <nav className="flex items-center w-full h-full max-w-page-header md:px-8 px-4">
-        <Link prefetch={false} href="/" className="flex items-center gap-2 pointer">
+        <Link prefetch={false} href="/" className="flex items-center gap-2 pointer mr-8">
           <Logo />
           <span className="font-bold">{"JSON For You"}</span>
         </Link>
-        <div className="ml-8" />
-        <div className="flex items-center gap-8">
+        <div className="items-center lg:gap-8 gap-4 md:flex hidden">
           {items.map((item) => (
             <Link
               prefetch={false}
@@ -49,8 +48,7 @@ function HeaderContainer() {
             </Link>
           ))}
         </div>
-        <div className="ml-auto" />
-        <div className="flex items-center gap-4">
+        <div className="flex ml-auto items-center gap-4">
           {!isCN && <AccountButton notOnSideNav avatarClassName="w-8 h-8" />}
           <LinkButton variant="default" href="/editor">
             <Typography variant="p">{t("Editor")}</Typography>
