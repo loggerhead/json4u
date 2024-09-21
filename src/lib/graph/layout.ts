@@ -40,9 +40,9 @@ export const globalStyle: GraphNodeStyle = {
   levelGap: 75,
 };
 
-// TODO: improve color
-export const nodeHighlightStyle: CSSProperties = { borderColor: "red" };
-export const edgeHighlightStyle: CSSProperties = { stroke: "red", strokeWidth: 2 };
+const selectedColor = "black";
+export const nodeHighlightStyle: CSSProperties = { borderColor: selectedColor };
+export const edgeHighlightStyle: CSSProperties = { stroke: selectedColor };
 
 export type NodeWithData = FlowNode<{
   parentId: string;
