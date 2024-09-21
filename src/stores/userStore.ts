@@ -29,7 +29,6 @@ export interface UserState {
   count: (key: StatisticsKeys) => void;
   isPremium: () => boolean;
   getPlan: () => SubscriptionType;
-  logout: () => Promise<string | void>;
   setUser: (user: User | null) => Promise<void>;
   setStatistics: (statistics: Statistics, nextQuotaRefreshTime: Date, fallbackKey: string) => void;
 }
@@ -90,17 +89,6 @@ export const {
         return activeOrder?.plan ?? "free";
       },
 
-      async logout() {
-        const { setUser } = get();
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-          return error.message;
-        }
-
-        await setUser(null);
-        return;
-      },
-
       async setUser(user: User | null) {
         if (user) {
           set({ user });
@@ -120,7 +108,7 @@ export const {
       },
     })),
 
-  (store) => {
+  async (store) => {
     const { setUser, setStatistics } = store.getState();
 
     (async () => {
@@ -133,10 +121,8 @@ export const {
       }
     })();
 
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      await setUser(data.session?.user ?? null);
-    })();
+    const { data } = await supabase.auth.getSession();
+    await setUser(data.session?.user ?? null);
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       await setUser(session?.user ?? null);

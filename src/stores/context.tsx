@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext as createReactContext, useContext, useEffect, useState } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { type StoreName } from "./types";

@@ -11,7 +11,6 @@ import Typography from "@/components/ui/typography";
 import { env } from "@/lib/env";
 import { supabase } from "@/lib/supabase/client";
 import { toastErr, toastSucc } from "@/lib/utils";
-import { useUserStore } from "@/stores/userStore";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -117,21 +116,15 @@ export default function EmailLoginButton({ redirectTo }: EmailLoginButtonProps) 
 function useVerifyOTP(redirectTo: string) {
   const t = useTranslations("Home");
   const router = useRouter();
-  const setUser = useUserStore((state) => state.setUser);
   const [loading, setLoading] = useState(false);
 
   const onVerifyOTP = async ({ email, otp }: FormData) => {
     setLoading(true);
-
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.verifyOtp({
+    const { error } = await supabase.auth.verifyOtp({
       email,
       token: otp,
       type: "email",
     });
-
     setLoading(false);
 
     if (error) {
@@ -140,7 +133,6 @@ function useVerifyOTP(redirectTo: string) {
     }
 
     toastSucc(t("login_succ"));
-    setUser(session?.user ?? null);
     // @ts-ignore
     router.push(redirectTo);
   };

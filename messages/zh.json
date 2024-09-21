@@ -200,5 +200,9 @@
   "NotFound": {
     "not_found": "404 页面找不到",
     "go_back_home": "点击返回首页"
+  },
+  "LoginError": {
+    "login_error": "登录失败",
+    "go_back_home": "点击返回首页"
   }
 }

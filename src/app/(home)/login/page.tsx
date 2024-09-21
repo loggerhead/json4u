@@ -17,7 +17,6 @@ import { toastErr } from "@/lib/utils";
 import StoresProvider from "@/stores/StoresProvider";
 import type { Provider } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
 
 export default function LoginPage() {
   return (
@@ -32,7 +31,6 @@ export default function LoginPage() {
 
 function Login() {
   const t = useTranslations("Home");
-  const locale = useLocale();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? `${window.location.origin}/editor`;
 
@@ -47,8 +45,7 @@ function Login() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-2">
-          {/* TODO: allow login via google after verification */}
-          {/* <OAuthButton provider="google" redirectTo={redirectTo} /> */}
+          <OAuthButton provider="google" redirectTo={redirectTo} />
           <OAuthButton provider="github" redirectTo={redirectTo} />
           <div className="my-4 flex items-center gap-2">
             <Separator className="flex-1" />
@@ -101,7 +98,7 @@ function OAuthButton({ provider, redirectTo }: OAuthButtonProps) {
   const login = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo },
+      options: { redirectTo: `${location.origin}/api/auth/callback?next=${redirectTo}` },
     });
 
     if (error) {

@@ -95,7 +95,7 @@
     "login_failed": "Failed to log in: {message}",
     "verify_otp_error": "OTP has expired or is invalid",
     "logout": "Log out",
-    "logout_succ": "Logged out successfully",
+    "logout_succ": "Logout success.",
     "logout_failed": "Failed to log out.",
     "Editor": "Editor",
     "Go to Editor": "Go to Editor",
@@ -199,6 +199,10 @@
   },
   "NotFound": {
     "not_found": "404 Not Found",
+    "go_back_home": "Click here to go back home page"
+  },
+  "LoginError": {
+    "login_error": "Login Error",
     "go_back_home": "Click here to go back home page"
   }
 }

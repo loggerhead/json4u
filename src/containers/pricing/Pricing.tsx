@@ -198,7 +198,7 @@ function CTA({ tier: { plan, highlighted, cta } }: CtaProps) {
         toastErr(`getCheckoutURL failed: ${error}`);
       }
     } else if (needPay) {
-      router.push(`/login?redirectTo=${encodeURIComponent(window.location.href)}`);
+      router.push(`/login?redirectTo=${window.location.href}`);
     } else {
       router.push("/editor");
     }
