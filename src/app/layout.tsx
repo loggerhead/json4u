@@ -2,7 +2,6 @@ import Script from "next/script";
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { env, isCN } from "@/lib/env";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
@@ -68,7 +67,6 @@ export default async function LocaleLayout({ children }: { children: React.React
           <GoogleTagManagerBody />
         </ThemeProvider>
         <Toaster richColors position="bottom-right" />
-        <SpeedInsights />
       </body>
     </html>
   );

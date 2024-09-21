@@ -51,7 +51,6 @@
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.3",
     "@t3-oss/env-nextjs": "^0.11.1",
-    "@vercel/speed-insights": "^1.0.12",
     "@xyflow/react": "^12.0.0-next.21",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
