@@ -12,15 +12,15 @@ export default function Index() {
       <Features />
       <Pricing />
       <FAQ />
-      <ProductHunk />
+      <ProductHunt />
     </div>
   );
 }
 
-function ProductHunk() {
+function ProductHunt() {
   return (
     <a
-      className="bottom-0 right-0 m-4 md:fixed hidden"
+      className="fixed bottom-0 right-0 m-4 md:block hidden"
       href="https://www.producthunt.com/posts/json-for-you?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-json&#0045;for&#0045;you"
       target="_blank"
     >
