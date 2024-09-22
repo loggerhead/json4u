@@ -11,7 +11,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { type MessageKey } from "@/global";
 import { useEditorStore } from "@/stores/editorStore";
-import { useStatusStore, useStatusStoreCtx } from "@/stores/statusStore";
+import { useStatusStore } from "@/stores/statusStore";
 import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
@@ -61,7 +61,7 @@ export function CommandSearch() {
 }
 
 function useCommands() {
-  const statusStore = useStatusStoreCtx();
+  const setCommandMode = useStatusStore((state) => state.setCommandMode);
   const { addCommand, commands, callCommand } = useEditorStore(
     useShallow((state) => ({
       addCommand: state.addCommand,
@@ -73,7 +73,7 @@ function useCommands() {
   useEffect(() => {
     addCommand({
       name: "show_jq",
-      call: () => statusStore.getState().setCommandMode("jq"),
+      call: () => setCommandMode("jq"),
     });
   }, []);
 

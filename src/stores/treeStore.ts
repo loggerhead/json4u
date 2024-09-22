@@ -5,8 +5,6 @@ import type { KeyWithType } from "@/lib/table";
 import { type FunctionKeys } from "@/lib/utils";
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
-import { createContext } from "./context";
-import { getStore } from "./utils";
 
 export const sides = ["top", "bottom", "left", "right"];
 export type Side = (typeof sides)[number];
@@ -48,35 +46,29 @@ const initialStates: Omit<TreeState, FunctionKeys<TreeState>> = {
   tableHTML: "",
 };
 
-export const {
-  Provider: TreeStoreProvider,
-  useStoreCtx: useTreeStoreCtx,
-  useStore: useTreeStore,
-} = createContext("treeStore", () =>
-  create<TreeState>()((set, get) => ({
-    ...initialStates,
+export const useTreeStore = create<TreeState>()((set, get) => ({
+  ...initialStates,
 
-    setTree(tree: Tree, kind: Kind) {
-      set({ [kind]: tree });
-    },
+  setTree(tree: Tree, kind: Kind) {
+    set({ [kind]: tree });
+  },
 
-    setTableHTML(tableHTML?: string) {
-      set({ tableHTML: tableHTML ?? initialStates.tableHTML });
-    },
+  setTableHTML(tableHTML?: string) {
+    set({ tableHTML: tableHTML ?? initialStates.tableHTML });
+  },
 
-    setTooltip(content: TooltipContent) {
-      set({ tooltipContent: content });
-    },
+  setTooltip(content: TooltipContent) {
+    set({ tooltipContent: content });
+  },
 
-    hideTooltip() {
-      set({ tooltipContent: initialStates.tooltipContent });
-    },
+  hideTooltip() {
+    set({ tooltipContent: initialStates.tooltipContent });
+  },
 
-    setGraph(graph?: Graph) {
-      set({ graph: graph ?? initialStates.graph });
-    },
-  })),
-);
+  setGraph(graph?: Graph) {
+    set({ graph: graph ?? initialStates.graph });
+  },
+}));
 
 export function useTree(kind: Kind = "main") {
   return useTreeStore((state) => state[kind]);
@@ -97,5 +89,5 @@ export function useGraph() {
 }
 
 export function getTreeState() {
-  return getStore("treeStore").getState();
+  return useTreeStore.getState();
 }

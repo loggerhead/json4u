@@ -8,7 +8,7 @@ import LoadingButton from "@/components/LoadingButton";
 import { MessageKey } from "@/global";
 import type { SubscriptionType } from "@/lib/shop/types";
 import { cn, toastErr } from "@/lib/utils";
-import { UserStoreProvider, useUserStore } from "@/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 import { sendGAEvent } from "@next/third-parties/google";
 import { useTranslations } from "next-intl";
 
@@ -28,15 +28,7 @@ interface CtaButtonProps {
   tier: PricingTier;
 }
 
-export function CtaButton(props: CtaButtonProps) {
-  return (
-    <UserStoreProvider>
-      <CTA {...props} />
-    </UserStoreProvider>
-  );
-}
-
-function CTA({ tier: { plan, highlighted, cta } }: CtaButtonProps) {
+export function CtaButton({ tier: { plan, highlighted, cta } }: CtaButtonProps) {
   const t = useTranslations("Pricing");
   const router = useRouter();
   const [loading, setLoading] = useState(false);

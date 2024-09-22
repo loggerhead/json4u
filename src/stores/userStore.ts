@@ -6,9 +6,8 @@ import { OrderSchema, type Order } from "@/lib/supabase/table.types";
 import { type FunctionKeys } from "@/lib/utils";
 import { sendGAEvent } from "@next/third-parties/google";
 import type { User } from "@supabase/supabase-js";
+import { last, sortBy } from "lodash-es";
 import { create } from "zustand";
-import { createContext } from "./context";
-import { getStore } from "./utils";
 
 const initialStatistics: Statistics = {
   graphModeView: 0,
@@ -31,6 +30,7 @@ export interface UserState {
   isPremium: () => boolean;
   getPlan: () => SubscriptionType;
   setUser: (user: User | null) => Promise<void>;
+  updateActiveOrder: (user: User | null) => Promise<void>;
   setStatistics: (statistics: Statistics, nextQuotaRefreshTime: Date, fallbackKey: string) => void;
 }
 
@@ -41,122 +41,137 @@ const initialStates: Omit<UserState, FunctionKeys<UserState>> = {
   fallbackKey: "",
 };
 
-export const {
-  Provider: UserStoreProvider,
-  useStoreCtx: useUserStoreCtx,
-  useStore: useUserStore,
-} = createContext(
-  "userStore",
-  () =>
-    create<UserState>()((set, get) => ({
-      ...initialStates,
+export const useUserStore = create<UserState>()((set, get) => ({
+  ...initialStates,
 
-      usable(key: StatisticsKeys) {
-        const { statistics: usage, isPremium } = get();
+  usable(key: StatisticsKeys) {
+    const { statistics: usage, isPremium } = get();
 
-        if (isPremium()) {
-          return true;
-        }
+    if (isPremium()) {
+      return true;
+    }
 
-        return usage[key] < freeQuota[key];
-      },
-
-      count(key: StatisticsKeys) {
-        const { fallbackKey, statistics, isPremium } = get();
-        statistics[key] += 1;
-
-        // can't connect to supabase in China, so disable the function temporarily
-        if (!(isPremium() || isDev || isCN)) {
-          reportStatistics(fallbackKey, key);
-        }
-
-        sendGAEvent("event", "cmd_statistics", { name: key });
-        set({ statistics });
-      },
-
-      isPremium() {
-        const { getPlan } = get();
-        switch (getPlan()) {
-          case "monthly":
-            return true;
-          case "yearly":
-            return true;
-          default:
-            return false;
-        }
-      },
-
-      getPlan(): SubscriptionType {
-        const { activeOrder } = get();
-        return activeOrder?.plan ?? "free";
-      },
-
-      async setUser(user: User | null) {
-        if (user) {
-          set({ user });
-
-          const { order, error } = await getActiveOrder(user.email);
-          if (error) {
-            console.error("getActiveOrder failed:", error);
-          }
-          set({ activeOrder: order });
-        } else {
-          set({ user: null, activeOrder: null });
-        }
-      },
-
-      setStatistics(statistics: Statistics, nextQuotaRefreshTime: Date, fallbackKey: string) {
-        set({ statistics, nextQuotaRefreshTime, fallbackKey });
-      },
-    })),
-
-  async (store) => {
-    const { setUser, setStatistics } = store.getState();
-
-    (async () => {
-      try {
-        const fallbackKey = (await getPublicIP()) ?? "";
-        const { statistics, expiredAt } = await getStatistics(fallbackKey);
-        setStatistics({ ...initialStatistics, ...statistics }, expiredAt, fallbackKey);
-      } catch (error) {
-        console.error("getStatistics failed:", error);
-      }
-    })();
-
-    const { data } = await supabase.auth.getSession();
-    await setUser(data.session?.user ?? null);
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      await setUser(session?.user ?? null);
-    });
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
+    return usage[key] < freeQuota[key];
   },
-);
+
+  count(key: StatisticsKeys) {
+    const { fallbackKey, statistics, isPremium } = get();
+    statistics[key] += 1;
+
+    // can't connect to supabase in China, so disable the function temporarily
+    if (!(isPremium() || isDev || isCN)) {
+      reportStatistics(fallbackKey, key);
+    }
+
+    sendGAEvent("event", "cmd_statistics", { name: key });
+    set({ statistics });
+  },
+
+  isPremium() {
+    const { getPlan } = get();
+    switch (getPlan()) {
+      case "monthly":
+        return true;
+      case "yearly":
+        return true;
+      default:
+        return false;
+    }
+  },
+
+  getPlan(): SubscriptionType {
+    const { activeOrder } = get();
+    return activeOrder?.plan ?? "free";
+  },
+
+  async setUser(user: User | null) {
+    const { updateActiveOrder: setActiveOrder } = get();
+    set({ user });
+    await setActiveOrder(user);
+  },
+
+  async updateActiveOrder(user: User | null) {
+    if (!user) {
+      set({ activeOrder: null });
+      return;
+    }
+
+    const { order, error } = await getActiveOrder(user.email);
+    if (error) {
+      console.error("getActiveOrder failed:", error);
+    }
+    set({ activeOrder: order });
+  },
+
+  setStatistics(statistics: Statistics, nextQuotaRefreshTime: Date, fallbackKey: string) {
+    set({ statistics, nextQuotaRefreshTime, fallbackKey });
+  },
+}));
+
+// listen to user session change
+(async () => {
+  const { setUser, setStatistics } = getUserState();
+
+  (async () => {
+    try {
+      const fallbackKey = (await getPublicIP()) ?? "";
+      const { statistics, expiredAt } = await getStatistics(fallbackKey);
+      setStatistics({ ...initialStatistics, ...statistics }, expiredAt, fallbackKey);
+    } catch (error) {
+      console.error("getStatistics failed:", error);
+    }
+  })();
+
+  const { data } = await supabase.auth.getSession();
+  await setUser(data.session?.user ?? null);
+
+  const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    await setUser(session?.user ?? null);
+  });
+
+  return () => {
+    authListener?.subscription.unsubscribe();
+  };
+})();
 
 export function getUserState() {
-  return getStore("userStore").getState();
+  return useUserStore.getState();
 }
 
-async function getActiveOrder(email: string | undefined) {
+// TODO: Think about how to keep multiple subscriptions mutually exclusive
+async function getActiveOrder(email: string | undefined): Promise<{
+  order: Order | null;
+  error: string | null;
+}> {
   if (!email) {
     return { order: null, error: null };
   }
 
   // API: https://supabase.com/docs/reference/javascript/select
-  const { data, error } = await supabase.from("orders").select().eq("email", email).neq("plan", "free").maybeSingle();
+  const { data: items, error } = await supabase
+    .from("orders")
+    .select()
+    .eq("email", email)
+    .neq("plan", "free")
+    .order("created_at", { ascending: false });
   if (error) {
-    return { order: null, error };
+    return { order: null, error: error.toString() };
   }
 
-  const r = OrderSchema.safeParse(data);
+  try {
+    const orders = items.map((item) => OrderSchema.parse(item));
 
-  if (!r.success) {
-    return { order: null, error: r.error };
+    for (const order of orders) {
+      if (order.status === "active") {
+        return { order, error: null };
+      }
+    }
+
+    const order = last(sortBy(orders, "ends_at")) ?? null;
+    return { order, error: null };
+  } catch (error) {
+    return { order: null, error: (error as Error).toString() };
   }
-  return { order: r.data, error: null };
 }
 
 async function getPublicIP() {

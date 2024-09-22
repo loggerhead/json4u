@@ -3,8 +3,6 @@ import { type ParseOptions } from "@/lib/parser";
 import { type FunctionKeys } from "@/lib/utils";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { createContext } from "./context";
-import { getStore } from "./utils";
 
 interface Position {
   line: number;
@@ -60,97 +58,91 @@ const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   revealId: { id: "", version: 0 },
 };
 
-export const {
-  Provider: StatusStoreProvider,
-  useStoreCtx: useStatusStoreCtx,
-  useStore: useStatusStore,
-} = createContext("statusStore", () =>
-  create<StatusState>()(
-    persist(
-      (set, get) => ({
-        ...initialStates,
+export const useStatusStore = create<StatusState>()(
+  persist(
+    (set, get) => ({
+      ...initialStates,
 
-        incrEditorInitCount() {
-          const { editorInitCount } = get();
-          const count = editorInitCount + 1;
-          set({ editorInitCount: count });
-          return count;
-        },
-
-        setLeftPanelWidth(width: number) {
-          set({ leftPanelWidth: width });
-        },
-
-        setRightPanelWidth(width: number) {
-          set({ rightPanelWidth: width });
-        },
-
-        setCommandMode(mode: CommandMode | undefined) {
-          set({ commandMode: mode });
-        },
-
-        setCommandOpen(open: boolean) {
-          set({ commandOpen: open });
-        },
-
-        setJsonPath(jsonPath: string[]) {
-          set({ jsonPath });
-        },
-
-        setCursorPosition(line: number, column: number, selectionLength: number) {
-          set({ cursorPosition: { line, column }, selectionLength });
-        },
-
-        setViewMode(viewMode: ViewModeValue) {
-          set({ viewMode: viewMode as ViewMode });
-        },
-
-        setEnableTextCompare(enable: boolean) {
-          set({ enableTextCompare: enable });
-        },
-
-        setRightPanelSize(size: number) {
-          set({ rightPanelSize: size });
-        },
-
-        setRightPanelCollapsed(collapsed: boolean) {
-          set({ rightPanelCollapsed: collapsed });
-        },
-
-        setParseOptions(options: ParseOptions) {
-          set({ parseOptions: { ...get().parseOptions, ...options } });
-        },
-
-        setRevealId(id: string) {
-          const { version } = get().revealId;
-          set({ revealId: { id, version: version + 1 } });
-        },
-
-        setEnableSyncScroll(enable: boolean) {
-          set({ enableSyncScroll: enable });
-        },
-
-        setSideNavExpanded(expanded: boolean) {
-          set({ sideNavExpanded: expanded });
-        },
-
-        setShowPricingOverlay(show: boolean) {
-          set({ showPricingOverlay: show });
-        },
-      }),
-      {
-        name: keyName,
-        skipHydration: true,
-        partialize: (state) => ({
-          ...Object.fromEntries(Object.keys(defaultConfig).map((k) => [k, state[k as keyof typeof state]])),
-          editorInitCount: state.editorInitCount,
-        }),
-        storage: createJSONStorage(() => storage),
+      incrEditorInitCount() {
+        const { editorInitCount } = get();
+        const count = editorInitCount + 1;
+        set({ editorInitCount: count });
+        return count;
       },
-    ),
+
+      setLeftPanelWidth(width: number) {
+        set({ leftPanelWidth: width });
+      },
+
+      setRightPanelWidth(width: number) {
+        set({ rightPanelWidth: width });
+      },
+
+      setCommandMode(mode: CommandMode | undefined) {
+        set({ commandMode: mode });
+      },
+
+      setCommandOpen(open: boolean) {
+        set({ commandOpen: open });
+      },
+
+      setJsonPath(jsonPath: string[]) {
+        set({ jsonPath });
+      },
+
+      setCursorPosition(line: number, column: number, selectionLength: number) {
+        set({ cursorPosition: { line, column }, selectionLength });
+      },
+
+      setViewMode(viewMode: ViewModeValue) {
+        set({ viewMode: viewMode as ViewMode });
+      },
+
+      setEnableTextCompare(enable: boolean) {
+        set({ enableTextCompare: enable });
+      },
+
+      setRightPanelSize(size: number) {
+        set({ rightPanelSize: size });
+      },
+
+      setRightPanelCollapsed(collapsed: boolean) {
+        set({ rightPanelCollapsed: collapsed });
+      },
+
+      setParseOptions(options: ParseOptions) {
+        set({ parseOptions: { ...get().parseOptions, ...options } });
+      },
+
+      setRevealId(id: string) {
+        const { version } = get().revealId;
+        set({ revealId: { id, version: version + 1 } });
+      },
+
+      setEnableSyncScroll(enable: boolean) {
+        set({ enableSyncScroll: enable });
+      },
+
+      setSideNavExpanded(expanded: boolean) {
+        set({ sideNavExpanded: expanded });
+      },
+
+      setShowPricingOverlay(show: boolean) {
+        set({ showPricingOverlay: show });
+      },
+    }),
+    {
+      name: keyName,
+      skipHydration: true,
+      partialize: (state) => ({
+        ...Object.fromEntries(Object.keys(defaultConfig).map((k) => [k, state[k as keyof typeof state]])),
+        editorInitCount: state.editorInitCount,
+      }),
+      storage: createJSONStorage(() => storage),
+    },
   ),
 );
 
 export function getStatusState() {
-  return getStore("statusStore").getState();
+  return useStatusStore.getState();
 }

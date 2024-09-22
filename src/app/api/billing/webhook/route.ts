@@ -8,23 +8,24 @@ import crypto from "node:crypto";
 
 // Test mode: https://docs.lemonsqueezy.com/help/getting-started/test-mode#test-card-numbers
 export async function POST(request: Request) {
-  const secret = env.LEMONSQUEEZY_WEBHOOK_SECRET;
+  const eventName = request.headers.get("X-Event-Name");
+  const ua = request.headers.get("User-Agent");
+  const rawBody = await request.text();
 
-  if (!secret) {
-    return new Response("Lemon Squeezy Webhook Secret not set in .env", {
-      status: 500,
-    });
+  // sometimes subscription_created will be sent with a null body for a unknown reason
+  if (!rawBody) {
+    console.error(`Empty rawBody: event[${eventName}] ua[${ua}]`);
+    return new Response("Invalid signature", { status: 400 });
   }
 
-  const rawBody = await request.text();
-  const hmac = crypto.createHmac("sha256", secret);
+  const hmac = crypto.createHmac("sha256", env.LEMONSQUEEZY_WEBHOOK_SECRET);
   const digest = Buffer.from(hmac.update(rawBody).digest("hex"), "utf8");
   const signature = Buffer.from(request.headers.get("X-Signature") || "", "utf8");
-  const ua = request.headers.get("User-Agent");
-  const eventName = request.headers.get("X-Event-Name");
 
   if (!crypto.timingSafeEqual(digest, signature)) {
-    console.error(`Invalid signature for "${eventName}" from "${ua}": signature[${signature}] rawBody[rawBody]`);
+    console.error(
+      `Invalid signature: event[${eventName}] ua[${ua}] digest[${digest}] signature[${signature}] rawBody[${rawBody}]`,
+    );
     return new Response("Invalid signature", { status: 400 });
   }
 
@@ -41,8 +42,9 @@ export async function POST(request: Request) {
     console.error(`Handle webhook event failed (${err}): rawBody=${rawBody}`);
     return new Response(err, { status: 500 });
   } else {
+    const data = webhookReq?.data;
     console.log(
-      `Handle ${webhookReq?.meta?.event_name} success. subscription_id[${webhookReq?.data?.id}] uid[${webhookReq?.meta?.custom_data?.uid}]`,
+      `Handle ${webhookReq?.meta?.event_name} success. subscription_id[${data?.id}] email[${data?.attributes?.user_email}]`,
     );
     return new Response("OK", { status: 200 });
   }
@@ -71,11 +73,7 @@ async function handle(req: TWebhookRequest): Promise<{ error: string }> {
   order.plan = getPlan(order);
 
   try {
-    if (req.meta.event_name === "subscription_created") {
-      await db.upsertOrder(order);
-    } else {
-      await db.updateOrder(order);
-    }
+    await db.upsertOrder(order);
   } catch (error: any) {
     console.error("DB access failed:", error, order);
     return { error: error.message };

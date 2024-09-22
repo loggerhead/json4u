@@ -5,7 +5,6 @@ import RLinkButton from "@/components/LinkButton";
 import UserAvatar from "@/components/UserAvatar";
 import Typography from "@/components/ui/typography";
 import { env } from "@/lib/env";
-import StoresProvider from "@/stores/StoresProvider";
 import { useUserStore } from "@/stores/userStore";
 import { CircleUserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,24 +17,14 @@ interface AccountButtonProps {
   notOnSideNav?: boolean;
 }
 
-export default function AccountButton(props: AccountButtonProps) {
-  // avoid create stores twice
-  return props.notOnSideNav ? (
-    <StoresProvider>
-      <AccountBtn {...props} />
-    </StoresProvider>
-  ) : (
-    <AccountBtn {...props} />
-  );
-}
-
-function AccountBtn({ notOnSideNav, avatarClassName, buttonClassName }: AccountButtonProps) {
+export default function AccountButton({ notOnSideNav, avatarClassName, buttonClassName }: AccountButtonProps) {
   const t = useTranslations("Home");
   const user = useUserStore((state) => state.user);
   const nameOrEmail = user?.user_metadata?.name || user?.email;
   const loginHref = {
     pathname: "/login",
     query: {
+      // FIX: Prop `href` did not match on SSR and CSR.
       redirectTo: typeof window !== "undefined" ? window.location.href : env.NEXT_PUBLIC_APP_URL,
     },
   };

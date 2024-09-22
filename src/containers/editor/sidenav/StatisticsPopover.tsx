@@ -20,15 +20,14 @@ export default function StatisticsPopover() {
     useShallow((state) => ({
       statistics: state.statistics,
       nextQuotaRefreshTime: state.nextQuotaRefreshTime,
-      isPremium: state.isPremium,
+      isPremium: state.isPremium(),
     })),
   );
-  const isFree = !isPremium();
 
   return (
     <BasePopover title="statistics">
       <div className="flex flex-col gap-2 w-60">
-        {isFree && nextQuotaRefreshTime && (
+        {!isPremium && nextQuotaRefreshTime && (
           <Typography affects="xs">{t("stats_description", { date: dateToYYYYMMDD(nextQuotaRefreshTime) })}</Typography>
         )}
         {Object.entries(statistics).map(([key, cnt]) => (
@@ -37,7 +36,7 @@ export default function StatisticsPopover() {
             <div className="ml-auto flex gap-1">
               <Typography>{cnt}</Typography>
               <Typography affects="muted">{"/"}</Typography>
-              <Typography affects="muted">{isFree ? freeQuota[key as StatisticsKeys] : "∞"}</Typography>
+              <Typography affects="muted">{isPremium ? "∞" : freeQuota[key as StatisticsKeys]}</Typography>
             </div>
           </div>
         ))}
