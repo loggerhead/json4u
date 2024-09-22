@@ -36,6 +36,7 @@ export default function PopoverBtn({
       <PopoverContent
         asChild={asChild}
         side={notOnSideNav ? "bottom" : "right"}
+        sideOffset={notOnSideNav ? 10 : 5}
         className={cn("w-fit", popoverBtnClass, contentClassName)}
       >
         {content}
