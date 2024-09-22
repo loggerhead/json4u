@@ -32,7 +32,6 @@ export class EditorWrapper {
 
   init() {
     this.version = this.model().getVersionId();
-    getEditorState().setEditor(this);
     this.listenOnDidPaste();
     this.listenOnKeyDown();
     this.listenOnDropFile();

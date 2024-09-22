@@ -1,10 +1,11 @@
 "use client";
 
-import { type ComponentPropsWithoutRef } from "react";
+import { useEffect, type ComponentPropsWithoutRef } from "react";
 import Loading from "@/components/Loading";
 import { EditorWrapper, type Kind } from "@/lib/editor/editor";
 import { cn } from "@/lib/utils";
-import { getEditorState, useEditor } from "@/stores/editorStore";
+import { getEditorState, useEditor, useEditorStore } from "@/stores/editorStore";
+import { useStatusStore } from "@/stores/statusStore";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 
@@ -25,6 +26,9 @@ export default function Editor({ kind, className, ...props }: EditorProps) {
 
 function MyEditor({ kind, ...props }: EditorProps) {
   const translations = useTranslations();
+  const setEditor = useEditorStore((state) => state.setEditor);
+  const setTranslations = useEditorStore((state) => state.setTranslations);
+  useDisplayExample();
 
   return (
     <MonacoEditor
@@ -37,8 +41,10 @@ function MyEditor({ kind, ...props }: EditorProps) {
         minimap: { enabled: false },
       }}
       onMount={(editor) => {
-        new EditorWrapper(editor, kind).init();
-        getEditorState().setTranslations(translations);
+        const wrapper = new EditorWrapper(editor, kind);
+        wrapper.init();
+        setEditor(wrapper);
+        setTranslations(translations);
       }}
       onChange={(value, ev) => {
         const editor = getEditorState()[kind];
@@ -47,4 +53,64 @@ function MyEditor({ kind, ...props }: EditorProps) {
       {...props}
     />
   );
+}
+
+const exampleData = `{
+  "Aidan Gillen": {
+      "array": [
+          "Game of Thron\\"es",
+          "The Wire"
+      ],
+      "string": "some string",
+      "int": 2,
+      "aboolean": true,
+      "boolean": true,
+      "null": null,
+      "a_null": null,
+      "another_null": "null check",
+      "object": {
+          "foo": "bar",
+          "object1": {
+              "new prop1": "new prop value"
+          },
+          "object2": {
+              "new prop1": "new prop value"
+          },
+          "object3": {
+              "new prop1": "new prop value"
+          },
+          "object4": {
+              "new prop1": "new prop value"
+          }
+      }
+  },
+  "Amy Ryan": {
+      "one": "In Treatment",
+      "two": "The Wire"
+  },
+  "Annie Fitzgerald": [
+      "Big Love",
+      "True Blood"
+  ],
+  "Anwan Glover": [
+      "Treme",
+      "The Wire"
+  ],
+  "Alexander Skarsgard": [
+      "Generation Kill",
+      "True Blood"
+  ],
+  "Clarke Peters": null
+}`;
+
+function useDisplayExample() {
+  const editor = useEditor("main");
+  const worker = useEditorStore((state) => state.worker);
+  const incrEditorInitCount = useStatusStore((state) => state.incrEditorInitCount);
+
+  useEffect(() => {
+    if (editor && worker && incrEditorInitCount() <= 1) {
+      editor.parseAndSet(exampleData);
+    }
+  }, [editor, worker]);
 }

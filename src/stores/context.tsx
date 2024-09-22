@@ -15,14 +15,10 @@ export const createContext = <TStore extends UseBoundStore<StoreApi<any>>>(
   const Provider = (props: { children?: React.ReactNode }) => {
     const [store] = useState(() => createStore());
 
-    if (typeof window !== "undefined") {
-      window[name] = store;
-    }
-
     useEffect(() => {
-      if (afterInitial && store) {
-        afterInitial(store);
-      }
+      if (!store) return;
+      window[name] = store;
+      afterInitial && afterInitial(store);
     }, [store]);
 
     return <Context.Provider value={store}>{props.children}</Context.Provider>;

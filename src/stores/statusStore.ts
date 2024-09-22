@@ -19,6 +19,7 @@ interface IdWithVersion {
 export type CommandMode = "jq";
 
 export interface StatusState extends Config {
+  editorInitCount: number;
   jsonPath: string[]; // the json path where the cursor stays in the left editor which displayed to the status bar
   cursorPosition: Position; // line and column number in the left editor which displayed to the status bar
   selectionLength: number; // selection chars number in the left editor which displayed to the status bar
@@ -31,6 +32,7 @@ export interface StatusState extends Config {
   sideNavExpanded?: boolean;
   showPricingOverlay?: boolean;
 
+  incrEditorInitCount: () => number;
   setLeftPanelWidth: (width: number) => void;
   setRightPanelWidth: (width: number) => void;
   setCommandMode: (mode: CommandMode | undefined) => void;
@@ -50,6 +52,7 @@ export interface StatusState extends Config {
 
 const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   ...defaultConfig,
+  editorInitCount: 0,
   jsonPath: [],
   cursorPosition: { line: 0, column: 0 },
   selectionLength: 0,
@@ -66,6 +69,13 @@ export const {
     persist(
       (set, get) => ({
         ...initialStates,
+
+        incrEditorInitCount() {
+          const { editorInitCount } = get();
+          const count = editorInitCount + 1;
+          set({ editorInitCount: count });
+          return count;
+        },
 
         setLeftPanelWidth(width: number) {
           set({ leftPanelWidth: width });
@@ -131,8 +141,10 @@ export const {
       {
         name: keyName,
         skipHydration: true,
-        partialize: (state) =>
-          Object.fromEntries(Object.keys(defaultConfig).map((k) => [k, state[k as keyof typeof state]])),
+        partialize: (state) => ({
+          ...Object.fromEntries(Object.keys(defaultConfig).map((k) => [k, state[k as keyof typeof state]])),
+          editorInitCount: state.editorInitCount,
+        }),
         storage: createJSONStorage(() => storage),
       },
     ),

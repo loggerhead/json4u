@@ -19,15 +19,13 @@ import { wrap } from "comlink";
 
 export default function Page() {
   return (
-    <main className="w-screen h-screen">
-      <ErrorBoundary>
-        <TooltipProvider delayDuration={0}>
-          <StoresProvider>
-            <Main />
-          </StoresProvider>
-        </TooltipProvider>
-      </ErrorBoundary>
-    </main>
+    <ErrorBoundary>
+      <TooltipProvider delayDuration={0}>
+        <StoresProvider>
+          <Main />
+        </StoresProvider>
+      </TooltipProvider>
+    </ErrorBoundary>
   );
 }
 
