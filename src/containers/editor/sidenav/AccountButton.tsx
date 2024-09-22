@@ -19,10 +19,13 @@ interface AccountButtonProps {
 }
 
 export default function AccountButton(props: AccountButtonProps) {
-  return (
+  // avoid create stores twice
+  return props.notOnSideNav ? (
     <StoresProvider>
       <AccountBtn {...props} />
     </StoresProvider>
+  ) : (
+    <AccountBtn {...props} />
   );
 }
 
