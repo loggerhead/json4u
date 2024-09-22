@@ -61,6 +61,7 @@ export function CtaButton({ tier: { plan, highlighted, cta } }: CtaButtonProps) 
       }
     } else if (needPay) {
       action = "login_before_pay";
+      // no good way to append a hash currently: https://github.com/remix-run/react-router/issues/8393
       router.push(`/login?redirectTo=${window.location.href}`);
     } else {
       action = "goto_editor";
