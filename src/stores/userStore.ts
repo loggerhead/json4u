@@ -1,4 +1,4 @@
-import { getStatistics, reportStatistics } from "@/app/actions";
+import { reportStatistics } from "@/app/actions";
 import { env, isCN, isDev, type Statistics, type StatisticsKeys } from "@/lib/env";
 import type { SubscriptionType } from "@/lib/shop/types";
 import { supabase } from "@/lib/supabase/client";
@@ -9,7 +9,7 @@ import type { User } from "@supabase/supabase-js";
 import { last, sortBy } from "lodash-es";
 import { create } from "zustand";
 
-const initialStatistics: Statistics = {
+export const initialStatistics: Statistics = {
   graphModeView: 0,
   tableModeView: 0,
   textComparison: 0,
@@ -108,32 +108,6 @@ export const useUserStore = create<UserState>()((set, get) => ({
   },
 }));
 
-// listen to user session change
-(async () => {
-  const { setUser, setStatistics } = getUserState();
-
-  (async () => {
-    try {
-      const fallbackKey = (await getPublicIP()) ?? "";
-      const { statistics, expiredAt } = await getStatistics(fallbackKey);
-      setStatistics({ ...initialStatistics, ...statistics }, expiredAt, fallbackKey);
-    } catch (error) {
-      console.error("getStatistics failed:", error);
-    }
-  })();
-
-  const { data } = await supabase.auth.getSession();
-  await setUser(data.session?.user ?? null);
-
-  const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-    await setUser(session?.user ?? null);
-  });
-
-  return () => {
-    authListener?.subscription.unsubscribe();
-  };
-})();
-
 export function getUserState() {
   return useUserStore.getState();
 }
@@ -171,14 +145,5 @@ async function getActiveOrder(email: string | undefined): Promise<{
     return { order, error: null };
   } catch (error) {
     return { order: null, error: (error as Error).toString() };
-  }
-}
-
-async function getPublicIP() {
-  try {
-    const resp = await fetch("https://api64.ipify.org");
-    return await resp.text();
-  } catch (error) {
-    console.error("failed to get public IP:", error);
   }
 }

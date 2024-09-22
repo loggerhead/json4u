@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import AccountPanel from "@/components/AccountPanel";
 import RLinkButton from "@/components/LinkButton";
 import UserAvatar from "@/components/UserAvatar";
 import Typography from "@/components/ui/typography";
 import { env } from "@/lib/env";
+import { supabase } from "@/lib/supabase/client";
 import { useUserStore } from "@/stores/userStore";
 import { CircleUserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -20,6 +22,7 @@ interface AccountButtonProps {
 export default function AccountButton({ notOnSideNav, avatarClassName, buttonClassName }: AccountButtonProps) {
   const t = useTranslations("Home");
   const user = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
   const nameOrEmail = user?.user_metadata?.name || user?.email;
   const loginHref = {
     pathname: "/login",
@@ -28,6 +31,22 @@ export default function AccountButton({ notOnSideNav, avatarClassName, buttonCla
       redirectTo: typeof window !== "undefined" ? window.location.href : env.NEXT_PUBLIC_APP_URL,
     },
   };
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      await setUser(data.session?.user ?? null);
+    })();
+
+    // listen to user session change
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      await setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
 
   if (user) {
     return (

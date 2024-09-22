@@ -1,8 +1,10 @@
+import { useEffect } from "react";
+import { getStatistics } from "@/app/actions";
 import Typography from "@/components/ui/typography";
 import { type MessageKey } from "@/global";
 import { type StatisticsKeys } from "@/lib/env";
 import { dateToYYYYMMDD } from "@/lib/utils";
-import { freeQuota, useUserStore } from "@/stores/userStore";
+import { freeQuota, initialStatistics, useUserStore } from "@/stores/userStore";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
 import BasePopover from "./BasePopover";
@@ -16,13 +18,26 @@ const i18nMap: Record<StatisticsKeys, MessageKey> = {
 
 export default function StatisticsPopover() {
   const t = useTranslations();
-  const { statistics, nextQuotaRefreshTime, isPremium } = useUserStore(
+  const { statistics, setStatistics, nextQuotaRefreshTime, isPremium } = useUserStore(
     useShallow((state) => ({
       statistics: state.statistics,
+      setStatistics: state.setStatistics,
       nextQuotaRefreshTime: state.nextQuotaRefreshTime,
       isPremium: state.isPremium(),
     })),
   );
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const fallbackKey = (await getPublicIP()) ?? "";
+        const { statistics, expiredAt } = await getStatistics(fallbackKey);
+        setStatistics({ ...initialStatistics, ...statistics }, expiredAt, fallbackKey);
+      } catch (error) {
+        console.error("getStatistics failed:", error);
+      }
+    })();
+  }, []);
 
   return (
     <BasePopover title="statistics">
@@ -34,13 +49,28 @@ export default function StatisticsPopover() {
           <div key={key} className="flex">
             <Typography>{t(i18nMap[key as StatisticsKeys])}</Typography>
             <div className="ml-auto flex gap-1">
-              <Typography>{cnt}</Typography>
-              <Typography affects="muted">{"/"}</Typography>
-              <Typography affects="muted">{isPremium ? "∞" : freeQuota[key as StatisticsKeys]}</Typography>
+              {isPremium ? (
+                <Typography affects="muted">{"∞"}</Typography>
+              ) : (
+                <>
+                  <Typography>{cnt}</Typography>
+                  <Typography affects="muted">{"/"}</Typography>
+                  <Typography affects="muted">{freeQuota[key as StatisticsKeys]}</Typography>
+                </>
+              )}
             </div>
           </div>
         ))}
       </div>
     </BasePopover>
   );
+}
+
+async function getPublicIP() {
+  try {
+    const resp = await fetch("https://api64.ipify.org");
+    return await resp.text();
+  } catch (error) {
+    console.error("failed to get public IP:", error);
+  }
 }
