@@ -150,7 +150,8 @@
     "feature_share_yearly_premium": "Share data up to 500KB",
     "manage_plan": "管理订阅",
     "plan_display_prefix": "订阅:",
-    "renew_display_prefix": "下次续费日期:"
+    "renew_display_prefix": "下次续费日期:",
+    "expired_display_prefix": "会员过期时间:"
   },
   "FAQ": {
     "FAQ": "常见问题",

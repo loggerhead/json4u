@@ -150,7 +150,8 @@
     "feature_share_yearly_premium": "Share data up to 500KB",
     "manage_plan": "Manage Plan",
     "plan_display_prefix": "Plan:",
-    "renew_display_prefix": "Next renewal date:"
+    "renew_display_prefix": "Next renewal date:",
+    "expired_display_prefix": "Premium expired at:"
   },
   "FAQ": {
     "FAQ": "Frequently Asked Questions",
