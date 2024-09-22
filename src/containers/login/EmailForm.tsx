@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase/client";
 import { toastErr, toastSucc } from "@/lib/utils";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { sendGAEvent } from "@next/third-parties/google";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { useCountdown } from "usehooks-ts";
@@ -102,7 +103,10 @@ export default function EmailForm() {
         ref={captchaRef}
         sitekey={env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
         size="invisible"
-        onError={(ev) => toastErr(t("captcha_error", { message: ev }))}
+        onError={(error) => {
+          sendGAEvent("event", "captcha", { error });
+          toastErr(t("captcha_error", { message: error }));
+        }}
       />
     </>
   );
@@ -121,6 +125,12 @@ function useVerifyOTP() {
       token: otp,
       type: "email",
     });
+
+    sendGAEvent("event", "login", {
+      channel: "email",
+      error: error?.message ?? "succ",
+    });
+
     setLoading(false);
 
     if (error) {
@@ -154,6 +164,10 @@ function useSendOTP(captchaRef: RefObject<HCaptcha>, email: string) {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { captchaToken },
+    });
+
+    sendGAEvent("event", "send_otp", {
+      error: error?.message ?? "succ",
     });
 
     if (error) {

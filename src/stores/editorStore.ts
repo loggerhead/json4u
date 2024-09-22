@@ -3,6 +3,7 @@ import { Comparer } from "@/lib/editor/comparer";
 import type { Kind, EditorWrapper } from "@/lib/editor/editor";
 import { toastErr, toastSucc, toastWarn } from "@/lib/utils";
 import { type MyWorker } from "@/lib/worker";
+import { sendGAEvent } from "@next/third-parties/google";
 import { type Remote } from "comlink";
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -152,6 +153,7 @@ export const {
       }
 
       const r = await Promise.resolve(commands.find((item) => item.name === name)?.call());
+      let isSucc = true;
 
       if (r !== undefined) {
         name = t!(name as MessageKey);
@@ -161,8 +163,11 @@ export const {
         } else {
           // @ts-ignore
           toastErr(t!(r ? r : "cmd_exec_fail", { name }));
+          isSucc = false;
         }
       }
+
+      sendGAEvent("event", "cmd_usage", { name, isSucc });
     },
 
     setTranslations(translations: ReturnType<typeof useTranslations>) {

@@ -9,6 +9,7 @@ import { MessageKey } from "@/global";
 import type { SubscriptionType } from "@/lib/shop/types";
 import { cn, toastErr } from "@/lib/utils";
 import { UserStoreProvider, useUserStore } from "@/stores/userStore";
+import { sendGAEvent } from "@next/third-parties/google";
 import { useTranslations } from "next-intl";
 
 export interface PricingTier {
@@ -47,6 +48,7 @@ function CTA({ tier: { plan, highlighted, cta } }: CtaButtonProps) {
 
   const onClick = async () => {
     setLoading(true);
+    let action = "";
 
     if (needPay && !needLogin) {
       try {
@@ -54,20 +56,29 @@ function CTA({ tier: { plan, highlighted, cta } }: CtaButtonProps) {
         const checkoutUrl = await getCheckoutURL(plan, redirectUrl);
 
         if (checkoutUrl) {
+          action = "open_checkout_url";
           window.LemonSqueezy.Url.Open(checkoutUrl);
         } else {
+          action = "empty_checkout_url_error";
           console.error("getCheckoutURL return a empty URL:", plan, email);
           toastErr("getCheckoutURL return a empty URL");
         }
       } catch (error) {
+        action = "get_checkout_url_error";
         toastErr(`getCheckoutURL failed: ${error}`);
       }
     } else if (needPay) {
+      action = "login_before_pay";
       router.push(`/login?redirectTo=${window.location.href}`);
     } else {
+      action = "goto_editor";
       router.push("/editor");
     }
 
+    sendGAEvent("event", "cta_clicked", {
+      plan,
+      action,
+    });
     setLoading(false);
   };
 

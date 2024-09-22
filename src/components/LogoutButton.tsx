@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import LoadingButton from "@/components/LoadingButton";
 import { supabase } from "@/lib/supabase/client";
 import { cn, toastErr, toastSucc } from "@/lib/utils";
+import { sendGAEvent } from "@next/third-parties/google";
 import { useTranslations } from "next-intl";
 import { ButtonProps } from "./ui/button";
 
@@ -21,6 +22,7 @@ const LogoutButton = forwardRef<HTMLButtonElement, ButtonProps>(({ className, ..
       onClick={async () => {
         setLoading(true);
         const { error } = await supabase.auth.signOut();
+        sendGAEvent("event", "logout", { error: error?.message ?? "succ" });
         setLoading(false);
         router.refresh();
 

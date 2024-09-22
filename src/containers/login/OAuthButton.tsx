@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Typography from "@/components/ui/typography";
 import { supabase } from "@/lib/supabase/client";
 import { toastErr } from "@/lib/utils";
+import { sendGAEvent } from "@next/third-parties/google";
 import type { Provider } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import useRedirectTo from "./useRedirectTo";
@@ -35,6 +36,11 @@ export default function OAuthButton({ provider }: OAuthButtonProps) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: { redirectTo: `${window.location.origin}/api/auth/callback?next=${next}` },
+    });
+
+    sendGAEvent("event", "login", {
+      channel: provider,
+      error: error?.message ?? "succ",
     });
 
     if (error) {

@@ -4,6 +4,7 @@ import type { SubscriptionType } from "@/lib/shop/types";
 import { supabase } from "@/lib/supabase/client";
 import { OrderSchema, type Order } from "@/lib/supabase/table.types";
 import { type FunctionKeys } from "@/lib/utils";
+import { sendGAEvent } from "@next/third-parties/google";
 import type { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { createContext } from "./context";
@@ -69,6 +70,7 @@ export const {
           reportStatistics(fallbackKey, key);
         }
 
+        sendGAEvent("event", "cmd_statistics", { name: key });
         set({ statistics });
       },
 
