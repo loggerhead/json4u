@@ -61,6 +61,14 @@ I'm really excited that you are interested in contributing to JSON For You. Befo
 3. I wish to keep JSON For You lightweight and fast. Please being aware of the number of npm dependencies and their size and don't add **unnecessary** dependencies.
 4. Run `pnpm test` to make sure your code pass the core tests.
 
+## Acknowledgment
+
+- Famous library that most people know: [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/), [Next.js](https://nextjs.org/), [Zustand](https://zustand-demo.pmnd.rs/) and [Zod](https://zod.dev/).
+- [React Flow](https://github.com/xyflow/xyflow): Extensible and customizable library for building interactive graphs.
+- [next-intl](https://github.com/amannn/next-intl): An out-of-the-box i18n library for Next.js that considers almost all of your usage scenarios.
+- [Vitest](https://vitest.dev/): A blazing fast unit testing framework for JavaScript.
+- And all the developers who contributed to open source!
+
 ## License
 
 [Apache](./LICENSE) License © 2022-Present [loggerhead](https://github.com/loggerhead)
