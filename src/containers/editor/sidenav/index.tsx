@@ -54,7 +54,7 @@ export default function SideNav() {
       onMouseLeave={() => setSideNavExpanded(false)}
     >
       <nav
-        className="group z-50 h-full py-1.5 w-8 data-[expanded=true]:w-32 box-content border-r border-default data-[expanded=true]:shadow-xl transition-width duration-200 hide-scrollbar flex flex-col justify-between overflow-y-auto bg-background"
+        className="group z-50 h-full py-1.5 w-8 data-[expanded=true]:w-32 box-content border-r border-default shadow-xl transition-width duration-200 hide-scrollbar flex flex-col justify-between overflow-y-auto bg-background"
         data-expanded={sideNavExpanded}
       >
         <ul className="relative flex flex-col justify-start px-1 gap-y-1">
