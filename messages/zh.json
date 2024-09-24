@@ -121,7 +121,8 @@
     "import_csv_img_desc": "导入并转换 CSV 文件",
     "Give a rating": "进行评价",
     "Terms": "服务协议",
-    "Privacy": "隐私政策"
+    "Privacy": "隐私政策",
+    "Friends": "友情链接:"
   },
   "Pricing": {
     "title": "价格",
