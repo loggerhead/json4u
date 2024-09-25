@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react";
 import AutoImport from "unplugin-auto-import/vite";
+import { loadEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
@@ -15,5 +16,7 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     includeSource: ["src/**/*.{js,ts,tsx}"],
+    // https://github.com/vitest-dev/vitest/issues/2117
+    env: loadEnv("", process.cwd(), ""),
   },
 });
