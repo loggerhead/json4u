@@ -60,8 +60,9 @@ function FriendLinks() {
 function Legal() {
   const t = useTranslations("Home");
 
+  // TODO: modify content. change back to flex
   return (
-    <div className="flex items-center lg:gap-8 lg:ml-0 ml-auto gap-4">
+    <div className="hidden items-center lg:gap-8 lg:ml-0 ml-auto gap-4">
       {isCN ? (
         <FooterLink nofollow href="https://beian.miit.gov.cn" title={"粤ICP备16007488号"} />
       ) : (
