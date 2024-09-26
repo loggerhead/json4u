@@ -11,7 +11,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Typography from "@/components/ui/typography";
-import Autoplay from "embla-carousel-autoplay";
 import { useTranslations } from "next-intl";
 
 export default function HeroCarousel() {
@@ -38,7 +37,7 @@ export default function HeroCarousel() {
 
   return (
     <Section className="gap-6 -mt-12">
-      <Carousel setApi={setApi} className="border rounded" plugins={[Autoplay({ delay: 2000 })]}>
+      <Carousel setApi={setApi} className="border rounded">
         <CarouselContent>
           {examples.map(({ fileName, desc }, i) => (
             <CarouselItem key={i}>
