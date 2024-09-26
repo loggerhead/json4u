@@ -9,9 +9,8 @@ import { useTranslations } from "next-intl";
 export default function Header() {
   const t = useTranslations("Home");
   const items = [
-    // TODO: redesign
-    // { href: "/#features", title: t("Features") },
-    // { href: "/#pricing", title: t("Pricing") },
+    { href: "/#features", title: t("Features") },
+    { href: "/#pricing", title: t("Pricing") },
     { href: "/#faq", title: t("FAQ") },
     { href: "/changelog", title: t("Changelog") },
   ];

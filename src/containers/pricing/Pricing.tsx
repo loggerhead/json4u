@@ -27,7 +27,7 @@ export const tiers: PricingTier[] = [
       // "feature_share_free",
       // "feature_settings_sync_free",
     ],
-    featureEnables: [true, true, false, false, false, false],
+    featureEnables: [true, true, true, true, true, true],
     highlighted: false,
     cta: "cta_free",
   },
