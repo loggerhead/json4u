@@ -61,6 +61,15 @@ I'm really excited that you are interested in contributing to JSON For You. Befo
 3. I wish to keep JSON For You lightweight and fast. Please being aware of the number of npm dependencies and their size and don't add **unnecessary** dependencies.
 4. Run `pnpm test` to make sure your code pass the core tests.
 
+## Quick Deployment
+
+### Vercel
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Floggerhead%2Fjson4u)
+
+#### Deployment Steps
+1. Click the `Deploy` button and confirm repository creation
+2. Wait for Vercel Deploy to complete, then visit the assigned domain (e.g. json4u.vercel.app)
+
 ## Acknowledgment
 
 - Famous library that most people know: [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/), [Next.js](https://nextjs.org/), [Zustand](https://zustand-demo.pmnd.rs/) and [Zod](https://zod.dev/).
