@@ -69,6 +69,16 @@ I'm really excited that you are interested in contributing to JSON For You. Befo
 #### Deployment Steps
 1. Click the `Deploy` button and confirm repository creation
 2. Wait for Vercel Deploy to complete, then visit the assigned domain (e.g. json4u.vercel.app)
+3. Add necessary environment variables:
+   - In the Vercel project dashboard, go to "Settings" > "Environment Variables"
+   - Add the following environment variables(refer to the .env):
+     - LEMONSQUEEZY_SUBSCRIPTION_VARIANT_MAP
+     - LEMONSQUEEZY_STORE_ID (must be a number)
+     - LEMONSQUEEZY_WEBHOOK_SECRET
+     - LEMONSQUEEZY_API_KEY
+     - SUPABASE_KEY
+   - After adding all variables, redeploy your project
+
 
 ## Acknowledgment
 
