@@ -94,7 +94,7 @@ export default function SideNav() {
           <LinkButton
             icon={<MessageCircleQuestion className="icon" />}
             title={t("Feedback")}
-            href="https://github.com/loggerhead/json4u/issues/new"
+            href={isCN ? "https://support.qq.com/product/670462" : "https://github.com/loggerhead/json4u/issues/new"}
             newWindow
           />
           <PopoverBtn title={t("statistics")} icon={<BarChartBig className="icon" />} content={<StatisticsPopover />} />
