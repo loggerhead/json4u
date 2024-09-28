@@ -153,7 +153,8 @@
     "manage_plan": "Manage Plan",
     "plan_display_prefix": "Plan:",
     "renew_display_prefix": "Next renewal date:",
-    "expired_display_prefix": "Premium expired at:"
+    "expired_display_prefix": "Premium expired at:",
+    "getCheckoutURL_error": "get checkout URL error: {error}"
   },
   "FAQ": {
     "FAQ": "Frequently Asked Questions",
