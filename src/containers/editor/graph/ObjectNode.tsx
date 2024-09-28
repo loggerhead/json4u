@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { genKeyText, genValueAttrs, type NodeWithData } from "@/lib/graph/layout";
 import { type Node } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
@@ -15,10 +14,10 @@ export default function ObjectNode({ id, data, ...props }: NodeProps<NodeWithDat
   return node ? (
     <>
       <Toolbar node={node} visible={selected} />
-      <div className="nodrag nopan select-text graph-node cursor-default" style={data.style}>
+      <div className="nodrag nopan graph-node cursor-default" style={data.style}>
         <TargetHandle node={node} />
         {tree.mapChildren(node, (child, key, i) => (
-          <KV key={i} index={i} property={node.type === "array" ? i : key} selected={selected} node={child}></KV>
+          <KV key={i} index={i} property={node.type === "array" ? i : key} node={child}></KV>
         ))}
       </div>
     </>
@@ -29,42 +28,21 @@ interface KvProps {
   index: number;
   property: string | number;
   node: Node;
-  selected?: boolean;
 }
 
-function KV({ index, property, selected, node }: KvProps) {
-  const keyRef = useRef(null);
-  const valueRef = useRef(null);
-  const [keyDisableWheel, setKeyDisableWheel] = useState(false);
-  const [valueDisableWheel, setValueDisableWheel] = useState(false);
+function KV({ index, property, node }: KvProps) {
   const keyText = genKeyText(property);
   const { className, text } = genValueAttrs(node);
   const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
 
-  useEffect(() => {
-    if (!selected) {
-      return;
-    }
-
-    if (keyRef.current) {
-      const { offsetWidth, scrollWidth } = keyRef.current;
-      scrollWidth > offsetWidth && setKeyDisableWheel(true);
-    }
-
-    if (valueRef.current) {
-      const { offsetWidth, scrollWidth } = valueRef.current;
-      scrollWidth > offsetWidth && setValueDisableWheel(true);
-    }
-  }, [selected]);
-
   return (
     <div className="graph-kv">
-      <span ref={keyRef} className={cn("graph-k", keyDisableWheel && "nowheel", keyClass)}>
+      <div contentEditable="true" className={cn("graph-k", keyClass)}>
         {keyText}
-      </span>
-      <span ref={valueRef} className={cn("graph-v", valueDisableWheel && "nowheel", className)}>
+      </div>
+      <div contentEditable="true" className={cn("graph-v", className)}>
         {text}
-      </span>
+      </div>
       <SourceHandle id={keyText} node={node} indexInParent={index} />
     </div>
   );
