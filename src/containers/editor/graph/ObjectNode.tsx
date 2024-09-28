@@ -37,10 +37,10 @@ function KV({ index, property, node }: KvProps) {
 
   return (
     <div className="graph-kv">
-      <div contentEditable="true" className={cn("graph-k", keyClass)}>
+      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-k", keyClass)}>
         {keyText}
       </div>
-      <div contentEditable="true" className={cn("graph-v", className)}>
+      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-v", className)}>
         {text}
       </div>
       <SourceHandle id={keyText} node={node} indexInParent={index} />
