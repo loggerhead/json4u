@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 export default function HeroCarousel() {
   const t = useTranslations("Home");
   const examples = [
+    { fileName: "jq.gif", desc: t("jq_img_desc") },
     { fileName: "graph.png", desc: t("graph_img_desc") },
     { fileName: "table.png", desc: t("table_img_desc") },
     { fileName: "compare.png", desc: t("compare_img_desc") },

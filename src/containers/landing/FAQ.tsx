@@ -42,15 +42,6 @@ export default function FAQ() {
               {t("jq_manual")}
             </Link>
           </Typography>
-          <img
-            width={1024}
-            height={632}
-            className="mt-4"
-            loading="lazy"
-            decoding="async"
-            alt={t("jq_img_desc")}
-            src="/example/jq.gif"
-          />
         </FaqItem>
       </Accordion>
     </Section>
