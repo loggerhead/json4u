@@ -227,14 +227,14 @@ body {
   margin-right: 20px;
   max-width: var(--max-key-length);
   white-space: nowrap;
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .graph-v {
   max-width: var(--max-value-length);
   margin-left: auto;
   white-space: nowrap;
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .tbl {
@@ -347,8 +347,8 @@ body {
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 #tbl-tooltip[data-side="top"] {
