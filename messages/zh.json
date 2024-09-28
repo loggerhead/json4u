@@ -153,7 +153,8 @@
     "manage_plan": "管理订阅",
     "plan_display_prefix": "订阅:",
     "renew_display_prefix": "下次续费日期:",
-    "expired_display_prefix": "会员过期时间:"
+    "expired_display_prefix": "会员过期时间:",
+    "getCheckoutURL_error": "生成支付链接失败: {error}"
   },
   "FAQ": {
     "FAQ": "常见问题",
