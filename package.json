@@ -57,6 +57,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "comlink": "^4.4.1",
+    "compare-versions": "^6.1.1",
     "embla-carousel-react": "^8.2.0",
     "github-markdown-css": "^5.6.1",
     "html-to-image": "^1.11.11",
