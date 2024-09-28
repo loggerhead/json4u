@@ -28,7 +28,9 @@ const nextConfig = {
   output: isCN ? "standalone" : undefined,
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   experimental: {
-    webVitalsAttribution: ["CLS", "LCP"],
+    serverActions: {
+      allowedOrigins: ["json4u.com", "*.json4u.com", "json4u.cn", "*.json4u.cn"],
+    },
     optimizePackageImports: [
       "react-use",
       "@next/mdx",

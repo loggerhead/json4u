@@ -5,8 +5,10 @@ import { env, type Statistics, type StatisticsKeys } from "@/lib/env";
 import { createClient, Db } from "@/lib/supabase/server";
 import { createCheckout, listCustomers } from "@lemonsqueezy/lemonsqueezy.js";
 import { lemonSqueezySetup } from "@lemonsqueezy/lemonsqueezy.js";
+import { satisfies } from "compare-versions";
 
 export async function getCheckoutURL(subscriptionType: "monthly" | "yearly", redirectUrl?: string) {
+  const version = getClientVersion();
   setupLemonSqueezy();
   const user = await new Db().getAuthenticatedUser();
   const variantId = env.LEMONSQUEEZY_SUBSCRIPTION_VARIANT_MAP[subscriptionType];
@@ -31,6 +33,12 @@ export async function getCheckoutURL(subscriptionType: "monthly" | "yearly", red
       receiptLinkUrl: redirectUrl,
     },
   });
+
+  if (satisfies(version, "<3.0.5")) {
+    console.log("old version app:", version);
+  } else {
+    console.log("new version app:", version);
+  }
 
   if (error) {
     throw new Error(error.message);
@@ -57,14 +65,23 @@ export async function getCustomerPortalURL() {
 }
 
 export async function getStatistics(fallbackKey: string) {
-  const { statistics, expiredAt } = await doGetStatistics(fallbackKey);
-  return { statistics, expiredAt };
+  try {
+    const { statistics, expiredAt } = await doGetStatistics(fallbackKey);
+    return { statistics, expiredAt };
+  } catch (error) {
+    console.error("getStatistics failed:", error);
+    return { error };
+  }
 }
 
 export async function reportStatistics(fallbackKey: string, k: StatisticsKeys) {
-  const { db, key, statistics, expiredAt } = await doGetStatistics(fallbackKey);
-  statistics[k] = (statistics[k] ?? 0) + 1;
-  await db.set(key, statistics, expiredAt);
+  try {
+    const { db, key, statistics, expiredAt } = await doGetStatistics(fallbackKey);
+    statistics[k] = (statistics[k] ?? 0) + 1;
+    await db.set(key, statistics, expiredAt);
+  } catch (error) {
+    console.error("reportStatistics failed:", (error as Error).message);
+  }
 }
 
 async function doGetStatistics(fallbackKey: string): Promise<{
@@ -96,11 +113,20 @@ function getStatisticsKey(fallbackKey: string): string {
 }
 
 function getIP(): string | undefined {
+  const version = getClientVersion();
   const hh = ["x-forwarded-for", "x-real-ip", "forwarded", "cf-connecting-ip"];
   const ips = [];
+  const headersList = headers();
 
-  for (const header in hh) {
-    const ip = headers().get(header);
+  if (satisfies(version, "<3.0.5")) {
+    console.log("old version app:", version);
+  } else {
+    console.log("new version app:", version);
+  }
+
+
+  for (const header of hh) {
+    const ip = headersList.get(header);
     ips.push(ip);
 
     if (ip && isValidPublicIP(ip)) {
@@ -109,7 +135,7 @@ function getIP(): string | undefined {
     }
   }
 
-  console.error(`cannot get remote ip: [${ips}]`);
+  console.error("cannot get remote ip:", JSON.stringify(ips));
   return;
 }
 
@@ -141,4 +167,8 @@ function setupLemonSqueezy() {
       throw new Error(`Lemon Squeezy API error: ${error.message}`);
     },
   });
+}
+
+function getClientVersion() {
+  return headers().get("x-json4u-version") ?? "3.0.0";
 }

@@ -31,8 +31,12 @@ export default function StatisticsPopover() {
     (async () => {
       try {
         const fallbackKey = (await getPublicIP()) ?? "";
-        const { statistics, expiredAt } = await getStatistics(fallbackKey);
-        setStatistics({ ...initialStatistics, ...statistics }, expiredAt, fallbackKey);
+        const { statistics, expiredAt, error } = await getStatistics(fallbackKey);
+        if (error) {
+          console.error("getStatistics failed:", error);
+        } else {
+          setStatistics({ ...initialStatistics, ...statistics }, expiredAt!, fallbackKey);
+        }
       } catch (error) {
         console.error("getStatistics failed:", error);
       }
