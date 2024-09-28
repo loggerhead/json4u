@@ -18,7 +18,6 @@ jiti("./src/lib/env");
 const isDev = process.env.NODE_ENV === "development";
 const isCN = /\.cn(:3000)?$/.test(process.env.NEXT_PUBLIC_APP_URL);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-console.log(`isDev=${isDev} isCN=${isCN} subscription_variant=${process.env.NEXT_PUBLIC_SUBSCRIPTION_VARIANT}`);
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {
