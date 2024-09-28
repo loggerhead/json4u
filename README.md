@@ -25,12 +25,12 @@ The best JSON visualization and processing tool.
 
 <table>
 <tr>
-<td><img src="./public/example/graph.png"></td>
-<td><img src="./public/example/table.png"></td>
+<td><img src="./public/example/jq.gif"></td>
+<td><img src="./public/example/nest-parse.png"></td>
 </tr>
 <tr>
-<td><img src="./public/example/nest-parse.png"></td>
-<td><img src="./public/example/jq.gif"></td>
+<td><img src="./public/example/graph.png"></td>
+<td><img src="./public/example/table.png"></td>
 </tr>
 </table>
 
