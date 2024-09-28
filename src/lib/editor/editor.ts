@@ -9,6 +9,7 @@ import { debounce } from "lodash-es";
 import { editorApi, IScrollEvent } from "./types";
 
 export type Kind = "main" | "secondary";
+type ScrollEvent = IScrollEvent & { _oldScrollTop: number; _oldScrollLeft: number };
 
 const parseWait = 500;
 
@@ -251,10 +252,9 @@ export class EditorWrapper {
     });
   }
 
-  // 滚动到指定位置（类似鼠标滚动）
   scrollTo(e: ScrollEvent) {
     if (e.scrollTopChanged || e.scrollLeftChanged) {
-      // 阻止下一次滚动
+      // prevent next scroll
       this.scrolling = -1;
       const top = this.editor.getScrollTop();
       const left = this.editor.getScrollLeft();
@@ -265,10 +265,7 @@ export class EditorWrapper {
     }
   }
 
-  // 可以滚动吗？
   scrollable() {
     return this.scrolling && getStatusState().enableSyncScroll;
   }
 }
-
-type ScrollEvent = IScrollEvent & { _oldScrollTop: number; _oldScrollLeft: number };
