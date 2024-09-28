@@ -55,8 +55,22 @@ The best JSON visualization and processing tool.
   - [ ] Support preprocessing via jq before fetch.
 - [ ] Integrating AI to provide certain functions (under research).
   - [ ] Integrating basic AI capabilities in server side.
-- [ ] Support jsonc and jsonl.
-  - [ ] Design the UI for jsonl.
+- [ ] Experience enhancement
+  - [ ] Support [JSON HERO](https://jsonhero.io/) like value preview
+    - [ ] Support for timestamp and date strings.
+    - [ ] Support URL parsing.
+    - [ ] Support image preview.
+    - [ ] Support for previewing leaf nodes at the same level.
+  - [ ] Support jsonc and jsonl.
+    - [ ] Design the UI for jsonl.
+  - [ ] Support collapsing blocks with no differences in comparison results.
+  - [ ] Change the switch to dropdown menu in comparison button.
+    - [ ] Support key comparison for object nodes.
+  - [ ] Support operations at the node dimension.
+    - [ ] Support copy a node.
+    - [ ] Support delete a node.
+    - [ ] Consider supporting the ability to move a node.
+    - [ ] Consider supporting the elevation of node levels.
 
 ## Setup
 
