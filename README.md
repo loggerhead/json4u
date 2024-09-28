@@ -34,6 +34,30 @@ The best JSON visualization and processing tool.
 </tr>
 </table>
 
+## Roadmap
+
+- [ ] Improve performance to support large files (>= 1mb).
+  - [ ] Only render visible nodes in graph mode.
+  - [ ] Use virtual list or canvas to render in table mode.
+  - [ ] Use wasm in web worker for parsing (use rust).
+  - [ ] Consider [changing the editor to Ace or CM6](https://medium.com/miro-engineering/how-we-integrated-a-code-editor-on-the-miro-canvas-a41e0eff7f21).
+- [ ] Improve interoperability between left and right panels.
+  - [ ] Support [search](https://www.fusejs.io/demo.html) in graph mode (synchronize reveal between left and right panels).
+  - [ ] Support search via JSON path (synchronize reveal).
+  - [ ] Support modifications in view mode.
+  - [ ] Support synchronize fold and unfold between left and right panels.
+  - [ ] Support displaying the key count of an object/array node after folding.
+- [ ] Add a group API to support file upload and retrieval.
+  - [ ] Support share with an expiration date.
+  - [ ] Support auto upload local files to server.
+  - [ ] Provide a command line tool ([#24](https://github.com/loggerhead/json4u/issues/24)).
+  - [ ] Provide vscode plugin.
+  - [ ] Support preprocessing via jq before fetch.
+- [ ] Integrating AI to provide certain functions (under research).
+  - [ ] Integrating basic AI capabilities in server side.
+- [ ] Support jsonc and jsonl.
+  - [ ] Design the UI for jsonl.
+
 ## Setup
 
 1. Run `pnpm install` in repo's root folder.
