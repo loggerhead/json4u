@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set variables
         run: |
-          VER=$(grep version package.json | cut -d '"' -f 4)
+          VER=$(grep '"version"' package.json | cut -d '"' -f 4)
           echo "VERSION=$VER" >> $GITHUB_ENV
       - name: Login to ACR
         uses: aliyun/acr-login@v1
