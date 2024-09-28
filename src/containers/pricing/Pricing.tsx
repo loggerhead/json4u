@@ -33,7 +33,7 @@ export const tiers: PricingTier[] = [
   },
   {
     plan: "monthly",
-    price: "$9.99",
+    price: "$6.29",
     description: "monthly_desc",
     features: [
       "feature_validate",
@@ -51,9 +51,9 @@ export const tiers: PricingTier[] = [
   },
   {
     plan: "yearly",
-    price: "$9.99",
-    saveBadge: "save_40",
-    discountPrice: "$6",
+    price: "$6.29",
+    saveBadge: "save_20",
+    discountPrice: "$5",
     description: "yearly_desc",
     features: [
       "feature_validate",
