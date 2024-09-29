@@ -91,6 +91,7 @@
     "@serwist/next": "^9.0.2",
     "@testing-library/react": "^16.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/jest": "^29.5.13",
     "@types/lodash-es": "^4.17.12",
     "@types/mdx": "^2.0.13",
     "@types/node": "^20",
