@@ -14,10 +14,9 @@ import { separateMap, toggleHidden } from "./utils";
 
 interface ToolbarProps {
   node: Node;
-  visible?: boolean;
 }
 
-export default function Toolbar({ node, visible }: ToolbarProps) {
+export default function Toolbar({ node }: ToolbarProps) {
   const [fold, setFold] = useState(true);
   const [foldSiblings, setFoldSiblings] = useState(true);
 
@@ -65,7 +64,6 @@ export default function Toolbar({ node, visible }: ToolbarProps) {
   return (
     <NodeToolbar
       className="flex items-center justify-center w-[96px] h-fit bg-input"
-      isVisible={visible}
       position={Position.Top}
       align="start"
       offset={0}

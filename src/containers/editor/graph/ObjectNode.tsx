@@ -13,7 +13,7 @@ export default function ObjectNode({ id, data, ...props }: NodeProps<NodeWithDat
 
   return node ? (
     <>
-      <Toolbar node={node} visible={selected} />
+      {selected && <Toolbar node={node} />}
       <div className="nodrag nopan graph-node cursor-default" style={data.style}>
         <TargetHandle node={node} />
         {tree.mapChildren(node, (child, key, i) => (
