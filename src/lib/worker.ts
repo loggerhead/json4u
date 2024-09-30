@@ -5,6 +5,8 @@ import { escape, unescape } from "./command/escape";
 import { parseAndFormat } from "./command/parse";
 import { pythonDictToJSON } from "./command/pythonDictToJSON";
 import { urlToJson } from "./command/urlToJson";
+import { setupGlobalGraphStyle } from "./graph/layout";
+
 
 export interface MyWorker {
   parseAndFormat: typeof parseAndFormat;
@@ -16,6 +18,7 @@ export interface MyWorker {
   urlToJson: typeof urlToJson;
   csv2json: typeof csv2json;
   json2csv: typeof json2csv;
+  setupGlobalGraphStyle: typeof setupGlobalGraphStyle;
 }
 
 Comlink.expose({
@@ -28,4 +31,5 @@ Comlink.expose({
   urlToJson,
   csv2json,
   json2csv,
+  setupGlobalGraphStyle,
 } satisfies MyWorker);

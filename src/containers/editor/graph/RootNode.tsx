@@ -16,7 +16,7 @@ export default function RootNode({ data, ...props }: NodeProps<NodeWithData>) {
 
   return (
     <>
-      <Toolbar node={node} visible={data.toolbarVisible} />
+      {data.toolbarVisible && <Toolbar node={node} />}
       <div className="graph-node" style={data.style}>
         <div className="graph-kv">
           <div className={className}>{text}</div>

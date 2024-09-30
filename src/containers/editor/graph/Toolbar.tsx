@@ -1,8 +1,7 @@
-import { ReactNode, useState } from "react";
+import { memo, ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
 import { join as idJoin, splitParentPointer, toPath } from "@/lib/idgen";
-import { type Node } from "@/lib/parser/node";
 import { useEditor } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { NodeToolbar, Position, useReactFlow } from "@xyflow/react";
@@ -13,10 +12,10 @@ import { useNodeClick } from "./useNodeClick";
 import { separateMap, toggleHidden } from "./utils";
 
 interface ToolbarProps {
-  node: Node;
+  id: string;
 }
 
-export default function Toolbar({ node }: ToolbarProps) {
+const Toolbar = memo(({ id }: ToolbarProps) => {
   const [fold, setFold] = useState(true);
   const [foldSiblings, setFoldSiblings] = useState(true);
 
@@ -27,7 +26,6 @@ export default function Toolbar({ node }: ToolbarProps) {
   const edges = getEdges();
   const args = { nodes, edges, setNodes, setEdges };
 
-  const id = node.id;
   const { callNodeClick } = useNodeClick(args);
   const { callHandleClick } = useHandleClick(args);
   const { parent: parentId } = splitParentPointer(id);
@@ -101,7 +99,8 @@ export default function Toolbar({ node }: ToolbarProps) {
       </ToolbarButton>
     </NodeToolbar>
   );
-}
+});
+Toolbar.displayName = "Toolbar";
 
 interface ToolbarButtonProps {
   title: string;
@@ -109,7 +108,7 @@ interface ToolbarButtonProps {
   children: ReactNode;
 }
 
-function ToolbarButton({ title, onClick, children }: ToolbarButtonProps) {
+const ToolbarButton = memo(({ title, onClick, children }: ToolbarButtonProps) => {
   return (
     <Button
       variant="icon"
@@ -124,4 +123,7 @@ function ToolbarButton({ title, onClick, children }: ToolbarButtonProps) {
       {children}
     </Button>
   );
-}
+});
+ToolbarButton.displayName = "ToolbarButton";
+
+export default Toolbar;
