@@ -1,38 +1,55 @@
+import { memo } from "react";
 import { genKeyText, genValueAttrs, type NodeWithData } from "@/lib/graph/layout";
-import { type Node } from "@/lib/parser/node";
+import { rootMarker } from "@/lib/idgen/pointer";
+import { getChildrenKeys, hasChildren } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
 import { useTree } from "@/stores/treeStore";
 import { type NodeProps } from "@xyflow/react";
 import { SourceHandle, TargetHandle } from "./Handle";
 import Toolbar from "./Toolbar";
 
-export default function ObjectNode({ id, data, ...props }: NodeProps<NodeWithData>) {
+export default function ObjectNode({ id, data }: NodeProps<NodeWithData>) {
   const tree = useTree();
   const node = tree.node(id);
   const selected = data.toolbarVisible;
 
-  return node ? (
+  if (!node) {
+    return null;
+  }
+
+  return (
     <>
-      {selected && <Toolbar node={node} />}
+      {selected && <Toolbar id={id} />}
       <div className="nodrag nopan graph-node cursor-default" style={data.style}>
-        <TargetHandle node={node} />
-        {tree.mapChildren(node, (child, key, i) => (
-          <KV key={i} index={i} property={node.type === "array" ? i : key} node={child}></KV>
-        ))}
+        {node?.id !== rootMarker && <TargetHandle childrenNum={getChildrenKeys(node).length} />}
+        {tree.mapChildren(node, (child, key, i) => {
+          const { className, text } = genValueAttrs(child);
+          return (
+            <KV
+              key={i}
+              index={i}
+              property={node.type === "array" ? i : key}
+              valueClassName={className}
+              valueText={text}
+              hasChildren={hasChildren(child)}
+            />
+          );
+        })}
       </div>
     </>
-  ) : null;
+  );
 }
 
 interface KvProps {
   index: number;
   property: string | number;
-  node: Node;
+  valueClassName: string;
+  valueText: string;
+  hasChildren: boolean;
 }
 
-function KV({ index, property, node }: KvProps) {
+const KV = memo(({ index, property, valueClassName, valueText, hasChildren }: KvProps) => {
   const keyText = genKeyText(property);
-  const { className, text } = genValueAttrs(node);
   const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
 
   return (
@@ -40,10 +57,11 @@ function KV({ index, property, node }: KvProps) {
       <div contentEditable="true" suppressContentEditableWarning className={cn("graph-k", keyClass)}>
         {keyText}
       </div>
-      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-v", className)}>
-        {text}
+      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-v", valueClassName)}>
+        {valueText}
       </div>
-      <SourceHandle id={keyText} node={node} indexInParent={index} />
+      {hasChildren && <SourceHandle id={keyText} indexInParent={index} />}
     </div>
   );
-}
+});
+KV.displayName = "KV";

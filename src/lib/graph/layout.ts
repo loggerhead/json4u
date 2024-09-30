@@ -2,7 +2,6 @@ import { type CSSProperties } from "react";
 import { rootMarker } from "@/lib/idgen";
 import { type Tree, type Node, hasChildren, getRawValue, isIterable, getChildrenKeys } from "@/lib/parser";
 import { type XYPosition, type Edge, type Node as FlowNode } from "@xyflow/react";
-import { max } from "lodash-es";
 
 export const config: Readonly<Record<string, any>> = {
   translateMargin: 500,
@@ -28,6 +27,7 @@ export interface GraphNodeStyle {
   levelGap: number; // spacing between neighboring levels (in px)
 }
 
+// measured in MainPanel when mounted. The value should remain consistent between the main thread and the web worker.
 export const globalStyle: GraphNodeStyle = {
   fontWidth: 0,
   padding: 0,
@@ -40,6 +40,10 @@ export const globalStyle: GraphNodeStyle = {
   levelGap: 75,
 };
 
+export function setupGlobalGraphStyle(style: Partial<GraphNodeStyle>) {
+  Object.assign(globalStyle, style);
+}
+
 const selectedColor = "black";
 export const nodeHighlightStyle: CSSProperties = { borderColor: selectedColor };
 export const edgeHighlightStyle: CSSProperties = { stroke: selectedColor };
@@ -49,12 +53,17 @@ export type NodeWithData = FlowNode<{
   childrenIds: string[];
   level: number; // distance from root node
   depth: number; // max distance from leaf node
+  width: number;
+  height: number;
   toolbarVisible?: boolean;
   style?: React.CSSProperties;
 }>;
 
 export type EdgeWithData = Edge<{
-  key: string;
+  sourceOffset: number; // the distance from the edge's starting point to the top of the source node.
+  targetOffset: number; // the distance from the edge's ending point to the top of the target node.
+  start?: XYPosition; // the starting point of the edge, equals (source.x + source.width, source.y + sourceOffset)
+  end?: XYPosition; // the ending point of the edge, equals (target.x, target.y + targetOffset)
   style?: React.CSSProperties;
 }>;
 
@@ -86,16 +95,27 @@ function doGenFlowNodes(
   const flowNode = newFlowNode(node, parentId, level);
   flowNodes.push(flowNode);
 
-  const childDepths = tree.mapChildren(node, (child, key) => {
+  let maxKvWidth = 0;
+  let maxChildDepth = hasChildren(node) ? 0 : -1;
+
+  tree.mapChildren(node, (child, key, i) => {
+    const keyText = genKeyText(key);
+    const { text } = genValueAttrs(child);
+    const keyWidth = Math.min(computeTextWidth(keyText, globalStyle.fontWidth), globalStyle.maxKeyWidth);
+    const valueWidth = Math.min(computeTextWidth(text, globalStyle.fontWidth), globalStyle.maxValueWidth);
+    const kvWidth = globalStyle.padding + keyWidth + globalStyle.kvGap + valueWidth + 2 * globalStyle.borderWidth;
+    maxKvWidth = Math.max(maxKvWidth, kvWidth);
+
     if (hasChildren(child)) {
       flowNode.data.childrenIds.push(child.id);
-      flowEdges.push(newEdge(node, child, key));
-      return doGenFlowNodes(flowNodes, flowEdges, tree, child, flowNode.id, level + 1);
+      flowEdges.push(newEdge(node, child, key, i));
+      const childDepth = doGenFlowNodes(flowNodes, flowEdges, tree, child, flowNode.id, level + 1);
+      maxChildDepth = Math.max(maxChildDepth, childDepth);
     }
-    return 0;
   });
 
-  flowNode.data.depth = 1 + (max(childDepths) ?? -1);
+  flowNode.data.width = maxKvWidth;
+  flowNode.data.depth = maxChildDepth + 1;
   return flowNode.data.depth;
 }
 
@@ -104,33 +124,42 @@ function newFlowNode(node: Node, parentId: string, level: number): NodeWithData 
     id: node.id,
     position: { x: 0, y: 0 },
     type: hasChildren(node) ? "object" : "root",
-    data: { level, depth: 0, parentId, childrenIds: [] },
+    data: {
+      level,
+      depth: 0,
+      width: 0,
+      height: getChildrenKeys(node).length * globalStyle.kvHeight + 2 * globalStyle.borderWidth,
+      parentId,
+      childrenIds: [],
+    },
     deletable: false,
     draggable: false,
   };
 }
 
-function newEdge(parent: Node, child: Node, key: string): EdgeWithData {
+function newEdge(parent: Node, child: Node, key: string, i: number): EdgeWithData {
   return {
     id: child.id,
     source: parent.id,
     target: child.id,
     sourceHandle: key,
     deletable: false,
+    data: {
+      sourceOffset: computeSourceHandleOffset(i),
+      targetOffset: computeTargetHandleOffset(getChildrenKeys(child).length),
+    },
   };
 }
 
 export class Layouter {
   tree: Tree;
   id2NodeMap: Record<string, NodeWithData>;
-  style: GraphNodeStyle;
 
-  constructor(style: GraphNodeStyle, tree: Tree, allNodes: NodeWithData[]) {
-    this.style = style;
+  constructor(tree: Tree, allNodes: NodeWithData[], allEdges: EdgeWithData[]) {
     this.tree = tree;
     this.id2NodeMap = {};
     for (const node of allNodes) {
-      this.id2NodeMap[node.id] = { ...node };
+      this.id2NodeMap[node.id] = node;
     }
   }
 
@@ -147,8 +176,7 @@ export class Layouter {
 
     for (let i = 0; i < ordered.length; i++) {
       const node = ordered[i];
-      const level = node.data.level;
-      const width = this.getNodeWidth(node);
+      const { level, width } = node.data;
 
       if (level >= levelMeta.length) {
         levelMeta.push({ x: 0, y: 0 });
@@ -168,9 +196,7 @@ export class Layouter {
   // use DFS to compute y of each node
   computeY(levelMeta: XYPosition[], id: string, parentY: number) {
     const node = this.id2NodeMap[id];
-    const level = node.data.level;
-    const depth = node.data.depth;
-    const height = this.getNodeHeight(node);
+    const { level, depth, height } = node.data;
 
     if (levelMeta[level].y === 0) {
       node.position.y = parentY;
@@ -187,38 +213,6 @@ export class Layouter {
       this.computeY(levelMeta, childId, node.position.y);
     }
   }
-
-  getNodeWidth(nd: NodeWithData): number {
-    const width = nd.measured?.width ?? 0;
-    if (width > 0) {
-      return width;
-    }
-
-    const node = this.tree.node(nd.id);
-    let maxWidth = 0;
-
-    this.tree.mapChildren(node, (child, key) => {
-      const keyText = genKeyText(key);
-      const { text } = genValueAttrs(child);
-      const keyWidth = Math.min(computeTextWidth(keyText, this.style.fontWidth), this.style.maxKeyWidth);
-      const valueWidth = Math.min(computeTextWidth(text, this.style.fontWidth), this.style.maxValueWidth);
-      const width = this.style.padding + keyWidth + this.style.kvGap + valueWidth + 2 * this.style.borderWidth;
-      maxWidth = Math.max(maxWidth, width);
-    });
-
-    return maxWidth;
-  }
-
-  getNodeHeight(nd: NodeWithData): number {
-    let height = nd.measured?.height ?? 0;
-    if (height > 0) {
-      return height;
-    }
-
-    const node = this.tree.node(nd.id);
-    height = getChildrenKeys(node).length * this.style.kvHeight + 2 * this.style.borderWidth;
-    return height;
-  }
 }
 
 const re = /[\s\w\d\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\{\}\[\]\\\|\;\:\'\"\<\>\,\.\/\?]/g;
@@ -227,6 +221,14 @@ function computeTextWidth(text: string, fontWidth: number) {
   const single = (text.match(re) || []).length;
   const double = text.length - single;
   return Math.ceil((single + 2 * double) * fontWidth);
+}
+
+export function computeTargetHandleOffset(childrenNum: number) {
+  return (childrenNum * globalStyle.kvHeight) / 2;
+}
+
+export function computeSourceHandleOffset(i: number) {
+  return globalStyle.kvHeight / 2 + i * globalStyle.kvHeight;
 }
 
 export function genKeyText(key: string | number) {

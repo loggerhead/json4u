@@ -1,4 +1,4 @@
-import { genFlowNodes, globalStyle, Layouter } from "@/lib/graph/layout";
+import { genFlowNodes, Layouter } from "@/lib/graph/layout";
 import { parseJSON } from "@/lib/parser/parse";
 
 function checkNodes(jsonStr: string, nodeNum: number, edgeNum: number) {
@@ -11,7 +11,7 @@ function checkNodes(jsonStr: string, nodeNum: number, edgeNum: number) {
     node.measured = { width: 200, height: 100 };
   });
 
-  const { ordered, levelMeta } = new Layouter(globalStyle, tree, nodes).layout();
+  const { ordered, levelMeta } = new Layouter(tree, nodes, edges).layout();
   expect(ordered.length).equals(nodeNum);
   expect(levelMeta.length).greaterThan(0);
 }

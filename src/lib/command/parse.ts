@@ -1,5 +1,5 @@
 import { format as textFormat } from "@/lib/format";
-import { type Graph, type GraphNodeStyle, Layouter, genFlowNodes } from "@/lib/graph/layout";
+import { type Graph, Layouter, genFlowNodes } from "@/lib/graph/layout";
 import { parseJSON, type ParseOptions, type StringifyOptions, type TreeObject } from "@/lib/parser";
 import { genDomString } from "@/lib/table";
 import * as jsonc from "jsonc-parser";
@@ -10,7 +10,6 @@ const fallbackThreshold = 100000;
 export interface ParseAndFormatOptions extends StringifyOptions {
   needTable: boolean;
   needGraph: boolean;
-  graphStyle: GraphNodeStyle;
 }
 
 export interface ParsedTree {
@@ -24,6 +23,7 @@ export async function parseAndFormat(
   version: number,
   options?: ParseAndFormatOptions,
 ): Promise<ParsedTree> {
+  // 5MB costs 240ms
   const tree = parseJSON(text, options);
   tree.version = version;
 
@@ -35,18 +35,21 @@ export async function parseAndFormat(
   }
 
   if (options?.format) {
+    // 5MB costs 69ms
     tree.stringify(options);
   } else if (!isEmpty(tree.nestNodeMap)) {
     tree.stringifyNestNodes();
   }
 
   let graph = undefined;
+  // 5MB costs 260ms
   if (options?.needGraph) {
     const { nodes, edges } = genFlowNodes(tree);
-    const { ordered, levelMeta } = new Layouter(options.graphStyle, tree, nodes).layout();
+    const { ordered, levelMeta } = new Layouter(tree, nodes, edges).layout();
     graph = { nodes: ordered, edges, levelMeta };
   }
 
+  // 5MB costs 230ms
   const tableHTML = options?.needTable ? genDomString(tree) : undefined;
   return { treeObject: tree.toObject(), tableHTML, graph };
 }

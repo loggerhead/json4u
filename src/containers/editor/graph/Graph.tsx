@@ -1,10 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
-import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { detectOS } from "@/lib/utils";
+import { Background, Controls, ReactFlow, ReactFlowProvider, useOnViewportChange } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useResizeObserver } from "usehooks-ts";
 import DownloadButton from "./DownloadButton";
 import MouseButton from "./MouseButton";
 import ObjectNode from "./ObjectNode";
@@ -26,8 +28,6 @@ export default function Graph() {
   );
 }
 
-// TODO: 支持搜索 https://www.fusejs.io/demo.html
-// TODO: lazy loading nodes using intersection observer and requestAnimationFrame to improve performance
 function LayoutGraph() {
   const nodesAndEdges = useNodesAndEdges();
   const onPaneClick = usePaneClick(nodesAndEdges);
@@ -80,24 +80,4 @@ function LayoutGraph() {
       <Background />
     </ReactFlow>
   );
-}
-
-function detectOS() {
-  // if a browser has no support for navigator.userAgentData.platform use platform as fallback
-  // @ts-ignore
-  const userAgent = (navigator.userAgentData?.platform ?? (navigator.platform || navigator.userAgent)).toLowerCase();
-
-  if (userAgent.includes("win")) {
-    return "Windows";
-  } else if (userAgent.includes("android")) {
-    return "Android";
-  } else if (userAgent.includes("mac")) {
-    return "Mac";
-  } else if (userAgent.includes("iphone") || userAgent.includes("ipad")) {
-    return "iOS";
-  } else if (userAgent.includes("linux")) {
-    return "Linux";
-  }
-
-  return "Unknown OS";
 }

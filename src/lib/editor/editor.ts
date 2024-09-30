@@ -1,5 +1,4 @@
 import { type ParsedTree } from "@/lib/command/parse";
-import { globalStyle as graphStyle } from "@/lib/graph/layout";
 import { toPointer } from "@/lib/idgen";
 import { getPath, ParseOptions, Tree } from "@/lib/parser";
 import { getEditorState } from "@/stores/editorStore";
@@ -150,7 +149,6 @@ export class EditorWrapper {
       ...extraParseOptions,
       needTable: this.isMain(),
       needGraph: this.isMain(),
-      graphStyle,
     };
 
     reportTextSize(text.length);

@@ -56,6 +56,26 @@ export function toastErr(msg: string, id?: string) {
   toast.error(msg, { ...toastOptions, id });
 }
 
+export function detectOS() {
+  // if a browser has no support for navigator.userAgentData.platform use platform as fallback
+  // @ts-ignore
+  const userAgent = (navigator.userAgentData?.platform ?? (navigator.platform || navigator.userAgent)).toLowerCase();
+
+  if (userAgent.includes("win")) {
+    return "Windows";
+  } else if (userAgent.includes("android")) {
+    return "Android";
+  } else if (userAgent.includes("mac")) {
+    return "Mac";
+  } else if (userAgent.includes("iphone") || userAgent.includes("ipad")) {
+    return "iOS";
+  } else if (userAgent.includes("linux")) {
+    return "Linux";
+  }
+
+  return "Unknown OS";
+}
+
 export function downloadFile(suffix: string, dataUrl: string) {
   const a = document.createElement("a");
   a.setAttribute("download", genDownloadFileName(suffix));

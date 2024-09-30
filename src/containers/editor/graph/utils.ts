@@ -74,7 +74,6 @@ export function highlightEdge(edge: EdgeWithData, enable: boolean): EdgeWithData
 
   edge.style = style;
   edge.data!.style = style;
-  edge.data!.key = edge.data?.key ?? "";
   return edge;
 }
 
