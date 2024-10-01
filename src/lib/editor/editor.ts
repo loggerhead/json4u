@@ -1,6 +1,6 @@
-import { type ParsedTree } from "@/lib/command/parse";
 import { toPointer } from "@/lib/idgen";
 import { getPath, ParseOptions, Tree } from "@/lib/parser";
+import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
 import { getStatusState } from "@/stores/statusStore";
 import { getTreeState } from "@/stores/treeStore";

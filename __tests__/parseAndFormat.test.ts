@@ -1,6 +1,6 @@
-import { parseAndFormat } from "@/lib/command/parse";
 import { splitParentPointer } from "@/lib/idgen";
 import { getRawValue, ParseOptions, Tree } from "@/lib/parser";
+import { parseAndFormat } from "@/lib/worker/command/parse";
 import { readFileIfNeed } from "./utils";
 
 interface TestData {
