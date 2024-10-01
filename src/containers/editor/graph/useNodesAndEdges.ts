@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
 import { type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
+import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { useGraph, useTreeStore, useTreeVersion } from "@/stores/treeStore";
+import { useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
 import {
   OnEdgesChange,
@@ -13,7 +14,9 @@ import {
   XYPosition,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { debounce } from "lodash-es";
 import { useResizeObserver } from "usehooks-ts";
+import { useShallow } from "zustand/react/shallow";
 
 export interface NodesAndEdges {
   nodes: NodeWithData[];
@@ -27,40 +30,67 @@ export interface NodesAndEdges {
 }
 
 export default function useNodesAndEdges(ref: React.RefObject<HTMLDivElement>): NodesAndEdges {
-  const count = useUserStore((state) => state.count);
-  const usable = useUserStore((state) => state.usable("graphModeView"));
-  const viewMode = useStatusStore((state) => state.viewMode);
-  const setShowPricingOverlay = useStatusStore((state) => state.setShowPricingOverlay);
+  const { count, usable } = useUserStore(
+    useShallow((state) => ({
+      count: state.count,
+      usable: state.usable("graphModeView"),
+    })),
+  );
+  const { isGraphView, setShowPricingOverlay } = useStatusStore(
+    useShallow((state) => ({
+      isGraphView: state.viewMode === ViewMode.Graph,
+      setShowPricingOverlay: state.setShowPricingOverlay,
+    })),
+  );
+  const worker = useEditorStore((state) => state.worker);
   const treeVersion = useTreeVersion();
-  const setGraphSize = useTreeStore((state) => state.setGraphSize);
-  const setGraphViewport = useTreeStore((state) => state.setGraphViewport);
-  const { nodes: nextNodes, edges: nextEdges, levelMeta } = useGraph();
 
   const [version, setVersion] = useState(0);
+  const [levelMeta, setLevelMeta] = useState<XYPosition[]>();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
 
   useEffect(() => {
-    if (viewMode === ViewMode.Graph && treeVersion > version) {
-      if (usable) {
-        setVersion(treeVersion);
-        setNodes(nextNodes);
-        setEdges(nextEdges);
-        nextNodes.length > 0 && count("graphModeView");
-      } else {
-        setShowPricingOverlay(true);
-      }
+    if (!(worker && isGraphView && treeVersion > version)) {
+      return;
     }
-  }, [usable, viewMode, treeVersion, version, nextNodes, nextEdges]);
 
-  useResizeObserver({
-    ref,
-    onResize: ({ width, height }) => setGraphSize(width, height),
-  });
+    if (!usable) {
+      setShowPricingOverlay(true);
+      return;
+    }
 
-  useOnViewportChange({
-    onEnd: (viewport) => setGraphViewport(viewport),
-  });
+    (async () => {
+      const { nodes, edges, levelMeta } = await worker.createGraph();
+      setNodes(nodes);
+      setEdges(edges);
+      setLevelMeta(levelMeta);
+      setVersion(treeVersion);
+      nodes.length > 0 && count("graphModeView");
+    })();
+  }, [worker, usable, isGraphView, treeVersion, version]);
 
-  return { nodes, edges, levelMeta, setNodes, setEdges, onNodesChange, onEdgesChange, version };
+  const onResize = useCallback(
+    debounce(({ width, height }) => worker?.setGraphSize(width, height), 250, { trailing: true }),
+    [worker],
+  );
+
+  const onViewportChange = useCallback(
+    debounce((viewport) => worker?.setGraphViewport(viewport), 250, { trailing: true }),
+    [worker],
+  );
+
+  useResizeObserver({ ref, onResize });
+  useOnViewportChange({ onEnd: onViewportChange });
+
+  return {
+    nodes,
+    edges,
+    levelMeta,
+    setNodes,
+    setEdges,
+    onNodesChange,
+    onEdgesChange,
+    version,
+  };
 }

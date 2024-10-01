@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
 import { detectOS } from "@/lib/utils";
+import { useTreeStore } from "@/stores/treeStore";
 import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import DownloadButton from "./DownloadButton";
@@ -32,6 +33,7 @@ function LayoutGraph() {
   const onPaneClick = usePaneClick(nodesAndEdges);
   const { onMouseClickNode } = useNodeClick(nodesAndEdges);
   const { onMouseClickHandle } = useHandleClick(nodesAndEdges);
+  const visibleGraph = useTreeStore((state) => state.visibleGraph);
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
 
   useCenterViewport(nodesAndEdges, false);
@@ -59,8 +61,8 @@ function LayoutGraph() {
       }}
       // TODO: waiting fix https://github.com/xyflow/xyflow/issues/3633
       // translateExtent={translateExtent}
-      nodes={nodesAndEdges.nodes}
-      edges={nodesAndEdges.edges}
+      nodes={visibleGraph.nodes}
+      edges={visibleGraph.edges}
       onNodesChange={nodesAndEdges.onNodesChange}
       onEdgesChange={nodesAndEdges.onEdgesChange}
       onPaneClick={onPaneClick}

@@ -103,7 +103,7 @@ export class EditorWrapper {
     return this.version;
   }
 
-  setTree({ treeObject, graph, tableHTML }: ParsedTree, resetCursor: boolean = true) {
+  setTree({ treeObject }: ParsedTree, resetCursor: boolean = true) {
     // increase version to skip next onChange event which triggered by setText
     const tree = Tree.fromObject(treeObject);
     tree.version = this.incVersion();
@@ -111,11 +111,6 @@ export class EditorWrapper {
 
     this.tree = tree;
     getTreeState().setTree(tree, this.kind);
-
-    if (this.kind === "main") {
-      getTreeState().setGraph(graph);
-      getTreeState().setTableHTML(tableHTML);
-    }
 
     // 全量替换成新文本
     this.editor.executeEdits(null, [
@@ -147,8 +142,7 @@ export class EditorWrapper {
     const options = {
       ...getStatusState().parseOptions,
       ...extraParseOptions,
-      needTable: this.isMain(),
-      needGraph: this.isMain(),
+      kind: this.kind,
     };
 
     reportTextSize(text.length);
