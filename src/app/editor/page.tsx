@@ -10,7 +10,7 @@ import { PricingOverlay } from "@/containers/pricing";
 import { init as dbInit } from "@/lib/db/config";
 import { version } from "@/lib/env";
 import { init as jqInit } from "@/lib/jq";
-import { type MyWorker } from "@/lib/worker";
+import { type MyWorker } from "@/lib/worker/worker";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useUserStore } from "@/stores/userStore";
@@ -65,7 +65,7 @@ function useInit() {
     Promise.resolve(useStatusStore.persist.rehydrate()).then(() => setHydrated(true));
     updateActiveOrder(user);
 
-    const worker = new Worker(new URL("@/lib/worker.ts", import.meta.url));
+    const worker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
     const workerProxy = wrap<MyWorker>(worker);
     setWorker(workerProxy);
 

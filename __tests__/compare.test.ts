@@ -1,6 +1,6 @@
-import { compareTree, compareText } from "@/lib/command/compare";
 import { newDiff, Diff, sort } from "@/lib/compare";
 import { parseJSON } from "@/lib/parser";
+import { compareTree, compareText } from "@/lib/worker/command/compare";
 import { readFileIfNeed } from "./utils";
 
 function expectEq(

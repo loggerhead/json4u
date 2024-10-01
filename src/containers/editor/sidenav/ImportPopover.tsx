@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type MessageKey } from "@/global";
-import { type CsvResult } from "@/lib/command/csv";
 import { Tree } from "@/lib/parser";
 import { toastErr } from "@/lib/utils";
+import { type CsvResult } from "@/lib/worker/command/csv";
 import { useEditor } from "@/stores/editorStore";
 import { useTranslations } from "next-intl";
 import { FileUploader } from "react-drag-drop-files";

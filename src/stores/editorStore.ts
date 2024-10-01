@@ -2,7 +2,7 @@ import { type MessageKey } from "@/global";
 import { Comparer } from "@/lib/editor/comparer";
 import type { Kind, EditorWrapper } from "@/lib/editor/editor";
 import { toastErr, toastSucc, toastWarn } from "@/lib/utils";
-import { type MyWorker } from "@/lib/worker";
+import { type MyWorker } from "@/lib/worker/worker";
 import { sendGAEvent } from "@next/third-parties/google";
 import { type Remote } from "comlink";
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, type LucideIcon } from "lucide-react";
