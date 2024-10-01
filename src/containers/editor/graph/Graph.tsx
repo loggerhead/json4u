@@ -8,8 +8,7 @@ import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/reac
 import "@xyflow/react/dist/style.css";
 import DownloadButton from "./DownloadButton";
 import MouseButton from "./MouseButton";
-import ObjectNode from "./ObjectNode";
-import RootNode from "./RootNode";
+import { ObjectNode, RootNode } from "./Node";
 import useCenterViewport from "./useCenterViewport";
 import { useHandleClick } from "./useHandleClick";
 import { useNodeClick } from "./useNodeClick";

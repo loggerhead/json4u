@@ -8,7 +8,7 @@ import { type NodeProps } from "@xyflow/react";
 import { SourceHandle, TargetHandle } from "./Handle";
 import Toolbar from "./Toolbar";
 
-export default function ObjectNode({ id, data }: NodeProps<NodeWithData>) {
+export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   const tree = useTree();
   const node = tree.node(id);
   const selected = data.toolbarVisible;
@@ -38,7 +38,8 @@ export default function ObjectNode({ id, data }: NodeProps<NodeWithData>) {
       </div>
     </>
   );
-}
+});
+ObjectNode.displayName = "ObjectNode";
 
 interface KvProps {
   index: number;
@@ -65,3 +66,23 @@ const KV = memo(({ index, property, valueClassName, valueText, hasChildren }: Kv
   );
 });
 KV.displayName = "KV";
+
+export const RootNode = memo(({ data }: NodeProps<NodeWithData>) => {
+  const tree = useTree();
+  const node = tree.root();
+
+  if (!node) {
+    return null;
+  }
+
+  const { className, text } = genValueAttrs(node);
+
+  return (
+    <div className="graph-node" style={data.style}>
+      <div className="graph-kv">
+        <div className={className}>{text}</div>
+      </div>
+    </div>
+  );
+});
+RootNode.displayName = "RootNode";
