@@ -4,7 +4,7 @@ import { rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
 import { useTree } from "@/stores/treeStore";
-import { type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { SourceHandle, TargetHandle } from "./Handle";
 import Toolbar from "./Toolbar";
 
@@ -86,3 +86,21 @@ export const RootNode = memo(({ data }: NodeProps<NodeWithData>) => {
   );
 });
 RootNode.displayName = "RootNode";
+
+export const DummySourceNode = memo(() => {
+  return (
+    <div className="w-[1px] h-[1px]">
+      <Handle type={"source"} isConnectable position={Position.Right} />
+    </div>
+  );
+});
+DummySourceNode.displayName = "DummySourceNode";
+
+export const DummyTargetNode = memo(() => {
+  return (
+    <div className="w-[1px] h-[1px]">
+      <Handle type={"target"} isConnectable position={Position.Left} />
+    </div>
+  );
+});
+DummyTargetNode.displayName = "DummyTargetNode";

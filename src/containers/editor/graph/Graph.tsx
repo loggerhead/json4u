@@ -1,21 +1,18 @@
 "use client";
 
-import * as React from "react";
 import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
 import { detectOS } from "@/lib/utils";
-import { useTreeStore } from "@/stores/treeStore";
 import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import DownloadButton from "./DownloadButton";
 import MouseButton from "./MouseButton";
-import { ObjectNode, RootNode } from "./Node";
-import useCenterViewport from "./useCenterViewport";
+import { ObjectNode, RootNode, DummySourceNode, DummyTargetNode } from "./Node";
 import { useHandleClick } from "./useHandleClick";
 import { useNodeClick } from "./useNodeClick";
 import useNodesAndEdges from "./useNodesAndEdges";
-import { usePaneClick } from "./usePaneClick";
 import useRevealNode from "./useRevealNode";
+import useViewportChange from "./useViewportChange";
 
 export default function Graph() {
   return (
@@ -28,21 +25,19 @@ export default function Graph() {
 }
 
 function LayoutGraph() {
-  const ref = useRef<HTMLDivElement>(null);
-  const nodesAndEdges = useNodesAndEdges(ref);
-  const onPaneClick = usePaneClick(nodesAndEdges);
-  const { onMouseClickNode } = useNodeClick(nodesAndEdges);
-  const { onMouseClickHandle } = useHandleClick(nodesAndEdges);
-  const visibleGraph = useTreeStore((state) => state.visibleGraph);
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
 
-  useCenterViewport(nodesAndEdges, false);
+  const ref = useRef<HTMLDivElement>(null);
+  const nodesAndEdges = useNodesAndEdges();
+  const { onMouseClickNode } = useNodeClick(nodesAndEdges);
+  const { onMouseClickHandle } = useHandleClick(nodesAndEdges);
+
+  useViewportChange(ref, nodesAndEdges);
   useRevealNode(nodesAndEdges);
 
   return (
     <ReactFlow
       ref={ref}
-      onlyRenderVisibleElements
       panOnScroll={isTouchPad}
       panOnScrollSpeed={config.panOnScrollSpeed}
       minZoom={config.minZoom}
@@ -53,6 +48,8 @@ function LayoutGraph() {
       nodeTypes={{
         object: ObjectNode,
         root: RootNode,
+        dummySource: DummySourceNode,
+        dummyTarget: DummyTargetNode,
       }}
       defaultEdgeOptions={{
         selectable: false,
@@ -61,11 +58,6 @@ function LayoutGraph() {
       }}
       // TODO: waiting fix https://github.com/xyflow/xyflow/issues/3633
       // translateExtent={translateExtent}
-      nodes={visibleGraph.nodes}
-      edges={visibleGraph.edges}
-      onNodesChange={nodesAndEdges.onNodesChange}
-      onEdgesChange={nodesAndEdges.onEdgesChange}
-      onPaneClick={onPaneClick}
       onNodeClick={onMouseClickNode}
       onConnectStart={onMouseClickHandle}
       nodesDraggable={false}
@@ -74,6 +66,7 @@ function LayoutGraph() {
       deleteKeyCode={null}
       selectionKeyCode={null}
       multiSelectionKeyCode={null}
+      {...nodesAndEdges}
     >
       <Controls showInteractive={false}>
         <MouseButton isTouchPad={isTouchPad} setIsTouchPad={setIsTouchPad} />

@@ -1,26 +1,36 @@
-import { genFlowNodes, Layouter, type Graph } from "@/lib/graph/layout";
+import computeVisibleGraph from "@/lib/graph/computeVisibleGraph";
+import { genFlowNodes, globalStyle, Layouter, newGraph, type Graph } from "@/lib/graph/layout";
 import { Tree } from "@/lib/parser";
 import { genDomString } from "@/lib/table";
 import { type FunctionKeys } from "@/lib/utils";
 import { type Viewport } from "@xyflow/react";
+import { keyBy } from "lodash-es";
 import { createStore } from "zustand/vanilla";
 
 export interface ViewState {
   tree: Tree;
   tableHTML: string;
   graph: Graph;
+  visibleGraph: Graph;
+  graphWidth: number;
+  graphHeight: number;
+  graphViewport: Viewport;
 
   setTree: (tree: Tree) => void;
   createTable: () => string;
-  createGraph: () => Graph;
-  setGraphSize: (width?: number, height?: number) => void;
-  setGraphViewport: (viewport: Viewport) => void;
+  createGraph: () => { graph: Graph; visible: Graph };
+  setGraphSize: (width?: number, height?: number) => { visible: Graph; changed: boolean };
+  setGraphViewport: (viewport: Viewport) => { visible: Graph; changed: boolean };
 }
 
 const initialStates: Omit<ViewState, FunctionKeys<ViewState>> = {
   tree: new Tree(),
-  graph: { nodes: [], edges: [] },
   tableHTML: "",
+  graph: newGraph(),
+  visibleGraph: newGraph(),
+  graphWidth: 0,
+  graphHeight: 0,
+  graphViewport: { x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: 1 },
 };
 
 const useViewStore = createStore<ViewState>((set, get) => ({
@@ -40,27 +50,53 @@ const useViewStore = createStore<ViewState>((set, get) => ({
 
   // 5MB costs 260ms
   createGraph() {
-    const { tree } = get();
+    const { tree, visibleGraph, graphWidth, graphHeight, graphViewport } = get();
+
+    if (!tree.valid()) {
+      set({ graph: initialStates.graph, visibleGraph: initialStates.visibleGraph });
+      return { graph: initialStates.graph, visible: initialStates.visibleGraph };
+    }
+
     const { nodes, edges } = genFlowNodes(tree);
     const { ordered, levelMeta } = new Layouter(tree, nodes, edges).layout();
+    const graphNodeMap = keyBy(ordered, "id");
+
+    edges.forEach((ed) => {
+      const source = graphNodeMap[ed.source];
+      const target = graphNodeMap[ed.target];
+      ed.data!.start = { x: source.position.x + source.data.width, y: source.position.y + ed.data!.sourceOffset };
+      ed.data!.end = { x: target.position.x, y: target.position.y + ed.data!.targetOffset };
+    });
+
     const graph = { nodes: ordered, edges, levelMeta };
-    set({ graph });
-    return graph;
+    const { visible } = computeVisibleGraph(visibleGraph, graph, graphWidth, graphHeight, graphViewport);
+    set({ graph, visibleGraph: visible });
+    return { graph, visible };
   },
 
-  // 1. get viewport (origin x, y in left-top)
-  // 2. compute current bounds (real size) of viewport
-  // 3. compute nodes includes in the bounds
-  // 4. compute edges includes in the bounds
-  // x/zoom, y/zoom 是实际大小
   setGraphSize(width?: number, height?: number) {
-    const { graph } = get();
-    set({ graph: { ...graph, width, height } });
+    const { graph, visibleGraph, graphWidth, graphHeight, graphViewport } = get();
+    const { visible, changed } = computeVisibleGraph(
+      visibleGraph,
+      graph,
+      width ?? graphWidth,
+      height ?? graphHeight,
+      graphViewport,
+    );
+    set({ visibleGraph: visible, graphWidth: width, graphHeight: height });
+    return { visible, changed };
   },
 
   setGraphViewport(viewport: Viewport) {
-    const { graph } = get();
-    set({ graph: { ...graph, viewport } });
+    const { graph, visibleGraph, graphWidth, graphHeight, graphViewport } = get();
+
+    if (viewport.x === graphViewport.x && viewport.y === graphViewport.y && viewport.zoom === graphViewport.zoom) {
+      return { visible: visibleGraph, changed: false };
+    }
+
+    const { visible, changed } = computeVisibleGraph(visibleGraph, graph, graphWidth, graphHeight, viewport);
+    set({ visibleGraph: visible, graphViewport: viewport });
+    return { visible, changed };
   },
 }));
 
