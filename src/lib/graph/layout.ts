@@ -1,7 +1,7 @@
 import { type CSSProperties } from "react";
 import { rootMarker } from "@/lib/idgen";
 import { type Tree, type Node, hasChildren, getRawValue, isIterable, getChildrenKeys } from "@/lib/parser";
-import { type XYPosition, type Edge, type Node as FlowNode } from "@xyflow/react";
+import { type XYPosition, type Edge, type Node as FlowNode, type Viewport } from "@xyflow/react";
 
 export const config: Readonly<Record<string, any>> = {
   translateMargin: 500,
@@ -71,6 +71,9 @@ export interface Graph {
   nodes: NodeWithData[];
   edges: EdgeWithData[];
   levelMeta?: XYPosition[];
+  width?: number;
+  height?: number;
+  viewport?: Viewport;
 }
 
 export function genFlowNodes(tree: Tree): Graph {

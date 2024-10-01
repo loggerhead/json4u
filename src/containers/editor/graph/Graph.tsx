@@ -4,9 +4,8 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
 import { detectOS } from "@/lib/utils";
-import { Background, Controls, ReactFlow, ReactFlowProvider, useOnViewportChange } from "@xyflow/react";
+import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useResizeObserver } from "usehooks-ts";
 import DownloadButton from "./DownloadButton";
 import MouseButton from "./MouseButton";
 import ObjectNode from "./ObjectNode";
@@ -29,7 +28,8 @@ export default function Graph() {
 }
 
 function LayoutGraph() {
-  const nodesAndEdges = useNodesAndEdges();
+  const ref = useRef<HTMLDivElement>(null);
+  const nodesAndEdges = useNodesAndEdges(ref);
   const onPaneClick = usePaneClick(nodesAndEdges);
   const { onMouseClickNode } = useNodeClick(nodesAndEdges);
   const { onMouseClickHandle } = useHandleClick(nodesAndEdges);
@@ -40,6 +40,7 @@ function LayoutGraph() {
 
   return (
     <ReactFlow
+      ref={ref}
       onlyRenderVisibleElements
       panOnScroll={isTouchPad}
       panOnScrollSpeed={config.panOnScrollSpeed}
