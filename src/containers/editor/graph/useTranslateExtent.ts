@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { config } from "@/lib/graph/layout";
-import { NodesAndEdges } from "./useNodesAndEdges";
+import { type XYPosition } from "@xyflow/react";
 
-export default function useTranslateExtent({ levelMeta }: NodesAndEdges) {
+export default function useTranslateExtent(levelMeta: XYPosition[]) {
   const [translateExtent, setTranslateExtent] = useState<[[number, number], [number, number]]>([
     [0, 0],
     [0, 0],

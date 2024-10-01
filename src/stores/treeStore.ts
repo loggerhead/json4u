@@ -27,11 +27,11 @@ interface TooltipContent {
 export interface TreeState {
   main: Tree;
   secondary: Tree;
-  visibleGraph: Graph;
+  graph: Graph;
   tooltipContent?: TooltipContent;
 
   setTree: (tree: Tree, kind: Kind) => void;
-  setVisibleGraph: (graph: Graph) => void;
+  setGraph: (graph: Graph) => void;
   setTooltip: (content: TooltipContent) => void;
   hideTooltip: () => void;
 }
@@ -39,7 +39,7 @@ export interface TreeState {
 const initialStates: Omit<TreeState, FunctionKeys<TreeState>> = {
   main: new Tree(),
   secondary: new Tree(),
-  visibleGraph: { nodes: [], edges: [] },
+  graph: { nodes: [], edges: [] },
 };
 
 export const useTreeStore = create<TreeState>()((set, get) => ({
@@ -49,8 +49,8 @@ export const useTreeStore = create<TreeState>()((set, get) => ({
     set({ [kind]: tree });
   },
 
-  setVisibleGraph(graph: Graph) {
-    set({ visibleGraph: graph });
+  setGraph(graph: Graph) {
+    set({ graph: graph });
   },
 
   setTooltip(content: TooltipContent) {

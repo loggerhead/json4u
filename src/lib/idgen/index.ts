@@ -4,6 +4,7 @@ export * from "./pointer";
 
 const tablePrefix = "tbl";
 const expanderPrefix = "exp";
+const graphDummyPrefix = "dm";
 
 function genId(pointer: string, prefix: string) {
   return prefix + pointer;
@@ -31,4 +32,8 @@ export function genExpanderId(nodeIdOrDomId: string, ...keys: string[]) {
 
 export function peelExpanderId(expanderId: string) {
   return peelId(expanderId, expanderPrefix);
+}
+
+export function genDummyId(nodeId: string, key?: string) {
+  return genId(key !== undefined ? join(nodeId, key, "source") : nodeId, graphDummyPrefix);
 }

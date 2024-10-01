@@ -1,7 +1,7 @@
 import { type CSSProperties } from "react";
 import { rootMarker } from "@/lib/idgen";
 import { type Tree, type Node, hasChildren, getRawValue, isIterable, getChildrenKeys } from "@/lib/parser";
-import { type XYPosition, type Edge, type Node as FlowNode, type Viewport } from "@xyflow/react";
+import { type XYPosition, type Edge, type Node as FlowNode } from "@xyflow/react";
 
 export const config: Readonly<Record<string, any>> = {
   translateMargin: 500,
@@ -62,8 +62,8 @@ export type NodeWithData = FlowNode<{
 export type EdgeWithData = Edge<{
   sourceOffset: number; // the distance from the edge's starting point to the top of the source node.
   targetOffset: number; // the distance from the edge's ending point to the top of the target node.
-  start?: XYPosition; // the starting point of the edge, equals (source.x + source.width, source.y + sourceOffset)
-  end?: XYPosition; // the ending point of the edge, equals (target.x, target.y + targetOffset)
+  start: XYPosition; // the starting point of the edge, equals (source.x + source.width, source.y + sourceOffset)
+  end: XYPosition; // the ending point of the edge, equals (target.x, target.y + targetOffset)
   style?: React.CSSProperties;
 }>;
 
@@ -71,9 +71,10 @@ export interface Graph {
   nodes: NodeWithData[];
   edges: EdgeWithData[];
   levelMeta?: XYPosition[];
-  width?: number;
-  height?: number;
-  viewport?: Viewport;
+}
+
+export function newGraph(): Graph {
+  return { nodes: [], edges: [] };
 }
 
 export function genFlowNodes(tree: Tree): Graph {
@@ -150,6 +151,8 @@ function newEdge(parent: Node, child: Node, key: string, i: number): EdgeWithDat
     data: {
       sourceOffset: computeSourceHandleOffset(i),
       targetOffset: computeTargetHandleOffset(getChildrenKeys(child).length),
+      start: { x: 0, y: 0 },
+      end: { x: 0, y: 0 },
     },
   };
 }

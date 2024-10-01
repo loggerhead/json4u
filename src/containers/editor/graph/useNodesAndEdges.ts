@@ -1,22 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { ViewMode } from "@/lib/db/config";
-import { type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
+import { globalStyle, type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
+import { clone } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { useTreeVersion } from "@/stores/treeStore";
+import { useTreeStore, useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
-import {
-  OnEdgesChange,
-  OnNodesChange,
-  useEdgesState,
-  useNodesState,
-  useOnViewportChange,
-  XYPosition,
-} from "@xyflow/react";
+import { OnEdgesChange, OnNodesChange, useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { debounce } from "lodash-es";
-import { useResizeObserver } from "usehooks-ts";
 import { useShallow } from "zustand/react/shallow";
+import { highlightEdge, highlightNode, toggleToolbar } from "./utils";
 
 export interface NodesAndEdges {
   nodes: NodeWithData[];
@@ -25,11 +19,17 @@ export interface NodesAndEdges {
   setEdges: (edges: EdgeWithData[]) => void;
   onNodesChange?: OnNodesChange<NodeWithData>;
   onEdgesChange?: OnEdgesChange<EdgeWithData>;
-  levelMeta?: XYPosition[];
-  version?: number;
 }
 
-export default function useNodesAndEdges(ref: React.RefObject<HTMLDivElement>): NodesAndEdges {
+export default function useNodesAndEdges() {
+  const treeVersion = useTreeVersion();
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
+
+  const versionRef = useRef(0);
+  const { setViewport, getZoom } = useReactFlow();
+  const worker = useEditorStore((state) => state.worker);
+  const setGraph = useTreeStore((state) => state.setGraph);
   const { count, usable } = useUserStore(
     useShallow((state) => ({
       count: state.count,
@@ -42,16 +42,9 @@ export default function useNodesAndEdges(ref: React.RefObject<HTMLDivElement>): 
       setShowPricingOverlay: state.setShowPricingOverlay,
     })),
   );
-  const worker = useEditorStore((state) => state.worker);
-  const treeVersion = useTreeVersion();
-
-  const [version, setVersion] = useState(0);
-  const [levelMeta, setLevelMeta] = useState<XYPosition[]>();
-  const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
 
   useEffect(() => {
-    if (!(worker && isGraphView && treeVersion > version)) {
+    if (!(worker && isGraphView && treeVersion > versionRef.current)) {
       return;
     }
 
@@ -61,36 +54,33 @@ export default function useNodesAndEdges(ref: React.RefObject<HTMLDivElement>): 
     }
 
     (async () => {
-      const { nodes, edges, levelMeta } = await worker.createGraph();
-      setNodes(nodes);
-      setEdges(edges);
-      setLevelMeta(levelMeta);
-      setVersion(treeVersion);
-      nodes.length > 0 && count("graphModeView");
+      const { graph, visible } = await worker.createGraph();
+      setGraph(graph);
+      setNodes(visible.nodes);
+      setEdges(visible.edges);
+      setViewport({ x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: getZoom() });
+
+      versionRef.current = treeVersion;
+      graph.nodes.length > 0 && count("graphModeView");
     })();
-  }, [worker, usable, isGraphView, treeVersion, version]);
+  }, [worker, usable, isGraphView, treeVersion]);
 
-  const onResize = useCallback(
-    debounce(({ width, height }) => worker?.setGraphSize(width, height), 250, { trailing: true }),
-    [worker],
+  // clear all animated for edges
+  const onPaneClick = useCallback(
+    (_: React.MouseEvent) => {
+      setEdges(edges.map((ed) => clone(highlightEdge(ed, false))));
+      setNodes(nodes.map((nd) => clone(toggleToolbar(highlightNode(nd, false), undefined))));
+    },
+    [nodes, edges],
   );
-
-  const onViewportChange = useCallback(
-    debounce((viewport) => worker?.setGraphViewport(viewport), 250, { trailing: true }),
-    [worker],
-  );
-
-  useResizeObserver({ ref, onResize });
-  useOnViewportChange({ onEnd: onViewportChange });
 
   return {
     nodes,
     edges,
-    levelMeta,
     setNodes,
     setEdges,
     onNodesChange,
     onEdgesChange,
-    version,
+    onPaneClick,
   };
 }
