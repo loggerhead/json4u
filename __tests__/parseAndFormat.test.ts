@@ -14,8 +14,7 @@ interface TestData {
 async function doExpect(options: Partial<ParseOptions>, text: string, ...aa: TestData[]) {
   const { treeObject } = await parseAndFormat(text, 1, {
     ...options,
-    needGraph: false,
-    needTable: false,
+    kind: "main",
   });
   const tree = Tree.fromObject(treeObject);
 

@@ -1,33 +1,47 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
+import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { useTreeStore, useTreeVersion } from "@/stores/treeStore";
+import { useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
+import { useShallow } from "zustand/react/shallow";
 
 export function useTableHTML() {
-  const count = useUserStore((state) => state.count);
-  const usable = useUserStore((state) => state.usable("tableModeView"));
-  const setShowPricingOverlay = useStatusStore((state) => state.setShowPricingOverlay);
-  const viewMode = useStatusStore((state) => state.viewMode);
+  const { count, usable } = useUserStore(
+    useShallow((state) => ({
+      count: state.count,
+      usable: state.usable("tableModeView"),
+    })),
+  );
+  const { isTableView, setShowPricingOverlay } = useStatusStore(
+    useShallow((state) => ({
+      isTableView: state.viewMode === ViewMode.Table,
+      setShowPricingOverlay: state.setShowPricingOverlay,
+    })),
+  );
+  const worker = useEditorStore((state) => state.worker);
   const treeVersion = useTreeVersion();
-  const tableHTML = useTreeStore((state) => state.tableHTML);
 
   const [version, setVersion] = useState(0);
   const [innerHTML, setInnerHTML] = useState("");
 
   useEffect(() => {
-    if (viewMode === ViewMode.Table && treeVersion > version) {
-      if (usable) {
-        setVersion(treeVersion);
-        setInnerHTML(tableHTML);
-        tableHTML.length > 0 && count("tableModeView");
-      } else {
-        setShowPricingOverlay(true);
-      }
+    if (!(worker && isTableView && treeVersion > version)) {
+      return;
     }
-  }, [usable, viewMode, treeVersion, version, tableHTML]);
+
+    if (!usable) {
+      setShowPricingOverlay(true);
+      return;
+    }
+
+    (async () => {
+      const tableHTML = await worker.createTable();
+      setInnerHTML(tableHTML);
+      setVersion(treeVersion);
+      tableHTML.length > 0 && count("tableModeView");
+    })();
+  }, [worker, usable, isTableView, treeVersion, version]);
 
   return innerHTML ? { __html: innerHTML } : undefined;
 }

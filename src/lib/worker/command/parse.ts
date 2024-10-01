@@ -1,12 +1,12 @@
+import { type Kind } from "@/lib/editor/editor";
 import { prettyFormat } from "@/lib/format/pretty";
-import { type Graph, Layouter, genFlowNodes } from "@/lib/graph/layout";
+import { type Graph } from "@/lib/graph/layout";
 import { parseJSON, type StringifyOptions, type TreeObject } from "@/lib/parser";
-import { genDomString } from "@/lib/table";
+import { getViewState } from "@/lib/worker/stores/viewStore";
 import { isEmpty } from "lodash-es";
 
 export interface ParseAndFormatOptions extends StringifyOptions {
-  needTable: boolean;
-  needGraph: boolean;
+  kind: Kind;
 }
 
 export interface ParsedTree {
@@ -24,6 +24,10 @@ export async function parseAndFormat(
   const tree = parseJSON(text, options);
   tree.version = version;
 
+  if (options?.kind === "main") {
+    getViewState().setTree(tree);
+  }
+
   if (!tree.valid()) {
     if (options?.format) {
       tree.text = prettyFormat(text, options);
@@ -38,15 +42,5 @@ export async function parseAndFormat(
     tree.stringifyNestNodes();
   }
 
-  let graph = undefined;
-  // 5MB costs 260ms
-  if (options?.needGraph) {
-    const { nodes, edges } = genFlowNodes(tree);
-    const { ordered, levelMeta } = new Layouter(tree, nodes, edges).layout();
-    graph = { nodes: ordered, edges, levelMeta };
-  }
-
-  // 5MB costs 230ms
-  const tableHTML = options?.needTable ? genDomString(tree) : undefined;
-  return { treeObject: tree.toObject(), tableHTML, graph };
+  return { treeObject: tree.toObject() };
 }

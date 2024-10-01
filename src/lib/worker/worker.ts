@@ -6,21 +6,9 @@ import { escape, unescape } from "./command/escape";
 import { parseAndFormat } from "./command/parse";
 import { pythonDictToJSON } from "./command/pythonDictToJSON";
 import { urlToJson } from "./command/urlToJson";
+import { createGraph, createTable, setGraphSize, setGraphViewport } from "./stores/viewStore";
 
-export interface MyWorker {
-  parseAndFormat: typeof parseAndFormat;
-  compareText: typeof compareText;
-  compareTree: typeof compareTree;
-  escape: typeof escape;
-  unescape: typeof unescape;
-  pythonDictToJSON: typeof pythonDictToJSON;
-  urlToJson: typeof urlToJson;
-  csv2json: typeof csv2json;
-  json2csv: typeof json2csv;
-  setupGlobalGraphStyle: typeof setupGlobalGraphStyle;
-}
-
-Comlink.expose({
+const worker = {
   parseAndFormat,
   compareText,
   compareTree,
@@ -31,4 +19,12 @@ Comlink.expose({
   csv2json,
   json2csv,
   setupGlobalGraphStyle,
-} satisfies MyWorker);
+  createTable,
+  createGraph,
+  setGraphSize,
+  setGraphViewport,
+};
+
+export type MyWorker = typeof worker;
+
+Comlink.expose(worker);
