@@ -29,6 +29,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const { callNodeClick } = useNodeClick(args);
   const { callHandleClick } = useHandleClick(args);
   const { parent: parentId } = splitParentPointer(id);
+  const isRoot = parentId === undefined;
   const setRevealId = useStatusStore((state) => state.setRevealId);
 
   const triggerFoldSiblings = () => {
@@ -58,28 +59,34 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
     setFoldSiblings(!foldSiblings);
   };
 
+  // TODO: hide fold button when there is no edges
   // TODO: fix w-fit doesn't work
   return (
     <NodeToolbar
+      isVisible={true}
       className="flex items-center justify-center w-[96px] h-fit bg-input"
       position={Position.Top}
       align="start"
       offset={0}
     >
-      <ToolbarButton
-        title={t("go to parent")}
-        onClick={() => {
-          if (parentId) {
-            setRevealId(parentId);
-            callNodeClick(parentId);
-          }
-        }}
-      >
-        <ArrowLeft className="icon" />
-      </ToolbarButton>
-      <ToolbarButton title={t(foldSiblings ? "fold sibings" : "unfold sibings")} onClick={triggerFoldSiblings}>
-        {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
-      </ToolbarButton>
+      {!isRoot && (
+        <ToolbarButton
+          title={t("go to parent")}
+          onClick={() => {
+            if (parentId) {
+              setRevealId(parentId);
+              callNodeClick(parentId);
+            }
+          }}
+        >
+          <ArrowLeft className="icon" />
+        </ToolbarButton>
+      )}
+      {!isRoot && (
+        <ToolbarButton title={t(foldSiblings ? "fold sibings" : "unfold sibings")} onClick={triggerFoldSiblings}>
+          {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
+        </ToolbarButton>
+      )}
       <ToolbarButton
         title={t(fold ? "fold node" : "unfold node")}
         onClick={() => {

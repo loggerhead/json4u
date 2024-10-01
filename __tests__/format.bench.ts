@@ -1,4 +1,4 @@
-import { format } from "@/lib/format";
+import { textFormat } from "@/lib/format/text";
 import { parseJSON } from "@/lib/parser";
 import { readFile } from "fs/promises";
 import { bench, describe } from "vitest";
@@ -14,6 +14,6 @@ describe("format", () => {
   });
 
   bench("simple", () => {
-    format(jsonString);
+    textFormat(jsonString);
   });
 });

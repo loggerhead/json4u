@@ -1,7 +1,7 @@
-import { format } from "@/lib/command/parse";
+import { prettyFormat } from "@/lib/format/pretty";
 
 function expectEq(text: string, expected: string) {
-  const s = format(text);
+  const s = prettyFormat(text);
   expect(s).toEqual(expected);
 }
 
