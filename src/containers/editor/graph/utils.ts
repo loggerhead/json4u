@@ -2,26 +2,28 @@ import { edgeHighlightStyle, type EdgeWithData, nodeHighlightStyle, type NodeWit
 import { isParent } from "@/lib/idgen";
 import { clone } from "@/lib/utils";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
+import { filter } from "lodash-es";
 
 type GetNodeFn = (id: string) => FlowNode | undefined;
 type GetEdgeFn = (id: string) => Edge | undefined;
 
-export function getDescendant(node: NodeWithData, getNode: GetNodeFn, getEdge: GetEdgeFn, prefixId?: string) {
+export function getVisibleDescendant(node: NodeWithData, getNode: GetNodeFn, getEdge: GetEdgeFn, prefixId?: string) {
   const nodes: NodeWithData[] = [];
   const edges: EdgeWithData[] = [];
 
   const addChildren = (children: NodeWithData[]) => {
-    nodes.push(...children);
-    edges.push(...children.map((child) => getEdge(child.id) as EdgeWithData));
+    nodes.push(...filter(children));
+    edges.push(...(filter(children.map((child) => child && getEdge(child.id))) as EdgeWithData[]));
   };
 
+  let childrenIds = node.data.childrenIds;
+
   if (prefixId) {
-    const childrenIds = node.data.childrenIds.filter((id) => id === prefixId || isParent(prefixId, id));
-    addChildren(childrenIds.map(getNode) as NodeWithData[]);
-  } else {
-    const children = node.data.childrenIds.map(getNode) as NodeWithData[];
-    addChildren(children);
+    childrenIds = childrenIds.filter((id) => id === prefixId || isParent(prefixId, id));
   }
+
+  const children = childrenIds.map(getNode) as NodeWithData[];
+  addChildren(children);
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
@@ -32,14 +34,20 @@ export function getDescendant(node: NodeWithData, getNode: GetNodeFn, getEdge: G
   return { nodes, edges };
 }
 
-export function getAncestor(node: NodeWithData, getNode: GetNodeFn, getEdge: GetEdgeFn) {
+export function getVisibleAncestor(node: NodeWithData, getNode: GetNodeFn, getEdge: GetEdgeFn) {
   const nodes: NodeWithData[] = [];
   const edges: EdgeWithData[] = [];
 
   while (node.data.parentId) {
+    const edge = getEdge(node.id) as EdgeWithData;
+    edge && edges.push(edge);
+
     const parent = getNode(node.data.parentId) as NodeWithData;
+    if (!parent) {
+      break;
+    }
+
     nodes.push(parent);
-    edges.push(getEdge(node.id) as EdgeWithData);
     node = parent;
   }
 

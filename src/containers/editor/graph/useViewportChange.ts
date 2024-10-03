@@ -10,6 +10,7 @@ const refreshInterval = 50;
 
 export default function useViewportChange(ref: RefObject<HTMLDivElement>, { setNodes, setEdges }: NodesAndEdges) {
   const worker = useEditorStore((state) => state.worker);
+
   const onResize = useCallback(
     debounce(
       async ({ width, height }) => {

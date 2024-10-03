@@ -2,7 +2,14 @@ import { useCallback } from "react";
 import { type NodeWithData } from "@/lib/graph/layout";
 import { type Node as FlowNode, useReactFlow } from "@xyflow/react";
 import { NodesAndEdges } from "./useNodesAndEdges";
-import { getAncestor, getDescendant, highlightEdge, highlightNode, separateMap, toggleToolbar } from "./utils";
+import {
+  getVisibleAncestor,
+  getVisibleDescendant,
+  highlightEdge,
+  highlightNode,
+  separateMap,
+  toggleToolbar,
+} from "./utils";
 
 // highlight nodes and edges when click on a node
 export function useNodeClick({ nodes, edges, setNodes, setEdges }: NodesAndEdges) {
@@ -11,8 +18,8 @@ export function useNodeClick({ nodes, edges, setNodes, setEdges }: NodesAndEdges
   const callNodeClick = useCallback(
     (id: string) => {
       const node = getNode(id) as NodeWithData;
-      const { nodes: ancestorNodes, edges: ancestorEdges } = getAncestor(node, getNode, getEdge);
-      const { nodes: descendantNodes, edges: descendantEdges } = getDescendant(node, getNode, getEdge);
+      const { nodes: ancestorNodes, edges: ancestorEdges } = getVisibleAncestor(node, getNode, getEdge);
+      const { nodes: descendantNodes, edges: descendantEdges } = getVisibleDescendant(node, getNode, getEdge);
 
       setEdges(
         separateMap(
