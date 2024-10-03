@@ -55,13 +55,21 @@ export type NodeWithData = FlowNode<{
   depth: number; // max distance from leaf node
   width: number;
   height: number;
+  renderArea: RenderArea;
   toolbarVisible?: boolean;
   style?: React.CSSProperties;
 }>;
 
+interface RenderArea {
+  kvStart: number;
+  kvEnd: number;
+  dummyHandleStart?: number;
+  dummyHandleEnd?: number;
+}
+
 export type EdgeWithData = Edge<{
-  sourceOffset: number; // the distance from the edge's starting point to the top of the source node.
-  targetOffset: number; // the distance from the edge's ending point to the top of the target node.
+  sourceHandleIndex: number; // the source handle index in the source node.
+  targetHandleOffset: number; // the distance from the edge's ending point to the top of the target node.
   start: XYPosition; // the starting point of the edge, equals (source.x + source.width, source.y + sourceOffset)
   end: XYPosition; // the ending point of the edge, equals (target.x, target.y + targetOffset)
   style?: React.CSSProperties;
@@ -77,6 +85,7 @@ export function newGraph(): Graph {
   return { nodes: [], edges: [] };
 }
 
+// nodes are in DFS order and edges are in BFS order
 export function genFlowNodes(tree: Tree): Graph {
   const nodes: NodeWithData[] = [];
   const edges: EdgeWithData[] = [];
@@ -124,6 +133,7 @@ function doGenFlowNodes(
 }
 
 function newFlowNode(node: Node, parentId: string, level: number): NodeWithData {
+  const childrenNum = getChildrenKeys(node).length;
   return {
     id: node.id,
     position: { x: 0, y: 0 },
@@ -132,12 +142,20 @@ function newFlowNode(node: Node, parentId: string, level: number): NodeWithData 
       level,
       depth: 0,
       width: 0,
-      height: getChildrenKeys(node).length * globalStyle.kvHeight + 2 * globalStyle.borderWidth,
+      height: childrenNum * globalStyle.kvHeight + 2 * globalStyle.borderWidth,
       parentId,
       childrenIds: [],
+      renderArea: newRenderArea(childrenNum),
     },
     deletable: false,
     draggable: false,
+  };
+}
+
+export function newRenderArea(childrenNum: number = 0) {
+  return {
+    kvStart: 0,
+    kvEnd: childrenNum,
   };
 }
 
@@ -149,8 +167,8 @@ function newEdge(parent: Node, child: Node, key: string, i: number): EdgeWithDat
     sourceHandle: key,
     deletable: false,
     data: {
-      sourceOffset: computeSourceHandleOffset(i),
-      targetOffset: computeTargetHandleOffset(getChildrenKeys(child).length),
+      sourceHandleIndex: i,
+      targetHandleOffset: computeTargetHandleOffset(getChildrenKeys(child).length),
       start: { x: 0, y: 0 },
       end: { x: 0, y: 0 },
     },

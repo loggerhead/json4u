@@ -29,7 +29,6 @@ export default function useNodesAndEdges() {
   const versionRef = useRef(0);
   const { setViewport, getZoom } = useReactFlow();
   const worker = useEditorStore((state) => state.worker);
-  const setGraph = useTreeStore((state) => state.setGraph);
   const { count, usable } = useUserStore(
     useShallow((state) => ({
       count: state.count,
@@ -54,14 +53,15 @@ export default function useNodesAndEdges() {
     }
 
     (async () => {
-      const { graph, visible } = await worker.createGraph();
-      setGraph(graph);
-      setNodes(visible.nodes);
-      setEdges(visible.edges);
+      const {
+        visible: { nodes, edges },
+      } = await worker.createGraph();
+      setNodes(nodes);
+      setEdges(edges);
       setViewport({ x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: getZoom() });
 
       versionRef.current = treeVersion;
-      graph.nodes.length > 0 && count("graphModeView");
+      nodes.length > 0 && count("graphModeView");
     })();
   }, [worker, usable, isGraphView, treeVersion]);
 

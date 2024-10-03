@@ -3,7 +3,7 @@ import { type NodeWithData } from "@/lib/graph/layout";
 import { join } from "@/lib/idgen";
 import { useReactFlow, type OnConnectStart } from "@xyflow/react";
 import { NodesAndEdges } from "./useNodesAndEdges";
-import { getDescendant, separateMap, toggleHidden } from "./utils";
+import { getVisibleDescendant, separateMap, toggleHidden } from "./utils";
 
 export function useHandleClick({ nodes, edges, setNodes, setEdges }: NodesAndEdges) {
   const { getNode, getEdge } = useReactFlow();
@@ -12,7 +12,7 @@ export function useHandleClick({ nodes, edges, setNodes, setEdges }: NodesAndEdg
     (id: string, handleId?: string, hide?: boolean) => {
       const node = getNode(id) as NodeWithData;
       const prefixId = handleId !== undefined ? join(id, handleId) : undefined;
-      const { nodes: descendantNodes, edges: descendantEdges } = getDescendant(node, getNode, getEdge, prefixId);
+      const { nodes: descendantNodes, edges: descendantEdges } = getVisibleDescendant(node, getNode, getEdge, prefixId);
       const isHide = hide ?? !(descendantNodes[0]?.hidden ?? false);
 
       setEdges(separateMap(edges, descendantEdges, (ed) => toggleHidden(ed, isHide)));

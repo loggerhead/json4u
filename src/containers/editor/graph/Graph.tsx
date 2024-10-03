@@ -7,7 +7,7 @@ import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/reac
 import "@xyflow/react/dist/style.css";
 import DownloadButton from "./DownloadButton";
 import MouseButton from "./MouseButton";
-import { ObjectNode, RootNode, DummySourceNode, DummyTargetNode } from "./Node";
+import { ObjectNode, RootNode, DummyTargetNode } from "./Node";
 import { useHandleClick } from "./useHandleClick";
 import { useNodeClick } from "./useNodeClick";
 import useNodesAndEdges from "./useNodesAndEdges";
@@ -48,7 +48,6 @@ function LayoutGraph() {
       nodeTypes={{
         object: ObjectNode,
         root: RootNode,
-        dummySource: DummySourceNode,
         dummyTarget: DummyTargetNode,
       }}
       defaultEdgeOptions={{
@@ -60,13 +59,17 @@ function LayoutGraph() {
       // translateExtent={translateExtent}
       onNodeClick={onMouseClickNode}
       onConnectStart={onMouseClickHandle}
+      nodes={nodesAndEdges.nodes}
+      edges={nodesAndEdges.edges}
+      onNodesChange={nodesAndEdges.onNodesChange}
+      onEdgesChange={nodesAndEdges.onEdgesChange}
+      onPaneClick={nodesAndEdges.onPaneClick}
       nodesDraggable={false}
       nodesConnectable={false}
       connectOnClick={false}
       deleteKeyCode={null}
       selectionKeyCode={null}
       multiSelectionKeyCode={null}
-      {...nodesAndEdges}
     >
       <Controls showInteractive={false}>
         <MouseButton isTouchPad={isTouchPad} setIsTouchPad={setIsTouchPad} />
