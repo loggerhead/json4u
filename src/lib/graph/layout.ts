@@ -63,8 +63,7 @@ export type NodeWithData = FlowNode<{
 interface RenderArea {
   kvStart: number;
   kvEnd: number;
-  dummyHandleStart?: number;
-  dummyHandleEnd?: number;
+  dummyHandleIndices: Record<number, boolean>;
 }
 
 export type EdgeWithData = Edge<{
@@ -145,17 +144,14 @@ function newFlowNode(node: Node, parentId: string, level: number): NodeWithData 
       height: childrenNum * globalStyle.kvHeight + 2 * globalStyle.borderWidth,
       parentId,
       childrenIds: [],
-      renderArea: newRenderArea(childrenNum),
+      renderArea: {
+        kvStart: 0,
+        kvEnd: childrenNum,
+        dummyHandleIndices: {},
+      },
     },
     deletable: false,
     draggable: false,
-  };
-}
-
-export function newRenderArea(childrenNum: number = 0) {
-  return {
-    kvStart: 0,
-    kvEnd: childrenNum,
   };
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "json4u",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "type": "module",
   "private": true,
   "scripts": {

@@ -5,7 +5,7 @@ import { globalStyle, type EdgeWithData, type NodeWithData } from "@/lib/graph/l
 import { clone } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { useTreeStore, useTreeVersion } from "@/stores/treeStore";
+import { useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
 import { OnEdgesChange, OnNodesChange, useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
