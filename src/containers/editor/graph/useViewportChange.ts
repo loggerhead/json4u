@@ -1,12 +1,11 @@
 import { RefObject, useCallback } from "react";
+import { refreshInterval } from "@/lib/graph/computeVisible";
 import { useEditorStore } from "@/stores/editorStore";
 import { useOnViewportChange } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { debounce } from "lodash-es";
 import { useResizeObserver } from "usehooks-ts";
 import { type NodesAndEdges } from "./useNodesAndEdges";
-
-const refreshInterval = 50;
 
 export default function useViewportChange(ref: RefObject<HTMLDivElement>, { setNodes, setEdges }: NodesAndEdges) {
   const worker = useEditorStore((state) => state.worker);

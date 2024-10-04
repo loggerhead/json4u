@@ -9,9 +9,9 @@ import {
 import { rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
-import { useTree, useTreeStore } from "@/stores/treeStore";
+import { useTree } from "@/stores/treeStore";
 import { Handle, Position, useReactFlow, type NodeProps } from "@xyflow/react";
-import { filter, keyBy } from "lodash-es";
+import { filter } from "lodash-es";
 import { SourceHandle, TargetHandle } from "./Handle";
 import Toolbar from "./Toolbar";
 
@@ -27,7 +27,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
 
   const width = flowNode.data.width;
   const childrenNum = getChildrenKeys(node).length;
-  const { kvStart, kvEnd, dummyHandleStart, dummyHandleEnd } = flowNode.data.renderArea;
+  const { kvStart, kvEnd, dummyHandleIndices: dummyHandleIndexs } = flowNode.data.renderArea;
 
   return (
     <>
@@ -37,13 +37,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
         {kvStart > 0 && <div style={{ width, height: kvStart * globalStyle.kvHeight }} />}
         {filter(
           tree.mapChildren(node, (child, key, i) => {
-            // if the source of the edge is in the viewport, but some of its children are dummy handles
-            if (
-              dummyHandleStart !== undefined &&
-              dummyHandleEnd !== undefined &&
-              dummyHandleStart <= i &&
-              i < dummyHandleEnd
-            ) {
+            if (dummyHandleIndexs?.[i]) {
               return (
                 <Handle
                   key={i}

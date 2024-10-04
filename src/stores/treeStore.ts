@@ -1,5 +1,4 @@
 import { type Kind } from "@/lib/editor/editor";
-import { type Graph } from "@/lib/graph/layout";
 import { Tree } from "@/lib/parser";
 import { type KeyWithType } from "@/lib/table";
 import { type FunctionKeys } from "@/lib/utils";

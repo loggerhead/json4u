@@ -37,7 +37,7 @@ The best JSON visualization and processing tool.
 ## Roadmap
 
 - [ ] Improve performance to support large files (>= 1mb).
-  - [ ] Only render visible nodes in graph mode.
+  - [x] Only render visible nodes in graph mode.
   - [ ] Use virtual list or canvas to render in table mode.
   - [ ] Use wasm in web worker for parsing (use rust).
   - [ ] Consider [changing the editor to Ace or CM6](https://medium.com/miro-engineering/how-we-integrated-a-code-editor-on-the-miro-canvas-a41e0eff7f21).
