@@ -5,7 +5,7 @@ import { useOnViewportChange } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { debounce } from "lodash-es";
 import { useResizeObserver } from "usehooks-ts";
-import { type NodesAndEdges } from "./useNodesAndEdges";
+import { setViewportSize, type NodesAndEdges } from "./useNodesAndEdges";
 
 export default function useViewportChange(ref: RefObject<HTMLDivElement>, { setNodes, setEdges }: NodesAndEdges) {
   const worker = useEditorStore((state) => state.worker);
@@ -14,6 +14,7 @@ export default function useViewportChange(ref: RefObject<HTMLDivElement>, { setN
     debounce(
       async ({ width, height }) => {
         if (!worker) return;
+        setViewportSize(width, height);
         const { visible, changed } = await worker.setGraphSize(width, height);
         if (changed) {
           setNodes(visible.nodes);
