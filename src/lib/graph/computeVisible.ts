@@ -5,7 +5,7 @@ import { differenceWith, isEmpty } from "lodash-es";
 
 export const refreshInterval = 30;
 const smoothPaddingGap = 300;
-const maxEdgesForDummy = 30;
+const maxEdgesForDummy = 20;
 
 export default function computeVisible(
   oldVisible: Graph,
@@ -81,6 +81,15 @@ function generateDummys(
     }
   > = {};
 
+  const seen: Record<string, boolean> = {};
+  const addDummyHandleIndex = (sourceNode: NodeWithData, sourceHandleIndex: number) => {
+    if (!seen[sourceNode.id]) {
+      seen[sourceNode.id] = true;
+      sourceNode.data.renderArea.dummyHandleIndices = {};
+    }
+    sourceNode.data.renderArea.dummyHandleIndices[sourceHandleIndex] = true;
+  };
+
   edges.forEach((edge) => {
     const sourceId = edge.source;
     const targetId = edge.target;
@@ -98,7 +107,7 @@ function generateDummys(
       // if the target node is in the viewport, but the source handle is not
     } else if (visibleTargetNode && isDummySourceHandle) {
       const sourceNode = visibleSourceNode ?? newDummySourceNode(nodeMap[sourceId]);
-      sourceNode.data.renderArea.dummyHandleIndices[sourceHandleIndex] = true;
+      addDummyHandleIndex(sourceNode, sourceHandleIndex);
 
       if (!visibleSourceNode) {
         renderMap[sourceNode.id] = sourceNode;
@@ -141,9 +150,9 @@ function generateDummys(
       startIdx = Math.max(startIdx, endIdx - maxEdgesForDummy);
     }
 
-    for (let i = start; i < end; i++) {
+    for (let i = startIdx; i < endIdx; i++) {
       const targetNode = targetNodeMap[i];
-      sourceNode.data.renderArea.dummyHandleIndices[i] = true;
+      addDummyHandleIndex(sourceNode, i);
 
       if (!renderMap[sourceNode.id]) {
         renderMap[sourceNode.id] = sourceNode;
