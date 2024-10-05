@@ -4,7 +4,7 @@ import { type Tree, type Node, hasChildren, getRawValue, isIterable, getChildren
 import { type XYPosition, type Edge, type Node as FlowNode } from "@xyflow/react";
 
 export const config: Readonly<Record<string, any>> = {
-  translateMargin: 500,
+  translateMargin: 200,
   panOnScrollSpeed: 1,
   minZoom: 0.5,
   maxZoom: 2,

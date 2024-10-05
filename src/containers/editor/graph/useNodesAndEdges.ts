@@ -12,6 +12,8 @@ import "@xyflow/react/dist/style.css";
 import { useShallow } from "zustand/react/shallow";
 import { highlightEdge, highlightNode, toggleToolbar } from "./utils";
 
+const viewportSize = [0, 0];
+
 export interface NodesAndEdges {
   nodes: NodeWithData[];
   edges: EdgeWithData[];
@@ -70,8 +72,9 @@ export default function useNodesAndEdges() {
       translateExtentRef.current = [
         [-config.translateMargin, -config.translateMargin],
         [
-          levelMeta![levelMeta!.length - 1].x + config.translateMargin,
-          levelMeta![levelMeta!.length - 1].y + config.translateMargin,
+          // fix https://github.com/xyflow/xyflow/issues/3633
+          Math.max(levelMeta![levelMeta!.length - 1].x + config.translateMargin, viewportSize[0]),
+          Math.max(levelMeta![levelMeta!.length - 1].y + config.translateMargin, viewportSize[1]),
         ],
       ];
 
@@ -98,4 +101,13 @@ export default function useNodesAndEdges() {
     onPaneClick,
     translateExtent: translateExtentRef.current,
   };
+}
+
+export function setViewportSize(width: number, height: number) {
+  if (width) {
+    viewportSize[0] = width;
+  }
+  if (height) {
+    viewportSize[1] = height;
+  }
 }
