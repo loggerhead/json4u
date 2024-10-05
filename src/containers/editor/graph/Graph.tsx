@@ -5,7 +5,6 @@ import { config } from "@/lib/graph/layout";
 import { detectOS } from "@/lib/utils";
 import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import DownloadButton from "./DownloadButton";
 import MouseButton from "./MouseButton";
 import { ObjectNode, RootNode, DummyTargetNode } from "./Node";
 import { useHandleClick } from "./useHandleClick";
@@ -73,7 +72,6 @@ function LayoutGraph() {
     >
       <Controls showInteractive={false}>
         <MouseButton isTouchPad={isTouchPad} setIsTouchPad={setIsTouchPad} />
-        <DownloadButton />
       </Controls>
       <Background />
     </ReactFlow>
