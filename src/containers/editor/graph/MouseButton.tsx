@@ -8,7 +8,7 @@ interface MouseButtonProps {
 
 export default function MouseButton({ isTouchPad, setIsTouchPad }: MouseButtonProps) {
   return (
-    <ControlButton onClick={() => setIsTouchPad(!isTouchPad)}>
+    <ControlButton title="switch between mouse and touchpad mode" onClick={() => setIsTouchPad(!isTouchPad)}>
       {isTouchPad ? <Touchpad style={{ fill: "none" }} /> : <Mouse style={{ fill: "none" }} />}
     </ControlButton>
   );
