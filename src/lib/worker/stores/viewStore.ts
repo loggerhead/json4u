@@ -27,7 +27,7 @@ export interface ViewState {
 
   setTree: (tree: Tree) => void;
   createTable: () => string;
-  createGraph: () => { visible: Graph };
+  createGraph: () => { graph: Graph; visible: Graph };
   setGraphSize: (width?: number, height?: number) => { visible: Graph; changed: boolean };
   setGraphViewport: (viewport: Viewport) => { visible: Graph; changed: boolean };
 }
@@ -67,7 +67,7 @@ const useViewStore = createStore<ViewState>((set, get) => ({
       return { graph: initialStates.graph, visible: initialStates.visibleGraph };
     }
 
-    // TODO: slow
+    // TODO: genFlowNodes is slow, need optimization
     const { nodes, edges } = genFlowNodes(tree);
     const { ordered, levelMeta } = new Layouter(tree, nodes, edges).layout();
     const graphNodeMap = keyBy(ordered, "id");
@@ -89,7 +89,7 @@ const useViewStore = createStore<ViewState>((set, get) => ({
     const { visible } = computeVisible(visibleGraph, graph, graphNodeMap, graphWidth, graphHeight, graphViewport);
 
     set({ graph, visibleGraph: visible, graphNodeMap });
-    return { visible };
+    return { graph, visible };
   },
 
   setGraphSize(width?: number, height?: number) {

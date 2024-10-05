@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useCallback } from "react";
 import { ViewMode } from "@/lib/db/config";
-import { globalStyle, type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
+import { config, globalStyle, type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
 import { clone } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
@@ -27,6 +27,11 @@ export default function useNodesAndEdges() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
 
   const versionRef = useRef(0);
+  const translateExtentRef = useRef<[[number, number], [number, number]]>([
+    [0, 0],
+    [0, 0],
+  ]);
+
   const { setViewport, getZoom } = useReactFlow();
   const worker = useEditorStore((state) => state.worker);
   const { count, usable } = useUserStore(
@@ -54,6 +59,7 @@ export default function useNodesAndEdges() {
 
     (async () => {
       const {
+        graph: { levelMeta },
         visible: { nodes, edges },
       } = await worker.createGraph();
       setNodes(nodes);
@@ -61,6 +67,14 @@ export default function useNodesAndEdges() {
       setViewport({ x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: getZoom() });
 
       versionRef.current = treeVersion;
+      translateExtentRef.current = [
+        [-config.translateMargin, -config.translateMargin],
+        [
+          levelMeta![levelMeta!.length - 1].x + config.translateMargin,
+          levelMeta![levelMeta!.length - 1].y + config.translateMargin,
+        ],
+      ];
+
       nodes.length > 0 && count("graphModeView");
     })();
   }, [worker, usable, isGraphView, treeVersion]);
@@ -82,5 +96,6 @@ export default function useNodesAndEdges() {
     onNodesChange,
     onEdgesChange,
     onPaneClick,
+    translateExtent: translateExtentRef.current,
   };
 }

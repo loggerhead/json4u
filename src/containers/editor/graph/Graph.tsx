@@ -27,12 +27,12 @@ function LayoutGraph() {
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
 
   const ref = useRef<HTMLDivElement>(null);
-  const nodesAndEdges = useNodesAndEdges();
-  const { onMouseClickNode } = useNodeClick(nodesAndEdges);
-  const { onMouseClickHandle } = useHandleClick(nodesAndEdges);
+  const r = useNodesAndEdges();
+  const { onMouseClickNode } = useNodeClick(r);
+  const { onMouseClickHandle } = useHandleClick(r);
 
-  useViewportChange(ref, nodesAndEdges);
-  useRevealNode(nodesAndEdges);
+  useViewportChange(ref, r);
+  useRevealNode(r);
 
   return (
     <ReactFlow
@@ -55,14 +55,14 @@ function LayoutGraph() {
         deletable: false,
       }}
       // TODO: waiting fix https://github.com/xyflow/xyflow/issues/3633
-      // translateExtent={translateExtent}
+      // translateExtent={r.translateExtent}
       onNodeClick={onMouseClickNode}
       onConnectStart={onMouseClickHandle}
-      nodes={nodesAndEdges.nodes}
-      edges={nodesAndEdges.edges}
-      onNodesChange={nodesAndEdges.onNodesChange}
-      onEdgesChange={nodesAndEdges.onEdgesChange}
-      onPaneClick={nodesAndEdges.onPaneClick}
+      nodes={r.nodes}
+      edges={r.edges}
+      onNodesChange={r.onNodesChange}
+      onEdgesChange={r.onEdgesChange}
+      onPaneClick={r.onPaneClick}
       nodesDraggable={false}
       nodesConnectable={false}
       connectOnClick={false}
