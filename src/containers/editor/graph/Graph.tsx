@@ -54,8 +54,8 @@ function LayoutGraph() {
         focusable: false,
         deletable: false,
       }}
-      // TODO: waiting fix https://github.com/xyflow/xyflow/issues/3633
-      // translateExtent={r.translateExtent}
+      // TODO: 两害取其轻，先启用。再等修复 https://github.com/xyflow/xyflow/issues/3633
+      translateExtent={r.translateExtent}
       onNodeClick={onMouseClickNode}
       onConnectStart={onMouseClickHandle}
       nodes={r.nodes}
