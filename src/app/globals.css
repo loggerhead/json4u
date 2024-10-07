@@ -52,7 +52,7 @@
       "Courier New", monospace;
     --max-key-length: 300px;
     --max-value-length: 500px;
-    --tbl-th-bg-color: rgb(224, 224, 224, 0.3);
+    --tbl-key-bg-color: rgb(242, 242, 242);
     --tbl-border: 1px solid #e0e0e080;
 
     --bg-key: #e0e0e04d;
@@ -244,7 +244,7 @@ body {
   border-collapse: collapse;
 
   th {
-    background-color: var(--tbl-th-bg-color);
+    background-color: var(--tbl-key-bg-color);
     font-weight: normal;
     text-align: left;
     vertical-align: top;
@@ -262,6 +262,14 @@ body {
     text-align: left;
     vertical-align: top;
     padding: 0 6px;
+  }
+
+  .sticky-scroll {
+    background-color: var(--tbl-key-bg-color);
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   .tbl-key {

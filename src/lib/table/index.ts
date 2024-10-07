@@ -58,7 +58,9 @@ function genArrayDom(tree: Tree, node: Node) {
   const indexHeader = existsLeafNode ? h("th") : "";
   const key2ExpanderId = genArrayExpanderIds(tree, node);
   const rowForHeaders = headers.length
-    ? h("tr", indexHeader, ...headers.map((key) => genTableHeader(tree, node, key, key2ExpanderId[key])))
+    ? h("tr", indexHeader, ...headers.map((key) => genTableHeader(tree, node, key, key2ExpanderId[key]))).class(
+        "sticky-scroll",
+      )
     : "";
 
   const rows = tree.mapChildren(node, (child, i) => {
