@@ -23,7 +23,7 @@ import Button from "./Button";
 import ExportPopover from "./ExportPopover";
 import ImportPopover from "./ImportPopover";
 import LinkButton from "./LinkButton";
-import PopoverBtn, { popoverBtnClass } from "./PopoverButton";
+import PopoverBtn from "./PopoverButton";
 import SharePopover from "./SharePopover";
 import StatisticsPopover from "./StatisticsPopover";
 import Toggle from "./Toggle";
@@ -45,16 +45,11 @@ export default function SideNav() {
   return (
     <div
       className="flex flex-col h-full w-8"
-      onMouseEnter={(event) => {
-        if ((event.target as HTMLElement).closest(`.${popoverBtnClass}`)) {
-          return;
-        }
-        setSideNavExpanded(true);
-      }}
+      onMouseEnter={() => setSideNavExpanded(true)}
       onMouseLeave={() => setSideNavExpanded(false)}
     >
       <nav
-        className="group z-50 h-full py-1.5 w-8 data-[expanded=true]:w-32 box-content border-r border-default shadow-xl transition-width duration-200 hide-scrollbar flex flex-col justify-between bg-background"
+        className="group z-50 h-full py-1.5 w-8 data-[expanded=true]:w-32 box-content border-r border-default shadow-xl transition-width duration-200 hide-scrollbar flex flex-col justify-between bg-background overflow-hidden"
         data-expanded={sideNavExpanded}
       >
         <ul className="relative flex flex-col justify-start px-1 gap-y-1">
