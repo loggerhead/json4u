@@ -36,13 +36,13 @@ The best JSON visualization and processing tool.
 
 ## Roadmap
 
-- [ ] Improve performance to support large files (>= 1mb).
+- [x] Improve performance to support large files (>= 1mb).
   - [x] Only render visible nodes in graph mode.
-  - [ ] Optimize performance of table mode.
+  - [ ] Optimize performance of table mode (no idea).
   - [ ] ~~Use wasm in web worker for parsing (use rust)~~.
-  - [ ] Consider [changing the editor to Ace](https://medium.com/miro-engineering/how-we-integrated-a-code-editor-on-the-miro-canvas-a41e0eff7f21).
+  - [ ] ~~Consider [changing the editor to Ace](https://medium.com/miro-engineering/how-we-integrated-a-code-editor-on-the-miro-canvas-a41e0eff7f21).~~
 - [ ] Improve interoperability between left and right panels.
-  - [ ] Support [search](https://www.fusejs.io/demo.html) in graph mode (synchronize reveal between left and right panels).
+  - [ ] Support search in graph mode (synchronize reveal between left and right panels).
   - [ ] Support search via JSON path (synchronize reveal).
   - [ ] Support modifications in view mode.
   - [ ] Support synchronize fold and unfold between left and right panels.
