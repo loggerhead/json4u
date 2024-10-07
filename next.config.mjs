@@ -67,6 +67,7 @@ const nextConfig = {
             "indentation", // 缩进
             "unusualLineTerminators", // invalid 换行符提示
             "wordHighlighter", // 高亮光标停留位置的词
+            "stickyScroll", // https://learn.microsoft.com/en-us/visualstudio/ide/editor-sticky-scroll
           ],
           filename: "static/[name].[contenthash:8].worker.js",
         }),
