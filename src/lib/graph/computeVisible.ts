@@ -43,7 +43,7 @@ function getNodesAndEdgesInViewport(viewportRect: Rect, graph: Graph) {
       ...edge.data!.start,
       // end point will always in the right and bottom to start point
       width: edge.data!.end.x - edge.data!.start.x,
-      height: edge.data!.end.y - edge.data!.start.y,
+      height: Math.max(Math.abs(edge.data!.end.y - edge.data!.start.y), 1),
     });
 
   const nodes = graph.nodes.filter(isNodeInViewport);
