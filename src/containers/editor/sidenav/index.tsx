@@ -23,7 +23,7 @@ import Button from "./Button";
 import ExportPopover from "./ExportPopover";
 import ImportPopover from "./ImportPopover";
 import LinkButton from "./LinkButton";
-import PopoverBtn from "./PopoverButton";
+import PopoverBtn, { popoverBtnClass } from "./PopoverButton";
 import SharePopover from "./SharePopover";
 import StatisticsPopover from "./StatisticsPopover";
 import Toggle from "./Toggle";
@@ -45,7 +45,12 @@ export default function SideNav() {
   return (
     <div
       className="flex flex-col h-full w-8"
-      onMouseEnter={() => setSideNavExpanded(true)}
+      onMouseEnter={(event) => {
+        if ((event.target as HTMLElement).closest(`.${popoverBtnClass}`)) {
+          return;
+        }
+        setSideNavExpanded(true);
+      }}
       onMouseLeave={() => setSideNavExpanded(false)}
     >
       <nav
