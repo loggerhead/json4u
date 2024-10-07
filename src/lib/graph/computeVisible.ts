@@ -5,7 +5,7 @@ import { differenceWith, isEmpty } from "lodash-es";
 
 export const refreshInterval = 30;
 const smoothPaddingGap = 300;
-const maxEdgesForDummy = 20;
+const maxEdgesForDummy = 10;
 
 export default function computeVisible(
   oldVisible: Graph,
