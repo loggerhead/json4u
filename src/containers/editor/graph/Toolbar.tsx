@@ -24,6 +24,8 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
   const nodes = getNodes();
   const edges = getEdges();
+  const hasSiblings = edges.some((edge) => edge.source === id);
+
   const args = { nodes, edges, setNodes, setEdges };
 
   const { callNodeClick } = useNodeClick(args);
@@ -59,12 +61,10 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
     setFoldSiblings(!foldSiblings);
   };
 
-  // TODO: hide fold button when there is no edges
-  // TODO: fix w-fit doesn't work
   return (
     <NodeToolbar
       isVisible={true}
-      className="flex items-center justify-center w-[96px] h-fit bg-input"
+      className="flex items-center justify-center w-fit h-fit px-2 bg-input"
       position={Position.Top}
       align="start"
       offset={0}
@@ -82,20 +82,24 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
           <ArrowLeft className="icon" />
         </ToolbarButton>
       )}
-      {!isRoot && (
-        <ToolbarButton title={t(foldSiblings ? "fold sibings" : "unfold sibings")} onClick={triggerFoldSiblings}>
-          {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
-        </ToolbarButton>
+      {hasSiblings && (
+        <>
+          {!isRoot && (
+            <ToolbarButton title={t(foldSiblings ? "fold sibings" : "unfold sibings")} onClick={triggerFoldSiblings}>
+              {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
+            </ToolbarButton>
+          )}
+          <ToolbarButton
+            title={t(fold ? "fold node" : "unfold node")}
+            onClick={() => {
+              callHandleClick(id, undefined, fold);
+              setFold(!fold);
+            }}
+          >
+            {fold ? <SquareMinus className="icon" /> : <SquarePlus className="icon" />}
+          </ToolbarButton>
+        </>
       )}
-      <ToolbarButton
-        title={t(fold ? "fold node" : "unfold node")}
-        onClick={() => {
-          callHandleClick(id, undefined, fold);
-          setFold(!fold);
-        }}
-      >
-        {fold ? <SquareMinus className="icon" /> : <SquarePlus className="icon" />}
-      </ToolbarButton>
       <ToolbarButton
         title={t("reveal position in editor")}
         onClick={() => {
