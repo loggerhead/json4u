@@ -7,6 +7,7 @@ export const refreshInterval = 30;
 const smoothPaddingGap = 300;
 const maxEdgesForDummy = 10;
 
+// TODO: change word "visible" to "render"
 export default function computeVisible(
   oldVisible: Graph,
   graph: Graph,
@@ -41,8 +42,8 @@ function getNodesAndEdgesInViewport(viewportRect: Rect, graph: Graph) {
   const isEdgeInViewport = (edge: EdgeWithData) =>
     isInViewport({
       ...edge.data!.start,
-      // end point will always in the right and bottom to start point
       width: edge.data!.end.x - edge.data!.start.x,
+      // height will be 0 when the edge is horizontal, so we set it to 1 to ensure the rect area > 0.
       height: Math.max(Math.abs(edge.data!.end.y - edge.data!.start.y), 1),
     });
 

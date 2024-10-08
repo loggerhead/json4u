@@ -25,6 +25,7 @@ export interface NodesAndEdges {
 
 export default function useNodesAndEdges() {
   const treeVersion = useTreeVersion();
+  // nodes and edges are not all that are in the graph, but rather the ones that will be rendered.
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
 

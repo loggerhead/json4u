@@ -21,6 +21,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
 
   const t = useTranslations();
   const editor = useEditor();
+  // TODO: fix by use full nodes and edges
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
   const nodes = getNodes();
   const edges = getEdges();
@@ -32,6 +33,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const isRoot = parentId === undefined;
   const setRevealId = useStatusStore((state) => state.setRevealId);
 
+  // TODO: change to hide siblings and their descendants
   const triggerFoldSiblings = () => {
     const isSiblingDescendant = (id: string) => {
       const { parent } = splitParentPointer(id);
@@ -83,6 +85,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
         </ToolbarButton>
       )}
       {!isRoot && (
+        // TODO: fix typo
         <ToolbarButton title={t(foldSiblings ? "fold sibings" : "unfold sibings")} onClick={triggerFoldSiblings}>
           {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
         </ToolbarButton>
