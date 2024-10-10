@@ -62,11 +62,10 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   };
 
   // TODO: hide fold button when there is no edges
-  // TODO: fix w-fit doesn't work
   return (
     <NodeToolbar
       isVisible={true}
-      className="flex items-center justify-center w-[96px] h-fit bg-input"
+      className="flex items-center justify-center w-fit h-fit bg-input"
       position={Position.Top}
       align="start"
       offset={0}
@@ -122,7 +121,7 @@ const ToolbarButton = memo(({ title, onClick, children }: ToolbarButtonProps) =>
   return (
     <Button
       variant="icon"
-      className="h-5 w-5 p-1"
+      className="h-6 w-6 p-1"
       title={title}
       onClick={(ev) => {
         ev.preventDefault();
