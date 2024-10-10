@@ -64,7 +64,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   return (
     <NodeToolbar
       isVisible={true}
-      className="flex items-center justify-center w-fit h-fit px-2 bg-input"
+      className="flex items-center justify-center w-fit h-fit bg-input gap-x-1"
       position={Position.Top}
       align="start"
       offset={0}
@@ -121,7 +121,7 @@ const ToolbarButton = memo(({ title, onClick, children }: ToolbarButtonProps) =>
   return (
     <Button
       variant="icon"
-      className="h-5 w-5 p-1"
+      className="h-5 w-5 p-0"
       title={title}
       onClick={(ev) => {
         ev.preventDefault();
