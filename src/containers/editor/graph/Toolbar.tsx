@@ -59,6 +59,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
     setFoldSiblings(!foldSiblings);
   };
 
+  // TODO: hide fold button when there is no edges
   return (
     <NodeToolbar
       isVisible={true}
