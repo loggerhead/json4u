@@ -24,7 +24,6 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
   const nodes = getNodes();
   const edges = getEdges();
-  const hasSiblings = edges.some((edge) => edge.source === id);
 
   const args = { nodes, edges, setNodes, setEdges };
 
@@ -87,17 +86,15 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
           {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
         </ToolbarButton>
       )}
-      {hasSiblings && (
-        <ToolbarButton
-          title={t(fold ? "fold node" : "unfold node")}
-          onClick={() => {
-            callHandleClick(id, undefined, fold);
-            setFold(!fold);
-          }}
-        >
-          {fold ? <SquareMinus className="icon" /> : <SquarePlus className="icon" />}
-        </ToolbarButton>
-      )}
+      <ToolbarButton
+        title={t(fold ? "fold node" : "unfold node")}
+        onClick={() => {
+          callHandleClick(id, undefined, fold);
+          setFold(!fold);
+        }}
+      >
+        {fold ? <SquareMinus className="icon" /> : <SquarePlus className="icon" />}
+      </ToolbarButton>
       <ToolbarButton
         title={t("reveal position in editor")}
         onClick={() => {
