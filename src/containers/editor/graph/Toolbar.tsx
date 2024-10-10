@@ -24,7 +24,6 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
   const nodes = getNodes();
   const edges = getEdges();
-
   const args = { nodes, edges, setNodes, setEdges };
 
   const { callNodeClick } = useNodeClick(args);
