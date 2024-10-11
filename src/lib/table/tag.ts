@@ -32,6 +32,11 @@ export class H {
     return this;
   }
 
+  addChildren(children: (H | string)[]): H {
+    this.children = this.children.concat(children);
+    return this;
+  }
+
   title(title: string): H {
     this.attrTitle = title;
     return this;

@@ -58,9 +58,9 @@ function genArrayDom(tree: Tree, node: Node) {
   const indexHeader = existsLeafNode ? h("th") : "";
   const key2ExpanderId = genArrayExpanderIds(tree, node);
   const rowForHeaders = headers.length
-    ? h("tr", indexHeader, ...headers.map((key) => genTableHeader(tree, node, key, key2ExpanderId[key]))).class(
-        "sticky-scroll",
-      )
+    ? h("tr", indexHeader)
+        .addChildren(headers.map((key) => genTableHeader(tree, node, key, key2ExpanderId[key])))
+        .class("sticky-scroll")
     : "";
 
   const rows = tree.mapChildren(node, (child, i) => {
@@ -75,10 +75,10 @@ function genArrayDom(tree: Tree, node: Node) {
       (indexCell as H).child(genDom(tree, child).class("tbl-leaf"));
     }
 
-    return h("tr", indexCell, ...valueCells);
+    return h("tr", indexCell).addChildren(valueCells);
   });
 
-  return h("table", h("tbody", rowForHeaders, ...rows)).class("tbl");
+  return h("table", h("tbody", rowForHeaders).addChildren(rows)).class("tbl");
 }
 
 function genObjectDom(tree: Tree, node: Node) {
@@ -86,10 +86,9 @@ function genObjectDom(tree: Tree, node: Node) {
 
   return h(
     "table",
-    h(
-      "tbody",
+    h("tbody").addChildren(
       // generate key:value pair as the row
-      ...tree.mapChildren(node, (child, key) =>
+      tree.mapChildren(node, (child, key) =>
         h("tr", genTableHeader(tree, node, key, key2ExpanderId[key]), h("td", genDom(tree, child))),
       ),
     ),

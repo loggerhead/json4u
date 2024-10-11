@@ -57,6 +57,10 @@ export function toastErr(msg: string, id?: string) {
 }
 
 export function detectOS() {
+  if (typeof window === "undefined") {
+    return "Unknown OS";
+  }
+
   // if a browser has no support for navigator.userAgentData.platform use platform as fallback
   // @ts-ignore
   const userAgent = (navigator.userAgentData?.platform ?? (navigator.platform || navigator.userAgent)).toLowerCase();
