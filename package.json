@@ -1,6 +1,6 @@
 {
   "name": "json4u",
-  "version": "3.0.9",
+  "version": "3.0.10",
   "type": "module",
   "private": true,
   "scripts": {
@@ -47,8 +47,6 @@
     "@sentry/nextjs": "^8.26.0",
     "@sentry/react": "^8.26.0",
     "@sentry/utils": "^8.27.0",
-    "@serwist/precaching": "^9.0.5",
-    "@serwist/sw": "^9.0.5",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.3",
     "@t3-oss/env-nextjs": "^0.11.1",
@@ -75,7 +73,6 @@
     "react-drag-drop-files": "^2.3.10",
     "react-hook-form": "^7.53.0",
     "react-resizable-panels": "^2.1.1",
-    "serwist": "^9.0.5",
     "sharp": "^0.33.5",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
@@ -88,7 +85,6 @@
     "@babel/preset-env": "^7.25.4",
     "@hcaptcha/types": "^1.0.4",
     "@next/bundle-analyzer": "^14.2.6",
-    "@serwist/next": "^9.0.5",
     "@testing-library/react": "^16.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/lodash-es": "^4.17.12",

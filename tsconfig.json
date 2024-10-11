@@ -13,7 +13,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": ["@serwist/next/typings", "vitest/importMeta", "mdx"],
+    "types": ["vitest/importMeta", "mdx"],
     "plugins": [
       {
         "name": "next"

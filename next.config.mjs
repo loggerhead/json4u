@@ -1,7 +1,6 @@
 import NextBundleAnalyzer from "@next/bundle-analyzer";
 import createMDX from "@next/mdx";
 import { withSentryConfig } from "@sentry/nextjs";
-import withSerwistInit from "@serwist/next";
 import createJiti from "jiti";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 import createNextIntlPlugin from "next-intl/plugin";
@@ -81,19 +80,13 @@ const nextConfig = {
   },
 };
 
-const withSerwist = withSerwistInit({
-  swSrc: "src/app/sw.ts",
-  swDest: "public/sw.js",
-  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-  additionalPrecacheEntries: ["jq/1.7/jq.js", "jq/1.7/jq.wasm"],
-});
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.tsx");
 const withMDX = createMDX({});
 const withBundleAnalyzer = NextBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
-const config = withBundleAnalyzer(withSerwist(withNextIntl(withMDX(nextConfig))));
+const config = withBundleAnalyzer(withNextIntl(withMDX(nextConfig)));
 
 export default withSentryConfig(config, {
   // For all available options, see:
