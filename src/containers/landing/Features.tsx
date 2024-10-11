@@ -1,51 +1,61 @@
 import Section from "@/components/Section";
 import Typography from "@/components/ui/typography";
-import { Diff, Braces, ScanEye, SquareTerminal, LucideIcon, ShieldCheck, SpellCheck2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function Features() {
   const t = useTranslations("Home");
   const items = [
     {
-      Icon: ScanEye,
       headline: t("Visualize"),
       description: t("Visualize_description"),
+      img: "/example/graph.png",
     },
     {
-      Icon: Diff,
       headline: t("Compare"),
       description: t("Compare_description"),
+      img: "/example/compare.png",
     },
     {
-      Icon: SquareTerminal,
       headline: t("Command"),
       description: t("Command_description"),
+      img: "/example/import-csv.png",
     },
     {
-      Icon: Braces,
       headline: t("Format"),
       description: t("Format_description"),
+      img: "/example/nest-parse.png",
     },
     {
-      Icon: SpellCheck2,
       headline: t("Validate"),
       description: t("Validate_description"),
-    },
-    {
-      Icon: ShieldCheck,
-      headline: t("Privacy"),
-      description: t("Privacy_description"),
+      img: "/example/validate.png",
     },
   ];
 
   return (
-    <Section id="features" className="gap-6">
-      <Typography variant="h2" className="text-center">
+    <Section id="features" className="md:!mt-4 !mt-2">
+      <Typography variant="h2" className="md:mb-6">
         {t("features_title")}
       </Typography>
-      <div className="grid lg:grid-cols-3 lg:gap-12 md:grid-cols-2 grid-cols-1 gap-6">
-        {items.map(({ Icon, headline, description }, i) => (
-          <Feature key={i} Icon={Icon} headline={headline} description={description} />
+      <div className="mt-8 flex flex-col gap-16">
+        {items.map(({ img, headline, description }, i) => (
+          <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className={cn("order-2", i % 2 ? "md:order-1" : "md:order-2")}>
+              <img
+                className="w-full max-w-2xl rounded-xl shadow-xl ring-1 ring-gray-400/10"
+                src={img}
+                alt={headline}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className={cn("order-1", i % 2 ? "md:order-2" : "md:order-1")}>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{headline}</h2>
+              <p className="mt-6 text-lg leading-8 text-muted-foreground">{description}</p>
+            </div>
+          </div>
         ))}
       </div>
     </Section>

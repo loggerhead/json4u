@@ -14,7 +14,7 @@ export default function Description() {
         }
       </Typography>
       <Typography className="w-full">{"你的支持对我来说非常重要，是我持续迭代和优化的动力！"}</Typography>
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-3 gap-6">
         <Btn text="好评" href="https://www.trustpilot.com/review/json4u.com" Icon={ThumbsUp} />
         <Btn text="关注" href="https://weibo.com/loggerhead" Icon={UserRoundPlus} />
         <Btn text="打赏" href="https://mbd.pub/o/loggerhead/work" Icon={JapaneseYen} />

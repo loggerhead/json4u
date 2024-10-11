@@ -87,7 +87,7 @@ const withSerwist = withSerwistInit({
   maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
   additionalPrecacheEntries: ["jq/1.7/jq.js", "jq/1.7/jq.wasm"],
 });
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.tsx");
 const withMDX = createMDX({});
 const withBundleAnalyzer = NextBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Logo from "@/components/icons/Logo";
 import { Separator } from "@/components/ui/separator";
-import { isCN } from "@/lib/env";
+import { isCN, version } from "@/lib/env";
 import { useStatusStore } from "@/stores/statusStore";
 import {
   ArrowDownNarrowWide,
@@ -21,6 +21,7 @@ import { useShallow } from "zustand/react/shallow";
 import AccountButton from "./AccountButton";
 import Button from "./Button";
 import ExportPopover from "./ExportPopover";
+import { Label } from "./IconLabel";
 import ImportPopover from "./ImportPopover";
 import LinkButton from "./LinkButton";
 import PopoverBtn, { popoverBtnClass } from "./PopoverButton";
@@ -60,6 +61,7 @@ export default function SideNav() {
         <ul className="relative flex flex-col justify-start px-1 gap-y-1">
           <Link prefetch={false} href="/" className="flex items-center pointer mt-1 mb-2">
             <Logo className="w-6 h-6" />
+            <Label title={`v${version}`} />
           </Link>
           <PopoverBtn title={t("Import")} icon={<FileUp className="icon" />} content={<ImportPopover />} />
           <PopoverBtn title={t("Export")} icon={<Download className="icon" />} content={<ExportPopover />} />

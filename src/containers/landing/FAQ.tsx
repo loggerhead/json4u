@@ -31,16 +31,19 @@ export default function FAQ() {
           <Advantages />
         </FaqItem>
         <FaqItem question="q_what_is_jq">
-          <Typography className="text-base">{t("a_what_is_jq")}</Typography>
           <Typography className="text-base">
-            <Link
-              prefetch={false}
-              href="https://jqlang.github.io/jq/manual/v1.7/#basic-filters"
-              target="_blank"
-              className="text-blue-600 hover:text-blue-800"
-            >
-              {t("jq_manual")}
-            </Link>
+            {t.rich("a_what_is_jq", {
+              jq: (children) => (
+                <Link
+                  prefetch={false}
+                  href="https://jqlang.github.io/jq/manual/v1.7/#basic-filters"
+                  target="_blank"
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  {children}
+                </Link>
+              ),
+            })}
           </Typography>
         </FaqItem>
       </Accordion>
