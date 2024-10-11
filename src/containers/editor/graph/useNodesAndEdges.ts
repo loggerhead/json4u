@@ -8,7 +8,9 @@ import { useStatusStore } from "@/stores/statusStore";
 import { useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
 import { OnEdgesChange, OnNodesChange, useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
+import { XYPosition } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { maxBy } from "lodash-es";
 import { useShallow } from "zustand/react/shallow";
 import { highlightEdge, highlightNode, toggleToolbar } from "./utils";
 
@@ -70,14 +72,16 @@ export default function useNodesAndEdges() {
       setViewport({ x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: getZoom() });
 
       versionRef.current = treeVersion;
+      const maxX = maxBy<XYPosition>(levelMeta, "x")?.x;
+      const maxY = maxBy<XYPosition>(levelMeta, "y")?.y;
 
-      if (levelMeta) {
+      if (maxX && maxY) {
         translateExtentRef.current = [
           [-config.translateMargin, -config.translateMargin],
           [
             // fix https://github.com/xyflow/xyflow/issues/3633
-            Math.max(levelMeta![levelMeta!.length - 1].x + config.translateMargin, viewportSize[0]),
-            Math.max(levelMeta![levelMeta!.length - 1].y + config.translateMargin, viewportSize[1]),
+            Math.max(maxX + config.translateMargin, viewportSize[0]),
+            Math.max(maxY + config.translateMargin, viewportSize[1]),
           ],
         ];
       }
