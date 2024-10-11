@@ -206,8 +206,8 @@ function genHighlightDecorations(diffPairs: DiffPair[]): { left: Decoration[]; r
     const { hunk: leftHunk, inlines: leftInlines } = genDecorations(left);
     const { hunk: rightHunk, inlines: rightInlines } = genDecorations(right);
 
-    leftHunk && leftDecorations.push(leftHunk);
-    rightHunk && rightDecorations.push(rightHunk);
+    mergeDecoration(leftDecorations, leftHunk);
+    mergeDecoration(rightDecorations, rightHunk);
     leftInlines.length > 0 && leftDecorations.push(...leftInlines);
     rightInlines.length > 0 && rightDecorations.push(...rightInlines);
   }
@@ -233,11 +233,26 @@ interface Decoration {
   options: editorApi.IModelDecorationOptions;
 }
 
+function mergeDecoration(decorations: Decoration[], decoration: Decoration | undefined) {
+  if (!decoration) {
+    return;
+  }
+
+  const prevEndLineNumber = decorations?.[decorations.length - 1]?.range?.endLineNumber;
+  const { startLineNumber, endLineNumber } = decoration.range;
+
+  if (startLineNumber <= prevEndLineNumber) {
+    decorations[decorations.length - 1].range.endLineNumber = Math.max(endLineNumber, prevEndLineNumber);
+  } else {
+    decorations.push(decoration);
+  }
+}
+
 // 生成高亮的装饰
 function newDecoration(range: Range, isInlineDiff: boolean, diffType: DiffType): Decoration {
   if (isInlineDiff) {
     return {
-      range: range,
+      range,
       options: {
         // 行内文本的装饰 class
         inlineClassName: getInlineClass(diffType),
@@ -245,7 +260,7 @@ function newDecoration(range: Range, isInlineDiff: boolean, diffType: DiffType):
     };
   } else {
     return {
-      range: range,
+      range,
       // 示例：https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
       // 参数定义：https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
       options: {
