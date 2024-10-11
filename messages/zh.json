@@ -15,6 +15,7 @@
   "sortDesc": "JSON 排序 (降序)",
   "pythonDictToJSON": "Python dict 转 JSON",
   "urlToJson": "URL 转 JSON",
+  "swapLeftRight": "交换左右两侧文本",
   "show_jq": "展示 jq 输入框",
   "Search Command": "搜索命令",
   "no_command_found": "找不到命令",

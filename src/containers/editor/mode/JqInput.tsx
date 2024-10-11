@@ -34,6 +34,10 @@ const JqInput = forwardRef<ElementRef<typeof Input>, ComponentPropsWithoutRef<ty
           ref={ref}
           onChange={onChange}
           onKeyDown={(ev) => {
+            if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) {
+              return;
+            }
+
             const el = ev.target as HTMLInputElement;
 
             if (ev.key === "Enter") {

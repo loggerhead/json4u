@@ -15,6 +15,7 @@
   "sortDesc": "Sort JSON (descending)",
   "pythonDictToJSON": "Convert Python dict to JSON",
   "urlToJson": "Convert URL to JSON",
+  "swapLeftRight": "Swap left and right text",
   "show_jq": "Show jq input box",
   "Search Command": "Search Command",
   "no_command_found": "No command found",
