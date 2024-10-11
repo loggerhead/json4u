@@ -61,7 +61,7 @@ export default function AccountButton({ notOnSideNav, avatarClassName, buttonCla
     );
   } else if (notOnSideNav) {
     return (
-      <RLinkButton className={buttonClassName} href={loginHref}>
+      <RLinkButton variant="outline" className={buttonClassName} href={loginHref}>
         <Typography variant="p" className="text-primary">
           {t("login")}
         </Typography>

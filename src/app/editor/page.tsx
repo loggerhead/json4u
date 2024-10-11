@@ -8,7 +8,6 @@ import MainPanel from "@/containers/editor/MainPanel";
 import SideNav from "@/containers/editor/sidenav";
 import { PricingOverlay } from "@/containers/pricing";
 import { init as dbInit } from "@/lib/db/config";
-import { version } from "@/lib/env";
 import { init as jqInit } from "@/lib/jq";
 import { type MyWorker } from "@/lib/worker/worker";
 import { useEditorStore } from "@/stores/editorStore";
@@ -55,9 +54,6 @@ function useInit() {
   );
 
   useEffect(() => {
-    console.log(`JSON For You version is ${version}`);
-    console.log("无人扶我青云志，我自踏雪至山巅！");
-
     // async init
     dbInit();
     jqInit();

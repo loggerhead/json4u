@@ -99,8 +99,8 @@
     "logout_failed": "Failed to log out.",
     "Editor": "Editor",
     "Go to Editor": "Go to Editor",
-    "landing_title": "Fastest JSON visualization and processing",
-    "landing_subtitle": "The best JSON tool to boost your efficiency.",
+    "landing_title": "Visualize and process<br></br>JSON in seconds",
+    "landing_subtitle": "Boost efficiency with all-in-one JSON toolkit designed for you – visualize, format, and compare your data like never before!",
     "try_now": "Try it now",
     "features_title": "Features tailored for you",
     "Visualize": "Visualize",
@@ -113,7 +113,6 @@
     "Format_description": "Fast formatting when importing file or pasting data. Intelligent formatting for non-JSON text.",
     "Validate": "Validate",
     "Validate_description": "Validate with context information to help you find and location the error quickly.",
-    "Privacy_description": "All data processing is done on your local device without any network transfer.",
     "jq_img_desc": "jq command",
     "graph_img_desc": "Graph view mode",
     "table_img_desc": "Table view mode",
@@ -154,7 +153,8 @@
     "plan_display_prefix": "Plan:",
     "renew_display_prefix": "Next renewal date:",
     "expired_display_prefix": "Premium expired at:",
-    "getCheckoutURL_error": "get checkout URL error: {error}"
+    "getCheckoutURL_error": "get checkout URL error: {error}",
+    "no_pricing": "Currently free, but in the future, there will be charges for some unique features based on usage."
   },
   "FAQ": {
     "FAQ": "Frequently Asked Questions",
@@ -178,8 +178,7 @@
     "a_support_features13": "Array Diff Comparison - If two JSON arrays have differences, we generally do not need to view the diff of every single element, as there may be a lot of noise that is inconvenient for visual inspection. Therefore, a diff comparison is provided, offering a concise, human-readable difference similar to git diff.",
     "a_support_features14": "Text Comparison - Since text comparison is also a common requirement, support has been added to downgrade invalid JSON to text comparison (text diff), providing an experience similar to git diff.",
     "q_what_is_jq": "What is jq and how to use it in JSON For You?",
-    "a_what_is_jq": "jq is like sed for JSON data - you can use it to slice and filter and map and transform structured data with the same ease that sed, awk, grep and friends let you play with text. JSON For You support to use jq online (version 1.7), you can input \"jq\" in the quick command bar to use it.",
-    "jq_manual": "Click here for the jq tutorial.",
+    "a_what_is_jq": "<jq>jq</jq> is like sed for JSON data - you can use it to slice and filter and map and transform structured data with the same ease that sed, awk, grep and friends let you play with text. JSON For You support to use jq online (version 1.7), you can input \"jq\" in the quick command bar to use it.",
     "q_advantages": "What are the differences from other JSON websites?",
     "Graph View & Table View": "Graph View & Table View",
     "Structured Comparison & Text Comparison": "Structured Comparison & Text Comparison",

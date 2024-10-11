@@ -99,8 +99,8 @@
     "logout_failed": "退出登录失败",
     "Editor": "编辑器",
     "Go to Editor": "前往编辑器",
-    "landing_title": "超快的 JSON 可视化与处理",
-    "landing_subtitle": "极大提升效率、最棒的 JSON 工具。",
+    "landing_title": "超快的 JSON<br></br>可视化与处理",
+    "landing_subtitle": "极大提升效率，专为你设计的一站式 JSON 工具。前所未有的可视化、格式化、比较功能！",
     "try_now": "立即尝试",
     "features_title": "为你量身打造的 JSON 功能",
     "Visualize": "可视化",
@@ -113,7 +113,6 @@
     "Format_description": "导入文件或粘贴数据时快速格式化。对非 JSON 文本进行智能格式化。",
     "Validate": "验证",
     "Validate_description": "提供上下文信息以帮助你快速找到和定位错误。",
-    "Privacy_description": "所有数据处理都在本地设备上完成，无需网络传输。",
     "jq_img_desc": "jq 命令",
     "graph_img_desc": "图模式",
     "table_img_desc": "表模式",
@@ -154,7 +153,8 @@
     "plan_display_prefix": "订阅:",
     "renew_display_prefix": "下次续费日期:",
     "expired_display_prefix": "会员过期时间:",
-    "getCheckoutURL_error": "生成支付链接失败: {error}"
+    "getCheckoutURL_error": "生成支付链接失败: {error}",
+    "no_pricing": "目前免费，但是未来会对特色功能按使用量进行收费。"
   },
   "FAQ": {
     "FAQ": "常见问题",
@@ -178,8 +178,7 @@
     "a_support_features13": "数组差分比较——如果两个 JSON 数组有差异，一般情况下我们其实不需要查看每一个元素的 diff，因为很可能会有比较多的噪音，并不方便我们肉眼查看。所以做了差分比较，提供与 git diff 一样简洁、人类可读的差异；",
     "a_support_features14": "文本比较——因为文本比较也是很常见的需求，所以支持了将无效 JSON 降级为文本比较（text diff），体验与 git diff 接近。",
     "q_what_is_jq": "jq 是什么，怎么使用 jq？",
-    "a_what_is_jq": "jq 是一个用于处理 JSON 数据的强大工具，你可以用它来选择、筛选、转换和重构 JSON 数据，就像 sed、awk、grep 和其他处理文本的工具一样。JSON For You 支持在线使用 jq（版本号 1.7），你可以通过快速搜索栏输入 \"jq\" 来使用它。",
-    "jq_manual": "点此查看 jq 教程。",
+    "a_what_is_jq": "<jq>jq</jq> 是一个用于处理 JSON 数据的强大工具，你可以用它来选择、筛选、转换和重构 JSON 数据，就像 sed、awk、grep 和其他处理文本的工具一样。JSON For You 支持在线使用 jq（版本号 1.7），你可以通过快速搜索栏输入 \"jq\" 来使用它。",
     "q_advantages": "与其他 JSON 工具站相比有什么不一样？",
     "Graph View & Table View": "图形视图 & 表视图",
     "Structured Comparison & Text Comparison": "结构化比较",

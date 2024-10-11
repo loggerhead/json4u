@@ -9,5 +9,11 @@ export default getRequestConfig(async () => {
   return {
     locale,
     messages: (await import(`../../messages/${locale}.json`)).default,
+    defaultTranslationValues: {
+      b: (children) => <b>{children}</b>,
+      i: (children) => <i>{children}</i>,
+      u: (children) => <u>{children}</u>,
+      br: () => <br />,
+    },
   };
 });
