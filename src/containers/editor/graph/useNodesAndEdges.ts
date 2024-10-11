@@ -70,14 +70,17 @@ export default function useNodesAndEdges() {
       setViewport({ x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: getZoom() });
 
       versionRef.current = treeVersion;
-      translateExtentRef.current = [
-        [-config.translateMargin, -config.translateMargin],
-        [
-          // fix https://github.com/xyflow/xyflow/issues/3633
-          Math.max(levelMeta![levelMeta!.length - 1].x + config.translateMargin, viewportSize[0]),
-          Math.max(levelMeta![levelMeta!.length - 1].y + config.translateMargin, viewportSize[1]),
-        ],
-      ];
+
+      if (levelMeta) {
+        translateExtentRef.current = [
+          [-config.translateMargin, -config.translateMargin],
+          [
+            // fix https://github.com/xyflow/xyflow/issues/3633
+            Math.max(levelMeta![levelMeta!.length - 1].x + config.translateMargin, viewportSize[0]),
+            Math.max(levelMeta![levelMeta!.length - 1].y + config.translateMargin, viewportSize[1]),
+          ],
+        ];
+      }
 
       nodes.length > 0 && count("graphModeView");
     })();
