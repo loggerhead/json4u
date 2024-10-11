@@ -13,7 +13,7 @@ export default function useViewportChange(ref: RefObject<HTMLDivElement>, { setN
   const onResize = useCallback(
     debounce(
       async ({ width, height }) => {
-        if (!worker) return;
+        if (!(worker && width && height)) return;
         setViewportSize(width, height);
         const { visible, changed } = await worker.setGraphSize(width, height);
         if (changed) {
