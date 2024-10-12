@@ -199,6 +199,8 @@ function genBlankHunkDom() {
 
 // 生成 diff 块高亮和行内高亮
 function genHighlightDecorations(diffPairs: DiffPair[]): { left: Decoration[]; right: Decoration[] } {
+  const leftHunks: Decoration[] = [];
+  const rightHunks: Decoration[] = [];
   const leftDecorations: Decoration[] = [];
   const rightDecorations: Decoration[] = [];
 
@@ -206,13 +208,37 @@ function genHighlightDecorations(diffPairs: DiffPair[]): { left: Decoration[]; r
     const { hunk: leftHunk, inlines: leftInlines } = genDecorations(left);
     const { hunk: rightHunk, inlines: rightInlines } = genDecorations(right);
 
-    mergeDecoration(leftDecorations, leftHunk);
-    mergeDecoration(rightDecorations, rightHunk);
+    leftHunk && leftHunks.push(leftHunk);
+    rightHunk && rightHunks.push(rightHunk);
     leftInlines.length > 0 && leftDecorations.push(...leftInlines);
     rightInlines.length > 0 && rightDecorations.push(...rightInlines);
   }
 
-  return { left: leftDecorations, right: rightDecorations };
+  const compare = (a: Decoration, b: Decoration) => a.range.startLineNumber - b.range.startLineNumber;
+  const left = leftDecorations.concat(mergeDecorations(leftHunks.sort(compare)));
+  const right = rightDecorations.concat(mergeDecorations(rightHunks.sort(compare)));
+  return { left, right };
+}
+
+function mergeDecorations(decorations: Decoration[]): Decoration[] {
+  if (decorations.length === 0) {
+    return [];
+  }
+
+  const merged = [decorations[0]];
+
+  for (const decoration of decorations.slice(1)) {
+    const prev = merged[merged.length - 1];
+    const { startLineNumber, endLineNumber } = decoration.range;
+
+    if (startLineNumber <= prev.range.endLineNumber) {
+      prev.range.endLineNumber = Math.max(endLineNumber, prev.range.endLineNumber);
+    } else {
+      merged.push(decoration);
+    }
+  }
+
+  return merged;
 }
 
 function genDecorations(diff: Diff | undefined): { hunk?: Decoration; inlines: Decoration[] } {
@@ -228,24 +254,9 @@ function genDecorations(diff: Diff | undefined): { hunk?: Decoration; inlines: D
 
 interface Decoration {
   range: Range;
-  // 示例：https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
-  // 参数定义：https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
+  // example: https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
+  // spec: https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
   options: editorApi.IModelDecorationOptions;
-}
-
-function mergeDecoration(decorations: Decoration[], decoration: Decoration | undefined) {
-  if (!decoration) {
-    return;
-  }
-
-  const prevEndLineNumber = decorations?.[decorations.length - 1]?.range?.endLineNumber;
-  const { startLineNumber, endLineNumber } = decoration.range;
-
-  if (startLineNumber <= prevEndLineNumber) {
-    decorations[decorations.length - 1].range.endLineNumber = Math.max(endLineNumber, prevEndLineNumber);
-  } else {
-    decorations.push(decoration);
-  }
 }
 
 // 生成高亮的装饰
