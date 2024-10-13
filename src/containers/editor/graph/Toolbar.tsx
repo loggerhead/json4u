@@ -84,8 +84,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
         </ToolbarButton>
       )}
       {!isRoot && (
-        // TODO: fix typo
-        <ToolbarButton title={t(foldSiblings ? "fold sibings" : "unfold sibings")} onClick={triggerFoldSiblings}>
+        <ToolbarButton title={t(foldSiblings ? "fold siblings" : "unfold siblings")} onClick={triggerFoldSiblings}>
           {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
         </ToolbarButton>
       )}
