@@ -46,6 +46,10 @@ export function isParent(parentPointer: string, childPointer: string) {
   return parent === parentPointer;
 }
 
+export function isDescendant(parentPointer: string, childPointer: string) {
+  return childPointer === parentPointer || childPointer.startsWith(parentPointer + "/");
+}
+
 export function lastKey(pointer: string) {
   const { lastKey } = splitParentPointer(pointer);
   return lastKey;

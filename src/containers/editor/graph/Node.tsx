@@ -27,7 +27,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
 
   const width = flowNode.data.width;
   const childrenNum = getChildrenKeys(node).length;
-  const { kvStart, kvEnd, dummyHandleIndices: dummyHandleIndexs } = flowNode.data.renderArea;
+  const { kvStart, kvEnd, virtualHandleIndices } = flowNode.data.render;
 
   return (
     <>
@@ -37,7 +37,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
         {kvStart > 0 && <div style={{ width, height: kvStart * globalStyle.kvHeight }} />}
         {filter(
           tree.mapChildren(node, (child, key, i) => {
-            if (dummyHandleIndexs?.[i]) {
+            if (virtualHandleIndices?.[i]) {
               return (
                 <Handle
                   key={i}
@@ -120,12 +120,12 @@ export const RootNode = memo(({ data }: NodeProps<NodeWithData>) => {
 });
 RootNode.displayName = "RootNode";
 
-// if the target of the edge is not in the viewport, then use a DummyTargetNode to represent it
-export const DummyTargetNode = memo(() => {
+// if the target of the edge is not in the viewport, then use a VirtualTargetNode to represent it
+export const VirtualTargetNode = memo(() => {
   return (
     <div className="w-[1px] h-[1px]">
       <Handle type={"target"} isConnectable position={Position.Left} />
     </div>
   );
 });
-DummyTargetNode.displayName = "DummyTargetNode";
+VirtualTargetNode.displayName = "VirtualTargetNode";

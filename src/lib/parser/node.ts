@@ -1,4 +1,4 @@
-import { rootMarker, toPath } from "@/lib/idgen";
+import { rootMarker } from "@/lib/idgen";
 
 export type SortType = "asc" | "desc";
 export interface ParseOptions {
@@ -36,10 +36,6 @@ export function isRoot(node: Node) {
 
 export function isIterable(node: Node) {
   return node.type === "array" || node.type === "object";
-}
-
-export function getPath(node: Node): string[] {
-  return toPath(node.id);
 }
 
 export function hasChildren(node: Node | undefined) {

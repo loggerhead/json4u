@@ -11,6 +11,7 @@ import {
   getChildId,
   getRawValue,
   computeAndSetBoundLength,
+  hasChildren,
 } from "./node";
 
 export interface StringifyOptions extends ParseOptions {
@@ -94,6 +95,10 @@ export class Tree implements TreeObject {
 
   childrenNodes(node: Node): Node[] {
     return getChildrenKeys(node).map((key) => this.getChild(node, key)!);
+  }
+
+  nonLeafChildrenNodes(node: Node): Node[] {
+    return this.childrenNodes(node).filter(hasChildren);
   }
 
   mapChildren<T>(node: Node, fn: (child: Node, key: string, index: number) => T): T[] {

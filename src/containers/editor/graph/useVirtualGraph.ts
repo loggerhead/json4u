@@ -1,31 +1,19 @@
 import { useEffect, useRef } from "react";
-import { useCallback } from "react";
 import { ViewMode } from "@/lib/db/config";
-import { config, globalStyle, type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
-import { clone } from "@/lib/utils";
+import { config, initialViewport, type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
-import { OnEdgesChange, OnNodesChange, useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
+import { useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
 import { XYPosition } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { maxBy } from "lodash-es";
 import { useShallow } from "zustand/react/shallow";
-import { highlightEdge, highlightNode, toggleToolbar } from "./utils";
 
-const viewportSize = [0, 0];
+const viewportSize: [number, number] = [0, 0];
 
-export interface NodesAndEdges {
-  nodes: NodeWithData[];
-  edges: EdgeWithData[];
-  setNodes: (nodes: NodeWithData[]) => void;
-  setEdges: (edges: EdgeWithData[]) => void;
-  onNodesChange?: OnNodesChange<NodeWithData>;
-  onEdgesChange?: OnEdgesChange<EdgeWithData>;
-}
-
-export default function useNodesAndEdges() {
+export default function useVirtualGraph() {
   const treeVersion = useTreeVersion();
   // nodes and edges are not all that are in the graph, but rather the ones that will be rendered.
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
@@ -33,8 +21,8 @@ export default function useNodesAndEdges() {
 
   const versionRef = useRef(0);
   const translateExtentRef = useRef<[[number, number], [number, number]]>([
-    [0, 0],
-    [0, 0],
+    [-config.translateMargin, -config.translateMargin],
+    [config.translateMargin, config.translateMargin],
   ]);
 
   const { setViewport, getZoom } = useReactFlow();
@@ -45,9 +33,10 @@ export default function useNodesAndEdges() {
       usable: state.usable("graphModeView"),
     })),
   );
-  const { isGraphView, setShowPricingOverlay } = useStatusStore(
+  const { isGraphView, resetFoldStatus, setShowPricingOverlay } = useStatusStore(
     useShallow((state) => ({
       isGraphView: state.viewMode === ViewMode.Graph,
+      resetFoldStatus: state.resetFoldStatus,
       setShowPricingOverlay: state.setShowPricingOverlay,
     })),
   );
@@ -65,48 +54,33 @@ export default function useNodesAndEdges() {
     (async () => {
       const {
         graph: { levelMeta },
-        visible: { nodes, edges },
+        renderable: { nodes, edges },
       } = await worker.createGraph();
+      
       setNodes(nodes);
       setEdges(edges);
-      setViewport({ x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: getZoom() });
+      setViewport({ ...initialViewport, zoom: getZoom() });
+      resetFoldStatus();
 
+      const [w, h] = viewportSize;
+      const maxX = maxBy<XYPosition>(levelMeta, "x")?.x ?? 0;
+      const maxY = maxBy<XYPosition>(levelMeta, "y")?.y ?? 0;
+
+      translateExtentRef.current = [
+        [-config.translateMargin, -config.translateMargin],
+        // fix https://github.com/xyflow/xyflow/issues/3633
+        [Math.max(maxX + config.translateMargin, w), Math.max(maxY + config.translateMargin, h)],
+      ];
       versionRef.current = treeVersion;
-      const maxX = maxBy<XYPosition>(levelMeta, "x")?.x;
-      const maxY = maxBy<XYPosition>(levelMeta, "y")?.y;
-
-      if (maxX && maxY) {
-        translateExtentRef.current = [
-          [-config.translateMargin, -config.translateMargin],
-          [
-            // fix https://github.com/xyflow/xyflow/issues/3633
-            Math.max(maxX + config.translateMargin, viewportSize[0]),
-            Math.max(maxY + config.translateMargin, viewportSize[1]),
-          ],
-        ];
-      }
-
       nodes.length > 0 && count("graphModeView");
     })();
   }, [worker, usable, isGraphView, treeVersion]);
 
-  // clear all animated for edges
-  const onPaneClick = useCallback(
-    (_: React.MouseEvent) => {
-      setEdges(edges.map((ed) => clone(highlightEdge(ed, false))));
-      setNodes(nodes.map((nd) => clone(toggleToolbar(highlightNode(nd, false), undefined))));
-    },
-    [nodes, edges],
-  );
-
   return {
     nodes,
     edges,
-    setNodes,
-    setEdges,
     onNodesChange,
     onEdgesChange,
-    onPaneClick,
     translateExtent: translateExtentRef.current,
   };
 }
