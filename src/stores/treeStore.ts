@@ -1,4 +1,5 @@
 import { type Kind } from "@/lib/editor/editor";
+import { Graph } from "@/lib/graph/layout";
 import { Tree } from "@/lib/parser";
 import { type KeyWithType } from "@/lib/table";
 import { type FunctionKeys } from "@/lib/utils";
@@ -26,9 +27,11 @@ interface TooltipContent {
 export interface TreeState {
   main: Tree;
   secondary: Tree;
+  graph: Graph;
   tooltipContent?: TooltipContent;
 
   setTree: (tree: Tree, kind: Kind) => void;
+  setGraph: (graph: Graph) => void;
   setTooltip: (content: TooltipContent) => void;
   hideTooltip: () => void;
 }
@@ -36,6 +39,7 @@ export interface TreeState {
 const initialStates: Omit<TreeState, FunctionKeys<TreeState>> = {
   main: new Tree(),
   secondary: new Tree(),
+  graph: { nodes: [], edges: [] },
 };
 
 export const useTreeStore = create<TreeState>()((set, get) => ({
@@ -51,6 +55,10 @@ export const useTreeStore = create<TreeState>()((set, get) => ({
 
   hideTooltip() {
     set({ tooltipContent: initialStates.tooltipContent });
+  },
+
+  setGraph(graph: Graph) {
+    set({ graph: graph });
   },
 }));
 

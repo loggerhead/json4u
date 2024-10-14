@@ -1,10 +1,11 @@
 import { memo, ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
+import { NodeWithData, EdgeWithData } from "@/lib/graph/layout";
 import { join as idJoin, splitParentPointer, toPath } from "@/lib/idgen";
 import { useEditor } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { NodeToolbar, Position, useReactFlow } from "@xyflow/react";
+import { useTreeStore } from "@/stores/treeStore";
+import { NodeToolbar, Position } from "@xyflow/react";
 import { ArrowLeft, CopyMinus, CopyPlus, Focus, SquareMinus, SquarePlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useHandleClick } from "./useHandleClick";
@@ -21,11 +22,19 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
 
   const t = useTranslations();
   const editor = useEditor();
-  // TODO: fix by use full nodes and edges
-  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
-  const nodes = getNodes();
-  const edges = getEdges();
-  const args = { nodes, edges, setNodes, setEdges };
+
+  const {
+    graph: { nodes, edges },
+    setGraph,
+  } = useTreeStore();
+  const setNodes = (newNodes: NodeWithData[]) => setGraph({ edges, nodes: newNodes });
+  const setEdges = (newEdges: EdgeWithData[]) => setGraph({ nodes, edges: newEdges });
+  const args = {
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+  };
 
   const { callNodeClick } = useNodeClick(args);
   const { callHandleClick } = useHandleClick(args);

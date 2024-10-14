@@ -5,7 +5,7 @@ import { config, globalStyle, type EdgeWithData, type NodeWithData } from "@/lib
 import { clone } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { useTreeVersion } from "@/stores/treeStore";
+import { useTreeStore, useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
 import { OnEdgesChange, OnNodesChange, useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
 import { XYPosition } from "@xyflow/react";
@@ -39,6 +39,7 @@ export default function useNodesAndEdges() {
 
   const { setViewport, getZoom } = useReactFlow();
   const worker = useEditorStore((state) => state.worker);
+  const { graph, setGraph } = useTreeStore();
   const { count, usable } = useUserStore(
     useShallow((state) => ({
       count: state.count,
@@ -53,6 +54,11 @@ export default function useNodesAndEdges() {
   );
 
   useEffect(() => {
+    setNodes(graph.nodes);
+    setEdges(graph.edges);
+  }, [graph, setEdges, setNodes]);
+
+  useEffect(() => {
     if (!(worker && isGraphView && treeVersion > versionRef.current)) {
       return;
     }
@@ -64,16 +70,17 @@ export default function useNodesAndEdges() {
 
     (async () => {
       const {
-        graph: { levelMeta },
+        graph,
         visible: { nodes, edges },
       } = await worker.createGraph();
+      setGraph({ nodes: graph.nodes, edges: graph.edges });
       setNodes(nodes);
       setEdges(edges);
       setViewport({ x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: getZoom() });
 
       versionRef.current = treeVersion;
-      const maxX = maxBy<XYPosition>(levelMeta, "x")?.x;
-      const maxY = maxBy<XYPosition>(levelMeta, "y")?.y;
+      const maxX = maxBy<XYPosition>(graph.levelMeta, "x")?.x;
+      const maxY = maxBy<XYPosition>(graph.levelMeta, "y")?.y;
 
       if (maxX && maxY) {
         translateExtentRef.current = [
