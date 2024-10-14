@@ -1,13 +1,21 @@
-import computeVisible from "@/lib/graph/computeVisible";
+import {
+  clearNodeSelected,
+  computeRevealPosition,
+  toggleNodeHidden,
+  toggleNodeSelected,
+  triggerFoldSiblings,
+} from "@/lib/graph/actions";
 import {
   computeSourceHandleOffset,
+  type EdgeWithData,
   genFlowNodes,
   globalStyle,
   Layouter,
   newGraph,
-  NodeWithData,
   type Graph,
+  initialViewport,
 } from "@/lib/graph/layout";
+import computeVirtualGraph from "@/lib/graph/virtual";
 import { Tree } from "@/lib/parser";
 import { genDomString } from "@/lib/table";
 import { type FunctionKeys } from "@/lib/utils";
@@ -19,25 +27,21 @@ export interface ViewState {
   tree: Tree;
   tableHTML: string;
   graph: Graph;
-  visibleGraph: Graph;
-  graphNodeMap: Record<string, NodeWithData>;
   graphWidth: number;
   graphHeight: number;
   graphViewport: Viewport;
 
   setTree: (tree: Tree) => void;
   createTable: () => string;
-  createGraph: () => { graph: Graph; visible: Graph };
-  setGraphSize: (width?: number, height?: number) => { visible: Graph; changed: boolean };
-  setGraphViewport: (viewport: Viewport) => { visible: Graph; changed: boolean };
+  createGraph: () => { graph: Graph; renderable: Graph };
+  setGraphSize: (width?: number, height?: number) => { renderable: Graph; changed: boolean };
+  setGraphViewport: (viewport: Viewport) => { renderable: Graph; changed: boolean };
 }
 
 const initialStates: Omit<ViewState, FunctionKeys<ViewState>> = {
   tree: new Tree(),
   tableHTML: "",
   graph: newGraph(),
-  visibleGraph: newGraph(),
-  graphNodeMap: {},
   graphWidth: 0,
   graphHeight: 0,
   graphViewport: { x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: 1 },
@@ -60,21 +64,29 @@ const useViewStore = createStore<ViewState>((set, get) => ({
 
   // 5MB costs 260ms
   createGraph() {
-    const { tree, visibleGraph, graphWidth, graphHeight, graphViewport } = get();
+    const {
+      tree,
+      graphWidth,
+      graphHeight,
+      graphViewport: { zoom },
+    } = get();
+    // reset viewport
+    const graphViewport = { ...initialViewport, zoom };
 
     if (!tree.valid()) {
-      set({ graph: initialStates.graph, visibleGraph: initialStates.visibleGraph });
-      return { graph: initialStates.graph, visible: initialStates.visibleGraph };
+      set({ graph: newGraph(), graphViewport });
+      return { graph: newGraph(), renderable: newGraph() };
     }
 
     // TODO: genFlowNodes is slow, need optimization
     const { nodes, edges } = genFlowNodes(tree);
     const { ordered, levelMeta } = new Layouter(tree, nodes, edges).layout();
-    const graphNodeMap = keyBy(ordered, "id");
+    const nodeMap = keyBy(ordered, "id");
+    const edgeMap: Record<string, EdgeWithData> = {};
 
     edges.forEach((ed) => {
-      const source = graphNodeMap[ed.source];
-      const target = graphNodeMap[ed.target];
+      const source = nodeMap[ed.source];
+      const target = nodeMap[ed.target];
       ed.data!.start = {
         x: source.position.x + source.data.width,
         y: source.position.y + computeSourceHandleOffset(ed.data!.sourceHandleIndex),
@@ -83,41 +95,32 @@ const useViewStore = createStore<ViewState>((set, get) => ({
         x: target.position.x,
         y: target.position.y + ed.data!.targetHandleOffset,
       };
+      edgeMap[ed.id] = ed;
     });
 
-    const graph = { nodes: ordered, edges, levelMeta };
-    const { visible } = computeVisible(visibleGraph, graph, graphNodeMap, graphWidth, graphHeight, graphViewport);
-
-    set({ graph, visibleGraph: visible, graphNodeMap });
-    return { graph, visible };
+    const graph = { nodes: ordered, edges, levelMeta, nodeMap, edgeMap };
+    const { renderable } = computeVirtualGraph(graph, graphWidth, graphHeight, graphViewport);
+    set({ graph, graphViewport });
+    return { graph, renderable };
   },
 
   setGraphSize(width?: number, height?: number) {
-    const { graph, visibleGraph, graphNodeMap, graphWidth, graphHeight, graphViewport } = get();
-    const { visible, changed } = computeVisible(
-      visibleGraph,
+    const { graph, graphWidth, graphHeight, graphViewport } = get();
+    const { renderable, changed } = computeVirtualGraph(
       graph,
-      graphNodeMap,
       width ?? graphWidth,
       height ?? graphHeight,
       graphViewport,
     );
-
-    set({ visibleGraph: visible, graphWidth: width, graphHeight: height });
-    return { visible, changed };
+    set({ graph, graphWidth: width, graphHeight: height });
+    return { renderable, changed };
   },
 
   setGraphViewport(viewport: Viewport) {
-    const { graph, visibleGraph, graphNodeMap, graphWidth, graphHeight, graphViewport } = get();
-
-    if (viewport.x === graphViewport.x && viewport.y === graphViewport.y && viewport.zoom === graphViewport.zoom) {
-      return { visible: visibleGraph, changed: false };
-    }
-
-    const { visible, changed } = computeVisible(visibleGraph, graph, graphNodeMap, graphWidth, graphHeight, viewport);
-
-    set({ visibleGraph: visible, graphViewport: viewport });
-    return { visible, changed };
+    const { graph, graphWidth, graphHeight } = get();
+    const { renderable, changed } = computeVirtualGraph(graph, graphWidth, graphHeight, viewport);
+    set({ graph, graphViewport: viewport });
+    return { renderable, changed };
   },
 }));
 
@@ -137,4 +140,25 @@ export function setGraphSize(width?: number, height?: number) {
 
 export function setGraphViewport(viewport: Viewport) {
   return getViewState().setGraphViewport(viewport);
+}
+
+export function toggleGraphNodeHidden(nodeId: string, handleId?: string, hide?: boolean) {
+  return toggleNodeHidden(getViewState().graph, nodeId, handleId, hide);
+}
+
+export function toggleGraphNodeSelected(nodeId: string) {
+  return toggleNodeSelected(getViewState().graph, nodeId);
+}
+
+export function clearGraphNodeSelected() {
+  return clearNodeSelected(getViewState().graph);
+}
+
+export function triggerGraphFoldSiblings(nodeId: string, fold: boolean) {
+  return triggerFoldSiblings(getViewState().graph, nodeId, fold);
+}
+
+export function computeGraphRevealPosition(nodeId: string) {
+  const { graph, graphWidth, graphHeight } = getViewState();
+  return computeRevealPosition(graphWidth, graphHeight, graph, nodeId);
 }

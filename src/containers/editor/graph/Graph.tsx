@@ -3,15 +3,15 @@
 import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
 import { detectOS } from "@/lib/utils";
-import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { useEditorStore } from "@/stores/editorStore";
+import { useStatusStore } from "@/stores/statusStore";
+import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import { type Node as FlowNode } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import MouseButton from "./MouseButton";
-import { ObjectNode, RootNode, DummyTargetNode } from "./Node";
-import { useHandleClick } from "./useHandleClick";
-import { useNodeClick } from "./useNodeClick";
-import useNodesAndEdges from "./useNodesAndEdges";
-import useRevealNode from "./useRevealNode";
-import useViewportChange from "./useViewportChange";
+import { ObjectNode, RootNode, VirtualTargetNode } from "./Node";
+import { useViewportChange, useRevealNode } from "./useViewportChange";
+import useVirtualGraph from "./useVirtualGraph";
 
 export default function Graph() {
   return (
@@ -23,16 +23,17 @@ export default function Graph() {
   );
 }
 
+// TODO: why is this render three times?
 function LayoutGraph() {
-  const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
-
   const ref = useRef<HTMLDivElement>(null);
-  const r = useNodesAndEdges();
-  const { onMouseClickNode } = useNodeClick(r);
-  const { onMouseClickHandle } = useHandleClick(r);
+  const onPaneClick = useOnPaneClick();
+  const onNodeClick = useOnNodeClick();
+  const onHandleClick = useOnHandleClick();
 
-  useViewportChange(ref, r);
-  useRevealNode(r);
+  const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
+  const g = useVirtualGraph();
+  useViewportChange(ref);
+  useRevealNode();
 
   return (
     <ReactFlow
@@ -47,21 +48,21 @@ function LayoutGraph() {
       nodeTypes={{
         object: ObjectNode,
         root: RootNode,
-        dummyTarget: DummyTargetNode,
+        virtualTarget: VirtualTargetNode,
       }}
       defaultEdgeOptions={{
         selectable: false,
         focusable: false,
         deletable: false,
       }}
-      translateExtent={r.translateExtent}
-      onNodeClick={onMouseClickNode}
-      onConnectStart={onMouseClickHandle}
-      nodes={r.nodes}
-      edges={r.edges}
-      onNodesChange={r.onNodesChange}
-      onEdgesChange={r.onEdgesChange}
-      onPaneClick={r.onPaneClick}
+      translateExtent={g.translateExtent}
+      onPaneClick={onPaneClick}
+      onNodeClick={onNodeClick}
+      onConnectStart={onHandleClick}
+      nodes={g.nodes}
+      edges={g.edges}
+      onNodesChange={g.onNodesChange}
+      onEdgesChange={g.onEdgesChange}
       nodesDraggable={false}
       nodesConnectable={false}
       connectOnClick={false}
@@ -75,4 +76,58 @@ function LayoutGraph() {
       <Background />
     </ReactFlow>
   );
+}
+
+function useOnNodeClick() {
+  const { setNodes, setEdges } = useReactFlow();
+  const worker = useEditorStore((state) => state.worker);
+  const setJsonPath = useStatusStore((state) => state.setJsonPath);
+
+  return (_: React.MouseEvent, node: FlowNode) => {
+    if (!worker) {
+      return;
+    }
+
+    (async () => {
+      const { nodes, edges, jsonPath } = await worker.toggleGraphNodeSelected(node.id);
+      setNodes(nodes);
+      setEdges(edges);
+      setJsonPath(jsonPath);
+    })();
+  };
+}
+
+function useOnHandleClick() {
+  const { setNodes, setEdges } = useReactFlow();
+  const worker = useEditorStore((state) => state.worker);
+
+  return (_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
+    if (handleType === "target" || !(worker && nodeId && handleId)) {
+      return;
+    }
+
+    (async () => {
+      const { nodes, edges } = await worker.toggleGraphNodeHidden(nodeId, handleId);
+      setNodes(nodes);
+      setEdges(edges);
+    })();
+  };
+}
+
+// clear all animated for edges
+function useOnPaneClick() {
+  const { setNodes, setEdges } = useReactFlow();
+  const worker = useEditorStore((state) => state.worker);
+
+  return (_: React.MouseEvent) => {
+    if (!worker) {
+      return;
+    }
+
+    (async () => {
+      const { nodes, edges } = await worker.clearGraphNodeSelected();
+      setNodes(nodes);
+      setEdges(edges);
+    })();
+  };
 }

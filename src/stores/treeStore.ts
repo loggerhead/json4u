@@ -54,14 +54,14 @@ export const useTreeStore = create<TreeState>()((set, get) => ({
   },
 }));
 
+export function getTreeState() {
+  return useTreeStore.getState();
+}
+
 export function useTree(kind: Kind = "main") {
   return useTreeStore((state) => state[kind]);
 }
 
 export function useTreeVersion() {
   return useTreeStore((state) => state.main.version ?? 0);
-}
-
-export function getTreeState() {
-  return useTreeStore.getState();
 }

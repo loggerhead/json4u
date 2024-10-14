@@ -1,5 +1,5 @@
-import { toPointer } from "@/lib/idgen";
-import { getPath, ParseOptions, Tree } from "@/lib/parser";
+import { toPath, toPointer } from "@/lib/idgen";
+import { ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
 import { getStatusState } from "@/stores/statusStore";
@@ -195,9 +195,9 @@ export class EditorWrapper {
         }
 
         // TODO tree 改变时重新获取当前的 offset 计算展示的 path
-        const node = this.tree.findNodeAtOffset(offset);
-        if (node) {
-          getStatusState().setJsonPath(getPath(node));
+        const nodeId = this.tree.findNodeAtOffset(offset)?.id;
+        if (nodeId) {
+          getStatusState().setJsonPath(toPath(nodeId));
         }
       }
     });

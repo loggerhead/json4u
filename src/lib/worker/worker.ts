@@ -6,7 +6,17 @@ import { escape, unescape } from "./command/escape";
 import { parseAndFormat } from "./command/parse";
 import { pythonDictToJSON } from "./command/pythonDictToJSON";
 import { urlToJson } from "./command/urlToJson";
-import { createGraph, createTable, setGraphSize, setGraphViewport } from "./stores/viewStore";
+import {
+  clearGraphNodeSelected,
+  computeGraphRevealPosition,
+  createGraph,
+  createTable,
+  setGraphSize,
+  setGraphViewport,
+  toggleGraphNodeHidden,
+  toggleGraphNodeSelected,
+  triggerGraphFoldSiblings,
+} from "./stores/viewStore";
 
 const worker = {
   parseAndFormat,
@@ -23,6 +33,11 @@ const worker = {
   createGraph,
   setGraphSize,
   setGraphViewport,
+  toggleGraphNodeHidden,
+  toggleGraphNodeSelected,
+  clearGraphNodeSelected,
+  triggerGraphFoldSiblings,
+  computeGraphRevealPosition,
 };
 
 export type MyWorker = typeof worker;

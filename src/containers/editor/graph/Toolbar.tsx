@@ -1,67 +1,43 @@
-import { memo, ReactNode, useState } from "react";
+import { memo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
-import { join as idJoin, splitParentPointer, toPath } from "@/lib/idgen";
-import { useEditor } from "@/stores/editorStore";
+import { splitParentPointer, toPath } from "@/lib/idgen";
+import { useEditor, useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
+import { useTreeStore } from "@/stores/treeStore";
 import { NodeToolbar, Position, useReactFlow } from "@xyflow/react";
 import { ArrowLeft, CopyMinus, CopyPlus, Focus, SquareMinus, SquarePlus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useHandleClick } from "./useHandleClick";
-import { useNodeClick } from "./useNodeClick";
-import { separateMap, toggleHidden } from "./utils";
+import { useShallow } from "zustand/react/shallow";
 
 interface ToolbarProps {
   id: string;
 }
 
+// TODO: change to a color with higher transparency for the source handle when node is collapsed.
 const Toolbar = memo(({ id }: ToolbarProps) => {
-  const [fold, setFold] = useState(true);
-  const [foldSiblings, setFoldSiblings] = useState(true);
-
   const t = useTranslations();
   const editor = useEditor();
-  // TODO: fix by use full nodes and edges
-  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
-  const nodes = getNodes();
-  const edges = getEdges();
-  const args = { nodes, edges, setNodes, setEdges };
+  const worker = useEditorStore((state) => state.worker)!;
+  const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
 
-  const { callNodeClick } = useNodeClick(args);
-  const { callHandleClick } = useHandleClick(args);
+  const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode, setRevealId, setJsonPath } = useStatusStore(
+    useShallow((state) => ({
+      setRevealId: state.setRevealId,
+      setJsonPath: state.setJsonPath,
+      toggleFoldNode: state.toggleFoldNode,
+      toggleFoldSibingsNode: state.toggleFoldSibingsNode,
+      fold: !state.unfoldNodeMap[id],
+      foldSiblings: !state.unfoldSiblingsNodeMap[id],
+    })),
+  );
+
   const { parent: parentId } = splitParentPointer(id);
   const isRoot = parentId === undefined;
-  const setRevealId = useStatusStore((state) => state.setRevealId);
+  const tree = useTreeStore((state) => state.main);
+  const hasSiblings = !isRoot && tree.nonLeafChildrenNodes(tree.node(parentId)).length > 1;
+  const hasNonLeafChildren = tree.nonLeafChildrenNodes(tree.node(id)).length > 0;
 
-  // TODO: change to hide siblings and their descendants
-  const triggerFoldSiblings = () => {
-    const isSiblingDescendant = (id: string) => {
-      const { parent } = splitParentPointer(id);
-      // `undefined` means the node is the root node
-      if (parentId === undefined) {
-        return parent !== undefined;
-      }
-      return parent?.startsWith(idJoin(parentId, ""));
-    };
-
-    setEdges(
-      separateMap(
-        edges,
-        edges.filter((ed) => isSiblingDescendant(ed.target)),
-        (ed) => toggleHidden(ed, foldSiblings),
-      ),
-    );
-    setNodes(
-      separateMap(
-        nodes,
-        nodes.filter((nd) => isSiblingDescendant(nd.id)),
-        (nd) => toggleHidden(nd, foldSiblings),
-      ),
-    );
-    setFoldSiblings(!foldSiblings);
-  };
-
-  // TODO: hide fold button when there is no edges
   return (
     <NodeToolbar
       isVisible={true}
@@ -73,31 +49,19 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
       {!isRoot && (
         <ToolbarButton
           title={t("go to parent")}
-          onClick={() => {
+          onClick={async () => {
             if (parentId) {
               setRevealId(parentId);
-              callNodeClick(parentId);
+              const { nodes, edges, jsonPath } = await worker.toggleGraphNodeSelected(parentId);
+              setNodes(nodes);
+              setEdges(edges);
+              setJsonPath(jsonPath);
             }
           }}
         >
           <ArrowLeft className="icon" />
         </ToolbarButton>
       )}
-      {!isRoot && (
-        // TODO: fix typo
-        <ToolbarButton title={t(foldSiblings ? "fold sibings" : "unfold sibings")} onClick={triggerFoldSiblings}>
-          {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
-        </ToolbarButton>
-      )}
-      <ToolbarButton
-        title={t(fold ? "fold node" : "unfold node")}
-        onClick={() => {
-          callHandleClick(id, undefined, fold);
-          setFold(!fold);
-        }}
-      >
-        {fold ? <SquareMinus className="icon" /> : <SquarePlus className="icon" />}
-      </ToolbarButton>
       <ToolbarButton
         title={t("reveal position in editor")}
         onClick={() => {
@@ -106,6 +70,32 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
       >
         <Focus className="icon" />
       </ToolbarButton>
+      {hasSiblings && (
+        <ToolbarButton
+          title={t(foldSiblings ? "fold_siblings" : "unfold_siblings")}
+          onClick={async () => {
+            toggleFoldSibingsNode(id);
+            const { nodes, edges } = await worker.triggerGraphFoldSiblings(id, foldSiblings);
+            setNodes(nodes);
+            setEdges(edges);
+          }}
+        >
+          {foldSiblings ? <CopyMinus className="icon" /> : <CopyPlus className="icon" />}
+        </ToolbarButton>
+      )}
+      {hasNonLeafChildren && (
+        <ToolbarButton
+          title={t(fold ? "fold node" : "unfold node")}
+          onClick={async () => {
+            toggleFoldNode(id);
+            const { nodes, edges } = await worker.toggleGraphNodeHidden(id, undefined, fold);
+            setNodes(nodes);
+            setEdges(edges);
+          }}
+        >
+          {fold ? <SquareMinus className="icon" /> : <SquarePlus className="icon" />}
+        </ToolbarButton>
+      )}
     </NodeToolbar>
   );
 });

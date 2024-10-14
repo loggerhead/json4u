@@ -29,6 +29,8 @@ export interface StatusState extends Config {
   rightPanelWidth?: number;
   sideNavExpanded?: boolean;
   showPricingOverlay?: boolean;
+  unfoldNodeMap: Record<string, boolean>;
+  unfoldSiblingsNodeMap: Record<string, boolean>;
 
   incrEditorInitCount: () => number;
   setLeftPanelWidth: (width: number) => void;
@@ -46,6 +48,9 @@ export interface StatusState extends Config {
   setEnableSyncScroll: (enable: boolean) => void;
   setSideNavExpanded: (expanded: boolean) => void;
   setShowPricingOverlay: (show: boolean) => void;
+  toggleFoldNode: (nodeId: string) => void;
+  toggleFoldSibingsNode: (nodeId: string) => void;
+  resetFoldStatus: () => void;
 }
 
 const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
@@ -56,6 +61,8 @@ const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   selectionLength: 0,
   commandOpen: false,
   revealId: { id: "", version: 0 },
+  unfoldNodeMap: {},
+  unfoldSiblingsNodeMap: {},
 };
 
 export const useStatusStore = create<StatusState>()(
@@ -129,6 +136,22 @@ export const useStatusStore = create<StatusState>()(
 
       setShowPricingOverlay(show: boolean) {
         set({ showPricingOverlay: show });
+      },
+
+      toggleFoldNode(nodeId: string) {
+        const { unfoldNodeMap } = get();
+        unfoldNodeMap[nodeId] = !unfoldNodeMap[nodeId];
+        set({ unfoldNodeMap });
+      },
+
+      toggleFoldSibingsNode(nodeId: string) {
+        const { unfoldSiblingsNodeMap } = get();
+        unfoldSiblingsNodeMap[nodeId] = !unfoldSiblingsNodeMap[nodeId];
+        set({ unfoldSiblingsNodeMap });
+      },
+
+      resetFoldStatus() {
+        set({ unfoldNodeMap: {}, unfoldSiblingsNodeMap: {} });
       },
     }),
     {

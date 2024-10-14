@@ -40,6 +40,8 @@ export const globalStyle: GraphNodeStyle = {
   levelGap: 75,
 };
 
+export const initialViewport = { x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: 1 };
+
 export function setupGlobalGraphStyle(style: Partial<GraphNodeStyle>) {
   Object.assign(globalStyle, style);
 }
@@ -50,20 +52,20 @@ export const edgeHighlightStyle: CSSProperties = { stroke: selectedColor };
 
 export type NodeWithData = FlowNode<{
   parentId: string;
-  childrenIds: string[];
+  targetIds: string[];
   level: number; // distance from root node
   depth: number; // max distance from leaf node
   width: number;
   height: number;
-  renderArea: RenderArea;
+  render: NodeRender;
   toolbarVisible?: boolean;
   style?: React.CSSProperties;
 }>;
 
-interface RenderArea {
+interface NodeRender {
   kvStart: number;
   kvEnd: number;
-  dummyHandleIndices: Record<number, boolean>;
+  virtualHandleIndices: Record<number, boolean>;
 }
 
 export type EdgeWithData = Edge<{
@@ -74,10 +76,21 @@ export type EdgeWithData = Edge<{
   style?: React.CSSProperties;
 }>;
 
+export interface GraphVirtual {
+  realNodeIds: Record<string, boolean>;
+  realEdgeIds: Record<string, boolean>;
+  omitEdgeIds?: Record<string, boolean>;
+  virtualSourceNodeIds?: Record<string, boolean>;
+  virtualTargetNodeIds?: Record<string, boolean>;
+}
+
 export interface Graph {
   nodes: NodeWithData[];
   edges: EdgeWithData[];
   levelMeta?: XYPosition[];
+  nodeMap?: Record<string, NodeWithData>;
+  edgeMap?: Record<string, EdgeWithData>;
+  virtual?: GraphVirtual;
 }
 
 export function newGraph(): Graph {
@@ -119,7 +132,7 @@ function doGenFlowNodes(
     maxKvWidth = Math.max(maxKvWidth, kvWidth);
 
     if (hasChildren(child)) {
-      flowNode.data.childrenIds.push(child.id);
+      flowNode.data.targetIds.push(child.id);
       flowEdges.push(newEdge(node, child, key, i));
       const childDepth = doGenFlowNodes(flowNodes, flowEdges, tree, child, flowNode.id, level + 1);
       maxChildDepth = Math.max(maxChildDepth, childDepth);
@@ -143,11 +156,11 @@ function newFlowNode(node: Node, parentId: string, level: number): NodeWithData 
       width: 0,
       height: childrenNum * globalStyle.kvHeight + 2 * globalStyle.borderWidth,
       parentId,
-      childrenIds: [],
-      renderArea: {
+      targetIds: [],
+      render: {
         kvStart: 0,
         kvEnd: childrenNum,
-        dummyHandleIndices: {},
+        virtualHandleIndices: {},
       },
     },
     deletable: false,
@@ -207,7 +220,7 @@ export class Layouter {
       }
 
       levelMeta[level].x = Math.max(levelMeta[level].x, node.position.x + width);
-      ordered.push(...node.data.childrenIds.map((id) => this.id2NodeMap[id]));
+      ordered.push(...node.data.targetIds.map((id) => this.id2NodeMap[id]));
     }
 
     return { ordered, levelMeta };
@@ -229,7 +242,7 @@ export class Layouter {
 
     levelMeta[level].y = node.position.y + height;
 
-    for (const childId of node.data.childrenIds) {
+    for (const childId of node.data.targetIds) {
       this.computeY(levelMeta, childId, node.position.y);
     }
   }
