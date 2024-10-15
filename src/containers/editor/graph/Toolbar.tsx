@@ -14,7 +14,6 @@ interface ToolbarProps {
   id: string;
 }
 
-// TODO: change to a color with higher transparency for the source handle when node is collapsed.
 const Toolbar = memo(({ id }: ToolbarProps) => {
   const t = useTranslations();
   const editor = useEditor();

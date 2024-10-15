@@ -58,6 +58,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                   valueClassName={className}
                   valueText={text}
                   hasChildren={hasChildren(child)}
+                  isChildrenHidden={getNode(child.id)?.hidden ?? false}
                   width={width}
                 />
               );
@@ -80,9 +81,10 @@ interface KvProps {
   valueText: string;
   hasChildren: boolean;
   width: number; // used to avoid width jump when viewport changes
+  isChildrenHidden: boolean;
 }
 
-const KV = memo(({ index, property, valueClassName, valueText, hasChildren, width }: KvProps) => {
+const KV = memo(({ index, property, valueClassName, valueText, hasChildren, width, isChildrenHidden }: KvProps) => {
   const keyText = genKeyText(property);
   const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
 
@@ -94,7 +96,7 @@ const KV = memo(({ index, property, valueClassName, valueText, hasChildren, widt
       <div contentEditable="true" suppressContentEditableWarning className={cn("graph-v", valueClassName)}>
         {valueText}
       </div>
-      {hasChildren && <SourceHandle id={keyText} indexInParent={index} />}
+      {hasChildren && <SourceHandle id={keyText} indexInParent={index} isChildrenHidden={isChildrenHidden} />}
     </div>
   );
 });
