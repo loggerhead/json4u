@@ -103,7 +103,7 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
       name: "urlToJson",
       call: async () => {
         const { main, worker } = get();
-        const { text, parse } = await worker!.urlToJson(main!.text());
+        const { text, parse } = await worker!.urlToJSON(main!.text());
         if (!parse) return parse;
         const { set } = await main!.parseAndSet(text);
         return set;

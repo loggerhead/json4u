@@ -6,7 +6,7 @@ import { csv2json, json2csv } from "./command/csv";
 import { escape, unescape } from "./command/escape";
 import { parseAndFormat } from "./command/parse";
 import { pythonDictToJSON } from "./command/pythonDictToJSON";
-import { urlToJson } from "./command/urlToJson";
+import { urlToJSON } from "./command/urlToJSON";
 import {
   clearGraphNodeSelected,
   computeGraphRevealPosition,
@@ -26,7 +26,7 @@ const worker = {
   escape,
   unescape,
   pythonDictToJSON,
-  urlToJson,
+  urlToJSON,
   csv2json,
   json2csv,
   setupGlobalGraphStyle,

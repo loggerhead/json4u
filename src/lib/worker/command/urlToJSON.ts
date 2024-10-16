@@ -1,7 +1,7 @@
 import { getConfig } from "@/lib/db/config";
 import { parseJSON } from "@/lib/parser";
 
-export async function urlToJson(text: string): Promise<{ text: string; parse: boolean }> {
+export async function urlToJSON(text: string): Promise<{ text: string; parse: boolean }> {
   if (!text.trim()) {
     return { text, parse: false };
   }
