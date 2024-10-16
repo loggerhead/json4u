@@ -17,29 +17,21 @@ export async function urlToJson(text: string): Promise<{ text: string; parse: bo
 }
 
 function urlToMap(s: string) {
-  const u = new URL(s);
+  const isIntact = /^\w+:\/\/.*/g.test(s);
+  const u = new URL(isIntact ? s : `http://json4u.com${s.startsWith("/") ? s : "/" + s}`);
   const m = new Map();
   const q = new Map();
 
-  m.set("Scheme", u.protocol);
-  if (u.username) {
-    m.set("Username", u.username);
+  if (isIntact) {
+    m.set("Scheme", u.protocol);
+    u.hostname && m.set("Host", u.hostname);
   }
-  if (u.password) {
-    m.set("Password", u.password);
-  }
-  if (u.hostname) {
-    m.set("Host", u.hostname);
-  }
-  if (u.port) {
-    m.set("Port", u.port);
-  }
-  if (u.pathname && u.pathname !== "/") {
-    m.set("Path", u.pathname);
-  }
-  if (u.hash) {
-    m.set("Hash", u.hash);
-  }
+
+  u.username && m.set("Username", u.username);
+  u.password && m.set("Password", u.password);
+  u.port && m.set("Port", u.port);
+  u.pathname && m.set("Path", u.pathname);
+  u.hash && m.set("Hash", u.hash);
 
   u.searchParams.forEach((value, name) => {
     if (typeof value === "string" && value.match(/[a-zA-Z]:\/\//)) {
