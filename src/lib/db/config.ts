@@ -57,9 +57,13 @@ const storage: StateStorage = {
 };
 
 async function getConfig() {
-  const stateStr = await get(keyName);
-  const state = JSON.parse(stateStr);
-  return state.state as Config;
+  const stateStr = await get(keyName, globalStore);
+  try {
+    return JSON.parse(stateStr).state as Config;
+  } catch (e) {
+    console.log("fallback to use default config.");
+    return defaultConfig;
+  }
 }
 
 export { storage, getConfig };

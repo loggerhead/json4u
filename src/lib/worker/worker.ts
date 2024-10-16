@@ -1,3 +1,4 @@
+import { init as dbInit } from "@/lib/db/config";
 import { setupGlobalGraphStyle } from "@/lib/graph/layout";
 import * as Comlink from "comlink";
 import { compareText, compareTree } from "./command/compare";
@@ -42,4 +43,5 @@ const worker = {
 
 export type MyWorker = typeof worker;
 
+dbInit();
 Comlink.expose(worker);
