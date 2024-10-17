@@ -36,9 +36,19 @@ function genDom(tree: Tree, node: Node, addExpander?: boolean): H {
   if (node.type === "string") {
     return h("span", node.value || '""')
       .class("tbl-val", node.value ? "text-hl-string" : "text-hl-empty")
+      .addAttributes([
+        ["contentEditable", "true"],
+        ["suppressContentEditableWarning", ""],
+      ])
       .id(id);
   } else {
-    return h("span", getRawValue(node)!).class("tbl-val", `text-hl-${node.type}`).id(id);
+    return h("span", getRawValue(node)!)
+      .class("tbl-val", `text-hl-${node.type}`)
+      .addAttributes([
+        ["contentEditable", "true"],
+        ["suppressContentEditableWarning", ""],
+      ])
+      .id(id);
   }
 }
 
@@ -111,7 +121,15 @@ function genTableHeader(tree: Tree, node: Node, key: string, expanderId?: string
     .join("\n");
   const keyDom = h("span", key || '""').class(key ? "text-hl-key" : "text-hl-empty");
 
-  return h("th", h("div", keyDom, genExpander(expanderId)).class("tbl-key")).title(title);
+  return h(
+    "th",
+    h("div", keyDom, genExpander(expanderId))
+      .addAttributes([
+        ["contentEditable", "true"],
+        ["suppressContentEditableWarning", ""],
+      ])
+      .class("tbl-key"),
+  ).title(title);
 }
 
 function genExpander(expanderId?: string) {

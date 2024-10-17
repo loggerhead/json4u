@@ -9,6 +9,7 @@ export class H {
   attrId?: string;
   attrClass: string[];
   attrTitle?: string;
+  attributes?: Array<[key: string, value: string]>;
   children: (H | string)[];
 
   constructor(tag: string = "", ...children: (H | string)[]) {
@@ -42,6 +43,11 @@ export class H {
     return this;
   }
 
+  addAttributes(attributes: Array<[key: string, value: string]>) {
+    this.attributes = attributes;
+    return this;
+  }
+
   toString(): string {
     const childrenStr = this.children
       .map((child) => (typeof child === "string" ? escape(child) : child.toString()))
@@ -54,6 +60,7 @@ export class H {
       this.attrId && attrs.push(`id="${this.attrId}"`);
       this.attrClass.length && attrs.push(`class="${this.attrClass.join(" ")}"`);
       this.attrTitle && attrs.push(`title="${this.attrTitle}"`);
+      this.attributes?.forEach(([key, value]) => attrs.push(value ? `${key}="${value}"` : key));
       return `<${this.tag} ${attrs.join(" ")}>${childrenStr}</${this.tag}>`;
     }
   }

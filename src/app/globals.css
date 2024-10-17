@@ -280,7 +280,7 @@ body {
       display: inline-block;
       max-width: var(--max-key-length);
       white-space: nowrap;
-      overflow-x: auto;
+      overflow-x: hidden;
     }
 
     :not(:first-child) {
@@ -314,7 +314,7 @@ body {
     display: inline-block;
     max-width: var(--max-value-length);
     white-space: nowrap;
-    overflow-x: auto;
+    overflow-x: hidden;
   }
 }
 
