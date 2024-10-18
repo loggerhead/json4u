@@ -1,8 +1,9 @@
-import { type ComponentPropsWithoutRef, type ElementRef, forwardRef, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { type ComponentPropsWithoutRef, type ElementRef, forwardRef, useCallback, useEffect, useState } from "react";
+import LoadingButton from "@/components/LoadingButton";
 import { Input } from "@/components/ui/input";
 import { ViewMode } from "@/lib/db/config";
 import { jq } from "@/lib/jq";
+import { init as jqInit } from "@/lib/jq";
 import { cn, toastErr, toastSucc } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
@@ -23,14 +24,22 @@ const JqInput = forwardRef<ElementRef<typeof Input>, ComponentPropsWithoutRef<ty
       debounce(async (ev) => execJq(ev.target.value), 1000, { trailing: true }),
       [execJq],
     );
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      (async () => {
+        await jqInit();
+        setLoading(false);
+      })();
+    }, []);
 
     return (
       <div className={cn("flex items-center space-x-2", className)}>
         <Input
           id={elementId}
           type="text"
-          disabled={!usable}
-          placeholder={usable ? t("jq_placeholder") : t("jq_disabled")}
+          disabled={loading || !usable}
+          placeholder={loading ? t("jq_loading") : usable ? t("jq_placeholder") : t("jq_disabled")}
           ref={ref}
           onChange={onChange}
           onKeyDown={(ev) => {
@@ -48,9 +57,9 @@ const JqInput = forwardRef<ElementRef<typeof Input>, ComponentPropsWithoutRef<ty
             }
           }}
         />
-        <Button variant="outline" onClick={async () => execJq()}>
+        <LoadingButton loading={loading} variant="outline" onClick={async () => execJq()}>
           {t("Execute")}
-        </Button>
+        </LoadingButton>
       </div>
     );
   },

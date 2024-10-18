@@ -8,7 +8,6 @@ import MainPanel from "@/containers/editor/MainPanel";
 import SideNav from "@/containers/editor/sidenav";
 import { PricingOverlay } from "@/containers/pricing";
 import { init as dbInit } from "@/lib/db/config";
-import { init as jqInit } from "@/lib/jq";
 import { type MyWorker } from "@/lib/worker/worker";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
@@ -56,7 +55,6 @@ function useInit() {
   useEffect(() => {
     // async init
     dbInit();
-    jqInit();
 
     Promise.resolve(useStatusStore.persist.rehydrate()).then(() => setHydrated(true));
     updateActiveOrder(user);

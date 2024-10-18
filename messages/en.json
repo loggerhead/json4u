@@ -41,6 +41,7 @@
   "no_diff": "compare success, no difference",
   "with_diff": "compare success with difference",
   "with_text_diff": "text compare success with difference",
+  "jq_loading": "Loading...",
   "jq_placeholder": "Input jq filter here",
   "jq_disabled": "Used up this month's jq execution quota",
   "Execute": "Execute",

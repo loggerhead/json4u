@@ -41,6 +41,7 @@
   "no_diff": "比较成功，没有差异",
   "with_diff": "比较成功，存在差异",
   "with_text_diff": "文本比较成功，存在差异",
+  "jq_loading": "加载中...",
   "jq_placeholder": "在此输入 jq filter",
   "jq_disabled": "已使用完本月 jq 执行额度",
   "Execute": "执行",
