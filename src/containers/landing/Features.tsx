@@ -10,27 +10,27 @@ export default function Features() {
     {
       headline: t("Visualize"),
       description: t("Visualize_description"),
-      img: "/example/graph.png",
+      img: "/example/graph.webp",
     },
     {
       headline: t("Compare"),
       description: t("Compare_description"),
-      img: "/example/compare.png",
+      img: "/example/compare.webp",
     },
     {
       headline: t("Command"),
       description: t("Command_description"),
-      img: "/example/import-csv.png",
+      img: "/example/import-csv.webp",
     },
     {
       headline: t("Format"),
       description: t("Format_description"),
-      img: "/example/nest-parse.png",
+      img: "/example/nest-parse.webp",
     },
     {
       headline: t("Validate"),
       description: t("Validate_description"),
-      img: "/example/validate.png",
+      img: "/example/validate.webp",
     },
   ];
 
