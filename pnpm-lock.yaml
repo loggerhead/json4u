@@ -122,9 +122,6 @@ importers:
       github-markdown-css:
         specifier: ^5.6.1
         version: 5.6.1
-      html-to-image:
-        specifier: ^1.11.11
-        version: 1.11.11
       idb-keyval:
         specifier: ^6.2.1
         version: 6.2.1
@@ -3750,9 +3747,6 @@ packages:
 
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==, tarball: https://registry.npmjs.org/html-escaper/-/html-escaper-2.0.2.tgz}
-
-  html-to-image@1.11.11:
-    resolution: {integrity: sha512-9gux8QhvjRO/erSnDPv28noDZcPZmYE7e1vFsBLKLlRlKDSqNJYebj6Qz1TGd5lsRV+X+xYyjCKjuZdABinWjA==, tarball: https://registry.npmjs.org/html-to-image/-/html-to-image-1.11.11.tgz}
 
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==, tarball: https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz}
@@ -9585,8 +9579,6 @@ snapshots:
       react-is: 16.13.1
 
   html-escaper@2.0.2: {}
-
-  html-to-image@1.11.11: {}
 
   https-proxy-agent@5.0.1:
     dependencies:
