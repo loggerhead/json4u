@@ -7,8 +7,8 @@ import { useTranslations } from "next-intl";
 const SwapButton = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const t = useTranslations();
-    const callCommand = useEditorStore((state) => state.callCommand);
-    const onClick = useCallback(() => callCommand("swapLeftRight"), [callCommand]);
+    const runCommand = useEditorStore((state) => state.runCommand);
+    const onClick = useCallback(() => runCommand("swapLeftRight"), [runCommand]);
 
     useEffect(() => {
       const onKeyDown = (e: KeyboardEvent) => {

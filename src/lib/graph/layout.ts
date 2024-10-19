@@ -93,6 +93,12 @@ export interface Graph {
   virtual?: GraphVirtual;
 }
 
+export interface RevealPosition {
+  version: number; // version is used to re-trigger when assigned same id by caller
+  type: "nonLeafNode" | "key" | "value";
+  treeNodeId: string;
+}
+
 export function newGraph(): Graph {
   return { nodes: [], edges: [] };
 }

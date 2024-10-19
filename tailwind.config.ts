@@ -25,7 +25,8 @@ const config = {
     extend: {
       spacing: {
         "page-header": "var(--max-header-width)",
-        command: "var(--command-width)",
+        search: "var(--search-width)",
+        "search-h": "var(--search-height)",
         header: "var(--container-height)",
         statusbar: "var(--statusbar-height)",
         "max-key": "var(--max-key-length)",
@@ -43,7 +44,7 @@ const config = {
         "hl-empty": "var(--hl-empty)",
         "hl-index": "var(--hl-index)",
         "btn-input": "var(--btn-input)",
-        "btn": "var(--btn-text-color)",
+        btn: "var(--btn-text-color)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -83,6 +84,9 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        search: "0 0 0 1px hsla(0, 0%, 0%, 0.1),0 4px 11px hsla(0, 0%, 0%, 0.1)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -99,7 +103,10 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("tailwind-scrollbar")({ nocompatible: true, preferredStrategy: "pseudoelements" }),
+  ],
 } satisfies Config;
 
 export default config;
