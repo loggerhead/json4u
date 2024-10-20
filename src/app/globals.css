@@ -253,6 +253,7 @@ body {
   max-width: var(--max-key-length);
   white-space: nowrap;
   overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .graph-v {
@@ -260,6 +261,23 @@ body {
   margin-left: auto;
   white-space: nowrap;
   overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.popover-container {
+  display: flex;
+  height: auto;
+  max-height: 250px;
+  overflow: hidden;
+
+  .popover-item {
+    width: max-content;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    word-wrap: break-word;
+    font-size: 12px;
+    padding: 10px 20px;
+  }
 }
 
 .tbl {
