@@ -36,6 +36,7 @@ function genDom(tree: Tree, node: Node, addExpander?: boolean): H {
   if (node.type === "string") {
     return h("span", node.value || '""')
       .class("tbl-val", node.value ? "text-hl-string" : "text-hl-empty")
+      .title(node.value)
       .id(id);
   } else {
     return h("span", getRawValue(node)!).class("tbl-val", `text-hl-${node.type}`).id(id);
