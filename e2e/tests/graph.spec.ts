@@ -35,4 +35,26 @@ test.describe("Virtual graph", () => {
     await move(page, 2000, 2000);
     await expect(getGraphNode(page, "$")).toBeHidden();
   });
+
+  test("it should render popover when a key node is hovered by mouse.", async ({ page }) => {
+    await getEditor(page, { goto: true });
+
+    const keyNode = page.locator(".graph-k");
+    const box = await keyNode.first().boundingBox();
+
+    expect(box).toBeTruthy();
+    await page.mouse.move(box!.x, box!.y);
+    await expect(page.getByTestId("popover-key").first()).toBeVisible();
+  });
+
+  test("it should render popover when a value node is hovered by mouse.", async ({ page }) => {
+    await getEditor(page, { goto: true });
+
+    const valueNode = page.locator(".graph-v");
+    const box = await valueNode.first().boundingBox();
+
+    expect(box).toBeTruthy();
+    await page.mouse.move(box!.x, box!.y);
+    await expect(page.getByTestId("popover-value").first()).toBeVisible();
+  });
 });
