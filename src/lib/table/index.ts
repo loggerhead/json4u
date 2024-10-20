@@ -59,7 +59,7 @@ function genArrayDom(tree: Tree, node: Node) {
   const key2ExpanderId = genArrayExpanderIds(tree, node);
   const rowForHeaders = headers.length
     ? h("tr", indexHeader)
-        .addChildren(headers.map((key) => genTableHeader(tree, node, key, key2ExpanderId[key])))
+        .addChildren(headers.map((key) => genTableHeader(key, key2ExpanderId[key])))
         .class("sticky-scroll")
     : "";
 
@@ -89,29 +89,15 @@ function genObjectDom(tree: Tree, node: Node) {
     h("tbody").addChildren(
       // generate key:value pair as the row
       tree.mapChildren(node, (child, key) =>
-        h("tr", genTableHeader(tree, node, key, key2ExpanderId[key]), h("td", genDom(tree, child))),
+        h("tr", genTableHeader(key, key2ExpanderId[key]), h("td", genDom(tree, child))),
       ),
     ),
   ).class("tbl");
 }
 
-const nodeTypeToPrefixMap: Partial<Record<NodeType, string>> = {
-  object: "{}",
-  array: "[]",
-};
-
-function genTableHeader(tree: Tree, node: Node, key: string, expanderId?: string) {
-  const path = genKeyAndTypeList(tree, node.id, key);
-  const title = path
-    .map(({ nodeType, key }, i) => {
-      // last key in the path has no prefix
-      const prefix = i < path.length - 1 ? nodeTypeToPrefixMap[nodeType!] + " " : "";
-      return `${prefix}${key.replaceAll('"', "&quot;")}`;
-    })
-    .join("\n");
+function genTableHeader(key: string, expanderId?: string) {
   const keyDom = h("span", key || '""').class(key ? "text-hl-key" : "text-hl-empty");
-
-  return h("th", h("div", keyDom, genExpander(expanderId)).class("tbl-key")).title(title);
+  return h("th", h("div", keyDom, genExpander(expanderId)).class("tbl-key")).title(key);
 }
 
 function genExpander(expanderId?: string) {
