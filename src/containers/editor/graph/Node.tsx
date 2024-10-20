@@ -90,10 +90,10 @@ const KV = memo(({ index, property, valueClassName, valueText, hasChildren, widt
 
   return (
     <div className="graph-kv" style={{ width }}>
-      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-k", keyClass)}>
+      <div className={cn("graph-k", keyClass)} title={keyText}>
         {keyText}
       </div>
-      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-v", valueClassName)}>
+      <div className={cn("graph-v", valueClassName)} title={valueText}>
         {valueText}
       </div>
       {hasChildren && <SourceHandle id={keyText} indexInParent={index} isChildrenHidden={isChildrenHidden} />}
