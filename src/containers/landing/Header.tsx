@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Typography from "@/components/ui/typography";
 import AccountButton from "@/containers/editor/sidenav/AccountButton";
-import { isCN, version } from "@/lib/env";
+import { isCN, majorVersion as version } from "@/lib/env";
 import { useTranslations } from "next-intl";
 
 export default function Header() {

@@ -38,7 +38,7 @@ The best JSON visualization and processing tool.
 
 - [x] Improve performance to support large files (>= 1mb).
   - [x] Only render visible nodes in graph mode.
-  - [ ] Optimize performance of table mode (no idea).
+  - [ ] Optimize performance of table mode (see [discussion](https://github.com/loggerhead/json4u/discussions/55)).
   - [ ] ~~Use wasm in web worker for parsing (use rust)~~.
   - [ ] ~~Consider [changing the editor to Ace](https://medium.com/miro-engineering/how-we-integrated-a-code-editor-on-the-miro-canvas-a41e0eff7f21).~~
 - [ ] Improve interoperability between left and right panels.

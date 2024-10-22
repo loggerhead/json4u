@@ -3,6 +3,7 @@ import { z } from "zod";
 import packageJSON from "../../package.json";
 
 export const version = packageJSON.version;
+export const majorVersion = packageJSON.version.split(".").slice(0, 2).join(".");
 
 const StatisticsSchema = z.object({
   graphModeView: z.number(),
