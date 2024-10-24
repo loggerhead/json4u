@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useHoverKv } from "@/contexts/hover-kv-context";
 import {
   computeSourceHandleOffset,
   genKeyText,
@@ -60,6 +61,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                   hasChildren={hasChildren(child)}
                   isChildrenHidden={getNode(child.id)?.hidden ?? false}
                   width={width}
+                  position={{ ...flowNode.position, y: flowNode.position.y + (flowNode.data.height ?? 0) }}
                 />
               );
             } else {
@@ -82,24 +84,53 @@ interface KvProps {
   hasChildren: boolean;
   width: number; // used to avoid width jump when viewport changes
   isChildrenHidden: boolean;
+  position: { x: number; y: number };
 }
 
-const KV = memo(({ index, property, valueClassName, valueText, hasChildren, width, isChildrenHidden }: KvProps) => {
-  const keyText = genKeyText(property);
-  const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
+const KV = memo(
+  ({ index, property, valueClassName, valueText, hasChildren, width, isChildrenHidden, position }: KvProps) => {
+    const keyText = genKeyText(property);
+    const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
+    const { state, setState } = useHoverKv();
 
-  return (
-    <div className="graph-kv" style={{ width }}>
-      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-k", keyClass)}>
-        {keyText}
+    const onMouseEnter = (type: "key" | "value", text: string) => {
+      if (!state) {
+        setState({
+          type,
+          text,
+          position,
+          maxWidth: width,
+        });
+      }
+    };
+
+    const onMouseLeave = () => {
+      if (state) {
+        setState(null);
+      }
+    };
+
+    return (
+      <div className="graph-kv" style={{ width }}>
+        <div
+          className={cn("graph-k", keyClass)}
+          onMouseEnter={() => onMouseEnter("key", keyText)}
+          onMouseLeave={onMouseLeave}
+        >
+          {keyText}
+        </div>
+        <div
+          className={cn("graph-v", valueClassName)}
+          onMouseEnter={() => onMouseEnter("value", valueText)}
+          onMouseLeave={onMouseLeave}
+        >
+          {valueText}
+        </div>
+        {hasChildren && <SourceHandle id={keyText} indexInParent={index} isChildrenHidden={isChildrenHidden} />}
       </div>
-      <div contentEditable="true" suppressContentEditableWarning className={cn("graph-v", valueClassName)}>
-        {valueText}
-      </div>
-      {hasChildren && <SourceHandle id={keyText} indexInParent={index} isChildrenHidden={isChildrenHidden} />}
-    </div>
-  );
-});
+    );
+  },
+);
 KV.displayName = "KV";
 
 export const RootNode = memo(({ data }: NodeProps<NodeWithData>) => {

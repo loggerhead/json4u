@@ -228,6 +228,7 @@ body {
   max-width: var(--max-key-length);
   white-space: nowrap;
   overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .graph-v {
@@ -235,6 +236,7 @@ body {
   margin-left: auto;
   white-space: nowrap;
   overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .tbl {

@@ -1,11 +1,20 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { HoverKvProvider, useHoverKv } from "@/contexts/hover-kv-context";
 import { config } from "@/lib/graph/layout";
 import { detectOS } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import {
+  Background,
+  Controls,
+  OnConnectStart,
+  ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
+  ViewportPortal,
+} from "@xyflow/react";
 import { type Node as FlowNode } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import MouseButton from "./MouseButton";
@@ -17,7 +26,9 @@ export default function Graph() {
   return (
     <div className="relative w-full h-full">
       <ReactFlowProvider>
-        <LayoutGraph />
+        <HoverKvProvider>
+          <LayoutGraph />
+        </HoverKvProvider>
       </ReactFlowProvider>
     </div>
   );
@@ -31,6 +42,7 @@ function LayoutGraph() {
   const onHandleClick = useOnHandleClick();
 
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
+  const { state } = useHoverKv();
   const g = useVirtualGraph();
   useViewportChange(ref);
   useRevealNode();
@@ -74,6 +86,25 @@ function LayoutGraph() {
         <MouseButton isTouchPad={isTouchPad} setIsTouchPad={setIsTouchPad} />
       </Controls>
       <Background />
+      {state && (
+        <ViewportPortal>
+          <div
+            style={{
+              transform: `translate(${state.position.x}px, ${state.position.y}px)`,
+              position: "absolute",
+              height: "auto",
+              padding: "10px 20px",
+              background: "#f8f9fa",
+              border: "1px solid #dee2e6",
+              maxWidth: `${state.maxWidth}px`,
+              wordWrap: "break-word",
+              fontSize: "12px",
+            }}
+          >
+            {state.text}
+          </div>
+        </ViewportPortal>
+      )}
     </ReactFlow>
   );
 }
