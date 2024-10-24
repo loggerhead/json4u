@@ -83,15 +83,18 @@ export function useViewportChange(ref: RefObject<HTMLDivElement>) {
 
 export function useRevealNode() {
   const { getZoom, setCenter } = useReactFlow();
-  const { id, version } = useStatusStore((state) => state.revealId);
   const worker = useEditorStore((state) => state.worker)!;
+  const revealPosition = useStatusStore((state) => state.revealPosition);
 
   useEffect(() => {
-    if (worker && id) {
+    if (worker && revealPosition.treeNodeId) {
       (async () => {
-        const { x, y } = await worker.computeGraphRevealPosition(id);
-        setCenter(x, y, { duration: 100, zoom: getZoom() });
+        const { x, y, changed } = await worker.computeGraphRevealPosition(revealPosition);
+
+        if (changed) {
+          setCenter(x, y, { duration: 100, zoom: getZoom() });
+        }
       })();
     }
-  }, [worker, id, version]);
+  }, [worker, revealPosition]);
 }

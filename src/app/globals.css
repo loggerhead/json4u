@@ -39,7 +39,8 @@
     --btn-input: #666;
     --kbd-color: #171717;
     --kbd-bg-color: #fafafa;
-    --command-width: 240px;
+    --search-width: 240px;
+    --search-height: 300px;
 
     --max-header-width: 1280px;
     /* height of <Container/> */

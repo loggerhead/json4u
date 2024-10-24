@@ -12,10 +12,10 @@ import { getStatusState } from "./statusStore";
 import { getUserState } from "./userStore";
 
 export interface Command {
-  name: string;
+  id: MessageKey;
   Icon?: LucideIcon;
   hidden?: boolean; // hidden in command bar?
-  call: () => void | Promise<void | boolean>;
+  run: () => void | Promise<void | boolean>;
 }
 
 export interface EditorState {
@@ -26,8 +26,7 @@ export interface EditorState {
   worker?: Remote<MyWorker>;
   commands: Command[];
 
-  addCommand: (cmd: Command) => void;
-  callCommand: (name: string) => void;
+  runCommand: (id: MessageKey) => void;
   setTranslations: (translations: ReturnType<typeof useTranslations>) => void;
   getWorker: () => Remote<MyWorker> | undefined;
   setWorker: (worker: Remote<MyWorker>) => void;
@@ -39,69 +38,68 @@ export interface EditorState {
 }
 
 export const useEditorStore = create<EditorState>()((set, get) => ({
-  // TODO: add icon for all commands
   commands: [
     {
-      name: "format",
-      call: async () => {
+      id: "format",
+      run: async () => {
         const { main } = get();
         const { set } = await main!.parseAndSet(main!.text(), { format: true });
         return set;
       },
     },
     {
-      name: "minify",
-      call: async () => {
+      id: "minify",
+      run: async () => {
         const { main } = get();
         const { parse } = await main!.parseAndSet(main!.text(), { format: "minify" });
         return parse;
       },
     },
     {
-      name: "escape",
-      call: async () => {
+      id: "escape",
+      run: async () => {
         const { main, worker } = get();
         const { set } = await main!.parseAndSet(await worker!.escape(main!.text()));
         return set;
       },
     },
     {
-      name: "unescape",
-      call: async () => {
+      id: "unescape",
+      run: async () => {
         const { main, worker } = get();
         const { set } = await main!.parseAndSet(await worker!.unescape(main!.text()));
         return set;
       },
     },
     {
-      name: "sortAsc",
+      id: "sortAsc",
       Icon: ArrowDownNarrowWide,
-      call: async () => {
+      run: async () => {
         const { main } = get();
         const { parse } = await main!.parseAndSet(main!.text(), { sort: "asc" });
         return parse;
       },
     },
     {
-      name: "sortDesc",
+      id: "sortDesc",
       Icon: ArrowDownWideNarrow,
-      call: async () => {
+      run: async () => {
         const { main } = get();
         const { parse } = await main!.parseAndSet(main!.text(), { sort: "desc" });
         return parse;
       },
     },
     {
-      name: "pythonDictToJSON",
-      call: async () => {
+      id: "pythonDictToJSON",
+      run: async () => {
         const { main, worker } = get();
         const { parse } = await main!.parseAndSet(await worker!.pythonDictToJSON(main!.text()));
         return parse;
       },
     },
     {
-      name: "urlToJson",
-      call: async () => {
+      id: "urlToJson",
+      run: async () => {
         const { main, worker } = get();
         const { text, parse } = await worker!.urlToJSON(main!.text());
         if (!parse) return parse;
@@ -110,13 +108,13 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
       },
     },
     {
-      name: "compare",
-      call: async () => await get().compare(),
+      id: "compare",
+      run: async () => await get().compare(),
     },
     {
-      name: "swapLeftRight",
+      id: "swapLeftRight",
       hidden: true,
-      call: async () => {
+      run: async () => {
         const { main, secondary } = get();
         const left = main?.text();
         const right = secondary?.text();
@@ -125,33 +123,24 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
         return true;
       },
     },
+    {
+      id: "show_jq",
+      run: () => getStatusState().setCommandMode("jq"),
+    },
   ],
 
-  addCommand(cmd: Command) {
-    const commands = get().commands;
-    const old = commands.find((item) => item.name === cmd.name);
-
-    if (old) {
-      Object.assign(old, cmd);
-    } else {
-      commands.push(cmd);
-    }
-
-    set({ commands });
-  },
-
-  async callCommand(name: string) {
+  async runCommand(id: MessageKey) {
     const { translations: t, commands, isReady } = get();
     if (!isReady()) {
       console.log("editor is not ready!");
       return;
     }
 
-    const r = await Promise.resolve(commands.find((item) => item.name === name)?.call());
+    const r = await Promise.resolve(commands.find((item) => item.id === id)?.run());
     let isSucc = true;
+    const name = t!(id);
 
     if (r !== undefined) {
-      name = t!(name as MessageKey);
       if (r) {
         // @ts-ignore
         toastSucc(t!("cmd_exec_succ", { name }));
@@ -232,6 +221,10 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
 
 export function useEditor(kind: Kind = "main") {
   return useEditorStore((state) => state[kind]);
+}
+
+export function useWorker() {
+  return useEditorStore((state) => state.worker);
 }
 
 export function getEditorState() {

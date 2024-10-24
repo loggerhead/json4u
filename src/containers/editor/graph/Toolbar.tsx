@@ -20,9 +20,9 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const worker = useEditorStore((state) => state.worker)!;
   const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
 
-  const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode, setRevealId, setJsonPath } = useStatusStore(
+  const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode, setRevealPosition, setJsonPath } = useStatusStore(
     useShallow((state) => ({
-      setRevealId: state.setRevealId,
+      setRevealPosition: state.setRevealPosition,
       setJsonPath: state.setJsonPath,
       toggleFoldNode: state.toggleFoldNode,
       toggleFoldSibingsNode: state.toggleFoldSibingsNode,
@@ -50,7 +50,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
           title={t("go to parent")}
           onClick={async () => {
             if (parentId) {
-              setRevealId(parentId);
+              setRevealPosition({ type: "nonLeafNode", treeNodeId: parentId });
               const { nodes, edges, jsonPath } = await worker.toggleGraphNodeSelected(parentId);
               setNodes(nodes);
               setEdges(edges);

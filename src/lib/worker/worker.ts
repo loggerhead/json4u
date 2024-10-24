@@ -12,6 +12,7 @@ import {
   computeGraphRevealPosition,
   createGraph,
   createTable,
+  searchInView,
   setGraphSize,
   setGraphViewport,
   toggleGraphNodeHidden,
@@ -39,6 +40,7 @@ const worker = {
   clearGraphNodeSelected,
   triggerGraphFoldSiblings,
   computeGraphRevealPosition,
+  searchInView,
 };
 
 export type MyWorker = typeof worker;

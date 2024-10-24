@@ -71,7 +71,6 @@ function useExecJq() {
     useShallow((state) => ({
       main: state.main,
       secondary: state.secondary,
-      callCommand: state.callCommand,
     })),
   );
   const { viewMode, setViewMode } = useStatusStore(
