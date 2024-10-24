@@ -100,6 +100,7 @@ function useObserveResize() {
     return () => {
       resizeObserver.unobserve(leftPanel);
       resizeObserver.unobserve(rightPanel);
+      console.log("Unobserve left and right panels.");
     };
   }, []);
 }
@@ -128,6 +129,7 @@ function WidthMeasure() {
 
       setupGlobalGraphStyle(measured);
       worker.setupGlobalGraphStyle(measured);
+      console.log("Finished measuring graph base style:", measured);
     }
   }, [worker]);
 

@@ -24,6 +24,15 @@ export function useViewportChange(ref: RefObject<HTMLDivElement>) {
           changed,
         } = await worker.setGraphSize(width, height);
 
+        console.log(
+          "Compute virtual graph because of resize:",
+          changed,
+          [width, height],
+          [nodes.length, edges.length],
+          nodes.slice(0, 10),
+          edges.slice(0, 10),
+        );
+
         setViewportSize(width, height);
         if (changed) {
           setNodes(nodes);
@@ -47,6 +56,15 @@ export function useViewportChange(ref: RefObject<HTMLDivElement>) {
           renderable: { nodes, edges },
           changed,
         } = await worker.setGraphViewport(viewport);
+
+        console.log(
+          "Compute virtual graph because of viewport changed:",
+          changed,
+          viewport,
+          [nodes.length, edges.length],
+          nodes.slice(0, 10),
+          edges.slice(0, 10),
+        );
 
         if (changed) {
           setNodes(nodes);

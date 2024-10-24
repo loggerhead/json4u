@@ -27,10 +27,12 @@ export function useTableHTML() {
 
   useEffect(() => {
     if (!(worker && isTableView && treeVersion > version)) {
+      console.log("Skip table render:", !!worker, isTableView, treeVersion, version);
       return;
     }
 
     if (!usable) {
+      console.log("Skip table render because reach out of free quota.");
       setShowPricingOverlay(true);
       return;
     }
@@ -39,6 +41,8 @@ export function useTableHTML() {
       const tableHTML = await worker.createTable();
       setInnerHTML(tableHTML);
       setVersion(treeVersion);
+
+      console.log("Create a new table:", treeVersion, tableHTML.length, tableHTML.slice(0, 100));
       tableHTML.length > 0 && count("tableModeView");
     })();
   }, [worker, usable, isTableView, treeVersion, version]);

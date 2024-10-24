@@ -53,15 +53,23 @@ function useInit() {
   );
 
   useEffect(() => {
-    // async init
     dbInit();
 
-    Promise.resolve(useStatusStore.persist.rehydrate()).then(() => setHydrated(true));
+    Promise.resolve(useStatusStore.persist.rehydrate())
+      .then(() => {
+        setHydrated(true);
+        console.log("Finished statusStore rehydrate.");
+      })
+      .catch((e) => {
+        console.error("statusStore rehydrate failed:", e);
+        throw e;
+      });
     updateActiveOrder(user);
 
     const worker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
     const workerProxy = wrap<MyWorker>(worker);
     setWorker(workerProxy);
+    console.log("Finished worker initial.");
 
     window.addEventListener("beforeunload", () => {
       console.log("worker is terminated.");

@@ -43,10 +43,12 @@ export default function useVirtualGraph() {
 
   useEffect(() => {
     if (!(worker && isGraphView && treeVersion > versionRef.current)) {
+      console.log("Skip graph render:", !!worker, isGraphView, treeVersion, versionRef.current);
       return;
     }
 
     if (!usable) {
+      console.log("Skip graph render because reach out of free quota.");
       setShowPricingOverlay(true);
       return;
     }
@@ -56,7 +58,7 @@ export default function useVirtualGraph() {
         graph: { levelMeta },
         renderable: { nodes, edges },
       } = await worker.createGraph();
-      
+
       setNodes(nodes);
       setEdges(edges);
       setViewport({ ...initialViewport, zoom: getZoom() });
@@ -72,6 +74,15 @@ export default function useVirtualGraph() {
         [Math.max(maxX + config.translateMargin, w), Math.max(maxY + config.translateMargin, h)],
       ];
       versionRef.current = treeVersion;
+
+      console.log(
+        "Create a new graph:",
+        treeVersion,
+        translateExtentRef.current,
+        [nodes.length, edges.length],
+        nodes.slice(0, 10),
+        edges.slice(0, 10),
+      );
       nodes.length > 0 && count("graphModeView");
     })();
   }, [worker, usable, isGraphView, treeVersion]);

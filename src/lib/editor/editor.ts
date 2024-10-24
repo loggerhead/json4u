@@ -126,6 +126,7 @@ export class EditorWrapper {
       this.revealPosition(1, 1);
     }
 
+    console.log("Set tree:", tree);
     return tree;
   }
 
@@ -136,6 +137,7 @@ export class EditorWrapper {
     version: number = this.version,
   ): Promise<{ set: boolean; parse: boolean }> {
     if (version < this.version) {
+      console.log("Skip parseAndSet:", version, this.version);
       return { set: false, parse: false };
     }
 
@@ -158,9 +160,11 @@ export class EditorWrapper {
   async onChange(text: string | undefined, ev: editorApi.IModelContentChangedEvent) {
     const version = ev.versionId;
     if (version <= this.version) {
+      console.log("Skip onChange:", version, this.version);
       return;
     }
 
+    console.log("onChange:", version);
     await this.delayParseAndSet(text ?? "", { format: false }, false, version);
   }
 
@@ -168,11 +172,13 @@ export class EditorWrapper {
     this.editor.onDidPaste(async (event) => {
       // 仅当粘贴替换全部文本时，才执行 paste 相关的动作
       if (!event.range.equalsRange(this.model().getFullModelRange())) {
+        console.log("Skip onDidPaste");
         return;
       }
 
       // increase version to skip next delayParseAndSet calling which triggered by onChange event
       this.incVersion();
+      console.log("onDidPaste:", this.version);
       await this.parseAndSet(this.text());
     });
   }
