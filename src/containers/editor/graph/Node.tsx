@@ -29,7 +29,6 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   const width = flowNode.data.width;
   const childrenNum = getChildrenKeys(node).length;
   const { kvStart, kvEnd, virtualHandleIndices } = flowNode.data.render;
-  console.log(flowNode);
 
   return (
     <>
