@@ -32,7 +32,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   return (
     <>
       {data.toolbarVisible && <Toolbar id={id} />}
-      <div className="nodrag nopan graph-node cursor-default" style={data.style}>
+      <div className="graph-node nodrag nopan cursor-default" style={data.style} data-tree-id={id}>
         {node.id !== rootMarker && <TargetHandle childrenNum={childrenNum} />}
         {kvStart > 0 && <div style={{ width, height: kvStart * globalStyle.kvHeight }} />}
         {filter(
@@ -52,6 +52,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
               const { className, text } = genValueAttrs(child);
               return (
                 <KV
+                  id={child.id}
                   key={i}
                   index={i}
                   property={node.type === "array" ? i : key}
@@ -75,6 +76,7 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
 ObjectNode.displayName = "ObjectNode";
 
 interface KvProps {
+  id: string;
   index: number;
   property: string | number;
   valueClassName: string;
@@ -84,12 +86,12 @@ interface KvProps {
   isChildrenHidden: boolean;
 }
 
-const KV = memo(({ index, property, valueClassName, valueText, hasChildren, width, isChildrenHidden }: KvProps) => {
+const KV = memo(({ id, index, property, valueClassName, valueText, hasChildren, width, isChildrenHidden }: KvProps) => {
   const keyText = genKeyText(property);
   const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
 
   return (
-    <div className="graph-kv" style={{ width }}>
+    <div className="graph-kv" style={{ width }} data-tree-id={id}>
       <div contentEditable="true" suppressContentEditableWarning className={cn("graph-k", keyClass)}>
         {keyText}
       </div>

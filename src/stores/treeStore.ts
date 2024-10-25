@@ -58,6 +58,10 @@ export function getTreeState() {
   return useTreeStore.getState();
 }
 
+export function getTree() {
+  return getTreeState()["main"];
+}
+
 export function useTree(kind: Kind = "main") {
   return useTreeStore((state) => state[kind]);
 }

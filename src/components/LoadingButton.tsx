@@ -1,6 +1,5 @@
 import { forwardRef } from "react";
-import { cn } from "@/lib/utils";
-import { LoaderCircle } from "lucide-react";
+import LoadingIcon from "./ui/LoadingIcon";
 import { Button, ButtonProps } from "./ui/button";
 
 export interface LoadingButtonProps extends ButtonProps {
@@ -10,7 +9,7 @@ export interface LoadingButtonProps extends ButtonProps {
 const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(({ loading, children, ...props }, ref) => {
   return (
     <Button ref={ref} disabled={loading} {...props}>
-      <LoaderCircle className={cn("animate-spin mr-2", !loading && "hidden")} />
+      <LoadingIcon loading={loading} />
       {children}
     </Button>
   );

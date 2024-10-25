@@ -3,6 +3,7 @@ import {
   type EdgeWithData,
   type Graph,
   nodeHighlightStyle,
+  nodeSelectedStyle,
   type NodeWithData,
 } from "@/lib/graph/layout";
 import { isParent } from "@/lib/idgen";
@@ -81,8 +82,13 @@ export function matchApply<T extends NodeWithData | EdgeWithData>(
   }
 }
 
-export function highlightNode(node: NodeWithData, enable: boolean) {
-  const style = enable ? nodeHighlightStyle : undefined;
+export function highlightNode(node: NodeWithData, enable: boolean, isSelected?: boolean) {
+  let style = undefined;
+
+  if (enable) {
+    style = isSelected ? nodeSelectedStyle : nodeHighlightStyle;
+  }
+
   node.style = style;
   node.data.style = style;
   return node;

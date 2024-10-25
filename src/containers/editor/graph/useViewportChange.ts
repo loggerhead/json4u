@@ -9,6 +9,7 @@ import { useResizeObserver } from "usehooks-ts";
 import { setViewportSize } from "./useVirtualGraph";
 
 export function useViewportChange(ref: RefObject<HTMLDivElement>) {
+  const focusRevealPosition = useStatusStore((state) => state.focusRevealPosition);
   const worker = useEditorStore((state) => state.worker);
   const { setNodes, setEdges } = useReactFlow();
 
@@ -70,11 +71,12 @@ export function useViewportChange(ref: RefObject<HTMLDivElement>) {
           setNodes(nodes);
           setEdges(edges);
         }
+        focusRevealPosition();
       },
       refreshInterval,
       { trailing: true },
     ),
-    [worker],
+    [worker, focusRevealPosition],
   );
 
   useResizeObserver({ ref, onResize });
@@ -83,15 +85,18 @@ export function useViewportChange(ref: RefObject<HTMLDivElement>) {
 
 export function useRevealNode() {
   const { getZoom, setCenter } = useReactFlow();
-  const { id, version } = useStatusStore((state) => state.revealId);
   const worker = useEditorStore((state) => state.worker)!;
+  const revealPosition = useStatusStore((state) => state.revealPosition);
 
   useEffect(() => {
-    if (worker && id) {
+    if (worker && revealPosition.treeNodeId) {
       (async () => {
-        const { x, y } = await worker.computeGraphRevealPosition(id);
-        setCenter(x, y, { duration: 100, zoom: getZoom() });
+        const { x, y, changed } = await worker.computeGraphRevealPosition(revealPosition);
+
+        if (changed) {
+          setCenter(x, y, { duration: 100, zoom: getZoom() });
+        }
       })();
     }
-  }, [worker, id, version]);
+  }, [worker, revealPosition]);
 }

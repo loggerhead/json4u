@@ -13,6 +13,7 @@ declare global {
   interface Window {
     monacoApi: MonacoApi;
     leftPanelHandle: ImperativePanelHandle | null;
+    searchComponents: Record<string, any>;
 
     createLemonSqueezy: () => void;
     LemonSqueezy: {

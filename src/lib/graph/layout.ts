@@ -15,6 +15,7 @@ export const config: Readonly<Record<string, any>> = {
   imageHeight: 768,
 };
 
+// TODO: move this to a separate file
 export interface GraphNodeStyle {
   fontWidth: number;
   padding: number;
@@ -46,9 +47,12 @@ export function setupGlobalGraphStyle(style: Partial<GraphNodeStyle>) {
   Object.assign(globalStyle, style);
 }
 
-const selectedColor = "black";
-export const nodeHighlightStyle: CSSProperties = { borderColor: selectedColor };
-export const edgeHighlightStyle: CSSProperties = { stroke: selectedColor };
+const highlightColor = "black";
+const selectedColor = "red";
+
+export const nodeSelectedStyle: CSSProperties = { borderColor: selectedColor };
+export const nodeHighlightStyle: CSSProperties = { borderColor: highlightColor };
+export const edgeHighlightStyle: CSSProperties = { stroke: highlightColor };
 
 export type NodeWithData = FlowNode<{
   parentId: string;
@@ -91,6 +95,14 @@ export interface Graph {
   nodeMap?: Record<string, NodeWithData>;
   edgeMap?: Record<string, EdgeWithData>;
   virtual?: GraphVirtual;
+}
+
+export type RevealType = "nonLeafNode" | "key" | "value";
+
+export interface RevealPosition {
+  version: number; // version is used to re-trigger when assigned same id by caller
+  type: RevealType;
+  treeNodeId: string;
 }
 
 export function newGraph(): Graph {

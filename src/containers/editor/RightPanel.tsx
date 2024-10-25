@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Container, ContainerContent, ContainerHeader } from "@/components/Container";
 import { Button } from "@/components/ui/button";
+import ViewSearchInput from "@/components/ui/search/ViewSearchInput";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toggle } from "@/components/ui/toggle";
@@ -55,7 +56,7 @@ export default function RightPanel() {
 
 function Buttons({ viewMode }: { viewMode: ViewMode }) {
   const t = useTranslations();
-  const callCommand = useEditorStore((state) => state.callCommand);
+  const runCommand = useEditorStore((state) => state.runCommand);
   const { enableTextCompare, setEnableTextCompare, enableSyncScroll, setEnableSyncScroll } = useStatusStore(
     useShallow((state) => ({
       enableTextCompare: state.enableTextCompare,
@@ -71,7 +72,7 @@ function Buttons({ viewMode }: { viewMode: ViewMode }) {
         <>
           <div className="flex items-center rounded-md pl-1 bg-muted text-zinc-600">
             <Switch checked={enableTextCompare} onCheckedChange={setEnableTextCompare} />
-            <Button className="px-2" onClick={() => callCommand("compare")}>
+            <Button className="px-2" onClick={() => runCommand("compare")}>
               {t(enableTextCompare ? "TextCompare" : "compare")}
             </Button>
           </div>
@@ -86,6 +87,7 @@ function Buttons({ viewMode }: { viewMode: ViewMode }) {
           <SwapButton variant="icon-outline" className="px-2" />
         </>
       )}
+      {viewMode === ViewMode.Graph && <ViewSearchInput />}
       <FullScreenButton />
     </div>
   );

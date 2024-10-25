@@ -2,22 +2,22 @@
 
 import { Container, ContainerContent, ContainerHeader } from "@/components/Container";
 import { Button } from "@/components/ui/button";
+import CommandSearchInput from "@/components/ui/search/CommandSearchInput";
 import Editor from "@/containers/editor/editor/loader";
 import { useEditorStore } from "@/stores/editorStore";
 import { useTranslations } from "next-intl";
-import { CommandSearch } from "./Command";
 
 export default function LeftPanel() {
   const t = useTranslations();
-  const callCommand = useEditorStore((state) => state.callCommand);
+  const runCommand = useEditorStore((state) => state.runCommand);
 
   return (
     <Container>
       <ContainerHeader>
-        <CommandSearch />
+        <CommandSearchInput />
         <div className="flex items-center ml-auto">
-          <Button onClick={() => callCommand("format")}>{t("format")}</Button>
-          <Button onClick={() => callCommand("unescape")}>{t("unescape")}</Button>
+          <Button onClick={() => runCommand("format")}>{t("format")}</Button>
+          <Button onClick={() => runCommand("unescape")}>{t("unescape")}</Button>
         </div>
       </ContainerHeader>
       <ContainerContent>

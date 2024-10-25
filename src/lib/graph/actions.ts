@@ -1,6 +1,7 @@
 import { join as idJoin, isDescendant, splitParentPointer, toPath } from "@/lib/idgen";
+import { type Tree } from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
-import { type Graph } from "./layout";
+import { computeSourceHandleOffset, type RevealPosition, type Graph } from "./layout";
 import {
   getAncestor,
   getDescendant,
@@ -37,7 +38,7 @@ export function toggleNodeSelected(graph: Graph, id: string) {
   matchApply(
     graph.nodes,
     [node, ...ancestorNodes, ...descendantNodes],
-    (nd) => toggleToolbar(highlightNode(nd, true), node),
+    (nd) => toggleToolbar(highlightNode(nd, true, nd.id === id), node),
     (nd) => toggleToolbar(highlightNode(nd, false), node),
   );
 
@@ -73,11 +74,33 @@ export function triggerFoldSiblings(graph: Graph, nodeId: string, fold: boolean)
   return generateVirtualGraph(graph);
 }
 
-export function computeRevealPosition(width: number, height: number, graph: Graph, nodeId: string): XYPosition {
-  // must >= toolbar's height, otherwise toolbar will not in viewport
+export function computeRevealPosition(
+  width: number,
+  height: number,
+  graph: Graph,
+  tree: Tree,
+  { type, treeNodeId }: RevealPosition,
+): XYPosition & { changed: boolean } {
+  const { parent, lastKey } = splitParentPointer(treeNodeId);
+  const graphNode = graph.nodeMap?.[type === "nonLeafNode" ? treeNodeId : (parent ?? "")];
+
+  if (!graphNode) {
+    console.error("computeRevealPosition (node not found):", treeNodeId, type);
+    return { x: 0, y: 0, changed: false };
+  }
+
+  let xOffset = 0;
+  let yOffset = 0;
+
+  if (type !== "nonLeafNode") {
+    const i = tree.node(parent!).childrenKeys?.indexOf(lastKey) ?? 0;
+    yOffset = computeSourceHandleOffset(i);
+    xOffset = type === "key" ? 0 : graphNode.data.width / 2;
+  }
+
+  // must >= Toolbar's height, otherwise Toolbar of the graph node will not in viewport
   const gap = 25;
-  const node = graph.nodeMap?.[nodeId]!;
-  const x = node.position.x + Math.min(node.data.width / 2, width / 2 - gap);
-  const y = node.position.y + Math.min(node.data.height / 2, height / 2 - gap);
-  return { x, y };
+  const x = graphNode.position.x + Math.min(graphNode.data.width / 2, width / 2 - gap) + xOffset;
+  const y = graphNode.position.y + Math.min(graphNode.data.height / 2, height / 2 - gap) + yOffset;
+  return { x, y, changed: true };
 }

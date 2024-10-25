@@ -232,12 +232,11 @@ export class EditorWrapper {
       if (e.keyCode === window.monacoApi.KeyCode.KeyK && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         e.stopPropagation();
-        const state = getStatusState();
-        state.setCommandOpen(!state.commandOpen);
+        window.searchComponents?.["cmd-search-input"]?.focus();
       } else if (e.keyCode === window.monacoApi.KeyCode.Enter && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         e.stopPropagation();
-        getEditorState().callCommand("swapLeftRight");
+        getEditorState().runCommand("swapLeftRight");
       }
     });
   }

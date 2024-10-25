@@ -11,6 +11,7 @@
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "double", { "avoidEscape": true }],
     "prefer-const": "error",
+    "react-hooks/exhaustive-deps": "off",
     "space-before-function-paren": [
       "error",
       {
