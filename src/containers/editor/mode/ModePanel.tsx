@@ -33,7 +33,7 @@ export default function ModePanel() {
 
   return (
     <Collapsible className="relative" defaultOpen={false} open={open} onOpenChange={setOpen}>
-      <CollapsibleContent id="cmd-panel" className="min-w-80" style={{ width: leftPanelWidth }}>
+      <CollapsibleContent id="cmd-panel" className="min-w-80 max-w-xl" style={{ width: leftPanelWidth }}>
         {commandMode && (
           <ModeComponent
             className="ml-4 my-2 grow"
