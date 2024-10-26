@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { ViewMode } from "@/lib/db/config";
-import { config, initialViewport, type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
+import { config, initialViewport } from "@/lib/graph/layout";
+import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeVersion } from "@/stores/treeStore";

@@ -7,15 +7,13 @@ import {
 } from "@/lib/graph/actions";
 import {
   computeSourceHandleOffset,
-  type EdgeWithData,
   genFlowNodes,
   globalStyle,
   Layouter,
   newGraph,
-  type Graph,
   initialViewport,
-  type RevealPosition,
 } from "@/lib/graph/layout";
+import type { EdgeWithData, Graph, RevealPosition } from "@/lib/graph/types";
 import computeVirtualGraph from "@/lib/graph/virtual";
 import { lastKey } from "@/lib/idgen";
 import { getRawValue, hasChildren, isIterable, Tree } from "@/lib/parser";

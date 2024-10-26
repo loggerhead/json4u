@@ -1,4 +1,4 @@
-import { type RevealType } from "@/lib/graph/layout";
+import type { RevealType } from "@/lib/graph/types";
 
 export interface SearchResult {
   revealType: RevealType;

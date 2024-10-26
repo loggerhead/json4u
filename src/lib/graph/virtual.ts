@@ -1,11 +1,5 @@
-import {
-  type NodeWithData,
-  type Graph,
-  type EdgeWithData,
-  globalStyle,
-  GraphVirtual,
-  newGraph,
-} from "@/lib/graph/layout";
+import { globalStyle, newGraph } from "@/lib/graph/layout";
+import type { NodeWithData, GraphVirtual, Graph, EdgeWithData } from "@/lib/graph/types";
 import { type Viewport, type Rect } from "@xyflow/react";
 import { getOverlappingArea } from "@xyflow/system";
 import { filter } from "lodash-es";

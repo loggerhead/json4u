@@ -1,5 +1,5 @@
 import { type Config, defaultConfig, keyName, type ViewMode, type ViewModeValue, storage } from "@/lib/db/config";
-import { type RevealPosition } from "@/lib/graph/layout";
+import type { RevealPosition } from "@/lib/graph/types";
 import { type ParseOptions } from "@/lib/parser";
 import { type FunctionKeys } from "@/lib/utils";
 import { create } from "zustand";

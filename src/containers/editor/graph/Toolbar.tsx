@@ -1,6 +1,6 @@
 import { memo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { type EdgeWithData, type NodeWithData } from "@/lib/graph/layout";
+import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
 import { splitParentPointer, toPath } from "@/lib/idgen";
 import { useEditor, useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";

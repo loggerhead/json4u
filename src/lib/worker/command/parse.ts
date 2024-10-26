@@ -1,6 +1,6 @@
 import { type Kind } from "@/lib/editor/editor";
 import { prettyFormat } from "@/lib/format/pretty";
-import { type Graph } from "@/lib/graph/layout";
+import type { Graph } from "@/lib/graph/types";
 import { parseJSON, type StringifyOptions, type TreeObject } from "@/lib/parser";
 import { getViewState } from "@/lib/worker/stores/viewStore";
 import { isEmpty } from "lodash-es";

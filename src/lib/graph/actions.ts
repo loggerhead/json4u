@@ -1,7 +1,8 @@
 import { join as idJoin, isDescendant, splitParentPointer, toPath } from "@/lib/idgen";
 import { type Tree } from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
-import { computeSourceHandleOffset, type RevealPosition, type Graph } from "./layout";
+import { computeSourceHandleOffset } from "./layout";
+import type { RevealPosition, Graph } from "./types";
 import {
   getAncestor,
   getDescendant,

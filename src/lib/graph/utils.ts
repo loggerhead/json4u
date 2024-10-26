@@ -1,11 +1,5 @@
-import {
-  edgeHighlightStyle,
-  type EdgeWithData,
-  type Graph,
-  nodeHighlightStyle,
-  nodeSelectedStyle,
-  type NodeWithData,
-} from "@/lib/graph/layout";
+import { edgeHighlightStyle, nodeHighlightStyle, nodeSelectedStyle } from "@/lib/graph/layout";
+import type { EdgeWithData, Graph, NodeWithData } from "@/lib/graph/types";
 import { isParent } from "@/lib/idgen";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
 import { filter, keyBy } from "lodash-es";
