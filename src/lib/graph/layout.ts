@@ -35,8 +35,8 @@ export function setupGlobalGraphStyle(style: Partial<GraphNodeStyle>) {
   Object.assign(globalStyle, style);
 }
 
-const highlightColor = "black";
-const selectedColor = "red";
+const highlightColor = "rgb(4, 81, 165)";
+const selectedColor = "rgb(163, 21, 21)";
 
 export const nodeSelectedStyle: CSSProperties = { borderColor: selectedColor };
 export const nodeHighlightStyle: CSSProperties = { borderColor: highlightColor };
