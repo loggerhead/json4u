@@ -39,7 +39,7 @@ export function getAncestor(graph: Graph, nodeId: string) {
   let node = getNode(nodeId);
 
   while (node?.data?.parentId) {
-    const edge = getEdge(nodeId);
+    const edge = getEdge(node.id);
     edge && edges.push(edge);
 
     const parent = getNode(node.data.parentId);
