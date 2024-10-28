@@ -12,6 +12,7 @@
     "quotes": ["error", "double", { "avoidEscape": true }],
     "prefer-const": "error",
     "react-hooks/exhaustive-deps": "off",
+    "@typescript-eslint/no-floating-promises": "error",
     "space-before-function-paren": [
       "error",
       {

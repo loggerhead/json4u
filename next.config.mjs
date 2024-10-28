@@ -101,8 +101,8 @@ export default withSentryConfig(config, {
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
   ignore: [
-    "cypress",
     "__tests__",
+    "e2e",
     "dist",
     "node_modules",
     "public",

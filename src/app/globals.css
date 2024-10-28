@@ -118,7 +118,8 @@
 html,
 body {
   overscroll-behavior: none;
-  scroll-behavior: smooth !important;
+  /* Clicking a Link does't scroll to top on the next page: https://github.com/vercel/next.js/discussions/64435 */
+  /* scroll-behavior: smooth !important; */
 }
 
 .markdown-body {

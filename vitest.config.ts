@@ -15,6 +15,7 @@ export default defineConfig({
   ],
   test: {
     environment: "happy-dom",
+    include: ["__tests__/*.{test,spec}.?(c|m)[jt]s?(x)"],
     includeSource: ["src/**/*.{js,ts,tsx}"],
     // https://github.com/vitest-dev/vitest/issues/2117
     env: loadEnv("", process.cwd(), ""),
