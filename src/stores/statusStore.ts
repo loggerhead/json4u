@@ -1,5 +1,6 @@
 import { type Config, defaultConfig, keyName, type ViewMode, type ViewModeValue, storage } from "@/lib/db/config";
 import type { RevealPosition } from "@/lib/graph/types";
+import { clearHighlight, highlightElement } from "@/lib/graph/utils";
 import { type ParseOptions } from "@/lib/parser";
 import { type FunctionKeys } from "@/lib/utils";
 import { create } from "zustand";
@@ -20,7 +21,7 @@ export interface StatusState extends Config {
   commandMode?: CommandMode; // the command mode box displayed above the status bar
   // TODO: 实现 json path 在 editor 和 view mode 同步跳转
   revealPosition: RevealPosition; // id of node in the tree to be revealed in the graph view
-  needFocusRevealPosition: boolean;
+  needHighlightRevealPosition: boolean;
   leftPanelWidth?: number;
   rightPanelWidth?: number;
   sideNavExpanded?: boolean;
@@ -40,7 +41,7 @@ export interface StatusState extends Config {
   setRightPanelCollapsed: (collapsed: boolean) => void;
   setParseOptions: (options: ParseOptions) => void;
   setRevealPosition: (pos: Partial<RevealPosition>) => void;
-  focusRevealPosition: () => void;
+  highlightRevealPosition: () => void;
   setEnableSyncScroll: (enable: boolean) => void;
   setSideNavExpanded: (expanded: boolean) => void;
   setShowPricingOverlay: (show: boolean) => void;
@@ -56,7 +57,7 @@ const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   cursorPosition: { line: 0, column: 0 },
   selectionLength: 0,
   revealPosition: { version: 0, treeNodeId: "", type: "nonLeafNode" },
-  needFocusRevealPosition: false,
+  needHighlightRevealPosition: false,
   unfoldNodeMap: {},
   unfoldSiblingsNodeMap: {},
 };
@@ -121,21 +122,23 @@ export const useStatusStore = create<StatusState>()(
             ...pos,
             version: oldPos.version + 1,
           },
-          needFocusRevealPosition: true,
+          needHighlightRevealPosition: true,
         });
       },
 
-      focusRevealPosition() {
+      highlightRevealPosition() {
         const durationToWaitRenderFinish = 100;
         const {
           revealPosition: { treeNodeId, type },
-          needFocusRevealPosition,
+          needHighlightRevealPosition: needFocusRevealPosition,
         } = get();
 
         if (needFocusRevealPosition) {
-          set({ needFocusRevealPosition: false });
+          set({ needHighlightRevealPosition: false });
 
           setTimeout(() => {
+            clearHighlight();
+
             if (type === "nonLeafNode") {
               const el = document.querySelector(`.graph-node[data-tree-id="${treeNodeId}"]`) as HTMLDivElement;
 
@@ -153,12 +156,7 @@ export const useStatusStore = create<StatusState>()(
               }
 
               el.click();
-              const range = window.document.createRange();
-              range.setStart(el, 0);
-              range.setEnd(el, 0);
-              const selection = window.getSelection()!;
-              selection.removeAllRanges();
-              selection.addRange(range);
+              highlightElement(el);
             }
           }, durationToWaitRenderFinish);
         }

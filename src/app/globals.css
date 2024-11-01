@@ -39,6 +39,7 @@
     --btn-input: #666;
     --kbd-color: #171717;
     --kbd-bg-color: #fafafa;
+    --search-hl-color: #f9c9b2;
     --search-width: 240px;
     --search-height: 300px;
 
@@ -201,6 +202,15 @@ body {
     border-radius: 9999px;
     cursor: pointer !important;
   }
+}
+
+::highlight(search-highlight) {
+  background-color: var(--search-hl-color);
+}
+
+/* used for firefox */
+.search-highlight {
+  background-color: var(--search-hl-color);
 }
 
 .graph-node {

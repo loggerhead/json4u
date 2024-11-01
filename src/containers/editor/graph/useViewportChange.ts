@@ -8,7 +8,7 @@ import { useDebounceCallback, useResizeObserver } from "usehooks-ts";
 import { setViewportSize } from "./useVirtualGraph";
 
 export function useViewportChange(ref: RefObject<HTMLDivElement>) {
-  const focusRevealPosition = useStatusStore((state) => state.focusRevealPosition);
+  const highlightRevealPosition = useStatusStore((state) => state.highlightRevealPosition);
   const worker = useEditorStore((state) => state.worker);
   const { setNodes, setEdges } = useReactFlow();
 
@@ -66,7 +66,7 @@ export function useViewportChange(ref: RefObject<HTMLDivElement>) {
         setNodes(nodes);
         setEdges(edges);
       }
-      focusRevealPosition();
+      highlightRevealPosition();
     },
     refreshInterval,
     { trailing: true },

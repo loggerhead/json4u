@@ -109,3 +109,21 @@ export function toggleHidden<T extends FlowNode | Edge>(v: T, hide?: boolean) {
   v.hidden = hide;
   return v;
 }
+
+export function highlightElement(el: HTMLDivElement) {
+  if (CSS.highlights) {
+    const range = new Range();
+    range.selectNode(el);
+    CSS.highlights.set("search-highlight", new Highlight(range));
+  } else {
+    el.classList.add("search-highlight");
+  }
+}
+
+export function clearHighlight() {
+  if (CSS.highlights) {
+    CSS.highlights.delete("search-highlight");
+  } else {
+    document.querySelectorAll(".search-highlight").forEach((el) => el.classList.remove("search-highlight"));
+  }
+}
