@@ -12,7 +12,7 @@ interface TestData {
 }
 
 async function doExpect(options: Partial<ParseOptions>, text: string, ...aa: TestData[]) {
-  const { treeObject } = await parseAndFormat(text, 1, {
+  const { treeObject } = await parseAndFormat(text, {
     ...options,
     kind: "main",
   });

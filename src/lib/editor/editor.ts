@@ -11,19 +11,17 @@ import { editorApi, IScrollEvent } from "./types";
 export type Kind = "main" | "secondary";
 type ScrollEvent = IScrollEvent & { _oldScrollTop: number; _oldScrollLeft: number };
 
-const parseWait = 500;
+const parseWait = 300;
 
 export class EditorWrapper {
-  version: number;
   editor: editorApi.IStandaloneCodeEditor;
   kind: Kind;
   // 滚动中吗？
   scrolling: number;
   tree: Tree;
-  delayParseAndSet: (text: string, extraOptions: ParseOptions, resetCursor: boolean, version: number) => void;
+  delayParseAndSet: (text: string, extraOptions: ParseOptions, resetCursor: boolean) => void;
 
   constructor(editor: editorApi.IStandaloneCodeEditor, kind: Kind) {
-    this.version = 0;
     this.editor = editor;
     this.kind = kind;
     this.scrolling = 0;
@@ -32,8 +30,6 @@ export class EditorWrapper {
   }
 
   init() {
-    this.version = this.model().getVersionId();
-    this.listenOnDidPaste();
     this.listenOnKeyDown();
     this.listenOnDropFile();
 
@@ -63,7 +59,7 @@ export class EditorWrapper {
   }
 
   isTreeValid() {
-    return this.tree.valid() && this.tree.version === this.version;
+    return this.tree.valid();
   }
 
   getPositionAt(offset: number) {
@@ -97,16 +93,8 @@ export class EditorWrapper {
     }
   }
 
-  // NOTICE: Increase the version based on the model's current version rather than the previous version.
-  incVersion() {
-    this.version = this.model().getVersionId() + 1;
-    return this.version;
-  }
-
   setTree({ treeObject }: ParsedTree, resetCursor: boolean = true) {
-    // increase version to skip next onChange event which triggered by setText
     const tree = Tree.fromObject(treeObject);
-    tree.version = this.incVersion();
     getEditorState().resetHighlight();
 
     this.tree = tree;
@@ -134,13 +122,7 @@ export class EditorWrapper {
     text: string,
     extraParseOptions?: ParseOptions,
     resetCursor: boolean = true,
-    version: number = this.version,
   ): Promise<{ set: boolean; parse: boolean }> {
-    if (version < this.version) {
-      console.log("Skip parseAndSet:", version, this.version);
-      return { set: false, parse: false };
-    }
-
     const options = {
       ...getStatusState().parseOptions,
       ...extraParseOptions,
@@ -148,39 +130,27 @@ export class EditorWrapper {
     };
 
     reportTextSize(text.length);
-    const parsedTree = await this.worker().parseAndFormat(text, version, options);
+    const parsedTree = await this.worker().parseAndFormat(text, options);
     const tree = this.setTree(parsedTree, resetCursor);
     return { set: true, parse: tree.valid() };
   }
 
-  // There are three kinds of calling situation:
-  // 1. paste on editor: onChange -> onDidPaste -> onDidPaste parseAndSet -> onChange parseAndSet (need ignore)
-  // 2. input on editor: onChange -> parseAndSet
-  // 3. execute command: parseAndSet
   async onChange(text: string | undefined, ev: editorApi.IModelContentChangedEvent) {
-    const version = ev.versionId;
-    if (version <= this.version) {
-      console.log("Skip onChange:", version, this.version);
+    const prevText = this.tree.text;
+    text = text ?? "";
+
+    if (text === prevText) {
+      console.log("skip onChange:", ev.versionId);
       return;
     }
 
-    console.log("onChange:", version);
-    await this.delayParseAndSet(text ?? "", { format: false }, false, version);
-  }
-
-  listenOnDidPaste() {
-    this.editor.onDidPaste(async (event) => {
-      // 仅当粘贴替换全部文本时，才执行 paste 相关的动作
-      if (!event.range.equalsRange(this.model().getFullModelRange())) {
-        console.log("Skip onDidPaste");
-        return;
-      }
-
-      // increase version to skip next delayParseAndSet calling which triggered by onChange event
-      this.incVersion();
-      console.log("onDidPaste:", this.version);
-      await this.parseAndSet(this.text());
-    });
+    if (prevText === "") {
+      console.log("onChange immediately:", ev.versionId);
+      await this.parseAndSet(text);
+    } else {
+      console.log("onChange with delay:", ev.versionId);
+      await this.delayParseAndSet(text, { format: false }, false);
+    }
   }
 
   // 监听光标改变事件。显示光标停留位置的 json path

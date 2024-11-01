@@ -17,12 +17,10 @@ export interface ParsedTree {
 
 export async function parseAndFormat(
   text: string,
-  version: number,
   options?: ParseAndFormatOptions,
 ): Promise<ParsedTree> {
   // 5MB costs 240ms
   const tree = parseJSON(text, options);
-  tree.version = version;
 
   if (options?.kind === "main") {
     getViewState().setTree(tree);

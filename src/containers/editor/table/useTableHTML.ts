@@ -21,13 +21,11 @@ export function useTableHTML() {
   );
   const worker = useEditorStore((state) => state.worker);
   const treeVersion = useTreeVersion();
-
-  const [version, setVersion] = useState(0);
   const [innerHTML, setInnerHTML] = useState("");
 
   useEffect(() => {
-    if (!(worker && isTableView && treeVersion > version)) {
-      console.log("Skip table render:", !!worker, isTableView, treeVersion, version);
+    if (!(worker && isTableView)) {
+      console.log("Skip table render:", !!worker, isTableView, treeVersion);
       return;
     }
 
@@ -40,12 +38,11 @@ export function useTableHTML() {
     (async () => {
       const tableHTML = await worker.createTable();
       setInnerHTML(tableHTML);
-      setVersion(treeVersion);
 
       console.log("Create a new table:", treeVersion, tableHTML.length, tableHTML.slice(0, 100));
       tableHTML.length > 0 && count("tableModeView");
     })();
-  }, [worker, usable, isTableView, treeVersion, version]);
+  }, [worker, usable, isTableView, treeVersion]);
 
   return innerHTML ? { __html: innerHTML } : undefined;
 }

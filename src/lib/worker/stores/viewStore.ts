@@ -54,6 +54,8 @@ const useViewStore = createStore<ViewState>((set, get) => ({
   ...initialStates,
 
   setTree(tree: Tree) {
+    const version = get().tree.version ?? 0;
+    tree.version = version + 1;
     set({ tree });
   },
 

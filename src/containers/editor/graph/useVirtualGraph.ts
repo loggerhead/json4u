@@ -20,7 +20,6 @@ export default function useVirtualGraph() {
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
 
-  const versionRef = useRef(0);
   const translateExtentRef = useRef<[[number, number], [number, number]]>([
     [-config.translateMargin, -config.translateMargin],
     [config.translateMargin, config.translateMargin],
@@ -43,8 +42,8 @@ export default function useVirtualGraph() {
   );
 
   useEffect(() => {
-    if (!(worker && isGraphView && treeVersion > versionRef.current)) {
-      console.log("Skip graph render:", !!worker, isGraphView, treeVersion, versionRef.current);
+    if (!(worker && isGraphView)) {
+      console.log("Skip graph render:", !!worker, isGraphView, treeVersion);
       return;
     }
 
@@ -74,7 +73,6 @@ export default function useVirtualGraph() {
         // fix https://github.com/xyflow/xyflow/issues/3633
         [Math.max(maxX + config.translateMargin, w), Math.max(maxY + config.translateMargin, h)],
       ];
-      versionRef.current = treeVersion;
 
       console.log(
         "Create a new graph:",
