@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { MouseEvent } from "react";
 import { genExpanderId, genTableId, isPeeled, join, peelExpanderId, splitParentPointer } from "@/lib/idgen";
 import { useTree } from "@/stores/treeStore";
@@ -6,37 +5,34 @@ import { useTree } from "@/stores/treeStore";
 export function useOnClickExpander() {
   const tree = useTree();
 
-  return useCallback(
-    (ev: MouseEvent) => {
-      const triggerExpander = ev.target as HTMLElement;
-      const nodeId = peelExpanderId(triggerExpander.id);
+  return (ev: MouseEvent) => {
+    const triggerExpander = ev.target as HTMLElement;
+    const nodeId = peelExpanderId(triggerExpander.id);
 
-      // if not click on expander
-      if (!isPeeled(triggerExpander.id, nodeId)) {
-        return;
-      }
+    // if not click on expander
+    if (!isPeeled(triggerExpander.id, nodeId)) {
+      return;
+    }
 
-      ev.preventDefault();
-      ev.stopPropagation();
-      ev.nativeEvent.stopImmediatePropagation();
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.nativeEvent.stopImmediatePropagation();
 
-      const hidden = triggerExpander.classList.contains("codicon-folding-expanded");
-      // change expander status
-      triggerExpander.classList.toggle("codicon-folding-expanded");
-      triggerExpander.classList.toggle("codicon-folding-collapsed");
+    const hidden = triggerExpander.classList.contains("codicon-folding-expanded");
+    // change expander status
+    triggerExpander.classList.toggle("codicon-folding-expanded");
+    triggerExpander.classList.toggle("codicon-folding-collapsed");
 
-      const node = tree.node(nodeId);
+    const node = tree.node(nodeId);
 
-      if (node !== undefined) {
-        toggle(nodeId, hidden);
-      } else {
-        const { parent, lastKey } = splitParentPointer(nodeId);
-        const arrayNode = tree.node(parent ?? nodeId);
-        tree.childrenIds(arrayNode).forEach((rowId) => toggle(join(rowId, lastKey), hidden));
-      }
-    },
-    [tree],
-  );
+    if (node !== undefined) {
+      toggle(nodeId, hidden);
+    } else {
+      const { parent, lastKey } = splitParentPointer(nodeId);
+      const arrayNode = tree.node(parent ?? nodeId);
+      tree.childrenIds(arrayNode).forEach((rowId) => toggle(join(rowId, lastKey), hidden));
+    }
+  };
 }
 
 function toggle(id: string, hidden: boolean) {

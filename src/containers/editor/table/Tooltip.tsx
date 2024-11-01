@@ -1,6 +1,6 @@
 "use client";
 
-import { MutableRefObject, useCallback, useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEditor } from "@/stores/editorStore";
@@ -24,7 +24,6 @@ interface TooltipProps {
   timeoutIdMap: TimeoutIdMap;
 }
 
-// TODO 同级取值预览
 export function Tooltip({ timeoutIdMap }: TooltipProps) {
   const t = useTranslations();
   const [visible, setVisible] = useState(false);
@@ -32,14 +31,6 @@ export function Tooltip({ timeoutIdMap }: TooltipProps) {
   const editor = useEditor();
   const tooltipContent = useTreeStore((state) => state.tooltipContent);
   const path = (tooltipContent?.path ?? []).map(({ key }) => key);
-
-  const onMouseEnter = useCallback(() => {
-    resetTimeout(timeoutIdMap);
-  }, [timeoutIdMap]);
-
-  const onMouseLeave = useCallback(() => {
-    setVisible(false);
-  }, []);
 
   useEffect(() => {
     if (tooltipContent) {
@@ -68,8 +59,8 @@ export function Tooltip({ timeoutIdMap }: TooltipProps) {
         top: position.top,
         [`margin${capitalize(position.side)}`]: globalStyle.margin,
       }}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      onMouseEnter={() => resetTimeout(timeoutIdMap)}
+      onMouseLeave={() => setVisible(false)}
     >
       <ol className="overflow-auto text-nowrap">
         {tooltipContent?.path.map(({ nodeType, key }, i) => (

@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, type ElementRef, forwardRef, useCallback, useEffect, useState } from "react";
+import { type ComponentPropsWithoutRef, type ElementRef, forwardRef, useEffect, useState } from "react";
 import LoadingButton from "@/components/LoadingButton";
 import { Input } from "@/components/ui/input";
 import { ViewMode } from "@/lib/db/config";
@@ -8,8 +8,8 @@ import { cn, toastErr, toastSucc } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useUserStore } from "@/stores/userStore";
-import { debounce } from "lodash-es";
 import { useTranslations } from "next-intl";
+import { useDebounceCallback } from "usehooks-ts";
 import { useShallow } from "zustand/react/shallow";
 
 const elementId = "jq-input";
@@ -20,10 +20,7 @@ const JqInput = forwardRef<ElementRef<typeof Input>, ComponentPropsWithoutRef<ty
     const usable = useUserStore((state) => state.usable("jqExecutions"));
     const setCommandMode = useStatusStore((state) => state.setCommandMode);
     const execJq = useExecJq();
-    const onChange = useCallback(
-      debounce(async (ev) => execJq(ev.target.value), 1000, { trailing: true }),
-      [execJq],
-    );
+    const onChange = useDebounceCallback(async (ev) => execJq(ev.target.value), 1000, { trailing: true });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -82,7 +79,7 @@ function useExecJq() {
   );
   const count = useUserStore((state) => state.count);
 
-  return useCallback(async (filter?: string) => {
+  return async (filter?: string) => {
     if (filter === "undefined") {
       filter = (document.getElementById(elementId) as HTMLInputElement).value;
     }
@@ -104,7 +101,7 @@ function useExecJq() {
       toastSucc(t("cmd_exec_succ", { name: "jq" }));
       count("jqExecutions");
     }
-  }, []);
+  };
 }
 
 JqInput.displayName = "JqInput";

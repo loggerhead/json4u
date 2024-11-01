@@ -1,7 +1,6 @@
-import { useCallback } from "react";
 import SearchInput from "@/components/ui/search/SearchInput";
 import { type MessageKey } from "@/global";
-import { useEditorStore } from "@/stores/editorStore";
+import { type Command, useEditorStore } from "@/stores/editorStore";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
 
@@ -13,10 +12,6 @@ export default function CommandSearch() {
       runCommand: state.runCommand,
     })),
   );
-  const search = useCallback(
-    (input: string) => commands.filter((cmd) => cmd.id.includes(input) || t(cmd.id).includes(input)),
-    [commands, t],
-  );
 
   return (
     <SearchInput
@@ -25,15 +20,20 @@ export default function CommandSearch() {
       displayShortcut
       openListOnFocus
       placeholder={"Search Command"}
-      search={search}
+      search={(input: string) => commands.filter((cmd) => cmd.id.includes(input) || t(cmd.id).includes(input))}
       onSelect={(cmd) => runCommand(cmd.id)}
       itemHeight={32}
-      Item={({ id, Icon }) => (
-        <div className="w-full h-8 flex items-center">
-          {Icon && <Icon className="icon mr-2" />}
-          {t(id as MessageKey)}
-        </div>
-      )}
+      Item={Item}
     />
+  );
+}
+
+function Item({ id, Icon }: Command) {
+  const t = useTranslations();
+  return (
+    <div className="w-full h-8 flex items-center">
+      {Icon && <Icon className="icon mr-2" />}
+      {t(id as MessageKey)}
+    </div>
   );
 }

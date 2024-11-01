@@ -8,6 +8,7 @@ import { useStatusStore } from "@/stores/statusStore";
 import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { type Node as FlowNode } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useDebounceCallback } from "usehooks-ts";
 import MouseButton from "./MouseButton";
 import { ObjectNode, RootNode, VirtualTargetNode } from "./Node";
 import { useViewportChange, useRevealNode } from "./useViewportChange";
@@ -83,35 +84,43 @@ function useOnNodeClick() {
   const worker = useEditorStore((state) => state.worker);
   const setJsonPath = useStatusStore((state) => state.setJsonPath);
 
-  return (_: React.MouseEvent, node: FlowNode) => {
-    if (!worker) {
-      return;
-    }
+  return useDebounceCallback(
+    (_: React.MouseEvent, node: FlowNode) => {
+      if (!worker) {
+        return;
+      }
 
-    (async () => {
-      const { nodes, edges, jsonPath } = await worker.toggleGraphNodeSelected(node.id);
-      setNodes(nodes);
-      setEdges(edges);
-      setJsonPath(jsonPath);
-    })();
-  };
+      (async () => {
+        const { nodes, edges, jsonPath } = await worker.toggleGraphNodeSelected(node.id);
+        setNodes(nodes);
+        setEdges(edges);
+        setJsonPath(jsonPath);
+      })();
+    },
+    10,
+    { trailing: true },
+  );
 }
 
 function useOnHandleClick() {
   const { setNodes, setEdges } = useReactFlow();
   const worker = useEditorStore((state) => state.worker);
 
-  return (_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
-    if (handleType === "target" || !(worker && nodeId && handleId)) {
-      return;
-    }
+  return useDebounceCallback(
+    (_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
+      if (handleType === "target" || !(worker && nodeId && handleId)) {
+        return;
+      }
 
-    (async () => {
-      const { nodes, edges } = await worker.toggleGraphNodeHidden(nodeId, handleId);
-      setNodes(nodes);
-      setEdges(edges);
-    })();
-  };
+      (async () => {
+        const { nodes, edges } = await worker.toggleGraphNodeHidden(nodeId, handleId);
+        setNodes(nodes);
+        setEdges(edges);
+      })();
+    },
+    10,
+    { trailing: true },
+  );
 }
 
 // clear all animated for edges
@@ -119,15 +128,19 @@ function useOnPaneClick() {
   const { setNodes, setEdges } = useReactFlow();
   const worker = useEditorStore((state) => state.worker);
 
-  return (_: React.MouseEvent) => {
-    if (!worker) {
-      return;
-    }
+  return useDebounceCallback(
+    (_: React.MouseEvent) => {
+      if (!worker) {
+        return;
+      }
 
-    (async () => {
-      const { nodes, edges } = await worker.clearGraphNodeSelected();
-      setNodes(nodes);
-      setEdges(edges);
-    })();
-  };
+      (async () => {
+        const { nodes, edges } = await worker.clearGraphNodeSelected();
+        setNodes(nodes);
+        setEdges(edges);
+      })();
+    },
+    10,
+    { trailing: true },
+  );
 }

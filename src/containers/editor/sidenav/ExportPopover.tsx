@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { type MessageKey } from "@/global";
 import { type EditorWrapper } from "@/lib/editor/editor";
@@ -42,7 +42,7 @@ function useOnClickButton(fileType: FileType) {
   const secondary = useEditor("secondary");
   const setViewMode = useStatusStore((state) => state.setViewMode);
 
-  const onClickPreview = useCallback(async () => {
+  const onClickPreview = async () => {
     if (!(main && secondary)) {
       return;
     }
@@ -52,9 +52,9 @@ function useOnClickButton(fileType: FileType) {
       secondary.revealPosition(1, 1, false);
       setViewMode("text");
     });
-  }, [main, secondary, fileType]);
+  };
 
-  const onClickDownload = useCallback(() => {
+  const onClickDownload = () => {
     if (!(main && secondary)) {
       return;
     }
@@ -65,7 +65,7 @@ function useOnClickButton(fileType: FileType) {
       downloadFile(fileType, url);
       URL.revokeObjectURL(url);
     });
-  }, [main, secondary, fileType]);
+  };
 
   return { onClickPreview, onClickDownload };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React from "react";
 import GitHub from "@/components/icons/GitHub";
 import Google from "@/components/icons/Google";
 import { Button } from "@/components/ui/button";
@@ -32,25 +32,27 @@ export default function OAuthButton({ provider }: OAuthButtonProps) {
   const next = useRedirectTo();
   const { Icon, text } = oauthInfoMap[provider]!;
 
-  const login = useCallback(async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/api/auth/callback?next=${next}` },
-    });
-
-    sendGAEvent("event", "login", {
-      channel: provider,
-      error: error?.message ?? "succ",
-    });
-
-    if (error) {
-      toastErr(t("login_failed", { message: error.message }));
-      return;
-    }
-  }, []);
-
   return (
-    <Button variant="outline" className="gap-4 py-5" onClick={() => login()}>
+    <Button
+      variant="outline"
+      className="gap-4 py-5"
+      onClick={async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: { redirectTo: `${window.location.origin}/api/auth/callback?next=${next}` },
+        });
+
+        sendGAEvent("event", "login", {
+          channel: provider,
+          error: error?.message ?? "succ",
+        });
+
+        if (error) {
+          toastErr(t("login_failed", { message: error.message }));
+          return;
+        }
+      }}
+    >
       <Icon className="w-5 h-5" />
       <Typography>{t("login_with", { provider: text })}</Typography>
     </Button>

@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect } from "react";
+import { forwardRef, useEffect } from "react";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { useEditorStore } from "@/stores/editorStore";
 import { ArrowRightLeft } from "lucide-react";
@@ -8,23 +8,30 @@ const SwapButton = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const t = useTranslations();
     const runCommand = useEditorStore((state) => state.runCommand);
-    const onClick = useCallback(() => runCommand("swapLeftRight"), [runCommand]);
 
     useEffect(() => {
+      if (!runCommand) return;
+
       const onKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
           e.preventDefault();
           e.stopPropagation();
-          onClick();
+          runCommand("swapLeftRight");
         }
       };
 
       document.addEventListener("keydown", onKeyDown);
       return () => document.removeEventListener("keydown", onKeyDown);
-    }, [onClick]);
+    }, [runCommand]);
 
     return (
-      <Button title={t("swap_left_right")} size={size} variant={variant} className={className} onClick={onClick}>
+      <Button
+        title={t("swap_left_right")}
+        size={size}
+        variant={variant}
+        className={className}
+        onClick={() => runCommand("swapLeftRight")}
+      >
         <ArrowRightLeft className="icon" />
       </Button>
     );

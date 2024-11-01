@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type MessageKey } from "@/global";
 import { Tree } from "@/lib/parser";
@@ -57,44 +57,39 @@ function useOnFile(fileType: FileType, options: { csvWithHeader?: boolean }) {
   const main = useEditor("main");
   const secondary = useEditor("secondary");
 
-  const onFile = useCallback(
-    (file: File) => {
-      if (!(main && secondary)) {
+  return (file: File) => {
+    if (!(main && secondary)) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = async (event) => {
+      const fileContent = event.target?.result;
+      if (typeof fileContent !== "string") {
         return;
       }
 
-      const reader = new FileReader();
-
-      reader.onload = async (event) => {
-        const fileContent = event.target?.result;
-        if (typeof fileContent !== "string") {
-          return;
-        }
-
-        let r: CsvResult = {
-          text: fileContent,
-        };
-
-        if (fileType !== "JSON") {
-          secondary.setTree({ treeObject: new Tree(fileContent).toObject() });
-
-          if (fileType === "CSV") {
-            r = await main.worker().csv2json(fileContent, { withHeader: options.csvWithHeader });
-          }
-          // TODO: consider to support yaml
-        }
-
-        if (r.errorKey) {
-          toastErr(t(r.errorKey as MessageKey));
-        } else {
-          await main.parseAndSet(r.text ?? "");
-        }
+      let r: CsvResult = {
+        text: fileContent,
       };
 
-      reader.readAsText(file);
-    },
-    [main, secondary, fileType, options],
-  );
+      if (fileType !== "JSON") {
+        secondary.setTree({ treeObject: new Tree(fileContent).toObject() });
 
-  return onFile;
+        if (fileType === "CSV") {
+          r = await main.worker().csv2json(fileContent, { withHeader: options.csvWithHeader });
+        }
+        // TODO: consider to support yaml
+      }
+
+      if (r.errorKey) {
+        toastErr(t(r.errorKey as MessageKey));
+      } else {
+        await main.parseAndSet(r.text ?? "");
+      }
+    };
+
+    reader.readAsText(file);
+  };
 }

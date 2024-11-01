@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Command as Cmd,
   CommandEmpty,
@@ -11,13 +11,13 @@ import {
 import { type MessageKey } from "@/global";
 import { useWorker } from "@/stores/editorStore";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import debounce from "debounce-promise";
 import { useTranslations } from "next-intl";
+import { useDebounceCallback } from "usehooks-ts";
 
 const commandGroupPaddingY = 4;
 const searchMenuHeight = 300;
 
-interface SearchInputProps<T extends { id: string }> {
+export interface SearchInputProps<T extends { id: string }> {
   search: (inputValue: string) => Promise<T[]> | T[];
   onSelect: (item: T) => void;
   itemHeight: number;
@@ -51,19 +51,16 @@ export default function SearchInput<T extends { id: string }>({
   const [inputValue, setInputValue] = useState("");
   const [items, setItems] = useState<T[]>([]);
 
-  const onSearch = useCallback(
-    debounce(
-      (input: string) => {
-        (async () => {
-          const items = await Promise.resolve(search(input));
-          setItems(items);
-          setOpen(true);
-        })();
-      },
-      100,
-      { leading: true },
-    ),
-    [search],
+  const onSearch = useDebounceCallback(
+    (input: string) => {
+      (async () => {
+        const items = (await Promise.resolve(search(input))) ?? [];
+        setItems(items);
+        setOpen(true);
+      })();
+    },
+    100,
+    { leading: true },
   );
 
   useEffect(() => {
