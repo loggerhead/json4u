@@ -2,16 +2,16 @@
 
 import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
-import { clearSearchHighlight } from "@/lib/graph/utils";
+import { clearHighlight } from "@/lib/graph/utils";
 import { detectOS } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { type Node as FlowNode } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import MouseButton from "./MouseButton";
 import { ObjectNode, RootNode, VirtualTargetNode } from "./Node";
-import { useViewportChange, useRevealNode } from "./useViewportChange";
+import { useRevealNode, useViewportChange } from "./useViewportChange";
 import useVirtualGraph from "./useVirtualGraph";
 
 export default function Graph() {
@@ -24,19 +24,19 @@ export default function Graph() {
   );
 }
 
-// TODO: why is this render three times?
 function LayoutGraph() {
   const ref = useRef<HTMLDivElement>(null);
   const worker = useEditorStore((state) => state.worker);
   const setJsonPath = useStatusStore((state) => state.setJsonPath);
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
-  const { setNodes, setEdges } = useReactFlow();
-  const g = useVirtualGraph();
 
-  useViewportChange(ref);
+  // The graph will render three times because:
+  // 1. Modify text in the editor will cause `treeVersion` to change.
+  // 2. A change in `treeVersion` will trigger the creation of a new graph, which will cause `nodes` to change.
+  // 3. xyflow will measure the new `nodes`, which will trigger a render.
+  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, translateExtent } = useVirtualGraph();
+  useViewportChange(ref, setNodes, setEdges);
   useRevealNode();
-
-  console.log("graph render");
 
   return (
     <ReactFlow
@@ -58,14 +58,14 @@ function LayoutGraph() {
         focusable: false,
         deletable: false,
       }}
-      translateExtent={g.translateExtent}
+      translateExtent={translateExtent}
       // clear all animated for edges
       onPaneClick={(_: React.MouseEvent) => {
         if (!worker) {
           return;
         }
 
-        clearSearchHighlight();
+        clearHighlight();
 
         (async () => {
           const { nodes, edges } = await worker.clearGraphNodeSelected();
@@ -96,10 +96,10 @@ function LayoutGraph() {
           setEdges(edges);
         })();
       }}
-      nodes={g.nodes}
-      edges={g.edges}
-      onNodesChange={g.onNodesChange}
-      onEdgesChange={g.onEdgesChange}
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
       nodesDraggable={false}
       nodesConnectable={false}
       connectOnClick={false}

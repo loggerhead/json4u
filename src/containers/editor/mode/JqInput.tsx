@@ -2,6 +2,7 @@ import { type ComponentPropsWithoutRef, type ElementRef, forwardRef, useEffect, 
 import LoadingButton from "@/components/LoadingButton";
 import { Input } from "@/components/ui/input";
 import { ViewMode } from "@/lib/db/config";
+import { useDebounceFn } from "@/lib/hooks";
 import { jq } from "@/lib/jq";
 import { init as jqInit } from "@/lib/jq";
 import { cn, toastErr, toastSucc } from "@/lib/utils";
@@ -9,7 +10,6 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useUserStore } from "@/stores/userStore";
 import { useTranslations } from "next-intl";
-import { useDebounceCallback } from "usehooks-ts";
 import { useShallow } from "zustand/react/shallow";
 
 const elementId = "jq-input";
@@ -20,7 +20,7 @@ const JqInput = forwardRef<ElementRef<typeof Input>, ComponentPropsWithoutRef<ty
     const usable = useUserStore((state) => state.usable("jqExecutions"));
     const setCommandMode = useStatusStore((state) => state.setCommandMode);
     const execJq = useExecJq();
-    const onChange = useDebounceCallback(async (ev) => execJq(ev.target.value), 1000, { trailing: true });
+    const onChange = useDebounceFn(async (ev) => execJq(ev.target.value), 1000, [execJq]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

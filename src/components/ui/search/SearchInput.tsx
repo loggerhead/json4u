@@ -9,10 +9,10 @@ import {
   CommandInputShortcut,
 } from "@/components/ui/command";
 import { type MessageKey } from "@/global";
+import { useDebounceFn } from "@/lib/hooks";
 import { useWorker } from "@/stores/editorStore";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useTranslations } from "next-intl";
-import { useDebounceCallback } from "usehooks-ts";
 
 const commandGroupPaddingY = 4;
 const searchMenuHeight = 300;
@@ -51,7 +51,7 @@ export default function SearchInput<T extends { id: string }>({
   const [inputValue, setInputValue] = useState("");
   const [items, setItems] = useState<T[]>([]);
 
-  const onSearch = useDebounceCallback(
+  const onSearch = useDebounceFn(
     (input: string) => {
       (async () => {
         const items = (await Promise.resolve(search(input))) ?? [];
@@ -60,7 +60,7 @@ export default function SearchInput<T extends { id: string }>({
       })();
     },
     100,
-    { leading: true },
+    [],
   );
 
   useEffect(() => {

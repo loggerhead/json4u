@@ -89,6 +89,8 @@ export default function useVirtualGraph() {
   return {
     nodes,
     edges,
+    setNodes,
+    setEdges,
     onNodesChange,
     onEdgesChange,
     translateExtent: translateExtentRef.current,
