@@ -1,4 +1,30 @@
-- 2024-09-24:
+- 2024-11-02:
+  - graph 视图支持搜索；
+  - 调整 graph 视图选中节点的边框颜色；
+  - 修复部分场景下选中的边未正常高亮的问题；
+  - 修复当 input 事件比 paste 事件先触发时，不能正常生成 graph 或 table 视图；
+- 2024-10-18:
+  - 改变颜色以表达图节点的折叠状态 (By [@haecheonlee](https://github.com/haecheonlee))；
+  - 调整为展示 jq 输入框时再懒加载 jq.wasm；
+- 2024-10-16:
+  - 「折叠兄弟节点」调整为隐藏兄弟节点，而不是隐藏兄弟节点的后代节点；
+  - fix URL 转 JSON、python dict 转 JSON 报错；
+  - fix virtual graph 折叠后重新回到视图时又展开的问题；
+- 2024-10-12:
+  - 重新设计首页；
+  - 删除 service worker 以提升页面加载速度；
+  - fix [#46](https://github.com/loggerhead/json4u/pull/46)；
+  - fix 生成 table 视图时栈溢出的问题；
+  - fix 同一行存在多个 diff 时，颜色加深的问题；
+  - fix jq input 和 swap command 快捷键冲突；
+- 2024-10-07:
+  - 支持 sticky scroll；
+  - fix [#41](https://github.com/loggerhead/json4u/pull/41)；
+- 2024-10-05:
+  - 优化大 JSON 下 graph 的性能（>= 1MB）；
+  - fix window 下的体验问题；
+  - fix safari 下侧边栏的样式问题；
+- 2024-08-24:
   - 3.0.0 上线：支持 graph、table view mode、重构 UI 以提供更好的扩展性、支持 command search 并提供命令执行反馈;
 - 2024-02-17:
   - feedback 改回 github issues；
