@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { getEditor } from "../helpers/getEditor";
+import { getEditor } from "../helpers/utils";
 
 test("go to editor", async ({ page }) => {
   await page.goto("/");

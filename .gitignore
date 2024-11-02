@@ -1,3 +1,4 @@
+e2e/foo.spec.ts
 *.report.html
 tsconfig.tsbuildinfo
 public/sw.js*

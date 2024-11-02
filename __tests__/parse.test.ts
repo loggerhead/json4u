@@ -168,3 +168,21 @@ describe("isEquals", () => {
     expectIsEquals("null", '"null"', false);
   });
 });
+
+describe("parse errors", () => {
+  test("addition ,", () => {
+    const tree = parseJSON(
+      `{
+    "foo": [
+      "first",
+      "second",
+    ],
+    "bar": 3
+}`,
+      { format: true },
+    );
+
+    expect(tree.hasError()).toEqual(true);
+    expect(tree.errors?.map((e) => e.context)).toEqual([['...second",     ', "]", ',     "bar...']]);
+  });
+});

@@ -19,7 +19,7 @@ import { useShallow } from "zustand/react/shallow";
 
 export default function StatusBar() {
   return (
-    <div className="w-full min-h-fit h-statusbar px-4 py-1 flex text-xs gap-4">
+    <div data-testid="statusbar" className="w-full min-h-fit h-statusbar px-4 py-1 flex text-xs gap-4">
       <JsonPath />
       <ParseErrorMsg kind="main" />
       <div className="ml-auto" />

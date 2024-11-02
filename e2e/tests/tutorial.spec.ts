@@ -1,17 +1,18 @@
 import { test, expect } from "@playwright/test";
-import { getEditor } from "../helpers/getEditor";
+import { getEditor, getGraphNode } from "../helpers/utils";
 
 test("tutorial data", async ({ page }) => {
-  await page.goto("/editor");
-  const editor = await getEditor(page);
-  await expect(editor).toContainText("Aidan Gillen");
+  {
+    const editor = await getEditor(page, { goto: true });
+    await expect(editor).toContainText("Aidan Gillen");
+  }
 
   // assert graph view has nodes.
-  await expect(page.getByTestId("rf__node-$")).toBeVisible();
-  await expect(page.getByTestId("rf__node-$/Alexander%20Skarsgard")).toBeVisible();
-  await expect(page.getByTestId("rf__node-$/Aidan%20Gillen/array")).toBeVisible();
+  await expect(getGraphNode(page, "$")).toBeVisible();
+  await expect(getGraphNode(page, "$/Alexander%20Skarsgard")).toBeVisible();
+  await expect(getGraphNode(page, "$/Aidan%20Gillen/array")).toBeVisible();
 
-  const nd = await page.getByTestId("rf__node-$/Aidan%20Gillen");
+  const nd = await getGraphNode(page, "$/Aidan%20Gillen");
   await expect(nd).toBeVisible();
   await nd.click();
 
@@ -23,9 +24,8 @@ test("tutorial data", async ({ page }) => {
 
   // no tutorial data when reentry.
   {
-    await page.reload();
-    const editor = await getEditor(page);
+    const editor = await getEditor(page, { goto: true });
     await expect(editor).toHaveText("");
-    await expect(page.getByTestId("rf__node-$")).toBeHidden();
+    await expect(getGraphNode(page, "$")).toBeHidden();
   }
 });
