@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - main
+
 concurrency:
-  group: ${{ github.ref_name }}
-  # optional
+  group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest

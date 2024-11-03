@@ -28,7 +28,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: CI,
   retries: 1,
-  workers: CI ? 4 : undefined,
+  workers: CI ? 2 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   use: {

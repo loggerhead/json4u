@@ -1,55 +1,61 @@
 name: 'E2E Tests'
 
 on:
+  workflow_dispatch:
   push:
     branches-ignore: [ main, gh-pages ]
+  pull_request:
+    branches: [main]
 
 concurrency:
-  group: ${{ github.ref_name }}
-  # optional
+  group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
-      name: Install pnpm
-      with:
-        run_install: false
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-        cache: 'pnpm'
+    - name: Checkout
+      uses: actions/checkout@v4
+
     - name: Install dependencies
-      run: pnpm install
-    # Cache and install Playwright browser binaries, modified version of:
-    # https://github.com/microsoft/playwright/issues/7249#issuecomment-1154603556
-    # https://github.com/microsoft/playwright/issues/7249#issuecomment-1385567519
+      uses: ./.github/actions/install-dependencies
+
+    # helpful reference for properly caching the playwright binaries/dependencies
     # https://playwrightsolutions.com/playwright-github-action-to-cache-the-browser-binaries/
-    - name: Get installed Playwright version for cache key
-      run: echo "PLAYWRIGHT_VERSION=$(yq eval '.version' --output-format=yaml ./node_modules/@playwright/test/package.json)" >> $GITHUB_ENV
-    - name: Cache Playwright browser binaries
-      uses: actions/cache@v3
-      id: playwright-browser-cache
+    - name: Get installed Playwright version
+      id: playwright-version
+      run: echo "PLAYWRIGHT_VERSION=$(cat ./package.json | jq -r '.devDependencies["@playwright/test"]')" >> $GITHUB_ENV
+
+    - name: Cache Playwright binaries/dependencies
+      id: playwright-cache
+      uses: actions/cache@v4
       with:
-        path: |
-          ~/.cache/ms-playwright
+        path: "~/.cache/ms-playwright"
         key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-    - name: Install Playwright browsers only on cache miss
-      run: pnpm playwright install --with-deps
-      if: steps.playwright-browser-cache.outputs.cache-hit != 'true'
+
+    - name: Install Playwright deps
+      shell: bash
+      run: npx playwright install --with-deps
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+    # Some WebKit dependencies seem to lay outside the cache and will need to be installed separately
+    # see the issue: https://github.com/microsoft/playwright/issues/30538
     - name: Install system dependencies for WebKit
-      # Some WebKit dependencies seem to lay outside the cache and will need to be installed separately
-      if: ${{ inputs.browser == 'webkit' && steps.playwright-cache.outputs.cache-hit == 'true' }}
       run: npx playwright install-deps webkit
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+
     - name: Run Playwright tests
       run: npx playwright test
+
     - uses: actions/upload-artifact@v4
-      if: always()
+      if: failure()
       with:
         name: playwright-report
         path: playwright-report/
