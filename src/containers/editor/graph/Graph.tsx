@@ -36,7 +36,7 @@ function LayoutGraph() {
   // 3. xyflow will measure the new `nodes`, which will trigger a render.
   const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, translateExtent } = useVirtualGraph();
   useViewportChange(ref, setNodes, setEdges);
-  useRevealNode();
+  useRevealNode(nodes, edges);
 
   return (
     <ReactFlow

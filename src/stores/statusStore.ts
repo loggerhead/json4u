@@ -127,38 +127,32 @@ export const useStatusStore = create<StatusState>()(
       },
 
       highlightRevealPosition() {
-        const durationToWaitRenderFinish = 100;
         const {
           revealPosition: { treeNodeId, type },
           needHighlightRevealPosition: needFocusRevealPosition,
         } = get();
 
-        if (needFocusRevealPosition) {
-          set({ needHighlightRevealPosition: false });
+        if (!needFocusRevealPosition) {
+          return;
+        }
 
-          setTimeout(() => {
-            clearHighlight();
+        set({ needHighlightRevealPosition: false });
+        clearHighlight();
+        const isKV = type !== "nonLeafNode";
+        let el: HTMLDivElement;
 
-            if (type === "nonLeafNode") {
-              const el = document.querySelector(`.graph-node[data-tree-id="${treeNodeId}"]`) as HTMLDivElement;
+        if (isKV) {
+          const kvEl = document.querySelector(`.graph-kv[data-tree-id="${treeNodeId}"]`);
+          el = kvEl?.querySelector(`.${type === "key" ? "graph-k" : "graph-v"}`) as HTMLDivElement;
+        } else {
+          el = document.querySelector(`.graph-node[data-tree-id="${treeNodeId}"]`) as HTMLDivElement;
+        }
 
-              if (!el) {
-                return;
-              }
-
-              el?.click();
-            } else {
-              const kvEl = document.querySelector(`.graph-kv[data-tree-id="${treeNodeId}"]`);
-              const el = kvEl?.querySelector(`.${type === "key" ? "graph-k" : "graph-v"}`) as HTMLDivElement;
-
-              if (!el) {
-                return;
-              }
-
-              el.click();
-              highlightElement(el);
-            }
-          }, durationToWaitRenderFinish);
+        if (el) {
+          el.click();
+          isKV && highlightElement(el);
+        } else {
+          console.log("skip highlight");
         }
       },
 

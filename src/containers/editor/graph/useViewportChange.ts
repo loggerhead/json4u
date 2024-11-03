@@ -15,7 +15,6 @@ export function useViewportChange(
   setEdges: Dispatch<SetStateAction<EdgeWithData[]>>,
 ) {
   const worker = useEditorStore((state) => state.worker);
-  const highlightRevealPosition = useStatusStore((state) => state.highlightRevealPosition);
 
   const onResize = useDebounceFn(
     async ({ width, height }) => {
@@ -71,20 +70,20 @@ export function useViewportChange(
         setNodes(nodes);
         setEdges(edges);
       }
-      highlightRevealPosition();
     },
     refreshInterval,
-    [worker, setNodes, setEdges, highlightRevealPosition],
+    [worker, setNodes, setEdges],
   );
 
   useResizeObserver({ ref, onResize });
   useOnViewportChange({ onChange: onViewportChange });
 }
 
-export function useRevealNode() {
+export function useRevealNode(nodes: NodeWithData[], edges: EdgeWithData[]) {
   const { getZoom, setCenter } = useReactFlow();
   const worker = useEditorStore((state) => state.worker)!;
   const revealPosition = useStatusStore((state) => state.revealPosition);
+  const highlightRevealPosition = useStatusStore((state) => state.highlightRevealPosition);
 
   useEffect(() => {
     if (worker && revealPosition.treeNodeId) {
@@ -97,4 +96,16 @@ export function useRevealNode() {
       })();
     }
   }, [worker, revealPosition]);
+
+  useEffect(() => {
+    // Every time nodes are set, it will cause the graph to render twice.
+    // We need to highlight after the second render. Otherwise, the highlight will not take effect.
+    // The first render will not set `node.measured`, but the second render will.
+    // So we can check `node.measured` to know whether it is the second render.
+    if (revealPosition.treeNodeId && nodes?.[0]?.measured?.width) {
+      highlightRevealPosition();
+    }
+  }, [nodes, edges]);
+
+  console.log("graph render");
 }
