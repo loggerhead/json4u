@@ -65,7 +65,8 @@
     --hl-empty: #0000004d;
     --hl-index: #0000004d;
 
-    --parse-error-red: #cb2a2f;
+    --parse-error: #cb2a2f;
+    --parse-error-foreground: #ff9b9533;
     --diff-blank-hunk: #cdd7e033;
     --diff-margin-red: #ffd7d5;
     --diff-margin-green: #ccffd8;
@@ -130,6 +131,18 @@ body {
   ul {
     list-style-type: disc;
   }
+}
+
+.left-truncate {
+  direction: rtl;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.left-truncate-content {
+  direction: ltr;
+  unicode-bidi: bidi-override;
 }
 
 .mono-font {

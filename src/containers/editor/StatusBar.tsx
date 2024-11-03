@@ -9,6 +9,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { LeftTruncate, RightTruncate } from "@/components/ui/truncate";
 import { type Kind } from "@/lib/editor/editor";
 import { cn } from "@/lib/utils";
 import { useEditor } from "@/stores/editorStore";
@@ -70,11 +71,17 @@ function ParseErrorMsg({ kind }: ParseErrorMsgProps) {
   const msg = t("parse error", { startLineNumber, startColumn });
 
   return (
-    <div className="parse-error" onClick={() => editor?.revealPosition(startLineNumber, startColumn)}>
+    <div
+      data-testid="parse-error"
+      className="flex text-error"
+      onClick={() => editor?.revealPosition(startLineNumber, startColumn)}
+    >
       <span className="mr-1">{msg}</span>
-      <span>{left}</span>
-      <span className="parse-error-ctx">{middle}</span>
-      <span>{right}</span>
+      <div className="flex bg-error-foreground">
+        <LeftTruncate className="max-w-32" text={left} />
+        <span className="font-bold">{middle}</span>
+        <RightTruncate className="max-w-32" text={right} />
+      </div>
     </div>
   );
 }

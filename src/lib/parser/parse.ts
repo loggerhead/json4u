@@ -13,7 +13,15 @@ import { Tree } from "./tree";
 
 export function parseJSON(text: string, options?: ParseOptions, parentMeta?: ParentMeta): Tree {
   const { nodeMap, nestNodeMap, parseErrors } = doParseJSON(text, options, parentMeta);
-  const errors = addContextToErrors(text, parseErrors);
+  const errors: ContextError[] =
+    parseErrors.map((e) => ({
+      ...e,
+      context: [
+        text.slice(0, e.offset).slice(-50),
+        text.slice(e.offset, e.offset + e.length),
+        text.slice(e.offset + e.length).slice(0, 50),
+      ],
+    })) ?? [];
 
   for (const id in nodeMap) {
     nodeMap[id].path = undefined!;
@@ -267,59 +275,6 @@ class Visitor {
   onError(error: jsonc.ParseErrorCode, offset: number, length: number) {
     this.parseErrors.push({ error, offset, length });
   }
-}
-
-function addContextToErrors(text: string, errors: jsonc.ParseError[]): ContextError[] {
-  const maxWordLength = 30;
-
-  if (!errors?.length) {
-    return [];
-  }
-
-  text = text.replace(/\n/g, " ");
-
-  // 找到最近一个单词，如果找不到，则返回最近 5 个字符
-  const findUntilFirstWord = (s: string, reverse = false) => {
-    if (reverse) {
-      s = s.slice(s.length - maxWordLength);
-      s = s.split("").reverse().join("");
-    } else {
-      s = s.slice(0, maxWordLength);
-    }
-
-    const mm = s.match(/^.*?\w+/);
-
-    if (mm) {
-      s = mm[0];
-      return reverse ? s.split("").reverse().join("") : s;
-    } else {
-      return s.slice(s.length - 5);
-    }
-  };
-
-  return errors.map((e) => {
-    let middle = text.slice(e.offset, e.offset + e.length);
-
-    const leftText = text.slice(0, e.offset);
-    let left = findUntilFirstWord(leftText, true);
-    left = (left.length < leftText.length ? "..." : "") + left;
-
-    let right = "";
-
-    if (middle.length > maxWordLength) {
-      middle = middle.slice(0, maxWordLength);
-      right = "...";
-    } else {
-      const rightText = text.slice(e.offset + e.length);
-      right = findUntilFirstWord(rightText);
-      right = right + (right.length < rightText.length ? "..." : "");
-    }
-
-    return {
-      ...e,
-      context: [left, middle, right],
-    };
-  });
 }
 
 function getNodeType(value: any): NodeType {

@@ -44,6 +44,8 @@ const config = {
         "hl-empty": "var(--hl-empty)",
         "hl-index": "var(--hl-index)",
         "btn-input": "var(--btn-input)",
+        error: "var(--parse-error)",
+        "error-foreground": "var(--parse-error-foreground)",
         btn: "var(--btn-text-color)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

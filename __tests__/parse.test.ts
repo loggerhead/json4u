@@ -175,14 +175,27 @@ describe("parse errors", () => {
       `{
     "foo": [
       "first",
-      "second",
+      "second
     ],
     "bar": 3
 }`,
-      { format: true },
+      { format: false },
     );
 
     expect(tree.hasError()).toEqual(true);
-    expect(tree.errors?.map((e) => e.context)).toEqual([['...second",     ', "]", ',     "bar...']]);
+    const { offset, length, context } = tree.errors![0];
+    expect(context).toEqual([
+      `{
+    "foo": [
+      "first",
+      `,
+      '"second',
+      `
+    ],
+    "bar": 3
+}`,
+    ]);
+    expect(offset).toEqual(36);
+    expect(length).toEqual(7);
   });
 });

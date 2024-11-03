@@ -7,7 +7,6 @@ function getJsonPaths(page: Page) {
 
 test("display cursor JSON path", async ({ page }) => {
   const editor = await getEditor(page, { goto: true });
-
   await expect(editor).toContainText("The Wire");
   await page.getByText("The Wire").nth(0).click();
 
@@ -28,10 +27,11 @@ test("display cursor JSON path", async ({ page }) => {
 
 test("display validation errors", async ({ page }) => {
   const editor = await getEditor(page, { goto: true });
-
   await expect(editor).toContainText("The Wire");
   await page.getByText("The Wire").nth(0).click();
   await page.keyboard.press("End");
-  await page.keyboard.press(",");
-  await expect(page.getByTestId("statusbar")).toHaveText('Ln 6, col 5 parsing error:...Wire", ], "string...');
+  await page.keyboard.press("Backspace");
+
+  await expect(page.getByTestId("parse-error")).toContainText(/Ln 5, col 7 parsing error:/);
+  await expect(page.getByTestId("parse-error")).toContainText(/\s+"The Wire\s+\],/);
 });
