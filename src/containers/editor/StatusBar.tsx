@@ -107,7 +107,7 @@ function CursorPosition({ className }: CursorPositionProps) {
   const selection = t("selection", { selection: selectionLength });
 
   return (
-    <div className={cn("flex flex-wrap items-center gap-1.5 break-words text-muted-foreground", className)}>
+    <div data-testid="cursor-position" className={cn("flex flex-wrap items-center gap-1.5 break-words text-muted-foreground", className)}>
       <span>{position}</span>
       {selectionLength > 0 && <span>{selection}</span>}
     </div>
