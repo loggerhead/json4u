@@ -1,3 +1,4 @@
+import { LeftTruncate } from "@/components/ui/truncate";
 import { genValueAttrs } from "@/lib/graph/layout";
 import { toPath } from "@/lib/idgen";
 import { cn } from "@/lib/utils";
@@ -50,9 +51,7 @@ function Item(props: SearchResult) {
   return (
     <div className="w-full h-12 flex flex-col justify-center">
       <div className={cn("text-sm truncate", className)}>{label}</div>
-      <div dir="rtl" className="text-xs text-muted-foreground truncate whitespace-nowrap text-left">
-        &lrm;{pathStr}
-      </div>
+      <LeftTruncate className="text-xs text-muted-foreground" text={pathStr} />
     </div>
   );
 }
