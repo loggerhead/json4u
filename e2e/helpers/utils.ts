@@ -18,8 +18,16 @@ export async function getEditor(page: Page, options?: Options) {
   return editor;
 }
 
-export function getFilePath(name: string) {
-  return path.join(process.cwd(), "__tests__/fixtures/", name);
+export async function importJsonFile(page: Page, fileName: string) {
+  await page.getByRole("button", { name: "Import" }).click();
+  await page
+    .locator("div")
+    .filter({ hasText: /^Click here to select file or drop a file right here$/ })
+    .setInputFiles(getFilePath(fileName));
+}
+
+export function getFilePath(fileName: string) {
+  return path.join(process.cwd(), "__tests__/fixtures/", fileName);
 }
 
 export async function getDownloadText(page: Page, downloadFn: () => void) {

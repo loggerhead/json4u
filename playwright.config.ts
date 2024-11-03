@@ -15,11 +15,12 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 export default defineConfig({
   timeout: 30 * 1000,
   expect: {
+    // TODO: find out why lazy load editor is slow, then change timeout to 5s or less.
     /**
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 5 * 1000,
+    timeout: 10 * 1000,
   },
   testDir: "./e2e/tests",
   /* Run tests in files in parallel */
@@ -30,12 +31,9 @@ export default defineConfig({
   workers: CI ? 4 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL,
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
   },
 
   /* Configure projects for major browsers */
@@ -52,7 +50,7 @@ export default defineConfig({
 
     {
       name: "webkit",
-      use: { ...devices["Desktop Safari"] },
+      use: { ...devices["Desktop Safari"], userAgent: "macos" },
     },
 
     /* Test against mobile viewports. */

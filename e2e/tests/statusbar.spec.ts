@@ -5,45 +5,51 @@ function getJsonPaths(page: Page) {
   return page.getByTestId("statusbar").getByLabel("breadcrumb").getByRole("listitem", { includeHidden: false });
 }
 
-test("display cursor JSON path", async ({ page }) => {
-  const editor = await getEditor(page, { goto: true });
-  await expect(editor).toContainText("The Wire");
-  await page.getByText("The Wire").first().click();
+test.describe("Sidenav", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/editor");
+  });
 
-  {
-    const pathElements = await getJsonPaths(page);
-    await expect(pathElements).toHaveText(["Aidan Gillen", "array", "1"]);
+  test("display cursor JSON path", async ({ page }) => {
+    const editor = await getEditor(page);
+    await expect(editor).toContainText("The Wire");
+    await page.getByText("The Wire").first().click();
 
-    await pathElements.first().click();
-    await expect(pathElements).toHaveText(["Aidan Gillen"]);
-  }
+    {
+      const pathElements = await getJsonPaths(page);
+      await expect(pathElements).toHaveText(["Aidan Gillen", "array", "1"]);
 
-  {
-    await page.getByText("string").first().click();
-    const pathElements = await getJsonPaths(page);
-    await expect(pathElements).toHaveText(["Aidan Gillen", "string"]);
-  }
-});
+      await pathElements.first().click();
+      await expect(pathElements).toHaveText(["Aidan Gillen"]);
+    }
 
-test("display validation errors", async ({ page }) => {
-  const editor = await getEditor(page, { goto: true });
-  await expect(editor).toContainText("The Wire");
-  await page.getByText("The Wire").first().click();
-  await page.keyboard.press("End");
-  await page.keyboard.press("Backspace");
+    {
+      await page.getByText("string").first().click();
+      const pathElements = await getJsonPaths(page);
+      await expect(pathElements).toHaveText(["Aidan Gillen", "string"]);
+    }
+  });
 
-  await expect(page.getByTestId("parse-error")).toContainText(/Ln 5, col 7 parsing error:/);
-  await expect(page.getByTestId("parse-error")).toContainText(/\s+"The Wire\s+\],/);
-});
+  test("display validation errors", async ({ page }) => {
+    const editor = await getEditor(page);
+    await expect(editor).toContainText("The Wire");
+    await page.getByText("The Wire").first().click();
+    await page.keyboard.press("End");
+    await page.keyboard.press("Backspace");
 
-test("display cursor position", async ({ page }) => {
-  const editor = await getEditor(page, { goto: true });
-  await expect(editor).toContainText("The Wire");
+    await expect(page.getByTestId("parse-error")).toContainText(/Ln 5, col 7 parsing error:/);
+    await expect(page.getByTestId("parse-error")).toContainText(/\s+"The Wire\s+\],/);
+  });
 
-  await page.getByText("The Wire").first().click();
-  await page.keyboard.press("End");
-  await expect(page.getByTestId("cursor-position")).toHaveText("5:17");
+  test("display cursor position", async ({ page }) => {
+    const editor = await getEditor(page);
+    await expect(editor).toContainText("The Wire");
 
-  await page.getByText("Wire").first().dblclick();
-  await expect(page.getByTestId("cursor-position")).toHaveText(/\d+:\d+\s*\(4 selected\)/);
+    await page.getByText("The Wire").first().click();
+    await page.keyboard.press("End");
+    await expect(page.getByTestId("cursor-position")).toHaveText("5:17");
+
+    await page.getByText("Wire").first().dblclick();
+    await expect(page.getByTestId("cursor-position")).toHaveText(/\d+:\d+\s*\(4 selected\)/);
+  });
 });
