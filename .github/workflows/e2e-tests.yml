@@ -1,4 +1,4 @@
-name: 'E2E Test'
+name: 'E2E Tests'
 
 on:
   push:
@@ -42,6 +42,10 @@ jobs:
     - name: Install Playwright browsers only on cache miss
       run: pnpm playwright install --with-deps
       if: steps.playwright-browser-cache.outputs.cache-hit != 'true'
+    - name: Install system dependencies for WebKit
+      # Some WebKit dependencies seem to lay outside the cache and will need to be installed separately
+      if: ${{ inputs.browser == 'webkit' && steps.playwright-cache.outputs.cache-hit == 'true' }}
+      run: npx playwright install-deps webkit
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4
