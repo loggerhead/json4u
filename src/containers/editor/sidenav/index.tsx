@@ -65,7 +65,6 @@ export default function SideNav() {
           </Link>
           <PopoverBtn title={t("Import")} icon={<FileUp className="icon" />} content={<ImportPopover />} />
           <PopoverBtn title={t("Export")} icon={<Download className="icon" />} content={<ExportPopover />} />
-          {/* TODO: support share */}
           <PopoverBtn
             className="hidden"
             title={t("Share")}

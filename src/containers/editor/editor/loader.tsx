@@ -7,18 +7,25 @@ import { loader } from "@monaco-editor/react";
 import "monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles";
 import "monaco-editor/esm/vs/editor/contrib/symbolIcons/browser/symbolIcons.js";
 
+export function loadEditor() {
+  window.monacoLoadAwaiter = import(
+    /* webpackChunkName: "monaco-editor" */ "monaco-editor/esm/vs/editor/editor.api"
+  ).then((monaco) => {
+    loader.config({ monaco });
+    window.monacoApi = {
+      KeyCode: monaco.KeyCode,
+      MinimapPosition: monaco.editor.MinimapPosition,
+      OverviewRulerLane: monaco.editor.OverviewRulerLane,
+      Range: monaco.Range,
+      RangeFromPositions: monaco.Range.fromPositions,
+    };
+  });
+  return window.monacoLoadAwaiter;
+}
+
 const Editor = dynamic(
   async () => {
-    await import(/* webpackChunkName: "monaco-editor" */ "monaco-editor/esm/vs/editor/editor.api").then((monaco) => {
-      loader.config({ monaco });
-      window.monacoApi = {
-        KeyCode: monaco.KeyCode,
-        MinimapPosition: monaco.editor.MinimapPosition,
-        OverviewRulerLane: monaco.editor.OverviewRulerLane,
-        Range: monaco.Range,
-        RangeFromPositions: monaco.Range.fromPositions,
-      };
-    });
+    await (window.monacoLoadAwaiter ?? loadEditor());
     return await import("./Editor");
   },
   {

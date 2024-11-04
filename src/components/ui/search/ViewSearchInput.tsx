@@ -9,8 +9,12 @@ import { getTree } from "@/stores/treeStore";
 import SearchInput from "./SearchInput";
 
 export default function ViewSearchInput() {
-  const worker = useWorker()!;
+  const worker = useWorker();
   const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
+
+  if (!worker) {
+    return null;
+  }
 
   return (
     <SearchInput

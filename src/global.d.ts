@@ -11,6 +11,8 @@ declare global {
   interface IntlMessages extends Messages {}
 
   interface Window {
+    worker?: Worker;
+    monacoLoadAwaiter?: Promise<void>;
     monacoApi: MonacoApi;
     leftPanelHandle: ImperativePanelHandle | null;
     searchComponents: Record<string, any>;

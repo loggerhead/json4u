@@ -5,6 +5,7 @@ import Loading from "@/components/Loading";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MainPanel from "@/containers/editor/MainPanel";
+import { loadEditor } from "@/containers/editor/editor/loader";
 import SideNav from "@/containers/editor/sidenav";
 import { PricingOverlay } from "@/containers/pricing";
 import { init as dbInit } from "@/lib/db/config";
@@ -53,28 +54,29 @@ function useInit() {
   );
 
   useEffect(() => {
-    dbInit();
+    (async () => {
+      dbInit();
 
-    Promise.resolve(useStatusStore.persist.rehydrate())
-      .then(() => {
-        setHydrated(true);
-        console.log("Finished statusStore rehydrate.");
-      })
-      .catch((e) => {
-        console.error("statusStore rehydrate failed:", e);
-        throw e;
-      });
-    updateActiveOrder(user);
+      await Promise.all([
+        Promise.resolve(useStatusStore.persist.rehydrate()),
+        loadEditor(),
+        () => {
+          updateActiveOrder(user);
 
-    const worker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
-    const workerProxy = wrap<MyWorker>(worker);
-    setWorker(workerProxy);
-    console.log("Finished worker initial.");
+          if (!window.worker) {
+            window.worker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
+            window.addEventListener("beforeunload", () => {
+              console.log("worker is terminated.");
+              window.worker?.terminate();
+            });
+            console.log("Finished worker initial.");
+          }
+        },
+      ]);
 
-    window.addEventListener("beforeunload", () => {
-      console.log("worker is terminated.");
-      worker.terminate();
-    });
+      window.worker && setWorker(wrap<MyWorker>(window.worker));
+      setHydrated(true);
+    })();
   }, []);
 
   return hydrated;
