@@ -106,6 +106,4 @@ export function useRevealNode(nodes: NodeWithData[], edges: EdgeWithData[]) {
       highlightRevealPosition();
     }
   }, [nodes, edges]);
-
-  console.log("graph render");
 }

@@ -4,7 +4,7 @@ import { reduce, union } from "lodash-es";
 import { h, H } from "./tag";
 
 export function genDomString(tree: Tree) {
-  return genDom(tree, tree.root()).toString();
+  return tree.valid() ? genDom(tree, tree.root()).toString() : "";
 }
 
 function genDom(tree: Tree, node: Node, addExpander?: boolean): H {
