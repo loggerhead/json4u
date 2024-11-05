@@ -9,8 +9,8 @@ import { loadEditor } from "@/containers/editor/editor/loader";
 import SideNav from "@/containers/editor/sidenav";
 import { PricingOverlay } from "@/containers/pricing";
 import { init as dbInit } from "@/lib/db/config";
+import { initLogger } from "@/lib/utils";
 import { type MyWorker } from "@/lib/worker/worker";
-import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useUserStore } from "@/stores/userStore";
 import { ErrorBoundary } from "@sentry/react";
@@ -45,7 +45,6 @@ function Main() {
 // FIX: If the user enter /editor repeatedly, it will cause multiple executions
 function useInit() {
   const [hydrated, setHydrated] = useState(false);
-  const setWorker = useEditorStore((state) => state.setWorker);
   const { user, updateActiveOrder } = useUserStore(
     useShallow((state) => ({
       user: state.user,
@@ -54,27 +53,20 @@ function useInit() {
   );
 
   useEffect(() => {
+    initLogger();
+
     (async () => {
       dbInit();
+      await Promise.all([useStatusStore.persist.rehydrate(), loadEditor()]);
+      updateActiveOrder(user);
 
-      await Promise.all([
-        Promise.resolve(useStatusStore.persist.rehydrate()),
-        loadEditor(),
-        () => {
-          updateActiveOrder(user);
-
-          if (!window.worker) {
-            window.worker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
-            window.addEventListener("beforeunload", () => {
-              console.log("worker is terminated.");
-              window.worker?.terminate();
-            });
-            console.log("Finished worker initial.");
-          }
-        },
-      ]);
-
-      window.worker && setWorker(wrap<MyWorker>(window.worker));
+      window.rawWorker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
+      window.worker = wrap<MyWorker>(window.rawWorker);
+      window.addEventListener("beforeunload", () => {
+        console.l("worker is terminated.");
+        window.rawWorker?.terminate();
+      });
+      console.l("Finished worker initial.");
       setHydrated(true);
     })();
   }, []);

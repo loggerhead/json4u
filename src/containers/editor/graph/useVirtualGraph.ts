@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { ViewMode } from "@/lib/db/config";
 import { config, initialViewport } from "@/lib/graph/layout";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
-import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
@@ -26,7 +25,6 @@ export default function useVirtualGraph() {
   ]);
 
   const { setViewport, getZoom } = useReactFlow();
-  const worker = useEditorStore((state) => state.worker);
   const { count, usable } = useUserStore(
     useShallow((state) => ({
       count: state.count,
@@ -42,13 +40,13 @@ export default function useVirtualGraph() {
   );
 
   useEffect(() => {
-    if (!(worker && isGraphView)) {
-      console.log("Skip graph render:", !!worker, isGraphView, treeVersion);
+    if (!isGraphView) {
+      console.l("Skip graph render:", isGraphView, treeVersion);
       return;
     }
 
     if (!usable) {
-      console.log("Skip graph render because reach out of free quota.");
+      console.l("Skip graph render because reach out of free quota.");
       setShowPricingOverlay(true);
       return;
     }
@@ -57,7 +55,7 @@ export default function useVirtualGraph() {
       const {
         graph: { levelMeta },
         renderable: { nodes, edges },
-      } = await worker.createGraph();
+      } = await window.worker.createGraph();
 
       setNodes(nodes);
       setEdges(edges);
@@ -74,7 +72,7 @@ export default function useVirtualGraph() {
         [Math.max(maxX + config.translateMargin, w), Math.max(maxY + config.translateMargin, h)],
       ];
 
-      console.log(
+      console.l(
         "Create a new graph:",
         treeVersion,
         translateExtentRef.current,
@@ -84,7 +82,7 @@ export default function useVirtualGraph() {
       );
       nodes.length > 0 && count("graphModeView");
     })();
-  }, [worker, usable, isGraphView, treeVersion]);
+  }, [usable, isGraphView, treeVersion]);
 
   return {
     nodes,

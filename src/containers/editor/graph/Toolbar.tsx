@@ -1,8 +1,10 @@
+"use client";
+
 import { memo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
 import { splitParentPointer, toPath } from "@/lib/idgen";
-import { useEditor, useEditorStore } from "@/stores/editorStore";
+import { useEditor } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeStore } from "@/stores/treeStore";
 import { NodeToolbar, Position, useReactFlow } from "@xyflow/react";
@@ -17,7 +19,6 @@ interface ToolbarProps {
 const Toolbar = memo(({ id }: ToolbarProps) => {
   const t = useTranslations();
   const editor = useEditor();
-  const worker = useEditorStore((state) => state.worker)!;
   const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
 
   const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode, setRevealPosition, setJsonPath } = useStatusStore(
@@ -51,7 +52,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
           onClick={async () => {
             if (parentId) {
               setRevealPosition({ type: "nonLeafNode", treeNodeId: parentId });
-              const { nodes, edges, jsonPath } = await worker.toggleGraphNodeSelected(parentId);
+              const { nodes, edges, jsonPath } = await window.worker.toggleGraphNodeSelected(parentId);
               setNodes(nodes);
               setEdges(edges);
               setJsonPath(jsonPath);
@@ -74,7 +75,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
           title={t(foldSiblings ? "fold_siblings" : "unfold_siblings")}
           onClick={async () => {
             toggleFoldSibingsNode(id);
-            const { nodes, edges } = await worker.triggerGraphFoldSiblings(id, foldSiblings);
+            const { nodes, edges } = await window.worker.triggerGraphFoldSiblings(id, foldSiblings);
             setNodes(nodes);
             setEdges(edges);
           }}
@@ -87,7 +88,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
           title={t(fold ? "fold node" : "unfold node")}
           onClick={async () => {
             toggleFoldNode(id);
-            const { nodes, edges } = await worker.toggleGraphNodeHidden(id, undefined, fold);
+            const { nodes, edges } = await window.worker.toggleGraphNodeHidden(id, undefined, fold);
             setNodes(nodes);
             setEdges(edges);
           }}

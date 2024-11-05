@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
 import { clearHighlight } from "@/lib/graph/utils";
 import { detectOS } from "@/lib/utils";
-import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { type Node as FlowNode } from "@xyflow/react";
@@ -26,7 +25,6 @@ export default function Graph() {
 
 function LayoutGraph() {
   const ref = useRef<HTMLDivElement>(null);
-  const worker = useEditorStore((state) => state.worker);
   const setJsonPath = useStatusStore((state) => state.setJsonPath);
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
 
@@ -61,37 +59,29 @@ function LayoutGraph() {
       translateExtent={translateExtent}
       // clear all animated for edges
       onPaneClick={(_: React.MouseEvent) => {
-        if (!worker) {
-          return;
-        }
-
         clearHighlight();
 
         (async () => {
-          const { nodes, edges } = await worker.clearGraphNodeSelected();
+          const { nodes, edges } = await window.worker.clearGraphNodeSelected();
           setNodes(nodes);
           setEdges(edges);
         })();
       }}
       onNodeClick={(_: React.MouseEvent, node: FlowNode) => {
-        if (!worker) {
-          return;
-        }
-
         (async () => {
-          const { nodes, edges, jsonPath } = await worker.toggleGraphNodeSelected(node.id);
+          const { nodes, edges, jsonPath } = await window.worker.toggleGraphNodeSelected(node.id);
           setNodes(nodes);
           setEdges(edges);
           setJsonPath(jsonPath);
         })();
       }}
       onConnectStart={(_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
-        if (handleType === "target" || !(worker && nodeId && handleId)) {
+        if (handleType === "target" || !(nodeId && handleId)) {
           return;
         }
 
         (async () => {
-          const { nodes, edges } = await worker.toggleGraphNodeHidden(nodeId, handleId);
+          const { nodes, edges } = await window.worker.toggleGraphNodeHidden(nodeId, handleId);
           setNodes(nodes);
           setEdges(edges);
         })();

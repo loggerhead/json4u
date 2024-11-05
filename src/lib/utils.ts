@@ -95,3 +95,33 @@ function genDownloadFileName(suffix: string) {
   const seconds = String(now.getSeconds()).padStart(2, "0");
   return `json4u-${hours}${minutes}${seconds}.${suffix.toLowerCase()}`;
 }
+
+const pathRegex = /(?:(?:file|https?|global code|[^@]+)@)?(?:file:)?((?:\/[^:/]+){2,})(?::(\d+))?(?::(\d+))?/;
+
+export function initLogger() {
+  const t = () => {
+    const s = new Date().toISOString().split("T")[1].replace("Z", "");
+    return `[${s}]`;
+  };
+
+  const log = (rawLog: (...args: any[]) => void, ...args: any[]) => {
+    try {
+      // stolen from https://github.com/fullstack-build/tslog/blob/master/src/runtime/browser/index.ts stackLineToStackFrame
+      const stack = Error().stack!.split("\n");
+      const match = stack[3].match(pathRegex)!;
+      const fileNameWithLine = `${match[1].replace(/\?.*$/, "").split("/").pop()}:${match[2]}`;
+      const spaces = fileNameWithLine.length < 30 ? " ".repeat(30 - fileNameWithLine.length) : "";
+      rawLog(t(), `[${fileNameWithLine}]${spaces}\t`, ...args);
+    } catch (e) {
+      rawLog(t(), ...args);
+    }
+  };
+
+  // @ts-ignore
+  console.rawInfo = console.info.bind(console);
+  // @ts-ignore
+  console.l = function (...args: any[]) {
+    // @ts-ignore
+    log(this.rawInfo, ...args);
+  };
+}

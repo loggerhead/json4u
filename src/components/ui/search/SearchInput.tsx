@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import {
   Command as Cmd,
@@ -10,7 +12,6 @@ import {
 } from "@/components/ui/command";
 import { type MessageKey } from "@/global";
 import { useDebounceFn } from "@/lib/hooks";
-import { useWorker } from "@/stores/editorStore";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useTranslations } from "next-intl";
 
@@ -44,7 +45,6 @@ export default function SearchInput<T extends { id: string }>({
   const commandRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const groupRef = useRef(null);
-  const worker = useWorker();
 
   const [initialed, setInitialed] = useState(false);
   const [open, setOpen] = useState(false);
@@ -129,7 +129,6 @@ export default function SearchInput<T extends { id: string }>({
     >
       <CommandInput
         ref={inputRef}
-        disabled={!worker}
         placeholder={placeholder ? t(placeholder) : undefined}
         onFocus={() => {
           if (openListOnFocus || inputValue.length > 0) {

@@ -3,23 +3,17 @@ import { genValueAttrs } from "@/lib/graph/layout";
 import { toPath } from "@/lib/idgen";
 import { cn } from "@/lib/utils";
 import { type SearchResult } from "@/lib/worker/stores/types";
-import { useWorker } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { getTree } from "@/stores/treeStore";
 import SearchInput from "./SearchInput";
 
 export default function ViewSearchInput() {
-  const worker = useWorker();
   const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
-
-  if (!worker) {
-    return null;
-  }
 
   return (
     <SearchInput
       openListOnFocus
-      search={worker.searchInView}
+      search={window.worker.searchInView}
       onSelect={(item) =>
         setRevealPosition({
           type: item.revealType,

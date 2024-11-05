@@ -49,7 +49,7 @@ function MyEditor({ kind, ...props }: EditorProps) {
         wrapper.init();
         setEditor(wrapper);
         setTranslations(translations);
-        console.log(`Finished initial editor ${kind}:`, wrapper);
+        console.l(`Finished initial editor ${kind}:`, wrapper);
       }}
       onChange={(value, ev) => {
         const editor = getEditorState()[kind];
@@ -110,12 +110,11 @@ const exampleData = `{
 
 function useDisplayExample() {
   const editor = useEditor("main");
-  const worker = useEditorStore((state) => state.worker);
   const incrEditorInitCount = useStatusStore((state) => state.incrEditorInitCount);
 
   useEffect(() => {
-    if (editor && worker && incrEditorInitCount() <= 1) {
+    if (editor && incrEditorInitCount() <= 1) {
       editor.parseAndSet(exampleData);
     }
-  }, [editor, worker]);
+  }, [editor]);
 }

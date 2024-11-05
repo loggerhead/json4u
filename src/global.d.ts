@@ -1,5 +1,7 @@
 import type { MonacoApi } from "@/lib/editor/types.d.ts";
+import type { MyWorker } from "@/lib/worker/worker";
 import "@hcaptcha/types";
+import type { Remote } from "comlink";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 import en from "../messages/en.json";
 
@@ -11,7 +13,8 @@ declare global {
   interface IntlMessages extends Messages {}
 
   interface Window {
-    worker?: Worker;
+    rawWorker: Worker;
+    worker: Remote<MyWorker>;
     monacoLoadAwaiter?: Promise<void>;
     monacoApi: MonacoApi;
     leftPanelHandle: ImperativePanelHandle | null;

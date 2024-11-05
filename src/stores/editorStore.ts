@@ -2,9 +2,7 @@ import { type MessageKey } from "@/global";
 import { Comparer } from "@/lib/editor/comparer";
 import type { Kind, EditorWrapper } from "@/lib/editor/editor";
 import { toastErr, toastSucc, toastWarn } from "@/lib/utils";
-import { type MyWorker } from "@/lib/worker/worker";
 import { sendGAEvent } from "@next/third-parties/google";
-import { type Remote } from "comlink";
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { create } from "zustand";
@@ -23,13 +21,10 @@ export interface EditorState {
   main?: EditorWrapper;
   secondary?: EditorWrapper;
   comparer?: Comparer;
-  worker?: Remote<MyWorker>;
   commands: Command[];
 
   runCommand: (id: MessageKey) => void;
   setTranslations: (translations: ReturnType<typeof useTranslations>) => void;
-  getWorker: () => Remote<MyWorker> | undefined;
-  setWorker: (worker: Remote<MyWorker>) => void;
   getAnotherEditor: (kind: Kind) => EditorWrapper;
   setEditor: (editor: EditorWrapper) => void;
   isReady: () => boolean;
@@ -58,16 +53,16 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
     {
       id: "escape",
       run: async () => {
-        const { main, worker } = get();
-        const { set } = await main!.parseAndSet(await worker!.escape(main!.text()));
+        const { main } = get();
+        const { set } = await main!.parseAndSet(await window.worker.escape(main!.text()));
         return set;
       },
     },
     {
       id: "unescape",
       run: async () => {
-        const { main, worker } = get();
-        const { set } = await main!.parseAndSet(await worker!.unescape(main!.text()));
+        const { main } = get();
+        const { set } = await main!.parseAndSet(await window.worker.unescape(main!.text()));
         return set;
       },
     },
@@ -92,16 +87,16 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
     {
       id: "pythonDictToJSON",
       run: async () => {
-        const { main, worker } = get();
-        const { parse } = await main!.parseAndSet(await worker!.pythonDictToJSON(main!.text()));
+        const { main } = get();
+        const { parse } = await main!.parseAndSet(await window.worker.pythonDictToJSON(main!.text()));
         return parse;
       },
     },
     {
       id: "urlToJson",
       run: async () => {
-        const { main, worker } = get();
-        const { text, parse } = await worker!.urlToJSON(main!.text());
+        const { main } = get();
+        const { text, parse } = await window.worker.urlToJSON(main!.text());
         if (!parse) return parse;
         const { set } = await main!.parseAndSet(text);
         return set;
@@ -156,14 +151,6 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
 
   setTranslations(translations: ReturnType<typeof useTranslations>) {
     set({ translations });
-  },
-
-  setWorker(worker: Remote<MyWorker>) {
-    set({ worker });
-  },
-
-  getWorker() {
-    return get().worker;
   },
 
   getAnotherEditor(kind: Kind) {
@@ -221,10 +208,6 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
 
 export function useEditor(kind: Kind = "main") {
   return useEditorStore((state) => state[kind]);
-}
-
-export function useWorker() {
-  return useEditorStore((state) => state.worker);
 }
 
 export function getEditorState() {

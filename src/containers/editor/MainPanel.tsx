@@ -7,7 +7,6 @@ import ModePanel from "@/containers/editor/mode/ModePanel";
 import { setupGlobalGraphStyle } from "@/lib/graph/layout";
 import { cn } from "@/lib/utils";
 import { px2num } from "@/lib/utils";
-import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useShallow } from "zustand/react/shallow";
 import LeftPanel from "./LeftPanel";
@@ -96,42 +95,32 @@ function useObserveResize() {
 
     resizeObserver.observe(leftPanel);
     resizeObserver.observe(rightPanel);
-
-    return () => {
-      resizeObserver.unobserve(leftPanel);
-      resizeObserver.unobserve(rightPanel);
-      console.log("Unobserve left and right panels.");
-    };
   }, []);
 }
 
 function WidthMeasure() {
-  const worker = useEditorStore((state) => state.worker);
-
   useEffect(() => {
-    if (worker) {
-      const el = document.getElementById("width-measure")!;
-      const span = el.querySelector("span")!;
-      const { lineHeight } = getComputedStyle(span);
-      const { borderWidth } = getComputedStyle(el);
-      const { paddingLeft, paddingRight } = getComputedStyle(el.querySelector(".graph-kv")!);
-      const { marginRight, maxWidth: maxKeyWidth } = getComputedStyle(el.querySelector(".graph-k")!);
-      const { maxWidth: maxValueWidth } = getComputedStyle(el.querySelector(".graph-v")!);
-      const measured = {
-        fontWidth: span.offsetWidth / span.textContent!.length,
-        kvHeight: px2num(lineHeight),
-        padding: px2num(paddingLeft) + px2num(paddingRight),
-        borderWidth: px2num(borderWidth),
-        kvGap: px2num(marginRight),
-        maxKeyWidth: px2num(maxKeyWidth),
-        maxValueWidth: px2num(maxValueWidth),
-      };
+    const el = document.getElementById("width-measure")!;
+    const span = el.querySelector("span")!;
+    const { lineHeight } = getComputedStyle(span);
+    const { borderWidth } = getComputedStyle(el);
+    const { paddingLeft, paddingRight } = getComputedStyle(el.querySelector(".graph-kv")!);
+    const { marginRight, maxWidth: maxKeyWidth } = getComputedStyle(el.querySelector(".graph-k")!);
+    const { maxWidth: maxValueWidth } = getComputedStyle(el.querySelector(".graph-v")!);
+    const measured = {
+      fontWidth: span.offsetWidth / span.textContent!.length,
+      kvHeight: px2num(lineHeight),
+      padding: px2num(paddingLeft) + px2num(paddingRight),
+      borderWidth: px2num(borderWidth),
+      kvGap: px2num(marginRight),
+      maxKeyWidth: px2num(maxKeyWidth),
+      maxValueWidth: px2num(maxValueWidth),
+    };
 
-      setupGlobalGraphStyle(measured);
-      worker.setupGlobalGraphStyle(measured);
-      console.log("Finished measuring graph base style:", measured);
-    }
-  }, [worker]);
+    setupGlobalGraphStyle(measured);
+    window.worker.setupGlobalGraphStyle(measured);
+    console.l("Finished measuring graph base style:", measured);
+  }, []);
 
   return (
     <div id="width-measure" className="absolute invisible graph-node">

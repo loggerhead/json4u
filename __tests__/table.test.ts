@@ -60,7 +60,7 @@ describe("genFlowNodes", () => {
     checkDom(
       `{
   "int64": 12345678987654321,
-  "key": "value",
+  "key": "value"
 }`,
       `<table>
   <tbody>

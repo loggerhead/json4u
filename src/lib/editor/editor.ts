@@ -51,7 +51,7 @@ export class EditorWrapper {
   }
 
   worker() {
-    return getEditorState().getWorker()!;
+    return window.worker;
   }
 
   getAnotherEditor() {
@@ -114,7 +114,7 @@ export class EditorWrapper {
       this.revealPosition(1, 1);
     }
 
-    console.log("Set tree:", tree);
+    console.l("Set tree:", tree);
     return tree;
   }
 
@@ -140,15 +140,15 @@ export class EditorWrapper {
     text = text ?? "";
 
     if (text === prevText) {
-      console.log("skip onChange:", ev.versionId);
+      console.l("skip onChange:", ev.versionId);
       return;
     }
 
     if (prevText === "") {
-      console.log("onChange immediately:", ev.versionId);
+      console.l("onChange immediately:", ev.versionId);
       await this.parseAndSet(text);
     } else {
-      console.log("onChange with delay:", ev.versionId);
+      console.l("onChange with delay:", ev.versionId);
       await this.delayParseAndSet(text, { format: false }, false);
     }
   }
