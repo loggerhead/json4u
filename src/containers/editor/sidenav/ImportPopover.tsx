@@ -67,12 +67,12 @@ function useOnFile(fileType: FileType, options: { csvWithHeader?: boolean }) {
     reader.onload = async (event) => {
       const fileContent = event.target?.result;
       if (typeof fileContent !== "string") {
+        console.l("skip import file:", typeof fileContent);
         return;
       }
 
-      let r: CsvResult = {
-        text: fileContent,
-      };
+      let r: CsvResult = { text: fileContent };
+      console.l("import file:", fileType, fileContent.length, fileContent.slice(0, 20));
 
       if (fileType !== "JSON") {
         secondary.setTree({ treeObject: new Tree(fileContent).toObject() });
@@ -85,9 +85,11 @@ function useOnFile(fileType: FileType, options: { csvWithHeader?: boolean }) {
 
       if (r.errorKey) {
         toastErr(t(r.errorKey as MessageKey));
-      } else {
-        await main.parseAndSet(r.text ?? "");
+        return;
       }
+
+      const text = r.text ?? "";
+      await main.parseAndSet(text);
     };
 
     reader.readAsText(file);

@@ -15,12 +15,11 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 export default defineConfig({
   timeout: 30 * 1000,
   expect: {
-    // TODO: find out why lazy load editor is slow, then change timeout to 5s or less.
     /**
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 10 * 1000,
+    timeout: 5 * 1000,
   },
   testDir: "./e2e/tests",
   /* Run tests in files in parallel */
@@ -50,7 +49,7 @@ export default defineConfig({
 
     {
       name: "webkit",
-      use: { ...devices["Desktop Safari"], userAgent: "macos" },
+      use: { ...devices["Desktop Safari"] },
     },
 
     /* Test against mobile viewports. */

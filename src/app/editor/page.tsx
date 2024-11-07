@@ -42,7 +42,6 @@ function Main() {
   );
 }
 
-// FIX: If the user enter /editor repeatedly, it will cause multiple executions
 function useInit() {
   const [hydrated, setHydrated] = useState(false);
   const { user, updateActiveOrder } = useUserStore(

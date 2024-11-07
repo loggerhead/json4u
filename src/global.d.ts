@@ -12,6 +12,10 @@ declare global {
   // Use type safe message keys with `next-intl`
   interface IntlMessages extends Messages {}
 
+  interface Console {
+    l: (...args: any[]) => void;
+  }
+
   interface Window {
     rawWorker: Worker;
     worker: Remote<MyWorker>;

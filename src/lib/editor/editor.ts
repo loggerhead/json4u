@@ -5,7 +5,7 @@ import { getEditorState } from "@/stores/editorStore";
 import { getStatusState } from "@/stores/statusStore";
 import { getTreeState } from "@/stores/treeStore";
 import { sendGAEvent } from "@next/third-parties/google";
-import { debounce } from "lodash-es";
+import { debounce, type DebouncedFunc } from "lodash-es";
 import { editorApi, IScrollEvent } from "./types";
 
 export type Kind = "main" | "secondary";
@@ -19,7 +19,7 @@ export class EditorWrapper {
   // 滚动中吗？
   scrolling: number;
   tree: Tree;
-  delayParseAndSet: (text: string, extraOptions: ParseOptions, resetCursor: boolean) => void;
+  delayParseAndSet: DebouncedFunc<(text: string, extraOptions: ParseOptions, resetCursor: boolean) => void>;
 
   constructor(editor: editorApi.IStandaloneCodeEditor, kind: Kind) {
     this.editor = editor;
@@ -30,6 +30,7 @@ export class EditorWrapper {
   }
 
   init() {
+    this.listenOnDidPaste();
     this.listenOnKeyDown();
     this.listenOnDropFile();
 
@@ -139,18 +140,31 @@ export class EditorWrapper {
     const prevText = this.tree.text;
     text = text ?? "";
 
-    if (text === prevText) {
-      console.l("skip onChange:", ev.versionId);
-      return;
-    }
-
-    if (prevText === "") {
-      console.l("onChange immediately:", ev.versionId);
-      await this.parseAndSet(text);
-    } else {
-      console.l("onChange with delay:", ev.versionId);
+    if (text !== prevText) {
+      console.l("onChange:", ev.versionId);
+      this.delayParseAndSet.cancel();
       await this.delayParseAndSet(text, { format: false }, false);
+    } else {
+      console.l("skip onChange:", ev.versionId);
     }
+  }
+
+  listenOnDidPaste() {
+    this.editor.onDidPaste(async (ev) => {
+      const versionId = this.model().getVersionId();
+      const text = this.text();
+      // if all text is replaced by pasted text
+      if (text.length > 0 && ev.range.equalsRange(this.model().getFullModelRange())) {
+        console.l("onDidPaste:", versionId, text.length, text.slice(0, 20));
+        // for avoid triggering onChange
+        this.tree.text = text;
+        // sometimes onChange will triggered before onDidPaste, so we need to cancel it
+        this.delayParseAndSet.cancel();
+        await this.parseAndSet(text);
+      } else {
+        console.l("skip onDidPaste:", versionId, text.length, text.slice(0, 20));
+      }
+    });
   }
 
   // 监听光标改变事件。显示光标停留位置的 json path
@@ -170,7 +184,6 @@ export class EditorWrapper {
           offset--;
         }
 
-        // TODO tree 改变时重新获取当前的 offset 计算展示的 path
         const nodeId = this.tree.findNodeAtOffset(offset)?.id;
         if (nodeId) {
           getStatusState().setJsonPath(toPath(nodeId));

@@ -13,7 +13,7 @@ test.describe("Sidenav", () => {
   test("display cursor JSON path", async ({ page }) => {
     const editor = await getEditor(page);
     await expect(editor).toContainText("The Wire");
-    await page.getByText("The Wire").first().click();
+    await page.locator(".view-lines > div:nth-child(5)").getByText("The Wire").first().click();
 
     {
       const pathElements = await getJsonPaths(page);

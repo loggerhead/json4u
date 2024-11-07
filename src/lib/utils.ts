@@ -2,6 +2,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
+import { isDev } from "./env";
 
 export function dateToYYYYMMDD(date: Date) {
   const year = date.getFullYear();
@@ -105,6 +106,11 @@ export function initLogger() {
   };
 
   const log = (rawLog: (...args: any[]) => void, ...args: any[]) => {
+    if (!isDev) {
+      rawLog(t(), ...args);
+      return;
+    }
+
     try {
       // stolen from https://github.com/fullstack-build/tslog/blob/master/src/runtime/browser/index.ts stackLineToStackFrame
       const stack = Error().stack!.split("\n");
