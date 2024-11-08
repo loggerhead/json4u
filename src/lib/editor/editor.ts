@@ -115,7 +115,7 @@ export class EditorWrapper {
       this.revealPosition(1, 1);
     }
 
-    console.l("Set tree:", tree);
+    console.l("set tree:", tree);
     return tree;
   }
 

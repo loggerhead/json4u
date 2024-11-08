@@ -112,12 +112,12 @@ export function initLogger() {
     }
 
     try {
-      // stolen from https://github.com/fullstack-build/tslog/blob/master/src/runtime/browser/index.ts stackLineToStackFrame
+      const fixWidth = 20;
       const stack = Error().stack!.split("\n");
       const match = stack[3].match(pathRegex)!;
-      const fileNameWithLine = `${match[1].replace(/\?.*$/, "").split("/").pop()}:${match[2]}`;
-      const spaces = fileNameWithLine.length < 30 ? " ".repeat(30 - fileNameWithLine.length) : "";
-      rawLog(t(), `[${fileNameWithLine}]${spaces}\t`, ...args);
+      const fileName = match[1].replace(/\?.*$/, "").split("/").pop() ?? "";
+      const spaces = fileName.length < fixWidth ? " ".repeat(fixWidth - fileName.length) : "";
+      rawLog(t(), `[${fileName}]${spaces}\t`, ...args);
     } catch (e) {
       rawLog(t(), ...args);
     }

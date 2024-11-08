@@ -65,7 +65,7 @@ function useInit() {
         console.l("worker is terminated.");
         window.rawWorker?.terminate();
       });
-      console.l("Finished worker initial.");
+      console.l("finished worker initial.");
       setHydrated(true);
     })();
   }, []);

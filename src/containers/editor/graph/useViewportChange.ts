@@ -25,7 +25,7 @@ export function useViewportChange(
       } = await window.worker.setGraphSize(width, height);
 
       console.l(
-        "Compute virtual graph because of resize:",
+        "compute virtual graph since resize:",
         changed,
         [width, height],
         [nodes.length, edges.length],
@@ -51,7 +51,7 @@ export function useViewportChange(
       } = await window.worker.setGraphViewport(viewport);
 
       console.l(
-        "Compute virtual graph because of viewport changed:",
+        "compute virtual graph since the viewport has changed:",
         changed,
         viewport,
         [nodes.length, edges.length],

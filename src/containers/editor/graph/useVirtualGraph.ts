@@ -41,12 +41,12 @@ export default function useVirtualGraph() {
 
   useEffect(() => {
     if (!isGraphView) {
-      console.l("Skip graph render:", isGraphView, treeVersion);
+      console.l("skip graph render:", isGraphView, treeVersion);
       return;
     }
 
     if (!usable) {
-      console.l("Skip graph render because reach out of free quota.");
+      console.l("skip graph render because reach out of free quota.");
       setShowPricingOverlay(true);
       return;
     }
@@ -73,7 +73,7 @@ export default function useVirtualGraph() {
       ];
 
       console.l(
-        "Create a new graph:",
+        "create a new graph:",
         treeVersion,
         translateExtentRef.current,
         [nodes.length, edges.length],

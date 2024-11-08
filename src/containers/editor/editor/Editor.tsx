@@ -49,7 +49,7 @@ function MyEditor({ kind, ...props }: EditorProps) {
         wrapper.init();
         setEditor(wrapper);
         setTranslations(translations);
-        console.l(`Finished initial editor ${kind}:`, wrapper);
+        console.l(`finished initial editor ${kind}:`, wrapper);
       }}
       onChange={(value, ev) => {
         const editor = getEditorState()[kind];

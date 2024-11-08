@@ -119,7 +119,7 @@ function WidthMeasure() {
 
     setupGlobalGraphStyle(measured);
     window.worker.setupGlobalGraphStyle(measured);
-    console.l("Finished measuring graph base style:", measured);
+    console.l("finished measuring graph base style:", measured);
   }, []);
 
   return (

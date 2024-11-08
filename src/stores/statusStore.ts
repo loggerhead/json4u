@@ -114,6 +114,9 @@ export const useStatusStore = create<StatusState>()(
         set({ parseOptions: { ...get().parseOptions, ...options } });
       },
 
+      // set reveal position will cause:
+      // 1. `setCenter` in `useRevealNode` to be called.
+      // 2. `setCenter` will change viewport and cause `onViewportChange` to be called.
       setRevealPosition(pos: Partial<RevealPosition>) {
         const oldPos = get().revealPosition;
         set({
@@ -126,6 +129,9 @@ export const useStatusStore = create<StatusState>()(
         });
       },
 
+      // Every time nodes are set, it will cause the graph to render twice.
+      // We need to highlight after the second render. Otherwise, the highlight will not take effect.
+      // The first render will not set `node.measured`, but the second render will.
       highlightRevealPosition() {
         const {
           revealPosition: { treeNodeId, type },
