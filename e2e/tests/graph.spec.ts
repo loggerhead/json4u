@@ -158,7 +158,7 @@ test.describe("graph", () => {
       const box = (await page.locator(".graph-k").first().boundingBox())!;
       await expect(box).toBeTruthy();
       await page.mouse.move(box.x, box.y);
-      await expect(page.getByTestId("popover-key").first()).toBeVisible();
+      await expect(page.getByTestId("graph-popover").first()).toBeVisible();
     }
 
     {
@@ -166,7 +166,7 @@ test.describe("graph", () => {
       const box = (await page.locator(".graph-v").first().boundingBox())!;
       await expect(box).toBeTruthy();
       await page.mouse.move(box.x, box.y);
-      await expect(page.getByTestId("popover-value").first()).toBeVisible();
+      await expect(page.getByTestId("graph-popover").first()).toBeVisible();
     }
   });
 });

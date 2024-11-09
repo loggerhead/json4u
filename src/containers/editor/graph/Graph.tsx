@@ -7,6 +7,7 @@ import { useStatusStore } from "@/stores/statusStore";
 import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { type Node as FlowNode } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { debounce } from "lodash-es";
 import MouseButton from "./MouseButton";
 import { ObjectNode, RootNode, VirtualTargetNode } from "./Node";
 import { useRevealNode, useViewportChange } from "./useViewportChange";
@@ -88,6 +89,7 @@ function LayoutGraph() {
           setEdges(edges);
         })();
       }}
+      onError={onError}
       nodes={nodes}
       edges={edges}
       onNodesChange={onNodesChange}
@@ -106,3 +108,19 @@ function LayoutGraph() {
     </ReactFlow>
   );
 }
+
+const print008Error = debounce(
+  (code: string, message: string) => {
+    console.error(message);
+  },
+  100,
+  { leading: true },
+);
+
+const onError = (code: string, message: string) => {
+  if (code === "008") {
+    print008Error(code, message);
+  } else {
+    console.error(message);
+  }
+};
