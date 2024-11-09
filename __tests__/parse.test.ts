@@ -2,6 +2,7 @@ import { rootMarker } from "@/lib/idgen";
 import { ParseOptions, isEquals, Node, getRawValue, isIterable } from "@/lib/parser";
 import { parseJSON } from "@/lib/parser/parse";
 import { random } from "lodash-es";
+import { readFileIfNeed } from "./utils";
 
 function expectEq(text: string, expected: string, options: ParseOptions = {}) {
   const tree = parseJSON(text, options);
@@ -101,6 +102,15 @@ describe("parseJSON", () => {
       const t = parseJSON(s);
       expect(t.stringify()).toEqual(s);
     }
+  });
+
+  test("complex.txt with bigint", () => {
+    const s = readFileIfNeed("complex.txt");
+    const t = parseJSON(s, { nest: false, format: true, prettyMaxWidth: 120 });
+    const node = t.node(
+      "$/we___are___such___stuff___as___dreams___are___made___on___and___our___little___life___is___rounded___with___sleep/199/inner%20object/0/object1/user_id",
+    );
+    expect(getRawValue(node)).toEqual("9876543210123456789");
   });
 });
 
