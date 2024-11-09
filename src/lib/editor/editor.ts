@@ -101,7 +101,7 @@ export class EditorWrapper {
     this.tree = tree;
     getTreeState().setTree(tree, this.kind);
 
-    // 全量替换成新文本
+    // replace editor text to the new tree text
     this.editor.executeEdits(null, [
       {
         text: tree.text,
@@ -111,10 +111,7 @@ export class EditorWrapper {
     // Indicates the above edit is a complete undo/redo change.
     this.editor.pushUndoStop();
 
-    if (resetCursor) {
-      this.revealPosition(1, 1);
-    }
-
+    resetCursor && this.revealPosition(1, 1);
     console.l("set tree:", tree);
     return tree;
   }
