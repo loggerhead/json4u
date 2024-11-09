@@ -12,16 +12,6 @@ test("tutorial data", async ({ page }) => {
   await expect(getGraphNode(page, "$/Alexander%20Skarsgard")).toBeVisible();
   await expect(getGraphNode(page, "$/Aidan%20Gillen/array")).toBeVisible();
 
-  const nd = await getGraphNode(page, "$/Aidan%20Gillen");
-  await expect(nd).toBeVisible();
-  await nd.click();
-
-  // go to root node and assert go to parent button is hidden.
-  const goToParentBtn = await page.getByRole("button", { name: "go to parent node" });
-  await expect(goToParentBtn).toBeVisible();
-  await goToParentBtn.click();
-  await expect(goToParentBtn).toBeHidden();
-
   // no tutorial data when reentry.
   {
     const editor = await getEditor(page, { goto: true });

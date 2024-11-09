@@ -22,6 +22,7 @@ export type NodeWithData = FlowNode<{
   render: NodeRender;
   toolbarVisible?: boolean;
   style?: React.CSSProperties;
+  selected?: boolean;
 }>;
 
 interface NodeRender {

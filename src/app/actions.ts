@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { env, type Statistics, type StatisticsKeys } from "@/lib/env";
+import { env, isDev, type Statistics, type StatisticsKeys } from "@/lib/env";
 import { createClient, Db } from "@/lib/supabase/server";
 import { createCheckout, listCustomers } from "@lemonsqueezy/lemonsqueezy.js";
 import { lemonSqueezySetup } from "@lemonsqueezy/lemonsqueezy.js";
@@ -113,6 +113,10 @@ function getStatisticsKey(fallbackKey: string): string {
 }
 
 function getIP(): string | undefined {
+  if (isDev) {
+    return;
+  }
+
   const version = getClientVersion();
   const hh = ["x-forwarded-for", "x-real-ip", "forwarded", "cf-connecting-ip"];
   const ips = [];
@@ -123,7 +127,6 @@ function getIP(): string | undefined {
   } else {
     console.log("new version app:", version);
   }
-
 
   for (const header of hh) {
     const ip = headersList.get(header);

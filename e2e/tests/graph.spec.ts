@@ -1,5 +1,5 @@
 import { type Page, test, expect } from "@playwright/test";
-import { getEditor, getGraphNode, importJsonFile } from "../helpers/utils";
+import { getEditor, getGraphNode, hasHighlight, importJsonFile } from "../helpers/utils";
 
 async function move(page: Page, right: number, down: number) {
   const { x, y, width, height } = (await page.getByTestId("rf__wrapper").boundingBox())!;
@@ -23,17 +23,116 @@ async function move(page: Page, right: number, down: number) {
   }
 }
 
-test.describe("Virtual graph", () => {
+test.describe("graph", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/editor");
   });
 
-  test("check node visible", async ({ page }) => {
+  test("lazy load nodes", async ({ page }) => {
     await getEditor(page, { goto: true });
     await importJsonFile(page, "complex.txt");
 
     await move(page, 2000, 2000);
     await expect(getGraphNode(page, "$")).toBeHidden();
+  });
+
+  test("toolbar actions", async ({ page }) => {
+    // display toolbar when click node
+    {
+      const nd = await getGraphNode(page, "$/Aidan%20Gillen");
+      await expect(nd).toBeVisible();
+      await nd.click();
+    }
+
+    // reveal position in editor
+    {
+      await page.getByRole("button", { name: "reveal position in editor" }).click();
+      await expect(page.getByTestId("cursor-position")).toHaveText("2:19");
+    }
+
+    // fold and unfold node
+    {
+      await expect(getGraphNode(page, "$/Aidan%20Gillen/array")).toBeVisible();
+      await expect(getGraphNode(page, "$/Aidan%20Gillen/object")).toBeVisible();
+      await page.getByRole("button", { name: "fold node" }).click();
+      await expect(getGraphNode(page, "$/Aidan%20Gillen/array")).toBeHidden();
+      await expect(getGraphNode(page, "$/Aidan%20Gillen/object")).toBeHidden();
+      await page.getByRole("button", { name: "unfold node" }).click();
+      await expect(getGraphNode(page, "$/Aidan%20Gillen/array")).toBeVisible();
+      await expect(getGraphNode(page, "$/Aidan%20Gillen/object")).toBeVisible();
+    }
+
+    // fold and unfold siblings
+    {
+      const nd = await getGraphNode(page, "$/Amy%20Ryan");
+      await expect(nd).toBeVisible();
+      await nd.click();
+
+      await page.getByRole("button", { name: "fold siblings" }).click();
+      const nodes = page.locator(".react-flow__node");
+      const cnt = await nodes.count();
+      const dataIds = ["$", "$/Amy%20Ryan"];
+
+      for (let i = 0; i < cnt; i++) {
+        const node = nodes.nth(i);
+        await expect(node).toHaveAttribute("data-id", dataIds[i]);
+      }
+
+      await page.getByRole("button", { name: "unfold siblings" }).click();
+      await expect(page.locator(".react-flow__node")).toHaveCount(12);
+    }
+
+    // go to parent
+    {
+      await page.getByRole("button", { name: "go to parent node" }).click();
+
+      // root node only have two buttons
+      const titles = ["reveal position in editor", "fold node"];
+      const buttons = page.locator(".react-flow__node-toolbar").getByRole("button");
+      const cnt = await buttons.count();
+
+      for (let i = 0; i < cnt; i++) {
+        const btn = buttons.nth(i);
+        await expect(btn).toHaveAttribute("title", titles[i]);
+      }
+    }
+  });
+
+  test("search", async ({ page }) => {
+    {
+      // wait for the graph to finish rendering
+      await expect(getGraphNode(page, "$")).toBeVisible();
+
+      // type the text into the search input
+      const searchInput = page.getByTestId("view-search-input");
+      await searchInput.click();
+      await searchInput.locator("input").fill("null check");
+
+      // select the first option
+      await expect(searchInput.getByRole("option").first()).toBeVisible();
+      await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("Enter");
+
+      // assert that the node is selected and one of its values is highlighted
+      {
+        await expect(page.getByRole("treeitem", { selected: true })).toHaveAttribute(
+          "data-tree-id",
+          "$/Aidan%20Gillen",
+        );
+        const isHl = await hasHighlight(page);
+        await expect(isHl).toBe(true);
+      }
+
+      // assert that the node is deselected and no value is highlighted
+      {
+        await getGraphNode(page, "$/Aidan%20Gillen/object").click();
+        const node = page.getByRole("treeitem", { selected: true });
+        await expect(node).toHaveCount(1);
+        await expect(node).toHaveAttribute("data-tree-id", "$/Aidan%20Gillen/object");
+        const isHl = await hasHighlight(page);
+        await expect(isHl).toBe(false);
+      }
+    }
   });
 
   test("it should render popover when a key node is hovered by mouse.", async ({ page }) => {

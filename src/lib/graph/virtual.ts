@@ -10,6 +10,9 @@ const smoothPaddingGap = 200;
 const minVirtualizeNodeNum = 100;
 const maxVirtualEdgesForTwoNodes = 10;
 
+// the x,y values of the viewport here are coordinates of the left-top point,
+// it's different from what it means in xyflow which means transform.
+// https://github.com/xyflow/xyflow/discussions/4311#discussioncomment-9602692
 export default function computeVirtualGraph(
   graph: Graph,
   width: number,
@@ -156,12 +159,12 @@ function virtualize(graph: Graph) {
   }
 }
 
-function getRenderRect(viewport: Viewport, width: number, height: number): Rect {
+function getRenderRect({ x, y, zoom }: Viewport, width: number, height: number): Rect {
   return {
-    x: (-viewport.x - smoothPaddingGap) / viewport.zoom,
-    y: (-viewport.y - smoothPaddingGap) / viewport.zoom,
-    width: (width + 2 * smoothPaddingGap) / viewport.zoom,
-    height: (height + 2 * smoothPaddingGap) / viewport.zoom,
+    x: (x - smoothPaddingGap) / zoom,
+    y: (y - smoothPaddingGap) / zoom,
+    width: (width + 2 * smoothPaddingGap) / zoom,
+    height: (height + 2 * smoothPaddingGap) / zoom,
   };
 }
 

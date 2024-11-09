@@ -43,6 +43,17 @@ export function getBackgroundColor(locator: Locator) {
   return locator.evaluate((el) => window.getComputedStyle(el).getPropertyValue("background-color"));
 }
 
+// NOTICE: the entire node should be visible in the graph; otherwise, a click may not select it.
 export function getGraphNode(page: Page, id: string) {
   return page.getByTestId(`rf__node-${id}`);
+}
+
+export function hasHighlight(page: Page) {
+  return page.evaluate(() => {
+    if (CSS.highlights) {
+      return !!CSS.highlights.get("search-highlight");
+    } else {
+      return !!document.querySelector(".search-highlight");
+    }
+  });
 }

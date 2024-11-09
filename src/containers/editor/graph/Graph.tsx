@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { config } from "@/lib/graph/layout";
-import { clearHighlight } from "@/lib/graph/utils";
 import { detectOS } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
@@ -26,6 +25,7 @@ export default function Graph() {
 function LayoutGraph() {
   const ref = useRef<HTMLDivElement>(null);
   const setJsonPath = useStatusStore((state) => state.setJsonPath);
+  const clearHighlight = useStatusStore((state) => state.clearHighlight);
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
 
   // The graph will render three times because:
@@ -34,7 +34,7 @@ function LayoutGraph() {
   // 3. xyflow will measure the new `nodes`, which will trigger a render.
   const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, translateExtent } = useVirtualGraph();
   useViewportChange(ref, setNodes, setEdges);
-  useRevealNode(nodes, edges);
+  useRevealNode(nodes, setNodes, setEdges);
 
   return (
     <ReactFlow
@@ -68,6 +68,8 @@ function LayoutGraph() {
         })();
       }}
       onNodeClick={(_: React.MouseEvent, node: FlowNode) => {
+        clearHighlight(node.id);
+
         (async () => {
           const { nodes, edges, jsonPath } = await window.worker.toggleGraphNodeSelected(node.id);
           setNodes(nodes);

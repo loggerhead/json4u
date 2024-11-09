@@ -28,7 +28,13 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   return (
     <>
       {data.toolbarVisible && <Toolbar id={id} />}
-      <div className="graph-node nodrag nopan cursor-default" style={data.style} data-tree-id={id}>
+      <div
+        className="graph-node nodrag nopan cursor-default"
+        role="treeitem"
+        aria-selected={data.selected}
+        style={data.style}
+        data-tree-id={id}
+      >
         {node.id !== rootMarker && <TargetHandle childrenNum={childrenNum} />}
         {kvStart > 0 && <div style={{ width, height: kvStart * globalStyle.kvHeight }} />}
         {filter(

@@ -81,13 +81,18 @@ export function computeRevealPosition(
   graph: Graph,
   tree: Tree,
   { type, treeNodeId }: RevealPosition,
-): XYPosition & { changed: boolean } {
+):
+  | {
+      center: XYPosition;
+      viewport: XYPosition;
+    }
+  | undefined {
   const { parent, lastKey } = splitParentPointer(treeNodeId);
   const graphNode = graph.nodeMap?.[type === "nonLeafNode" ? treeNodeId : (parent ?? "")];
 
   if (!graphNode) {
     console.error("computeRevealPosition (node not found):", treeNodeId, type);
-    return { x: 0, y: 0, changed: false };
+    return;
   }
 
   let xOffset = 0;
@@ -103,5 +108,8 @@ export function computeRevealPosition(
   const gap = 25;
   const x = graphNode.position.x + Math.min(graphNode.data.width / 2, width / 2 - gap) + xOffset;
   const y = graphNode.position.y + Math.min(graphNode.data.height / 2, height / 2 - gap) + yOffset;
-  return { x, y, changed: true };
+  return {
+    center: { x, y },
+    viewport: { x: x - width / 2, y: y - height / 2 },
+  };
 }

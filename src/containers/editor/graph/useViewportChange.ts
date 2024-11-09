@@ -1,10 +1,11 @@
-import { type Dispatch, type RefObject, type SetStateAction, useEffect } from "react";
+import { type Dispatch, type RefObject, type SetStateAction, useEffect, useState } from "react";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
 import { refreshInterval } from "@/lib/graph/virtual";
 import { useDebounceFn } from "@/lib/hooks";
 import { useStatusStore } from "@/stores/statusStore";
 import { useOnViewportChange, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { keyBy } from "lodash-es";
 import { useResizeObserver } from "usehooks-ts";
 import { setViewportSize } from "./useVirtualGraph";
 
@@ -44,22 +45,18 @@ export function useViewportChange(
   );
 
   const onViewportChange = useDebounceFn(
-    async (viewport) => {
+    // the x,y values of the viewport aren't technically coordinates,
+    // they are values used to apply a transformation to the viewport.
+    // https://github.com/xyflow/xyflow/discussions/4311#discussioncomment-9602692
+    async ({ x, y, zoom }) => {
+      const viewport = { x: -x, y: -y, zoom };
       const {
         renderable: { nodes, edges },
         changed,
       } = await window.worker.setGraphViewport(viewport);
 
-      console.l(
-        "compute virtual graph since the viewport has changed:",
-        changed,
-        viewport,
-        [nodes.length, edges.length],
-        nodes.slice(0, 10),
-        edges.slice(0, 10),
-      );
-
       if (changed) {
+        console.l("compute virtual graph since the viewport has changed:", viewport, nodes.length, nodes.slice(0, 10));
         setNodes(nodes);
         setEdges(edges);
       }
@@ -72,30 +69,51 @@ export function useViewportChange(
   useOnViewportChange({ onChange: onViewportChange });
 }
 
-export function useRevealNode(nodes: NodeWithData[], edges: EdgeWithData[]) {
+export function useRevealNode(
+  nodes: NodeWithData[],
+  setNodes: Dispatch<SetStateAction<NodeWithData[]>>,
+  setEdges: Dispatch<SetStateAction<EdgeWithData[]>>,
+) {
   const { getZoom, setCenter } = useReactFlow();
   const revealPosition = useStatusStore((state) => state.revealPosition);
-  const highlightRevealPosition = useStatusStore((state) => state.highlightRevealPosition);
+  const hlRevealPosition = useStatusStore((state) => state.hlRevealPosition);
+
+  const [waitToMeasure, setWaitToMeasure] = useState<string[]>([]);
+  const nodesMap = keyBy(nodes, "id");
+  const isMeasured = waitToMeasure.length && waitToMeasure.every((id) => nodesMap[id]?.measured?.width);
 
   useEffect(() => {
     if (revealPosition.treeNodeId) {
       (async () => {
-        const { x, y, changed } = await window.worker.computeGraphRevealPosition(revealPosition);
+        const r = await window.worker.computeGraphRevealPosition(revealPosition);
+        if (!r) {
+          return;
+        }
+
+        const { center, viewport } = r;
+        const zoom = getZoom();
+
+        const {
+          renderable: { nodes, edges },
+          changed,
+        } = await window.worker.setGraphViewport({ ...viewport, zoom });
+
+        console.l("reveal node in graph:", viewport, changed, nodes.length);
+        setWaitToMeasure(nodes.map((node) => node.id));
+        setCenter(center.x, center.y, { duration: 0, zoom });
 
         if (changed) {
-          setCenter(x, y, { duration: 100, zoom: getZoom() });
+          setNodes(nodes);
+          setEdges(edges);
         }
       })();
     }
   }, [revealPosition]);
 
   useEffect(() => {
-    // Every time nodes are set, it will cause the graph to render twice.
-    // We need to highlight after the second render. Otherwise, the highlight will not take effect.
-    // The first render will not set `node.measured`, but the second render will.
-    // So we can check `node.measured` to know whether it is the second render.
-    if (revealPosition.treeNodeId && nodes?.[0]?.measured?.width) {
-      highlightRevealPosition();
+    if (revealPosition.treeNodeId && isMeasured) {
+      hlRevealPosition();
+      setWaitToMeasure([]);
     }
-  }, [nodes, edges]);
+  }, [revealPosition, isMeasured]);
 }

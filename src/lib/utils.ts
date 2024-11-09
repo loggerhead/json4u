@@ -106,11 +106,6 @@ export function initLogger() {
   };
 
   const log = (rawLog: (...args: any[]) => void, ...args: any[]) => {
-    if (!isDev) {
-      rawLog(t(), ...args);
-      return;
-    }
-
     try {
       const fixWidth = 20;
       const stack = Error().stack!.split("\n");

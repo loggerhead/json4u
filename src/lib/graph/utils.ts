@@ -81,6 +81,9 @@ export function highlightNode(node: NodeWithData, enable: boolean, isSelected?: 
 
   if (enable) {
     style = isSelected ? nodeSelectedStyle : nodeHighlightStyle;
+    node.data.selected = isSelected;
+  } else {
+    node.data.selected = undefined;
   }
 
   node.style = style;

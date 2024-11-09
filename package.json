@@ -10,7 +10,6 @@
     "start": "next start",
     "preview": "next build && next start",
     "e2e": "npx playwright test",
-    "e2e:ui": "npx playwright test --ui",
     "e2e:gen": "playwright codegen -o e2e/foo.spec.ts http://localhost:3000",
     "test": "vitest",
     "bench": "vitest bench",
