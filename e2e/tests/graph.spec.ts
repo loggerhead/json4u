@@ -1,5 +1,5 @@
 import { type Page, test, expect } from "@playwright/test";
-import { getEditor, getGraphNode, hasHighlight, importJsonFile } from "../helpers/utils";
+import { getGraphNode, hasHighlight, importJsonFile } from "../helpers/utils";
 
 async function move(page: Page, right: number, down: number) {
   const { x, y, width, height } = (await page.getByTestId("rf__wrapper").boundingBox())!;
@@ -26,12 +26,12 @@ async function move(page: Page, right: number, down: number) {
 test.describe("graph", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/editor");
+    // wait for the graph to finish rendering
+    await expect(getGraphNode(page, "$")).toBeVisible();
   });
 
   test("lazy load nodes", async ({ page }) => {
-    await getEditor(page, { goto: true });
     await importJsonFile(page, "complex.txt");
-
     await move(page, 2000, 2000);
     await expect(getGraphNode(page, "$")).toBeHidden();
   });
@@ -100,9 +100,6 @@ test.describe("graph", () => {
 
   test("search", async ({ page }) => {
     {
-      // wait for the graph to finish rendering
-      await expect(getGraphNode(page, "$")).toBeVisible();
-
       // type the text into the search input
       const searchInput = page.getByTestId("view-search-input");
       await searchInput.click();
@@ -135,25 +132,21 @@ test.describe("graph", () => {
     }
   });
 
-  test("it should render popover when a key node is hovered by mouse.", async ({ page }) => {
-    await getEditor(page, { goto: true });
+  test("popover", async ({ page }) => {
+    {
+      // it should render popover when a key node is hovered by mouse.
+      const box = (await page.locator(".graph-k").first().boundingBox())!;
+      await expect(box).toBeTruthy();
+      await page.mouse.move(box.x, box.y);
+      await expect(page.getByTestId("popover-key").first()).toBeVisible();
+    }
 
-    const keyNode = page.locator(".graph-k");
-    const box = await keyNode.first().boundingBox();
-
-    expect(box).toBeTruthy();
-    await page.mouse.move(box!.x, box!.y);
-    await expect(page.getByTestId("popover-key").first()).toBeVisible();
-  });
-
-  test("it should render popover when a value node is hovered by mouse.", async ({ page }) => {
-    await getEditor(page, { goto: true });
-
-    const valueNode = page.locator(".graph-v");
-    const box = await valueNode.first().boundingBox();
-
-    expect(box).toBeTruthy();
-    await page.mouse.move(box!.x, box!.y);
-    await expect(page.getByTestId("popover-value").first()).toBeVisible();
+    {
+      // it should render popover when a value node is hovered by mouse.
+      const box = (await page.locator(".graph-v").first().boundingBox())!;
+      await expect(box).toBeTruthy();
+      await page.mouse.move(box.x, box.y);
+      await expect(page.getByTestId("popover-value").first()).toBeVisible();
+    }
   });
 });

@@ -5,10 +5,10 @@ import { rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
 import { useTree } from "@/stores/treeStore";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import { Handle, Position, useReactFlow, type NodeProps } from "@xyflow/react";
 import { filter } from "lodash-es";
 import { SourceHandle, TargetHandle } from "./Handle";
+import Popover from "./Popover";
 import Toolbar from "./Toolbar";
 
 export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
@@ -94,26 +94,10 @@ const KV = memo(({ id, index, property, valueClassName, valueText, hasChildren, 
 
   return (
     <div className="graph-kv" style={{ width }} data-tree-id={id}>
-      <Popover
-        content={
-          <div className="popover-container" data-testid="popover-key">
-            <div className={cn("popover-item", keyClass)} style={{ maxWidth: width }}>
-              {keyText}
-            </div>
-          </div>
-        }
-      >
+      <Popover width={width} hlClass={keyClass} text={keyText}>
         <div className={cn("graph-k", keyClass)}>{keyText}</div>
       </Popover>
-      <Popover
-        content={
-          <div className="popover-container" data-testid="popover-value">
-            <div className={cn("popover-item", valueClassName)} style={{ maxWidth: width }}>
-              {valueText}
-            </div>
-          </div>
-        }
-      >
+      <Popover width={width} hlClass={valueClassName} text={valueText}>
         <div className={cn("graph-v", valueClassName)}>{valueText}</div>
       </Popover>
       {hasChildren && <SourceHandle id={keyText} indexInParent={index} isChildrenHidden={isChildrenHidden} />}
@@ -151,16 +135,3 @@ export const VirtualTargetNode = memo(() => {
   );
 });
 VirtualTargetNode.displayName = "VirtualTargetNode";
-
-function Popover({ children, content }: React.PropsWithChildren<{ content: JSX.Element }>): JSX.Element {
-  return (
-    <Tooltip.Provider>
-      <Tooltip.Root>
-        <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content side="top">{content}</Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-  );
-}
