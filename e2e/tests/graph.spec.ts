@@ -99,6 +99,7 @@ test.describe("graph", () => {
   });
 
   test("search", async ({ page }) => {
+    // no virtual nodes case
     {
       // type the text into the search input
       const searchInput = page.getByTestId("view-search-input");
@@ -129,6 +130,25 @@ test.describe("graph", () => {
         const isHl = await hasHighlight(page);
         await expect(isHl).toBe(false);
       }
+    }
+
+    // has virtual nodes case
+    {
+      await importJsonFile(page, "complex.txt");
+      // type the text into the search input
+      const searchInput = page.getByTestId("view-search-input");
+      await searchInput.click();
+      await searchInput.locator("input").fill("987654321123456789");
+
+      // select the first option
+      await expect(searchInput.getByRole("option").first()).toBeVisible();
+      await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("Enter");
+
+      // assert that the node is selected and one of its values is highlighted
+      await expect(page.getByRole("treeitem", { selected: true })).toHaveCount(1);
+      const isHl = await hasHighlight(page);
+      await expect(isHl).toBe(true);
     }
   });
 
