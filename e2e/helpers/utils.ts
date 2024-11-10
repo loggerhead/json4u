@@ -20,7 +20,7 @@ export async function getEditor(page: Page, options?: Options) {
 
   const id = getEditorId(options?.rightEditor);
   const editor = await page.locator(id).locator(options?.textarea ? "textarea" : ".view-lines");
-  await expect(editor).toBeVisible();
+  await expect(editor).toBeAttached();
   return editor;
 }
 
@@ -31,12 +31,14 @@ export async function clearEditor(page: Page, options?: Options) {
   // For an unknown reason, Ctrl+A will not select all the text and `locator.fill("")` will only remove part of it.
   // So we need to loop and check the number of line numbers to clear all the text.
   while (true) {
-    await editor.fill("");
+    await editor.fill("", { force: true });
     const lns = filter(await page.locator(`${id} .line-numbers`).allInnerTexts());
     if (lns.length <= 1) {
       break;
     }
   }
+
+  await editor.fill("", { force: true });
 }
 
 // A tricky way to copy all the text in the editor since `ControlOrMeta+A` does not work for unknown reason.
@@ -114,8 +116,8 @@ export async function writeToClipboard(page: Page, text: string) {
 
   await page.locator("#dummy-clipboard").fill(text);
   await page.locator("#dummy-clipboard").focus();
-  await page.keyboard.press(`ControlOrMeta+A`);
-  await page.keyboard.press(`ControlOrMeta+C`);
+  await page.keyboard.press("ControlOrMeta+A");
+  await page.keyboard.press("ControlOrMeta+C");
 
   await page.evaluate(() => {
     document.body.removeChild(document.querySelector("#dummy-clipboard")!);

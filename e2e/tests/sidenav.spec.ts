@@ -94,6 +94,7 @@ test.describe("Sidenav", () => {
       await editor.click();
       const color3 = await getBackgroundColor(btn);
 
+      // TODO: for unknown reasons, the color is actually changed but does not get the right value in the case
       await expect(color1).not.toEqual(color2);
       await expect(color2).not.toEqual(color3);
     };
