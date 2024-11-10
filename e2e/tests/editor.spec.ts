@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
-import clipboard from "clipboardy";
-import { clearEditor, getEditor, getGraphNode, selectAllInEditor } from "../helpers/utils";
+import { clearEditor, getEditor, selectAllInEditor, writeToClipboard } from "../helpers/utils";
 
 test.describe("edit in the editor", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/editor");
+    await getEditor(page);
   });
 
   test("typing will not reset the cursor", async ({ page }) => {
@@ -30,11 +30,11 @@ test.describe("edit in the editor", () => {
     await expect(page.getByRole("treeitem").getByText("The string")).toBeVisible();
   });
 
-  test("pasting and replacing the whole text will reset the cursor", async ({ page, context }) => {
+  test("pasting and replacing the whole text will reset the cursor", async ({ page }) => {
+    await writeToClipboard(page, '"hello": "world"}');
     await selectAllInEditor(page);
-    await context.grantPermissions(["clipboard-write"]);
-    clipboard.writeSync('"hello": "world"}');
     await page.keyboard.press("ControlOrMeta+V");
+    await page.waitForTimeout(100);
     await page.keyboard.type("{");
     await expect(page.getByRole("treeitem").getByText("hello")).toBeVisible();
   });

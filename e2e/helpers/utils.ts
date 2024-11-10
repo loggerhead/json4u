@@ -39,15 +39,20 @@ export async function clearEditor(page: Page, options?: Options) {
   }
 }
 
-export async function selectAllInEditor(page: Page, options?: Options) {
+// A tricky way to copy all the text in the editor since `ControlOrMeta+A` does not work for unknown reason.
+export async function selectAllInEditor(page: Page, options?: Options & { lines?: number }) {
+  const lineCount = options?.lines ?? 50;
   const id = getEditorId(options?.rightEditor);
+
   await page.locator(`${id} .view-lines > div:nth-child(1)`).click();
   await page.keyboard.press("Home");
+  await page.keyboard.down("Shift");
 
-  for (let i = 0; i < 20; i++) {
-    await page.keyboard.press("ControlOrMeta+A");
-    await page.waitForTimeout(100);
+  for (let i = 0; i < lineCount; i++) {
+    await page.keyboard.press("ArrowDown");
   }
+
+  await page.keyboard.up("Shift");
 }
 
 export async function importJsonFile(page: Page, fileName: string) {
@@ -87,5 +92,32 @@ export function hasHighlight(page: Page) {
     } else {
       return !!document.querySelector(".search-highlight");
     }
+  });
+}
+
+// A tricky way to write to the clipboard. see:
+// - https://github.com/microsoft/playwright/issues/8114
+// - https://github.com/microsoft/playwright/issues/13037
+// NOTICE: It needs to be used before focusing on an element to avoid losing focus after writing to the clipboard.
+export async function writeToClipboard(page: Page, text: string) {
+  await page.evaluate(() => {
+    const dummy = document.createElement("textarea");
+    dummy.id = "dummy-clipboard";
+    dummy.style.position = "absolute";
+    dummy.style.top = "0";
+    dummy.style.left = "0";
+    dummy.style.width = "100";
+    dummy.style.height = "100";
+    dummy.style.zIndex = "1000";
+    document.body.appendChild(dummy);
+  });
+
+  await page.locator("#dummy-clipboard").fill(text);
+  await page.locator("#dummy-clipboard").focus();
+  await page.keyboard.press(`ControlOrMeta+A`);
+  await page.keyboard.press(`ControlOrMeta+C`);
+
+  await page.evaluate(() => {
+    document.body.removeChild(document.querySelector("#dummy-clipboard")!);
   });
 }
