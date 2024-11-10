@@ -111,6 +111,8 @@ export function useRevealNode(
   }, [revealPosition]);
 
   useEffect(() => {
+    // TODO: fix the highlight disappearing when the viewport is changed.
+    // This is because the node to be removed from the graph when it hidden in the viewport.
     if (revealPosition.treeNodeId && isMeasured) {
       hlRevealPosition();
       setWaitToMeasure([]);

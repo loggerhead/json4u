@@ -5,7 +5,7 @@ function getJsonPaths(page: Page) {
   return page.getByTestId("statusbar").getByLabel("breadcrumb").getByRole("listitem", { includeHidden: false });
 }
 
-test.describe("Sidenav", () => {
+test.describe("sidenav", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/editor");
   });

@@ -32,8 +32,8 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
         className="graph-node nodrag nopan cursor-default"
         role="treeitem"
         aria-selected={data.selected}
-        style={data.style}
         data-tree-id={id}
+        style={data.style}
       >
         {node.id !== rootMarker && <TargetHandle childrenNum={childrenNum} />}
         {kvStart > 0 && <div style={{ width, height: kvStart * globalStyle.kvHeight }} />}
@@ -106,7 +106,7 @@ const KV = memo(({ id, index, property, valueClassName, valueText, hasChildren, 
 });
 KV.displayName = "KV";
 
-export const RootNode = memo(({ data }: NodeProps<NodeWithData>) => {
+export const RootNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   const tree = useTree();
   const node = tree.root();
 
@@ -117,7 +117,7 @@ export const RootNode = memo(({ data }: NodeProps<NodeWithData>) => {
   const { className, text } = genValueAttrs(node);
 
   return (
-    <div className="graph-node" style={data.style}>
+    <div className="graph-node" style={data.style} role="treeitem" aria-selected={data.selected} data-tree-id={id}>
       <div className="graph-kv">
         <div className={className}>{text}</div>
       </div>

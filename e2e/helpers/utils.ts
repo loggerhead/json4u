@@ -1,10 +1,16 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 import fs from "fs";
+import { filter } from "lodash-es";
 import path from "path";
 
 interface Options {
   goto?: boolean;
   rightEditor?: boolean;
+  textarea?: boolean;
+}
+
+function getEditorId(rightEditor?: boolean) {
+  return `#${rightEditor ? "right" : "left"}-panel`;
 }
 
 export async function getEditor(page: Page, options?: Options) {
@@ -12,10 +18,36 @@ export async function getEditor(page: Page, options?: Options) {
     await page.goto("/editor");
   }
 
-  const id = `#${options?.rightEditor ? "right" : "left"}-panel`;
-  const editor = await page.locator(id).locator(".view-lines");
+  const id = getEditorId(options?.rightEditor);
+  const editor = await page.locator(id).locator(options?.textarea ? "textarea" : ".view-lines");
   await expect(editor).toBeVisible();
   return editor;
+}
+
+export async function clearEditor(page: Page, options?: Options) {
+  const id = getEditorId(options?.rightEditor);
+  const editor = await getEditor(page, { ...options, textarea: true });
+
+  // For an unknown reason, Ctrl+A will not select all the text and `locator.fill("")` will only remove part of it.
+  // So we need to loop and check the number of line numbers to clear all the text.
+  while (true) {
+    await editor.fill("");
+    const lns = filter(await page.locator(`${id} .line-numbers`).allInnerTexts());
+    if (lns.length <= 1) {
+      break;
+    }
+  }
+}
+
+export async function selectAllInEditor(page: Page, options?: Options) {
+  const id = getEditorId(options?.rightEditor);
+  await page.locator(`${id} .view-lines > div:nth-child(1)`).click();
+  await page.keyboard.press("Home");
+
+  for (let i = 0; i < 20; i++) {
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.waitForTimeout(100);
+  }
 }
 
 export async function importJsonFile(page: Page, fileName: string) {
