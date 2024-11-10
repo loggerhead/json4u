@@ -24,6 +24,17 @@ export async function getEditor(page: Page, options?: Options) {
   return editor;
 }
 
+export async function getMaxLineNumber(page: Page, rightEditor?: boolean) {
+  const id = getEditorId(rightEditor);
+  const lns = filter(await page.locator(`${id} .line-numbers`).allInnerTexts());
+
+  try {
+    return Number(lns[lns.length - 1]);
+  } catch {
+    return 0;
+  }
+}
+
 export async function clearEditor(page: Page, options?: Options) {
   const id = getEditorId(options?.rightEditor);
   const editor = await getEditor(page, { ...options, textarea: true });
@@ -32,8 +43,8 @@ export async function clearEditor(page: Page, options?: Options) {
   // So we need to loop and check the number of line numbers to clear all the text.
   while (true) {
     await editor.fill("", { force: true });
-    const lns = filter(await page.locator(`${id} .line-numbers`).allInnerTexts());
-    if (lns.length <= 1) {
+    const ln = await getMaxLineNumber(page, options?.rightEditor);
+    if (ln <= 1) {
       break;
     }
   }

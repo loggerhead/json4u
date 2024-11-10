@@ -12,7 +12,7 @@ export default function ViewSearchInput() {
 
   return (
     <SearchInput
-      testId="view-search-input"
+      id="view-search"
       openListOnFocus
       search={window.worker.searchInView}
       onSelect={(item) =>

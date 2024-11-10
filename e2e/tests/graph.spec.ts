@@ -102,7 +102,7 @@ test.describe("graph", () => {
     // no virtual nodes case
     {
       // type the text into the search input
-      const searchInput = page.getByTestId("view-search-input");
+      const searchInput = page.locator("#view-search");
       await searchInput.click();
       await searchInput.locator("input").fill("null check");
 
@@ -136,7 +136,7 @@ test.describe("graph", () => {
     {
       await importJsonFile(page, "complex.txt");
       // type the text into the search input
-      const searchInput = page.getByTestId("view-search-input");
+      const searchInput = page.locator("#view-search");
       await searchInput.click();
       await searchInput.locator("input").fill("987654321123456789");
 

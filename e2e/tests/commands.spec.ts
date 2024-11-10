@@ -1,11 +1,34 @@
 import { test, expect } from "@playwright/test";
-import { getEditor } from "../helpers/utils";
+import { getEditor, getMaxLineNumber } from "../helpers/utils";
 
-// TODO: add tests
 test.describe("commands", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/editor");
+    await getEditor(page, { goto: true });
   });
 
-  test("format and minify", async ({ page }) => {});
+  test("open command list", async ({ page }) => {
+    const search = page.locator("#cmd-search");
+    await search.click();
+    await search.getByRole("option").first().hover();
+    await page.mouse.wheel(0, 100);
+    await expect(page.getByText("Show jq input box")).toBeVisible();
+  });
+
+  test("format and minify", async ({ page }) => {
+    await expect(await getMaxLineNumber(page)).toBeGreaterThan(1);
+    {
+      const search = page.locator("#cmd-search");
+      await search.click();
+      await search.locator("input").fill("minify");
+      await search.getByRole("option").first().click();
+      await expect(await getMaxLineNumber(page)).toBe(1);
+    }
+    {
+      const search = page.locator("#cmd-search");
+      await search.click();
+      await search.locator("input").fill("format");
+      await search.getByRole("option").first().click();
+      await expect(await getMaxLineNumber(page)).toBeGreaterThan(1);
+    }
+  });
 });

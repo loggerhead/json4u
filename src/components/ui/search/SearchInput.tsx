@@ -28,7 +28,6 @@ export interface SearchInputProps<T extends { id: string }> {
   bindShortcut?: "K" | "F";
   displayShortcut?: boolean;
   id?: string;
-  testId?: string;
 }
 
 export default function SearchInput<T extends { id: string }>({
@@ -41,7 +40,6 @@ export default function SearchInput<T extends { id: string }>({
   bindShortcut,
   displayShortcut,
   id,
-  testId,
 }: SearchInputProps<T>) {
   const t = useTranslations();
   const commandRef = useRef<HTMLDivElement>(null);
@@ -119,7 +117,6 @@ export default function SearchInput<T extends { id: string }>({
   return (
     <Cmd
       id={id}
-      data-testid={testId}
       data-open={open}
       ref={commandRef}
       shouldFilter={false}
