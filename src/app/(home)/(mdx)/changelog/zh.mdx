@@ -1,8 +1,15 @@
+- 2024-11-10:
+  - 优化编辑器加载速度；
+  - 优化 graph 视图在切换 JSON tree 时的渲染速度；
+  - graph 视图支持通过 popover 展示字段值 (By [@haecheonlee](https://github.com/haecheonlee))；
+  - fix 搜索高亮有时不生效的问题；
+  - fix 空值导致 table 视图展示 "miss" 的问题；
+  - fix 编辑器为空时输入文本会重置光标的问题；
 - 2024-11-02:
   - graph 视图支持搜索；
   - 调整 graph 视图选中节点的边框颜色；
-  - 修复部分场景下选中的边未正常高亮的问题；
-  - 修复当 input 事件比 paste 事件先触发时，不能正常生成 graph 或 table 视图；
+  - fix 部分场景下选中的边未正常高亮的问题；
+  - fix 当 input 事件比 paste 事件先触发时，不能正常生成 graph 或 table 视图；
 - 2024-10-18:
   - 改变颜色以表达图节点的折叠状态 (By [@haecheonlee](https://github.com/haecheonlee))；
   - 调整为展示 jq 输入框时再懒加载 jq.wasm；
