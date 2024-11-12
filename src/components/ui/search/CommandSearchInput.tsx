@@ -1,6 +1,7 @@
 import SearchInput from "@/components/ui/search/SearchInput";
 import { type MessageKey } from "@/global";
 import { type Command, useEditorStore } from "@/stores/editorStore";
+import fuzzysort from "fuzzysort";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
 
@@ -12,6 +13,14 @@ export default function CommandSearch() {
       runCommand: state.runCommand,
     })),
   );
+  const search = (input: string) =>
+    input.trim()
+      ? fuzzysort
+          .go(input, commands, {
+            keys: [(cmd) => cmd.id, (cmd) => t(cmd.id)],
+          })
+          .map((r) => r.obj)
+      : commands;
 
   return (
     <SearchInput
@@ -20,7 +29,7 @@ export default function CommandSearch() {
       displayShortcut
       openListOnFocus
       placeholder={"Search Command"}
-      search={(input: string) => commands.filter((cmd) => cmd.id.includes(input) || t(cmd.id).includes(input))}
+      search={search}
       onSelect={(cmd) => runCommand(cmd.id)}
       itemHeight={32}
       Item={Item}
