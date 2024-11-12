@@ -7,7 +7,7 @@ function getJsonPaths(page: Page) {
 
 test.describe("sidenav", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/editor");
+    await getEditor(page, { goto: true, needTutorial: true });
   });
 
   test("display cursor JSON path", async ({ page }) => {

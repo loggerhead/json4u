@@ -1,5 +1,5 @@
 import { type Page, test, expect } from "@playwright/test";
-import { getGraphNode, hasHighlight, importJsonFile } from "../helpers/utils";
+import { getEditor, getGraphNode, hasHighlight, importJsonFile } from "../helpers/utils";
 
 async function move(page: Page, right: number, down: number) {
   const { x, y, width, height } = (await page.getByTestId("rf__wrapper").boundingBox())!;
@@ -25,7 +25,7 @@ async function move(page: Page, right: number, down: number) {
 
 test.describe("graph", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/editor");
+    await getEditor(page, { goto: true, needTutorial: true });
     // wait for the graph to finish rendering
     await expect(getGraphNode(page, "$")).toBeVisible();
   });

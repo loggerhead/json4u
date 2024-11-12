@@ -3,7 +3,7 @@ import { getEditor, getGraphNode } from "../helpers/utils";
 
 test("tutorial data", async ({ page }) => {
   {
-    const editor = await getEditor(page, { goto: true });
+    const editor = await getEditor(page, { goto: true, needTutorial: true });
     await expect(editor).toContainText("Aidan Gillen");
   }
 

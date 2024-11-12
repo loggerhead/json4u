@@ -3,7 +3,7 @@ import { clearEditor, getEditor, selectAllInEditor, writeToClipboard } from "../
 
 test.describe("edit in the editor", () => {
   test.beforeEach(async ({ page }) => {
-    await getEditor(page, { goto: true });
+    await getEditor(page, { goto: true, needTutorial: true });
   });
 
   test("typing will not reset the cursor", async ({ page }) => {

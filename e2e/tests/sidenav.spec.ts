@@ -3,7 +3,7 @@ import { getEditor, getBackgroundColor, getDownloadText, getFilePath, importJson
 
 test.describe("Sidenav", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/editor");
+    await getEditor(page, { goto: true, needTutorial: true });
   });
 
   test("click logo", async ({ page }) => {

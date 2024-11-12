@@ -7,6 +7,7 @@ interface Options {
   goto?: boolean;
   rightEditor?: boolean;
   textarea?: boolean;
+  needTutorial?: boolean;
 }
 
 function getEditorId(rightEditor?: boolean) {
@@ -21,6 +22,15 @@ export async function getEditor(page: Page, options?: Options) {
   const id = getEditorId(options?.rightEditor);
   const editor = await page.locator(id).locator(options?.textarea ? "textarea" : ".view-lines");
   await expect(editor).toBeAttached();
+
+  // Wait for the completion of setting the text of the tutorial
+  if (options?.needTutorial) {
+    if (options?.textarea) {
+      await expect(editor.inputValue()).toContain("Aidan Gillen");
+    } else {
+      await expect(editor).toContainText("Aidan Gillen");
+    }
+  }
   return editor;
 }
 
@@ -66,6 +76,12 @@ export async function selectAllInEditor(page: Page, options?: Options & { lines?
   }
 
   await page.keyboard.up("Shift");
+}
+
+// NOTICE: for unknown reasons, this function can only get partial text
+export async function getEditorText(page: Page, options?: Options) {
+  const editor = await getEditor(page, { ...options, textarea: true });
+  return editor.inputValue();
 }
 
 export async function importJsonFile(page: Page, fileName: string) {
