@@ -5,14 +5,15 @@ import Background from "@/components/Background";
 import { px2num } from "@/lib/utils";
 import { globalStyle, tableId, type TimeoutIdMap, Tooltip } from "./Tooltip";
 import { useOnClickExpander } from "./useOnClickExpander";
-import { useOnShowTooltip } from "./useOnShowTooltip";
+// import { useOnShowTooltip } from "./useOnShowTooltip";
 import { useTableHTML } from "./useTableHTML";
 
+// TODO: redesign
 export function JsonTable() {
   const tableHTML = useTableHTML();
   const timeoutIdMap: TimeoutIdMap = useRef({});
   const onClickExpander = useOnClickExpander();
-  const { onMouseOver, onMouseOut } = useOnShowTooltip(timeoutIdMap);
+  // const { onMouseOver, onMouseOut } = useOnShowTooltip(timeoutIdMap);
 
   useEffect(() => {
     const { paddingBottom } = getComputedStyle(document.getElementById(tableId)!);
@@ -24,8 +25,8 @@ export function JsonTable() {
       <div
         className="w-fit h-fit bg-white"
         onClick={onClickExpander}
-        onMouseOver={onMouseOver}
-        onMouseOut={onMouseOut}
+        // onMouseOver={onMouseOver}
+        // onMouseOut={onMouseOut}
         dangerouslySetInnerHTML={tableHTML}
       />
       <Tooltip timeoutIdMap={timeoutIdMap} />

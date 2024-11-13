@@ -1,7 +1,6 @@
 "use client";
 
 import { MutableRefObject, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEditor } from "@/stores/editorStore";
 import { type TooltipPosition, useTreeStore } from "@/stores/treeStore";
@@ -65,14 +64,7 @@ export function Tooltip({ timeoutIdMap }: TooltipProps) {
       <ol className="overflow-auto text-nowrap">
         {tooltipContent?.path.map(({ nodeType, key }, i) => (
           <li key={i}>
-            <Button
-              size="xs"
-              title={t("reveal position in editor")}
-              className={`tooltip-${nodeType}`}
-              onClick={() => editor?.revealJsonPath(path, i)}
-            >
-              {nodeType === "object" ? "{}" : "[]"}
-            </Button>
+            <span className={`tooltip-${nodeType}`}>{nodeType === "object" ? "{}" : "[]"}</span>
             <span className="tooltip-key">{key}</span>
           </li>
         ))}
