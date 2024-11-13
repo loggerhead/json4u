@@ -1,6 +1,6 @@
 import { edgeHighlightStyle, nodeHighlightStyle, nodeSelectedStyle } from "@/lib/graph/layout";
 import type { EdgeWithData, Graph, NodeWithData } from "@/lib/graph/types";
-import { isParent } from "@/lib/idgen";
+import { getParentId } from "@/lib/idgen";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
 import { filter, keyBy } from "lodash-es";
 
@@ -18,7 +18,7 @@ export function getDescendant(graph: Graph, nodeId: string, prefixId?: string) {
   let targetIds = getNode(nodeId)?.data?.targetIds ?? [];
 
   if (prefixId) {
-    targetIds = targetIds.filter((id) => id === prefixId || isParent(prefixId, id));
+    targetIds = targetIds.filter((id) => id === prefixId || getParentId(id) === prefixId);
   }
 
   addTargetNodes(targetIds.map(getNode) as NodeWithData[]);

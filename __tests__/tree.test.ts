@@ -3,26 +3,31 @@ import { parseJSON } from "@/lib/parser/parse";
 describe("findNodeAtOffset", () => {
   const tree = parseJSON('{ "array": [12345678987654321, 0.1234567891111111111] }');
 
+  const expectOffset = (offset: number, id: string | undefined) => {
+    const r = tree.findNodeAtOffset(offset);
+    expect(r?.node?.id).toEqual(id);
+  };
+
   test("simple", () => {
-    expect(tree.findNodeAtOffset(6)?.id).toEqual("$/array");
-    expect(tree.findNodeAtOffset(20)?.id).toEqual("$/array/0");
-    expect(tree.findNodeAtOffset(43)?.id).toEqual("$/array/1");
+    expectOffset(6, "$/array");
+    expectOffset(20, "$/array/0");
+    expectOffset(43, "$/array/1");
   });
 
   test("corner", () => {
-    expect(tree.findNodeAtOffset(0)?.id).toEqual(undefined);
-    expect(tree.findNodeAtOffset(2)?.id).toEqual("$");
-    expect(tree.findNodeAtOffset(9)?.id).toEqual("$/array");
-    expect(tree.findNodeAtOffset(10)?.id).toEqual("$/array");
-    expect(tree.findNodeAtOffset(12)?.id).toEqual("$/array");
-    expect(tree.findNodeAtOffset(13)?.id).toEqual("$/array/0");
-    expect(tree.findNodeAtOffset(29)?.id).toEqual("$/array/0");
-    expect(tree.findNodeAtOffset(31)?.id).toEqual("$/array");
-    expect(tree.findNodeAtOffset(32)?.id).toEqual("$/array/1");
-    expect(tree.findNodeAtOffset(52)?.id).toEqual("$/array/1");
-    expect(tree.findNodeAtOffset(53)?.id).toEqual("$/array");
-    expect(tree.findNodeAtOffset(54)?.id).toEqual("$");
-    expect(tree.findNodeAtOffset(55)?.id).toEqual("$");
-    expect(tree.findNodeAtOffset(56)?.id).toEqual(undefined);
+    expectOffset(0, undefined);
+    expectOffset(2, "$");
+    expectOffset(9, "$/array");
+    expectOffset(10, "$/array");
+    expectOffset(12, "$/array");
+    expectOffset(13, "$/array/0");
+    expectOffset(29, "$/array/0");
+    expectOffset(31, "$/array");
+    expectOffset(32, "$/array/1");
+    expectOffset(52, "$/array/1");
+    expectOffset(53, "$/array");
+    expectOffset(54, "$");
+    expectOffset(55, "$");
+    expectOffset(56, undefined);
   });
 });

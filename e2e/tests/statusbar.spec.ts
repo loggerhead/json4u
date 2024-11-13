@@ -17,16 +17,16 @@ test.describe("sidenav", () => {
 
     {
       const pathElements = await getJsonPaths(page);
-      await expect(pathElements).toHaveText(["Aidan Gillen", "array", "1"]);
+      await expect(pathElements).toHaveText(["$", "Aidan Gillen", "array", "1"]);
 
-      await pathElements.first().click();
-      await expect(pathElements).toHaveText(["Aidan Gillen"]);
+      await pathElements.nth(1).click();
+      await expect(pathElements).toHaveText(["$", "Aidan Gillen"]);
     }
 
     {
       await page.getByText("string").first().click();
       const pathElements = await getJsonPaths(page);
-      await expect(pathElements).toHaveText(["Aidan Gillen", "string"]);
+      await expect(pathElements).toHaveText(["$", "Aidan Gillen", "string"]);
     }
   });
 

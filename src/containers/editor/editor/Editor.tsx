@@ -6,6 +6,7 @@ import { EditorWrapper, type Kind } from "@/lib/editor/editor";
 import { cn } from "@/lib/utils";
 import { getEditorState, useEditor, useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
+import { getTree } from "@/stores/treeStore";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 
@@ -28,7 +29,9 @@ function MyEditor({ kind, ...props }: EditorProps) {
   const translations = useTranslations();
   const setEditor = useEditorStore((state) => state.setEditor);
   const setTranslations = useEditorStore((state) => state.setTranslations);
+
   useDisplayExample();
+  useRevealNode();
 
   return (
     <MonacoEditor
@@ -58,6 +61,23 @@ function MyEditor({ kind, ...props }: EditorProps) {
       {...props}
     />
   );
+}
+
+// reveal position in text
+export function useRevealNode() {
+  const editor = useEditor("main");
+  const revealPosition = useStatusStore((state) => state.revealPosition);
+
+  useEffect(() => {
+    const { treeNodeId, type, from } = revealPosition;
+
+    if (editor && from !== "editor" && treeNodeId) {
+      const node = getTree().node(treeNodeId);
+      if (node) {
+        editor.revealOffset((type === "key" ? node.boundOffset : node.offset) + 1);
+      }
+    }
+  }, [revealPosition]);
 }
 
 const exampleData = `{

@@ -16,7 +16,7 @@ import {
 import type { EdgeWithData, Graph, RevealPosition } from "@/lib/graph/types";
 import computeVirtualGraph from "@/lib/graph/virtual";
 import { lastKey } from "@/lib/idgen";
-import { getRawValue, hasChildren, isIterable, Tree } from "@/lib/parser";
+import { getRawValue, hasChildren, isIterable, isRoot, Tree } from "@/lib/parser";
 import { genDomString } from "@/lib/table";
 import { type FunctionKeys } from "@/lib/utils";
 import { type Viewport } from "@xyflow/react";
@@ -138,13 +138,13 @@ const useViewStore = createStore<ViewState>((set, get) => ({
 
     const results: SearchResult[] = keysResults.map((r) => {
       const node = r.obj;
-      const isMatchKey = r[0].score > r[1].score;
-      const revealType = hasChildren(node) ? "nonLeafNode" : isMatchKey ? "key" : "value";
+      const isMatchValue = r[0].score <= r[1].score;
+      const revealType = (isRoot(node) && "node") || (isMatchValue && "value") || (hasChildren(node) ? "node" : "key");
 
       return {
         revealType,
         id: node.id,
-        label: isMatchKey ? lastKey(node.id) : (getRawValue(node) ?? ""),
+        label: isMatchValue ? (getRawValue(node) ?? "") : lastKey(node.id),
       };
     });
 

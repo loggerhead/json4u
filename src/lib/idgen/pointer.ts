@@ -41,9 +41,9 @@ export function splitParentPointer(pointer: string) {
   return { parent: parent || undefined, lastKey };
 }
 
-export function isParent(parentPointer: string, childPointer: string) {
-  const { parent } = splitParentPointer(childPointer);
-  return parent === parentPointer;
+export function getParentId(id: string) {
+  const { parent } = splitParentPointer(id);
+  return parent;
 }
 
 export function isDescendant(parentPointer: string, childPointer: string) {

@@ -10,7 +10,7 @@ import "@xyflow/react/dist/style.css";
 import { debounce } from "lodash-es";
 import MouseButton from "./MouseButton";
 import { ObjectNode, RootNode, VirtualTargetNode } from "./Node";
-import { useRevealNode, useViewportChange } from "./useViewportChange";
+import { useClearSearchHl, useRevealNode, useViewportChange } from "./useViewportChange";
 import useVirtualGraph from "./useVirtualGraph";
 
 export default function Graph() {
@@ -25,8 +25,7 @@ export default function Graph() {
 
 function LayoutGraph() {
   const ref = useRef<HTMLDivElement>(null);
-  const setJsonPath = useStatusStore((state) => state.setJsonPath);
-  const clearHighlight = useStatusStore((state) => state.clearHighlight);
+  const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
   const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
 
   // The graph will render three times because:
@@ -36,6 +35,7 @@ function LayoutGraph() {
   const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, translateExtent } = useVirtualGraph();
   useViewportChange(ref, setNodes, setEdges);
   useRevealNode(nodes, setNodes, setEdges);
+  const clearSearchHl = useClearSearchHl();
 
   return (
     <ReactFlow
@@ -60,7 +60,7 @@ function LayoutGraph() {
       translateExtent={translateExtent}
       // clear all animated for edges
       onPaneClick={(_: React.MouseEvent) => {
-        clearHighlight();
+        clearSearchHl();
 
         (async () => {
           const { nodes, edges } = await window.worker.clearGraphNodeSelected();
@@ -69,13 +69,13 @@ function LayoutGraph() {
         })();
       }}
       onNodeClick={(_: React.MouseEvent, node: FlowNode) => {
-        clearHighlight(node.id);
+        clearSearchHl(node.id);
+        setRevealPosition({ treeNodeId: node.id, type: "node", from: "graphClick" });
 
         (async () => {
-          const { nodes, edges, jsonPath } = await window.worker.toggleGraphNodeSelected(node.id);
+          const { nodes, edges } = await window.worker.toggleGraphNodeSelected(node.id);
           setNodes(nodes);
           setEdges(edges);
-          setJsonPath(jsonPath);
         })();
       }}
       onConnectStart={(_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
@@ -109,13 +109,7 @@ function LayoutGraph() {
   );
 }
 
-const print008Error = debounce(
-  (code: string, message: string) => {
-    console.error(message);
-  },
-  100,
-  { leading: true },
-);
+const print008Error = debounce((code: string, message: string) => console.error(message), 100, { leading: true });
 
 const onError = (code: string, message: string) => {
   if (code === "008") {

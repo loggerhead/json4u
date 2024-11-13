@@ -56,10 +56,11 @@ export interface Graph {
   virtual?: GraphVirtual;
 }
 
-export type RevealType = "nonLeafNode" | "key" | "value";
+export type RevealType = "node" | "key" | "value";
 
 export interface RevealPosition {
   version: number; // version is used to re-trigger when assigned same id by caller
   type: RevealType;
+  from: "editor" | "statusBar" | "search" | "graphBtn" | "graphClick";
   treeNodeId: string;
 }

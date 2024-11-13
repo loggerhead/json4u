@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { LeftTruncate, RightTruncate } from "@/components/ui/truncate";
 import { type Kind } from "@/lib/editor/editor";
+import { rootMarker, toPath, toPointer } from "@/lib/idgen";
 import { cn } from "@/lib/utils";
 import { useEditor } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
@@ -33,22 +34,41 @@ export default function StatusBar() {
 function JsonPath() {
   const editor = useEditor();
   const tree = useTree();
-  const jsonPath = useStatusStore((state) => state.jsonPath);
+  const id = useStatusStore((state) => state.revealPosition.treeNodeId);
+  const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
 
-  return tree.valid() ? (
+  if (!(editor && tree.valid() && id)) {
+    return null;
+  }
+
+  const jsonPath = [rootMarker, ...toPath(id)];
+
+  return (
     <Breadcrumb className="max-w-[80%]">
       <BreadcrumbList className="flex-nowrap whitespace-nowrap overflow-x-auto">
         {jsonPath.map((k, i) => (
           <Fragment key={`${i}-${k}`}>
             <BreadcrumbItem title={k} className="inline-block cursor-pointer max-w-max-key truncate">
-              <BreadcrumbLink onClick={() => editor?.revealJsonPath(jsonPath, i)}>{k}</BreadcrumbLink>
+              <BreadcrumbLink
+                onClick={() => {
+                  const id = toPointer(jsonPath.slice(1, i + 1));
+                  const node = tree.node(id);
+                  setRevealPosition({
+                    treeNodeId: id,
+                    type: tree.isGraphNode(node) ? "node" : "key",
+                    from: "statusBar",
+                  });
+                }}
+              >
+                {k}
+              </BreadcrumbLink>
             </BreadcrumbItem>
             {i < jsonPath.length - 1 ? <BreadcrumbSeparator /> : null}
           </Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>
-  ) : null;
+  );
 }
 
 interface ParseErrorMsgProps {
@@ -107,7 +127,10 @@ function CursorPosition({ className }: CursorPositionProps) {
   const selection = t("selection", { selection: selectionLength });
 
   return (
-    <div data-testid="cursor-position" className={cn("flex flex-wrap items-center gap-1.5 break-words text-muted-foreground", className)}>
+    <div
+      data-testid="cursor-position"
+      className={cn("flex flex-wrap items-center gap-1.5 break-words text-muted-foreground", className)}
+    >
       <span>{position}</span>
       {selectionLength > 0 && <span>{selection}</span>}
     </div>

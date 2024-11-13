@@ -1,6 +1,7 @@
 import { LeftTruncate } from "@/components/ui/truncate";
 import { genValueAttrs } from "@/lib/graph/layout";
 import { toPath } from "@/lib/idgen";
+import { hasChildren } from "@/lib/parser";
 import { cn } from "@/lib/utils";
 import { type SearchResult } from "@/lib/worker/stores/types";
 import { useStatusStore } from "@/stores/statusStore";
@@ -15,12 +16,7 @@ export default function ViewSearchInput() {
       id="view-search"
       openListOnFocus
       search={window.worker.searchInView}
-      onSelect={(item) =>
-        setRevealPosition({
-          type: item.revealType,
-          treeNodeId: item.id,
-        })
-      }
+      onSelect={(item) => setRevealPosition({ treeNodeId: item.id, type: item.revealType, from: "search" })}
       Item={Item}
       itemHeight={48}
       placeholder={"search_json"}
@@ -40,11 +36,11 @@ function Item(props: SearchResult) {
   const pathStr = ["$", ...toPath(id)].join(" > ");
   let className = "";
 
-  if (revealType === "key") {
-    className = "text-hl-key";
-  } else if (revealType === "value") {
+  if (revealType === "value") {
     const { className: cls } = genValueAttrs(node);
     className = cls;
+  } else if (!hasChildren(node)) {
+    className = "text-hl-key";
   }
 
   return (

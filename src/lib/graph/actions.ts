@@ -1,4 +1,4 @@
-import { join as idJoin, isDescendant, splitParentPointer, toPath } from "@/lib/idgen";
+import { getParentId, join as idJoin, isDescendant, splitParentPointer } from "@/lib/idgen";
 import { type Tree } from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
 import { computeSourceHandleOffset } from "./layout";
@@ -43,8 +43,7 @@ export function toggleNodeSelected(graph: Graph, id: string) {
     (nd) => toggleToolbar(highlightNode(nd, false), node),
   );
 
-  const jsonPath = toPath(node.id);
-  return { ...generateVirtualGraph(graph), jsonPath };
+  return generateVirtualGraph(graph);
 }
 
 export function clearNodeSelected(graph: Graph) {
@@ -54,11 +53,11 @@ export function clearNodeSelected(graph: Graph) {
 }
 
 export function triggerFoldSiblings(graph: Graph, nodeId: string, fold: boolean) {
-  const { parent } = splitParentPointer(nodeId);
+  const parentId = getParentId(nodeId);
 
-  if (parent) {
+  if (parentId) {
     const isSiblingOrDescendantOfSibling = (id: string) =>
-      id.startsWith(parent) && !(parent === id || isDescendant(nodeId, id));
+      id.startsWith(parentId) && !(parentId === id || isDescendant(nodeId, id));
 
     matchApply(
       graph.edges,
@@ -88,7 +87,8 @@ export function computeRevealPosition(
     }
   | undefined {
   const { parent, lastKey } = splitParentPointer(treeNodeId);
-  const graphNode = graph.nodeMap?.[type === "nonLeafNode" ? treeNodeId : (parent ?? "")];
+  const graphNodeId = type === "node" ? treeNodeId : (parent ?? "");
+  const graphNode = graph.nodeMap?.[graphNodeId];
 
   if (!graphNode) {
     console.error("computeRevealPosition (node not found):", treeNodeId, type);
@@ -98,7 +98,7 @@ export function computeRevealPosition(
   let xOffset = 0;
   let yOffset = 0;
 
-  if (type !== "nonLeafNode") {
+  if (type !== "node") {
     const i = tree.node(parent!).childrenKeys?.indexOf(lastKey) ?? 0;
     yOffset = computeSourceHandleOffset(i);
     xOffset = type === "key" ? 0 : graphNode.data.width / 2;

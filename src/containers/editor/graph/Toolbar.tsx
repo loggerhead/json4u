@@ -3,12 +3,11 @@
 import { memo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
-import { splitParentPointer, toPath } from "@/lib/idgen";
-import { useEditor } from "@/stores/editorStore";
+import { getParentId } from "@/lib/idgen";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeStore } from "@/stores/treeStore";
 import { NodeToolbar, Position, useReactFlow } from "@xyflow/react";
-import { ArrowLeft, CopyMinus, CopyPlus, Focus, SquareMinus, SquarePlus } from "lucide-react";
+import { ArrowLeft, CopyMinus, CopyPlus, SquareMinus, SquarePlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
 
@@ -18,13 +17,11 @@ interface ToolbarProps {
 
 const Toolbar = memo(({ id }: ToolbarProps) => {
   const t = useTranslations();
-  const editor = useEditor();
   const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
 
-  const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode, setRevealPosition, setJsonPath } = useStatusStore(
+  const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode, setRevealPosition } = useStatusStore(
     useShallow((state) => ({
       setRevealPosition: state.setRevealPosition,
-      setJsonPath: state.setJsonPath,
       toggleFoldNode: state.toggleFoldNode,
       toggleFoldSibingsNode: state.toggleFoldSibingsNode,
       fold: !state.unfoldNodeMap[id],
@@ -32,7 +29,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
     })),
   );
 
-  const { parent: parentId } = splitParentPointer(id);
+  const parentId = getParentId(id);
   const isRoot = parentId === undefined;
   const tree = useTreeStore((state) => state.main);
   const hasSiblings = !isRoot && tree.nonLeafChildrenNodes(tree.node(parentId)).length > 1;
@@ -51,25 +48,16 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
           title={t("go to parent")}
           onClick={async () => {
             if (parentId) {
-              setRevealPosition({ type: "nonLeafNode", treeNodeId: parentId });
-              const { nodes, edges, jsonPath } = await window.worker.toggleGraphNodeSelected(parentId);
+              const { nodes, edges } = await window.worker.toggleGraphNodeSelected(parentId);
               setNodes(nodes);
               setEdges(edges);
-              setJsonPath(jsonPath);
+              setRevealPosition({ treeNodeId: parentId, type: "node", from: "graphBtn" });
             }
           }}
         >
           <ArrowLeft className="icon" />
         </ToolbarButton>
       )}
-      <ToolbarButton
-        title={t("reveal position in editor")}
-        onClick={() => {
-          editor?.revealJsonPath(toPath(id));
-        }}
-      >
-        <Focus className="icon" />
-      </ToolbarButton>
       {hasSiblings && (
         <ToolbarButton
           title={t(foldSiblings ? "fold_siblings" : "unfold_siblings")}

@@ -1,4 +1,4 @@
-import { rootMarker } from "@/lib/idgen";
+import { getParentId, rootMarker } from "@/lib/idgen";
 import * as jsonc from "jsonc-parser";
 import { isEmpty, repeat } from "lodash-es";
 import { union } from "lodash-es";
@@ -12,6 +12,7 @@ import {
   getRawValue,
   computeAndSetBoundLength,
   hasChildren,
+  isRoot,
 } from "./node";
 
 export interface StringifyOptions extends ParseOptions {
@@ -113,7 +114,16 @@ export class Tree implements TreeObject {
     return !isEmpty(this.errors);
   }
 
-  findNodeAtOffset(offset: number) {
+  isGraphNode(node: Node) {
+    return isRoot(node) || hasChildren(node);
+  }
+
+  getGraphNodeId(nodeId: string) {
+    const node = this.node(nodeId);
+    return this.isGraphNode(node) ? nodeId : getParentId(nodeId);
+  }
+
+  findNodeAtOffset(offset: number): { node: Node; type: "node" | "key" | "value" } | undefined {
     if (!this.valid()) {
       return undefined;
     }
@@ -151,7 +161,16 @@ export class Tree implements TreeObject {
       return node;
     };
 
-    return doFind(this.root());
+    const node = doFind(this.root());
+    if (!node) {
+      return undefined;
+    }
+
+    if (this.isGraphNode(node)) {
+      return { node, type: "node" };
+    } else {
+      return { node, type: node.offset < offset && offset <= node.offset + node.length ? "value" : "key" };
+    }
   }
 
   // TODO support pretty format

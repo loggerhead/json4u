@@ -44,12 +44,6 @@ test.describe("graph", () => {
       await nd.click();
     }
 
-    // reveal position in editor
-    {
-      await page.getByRole("button", { name: "reveal position in editor" }).click();
-      await expect(page.getByTestId("cursor-position")).toHaveText("2:19");
-    }
-
     // fold and unfold node
     {
       await expect(getGraphNode(page, "$/Aidan%20Gillen/array")).toBeVisible();
@@ -86,8 +80,8 @@ test.describe("graph", () => {
     {
       await page.getByRole("button", { name: "go to parent node" }).click();
 
-      // root node only have two buttons
-      const titles = ["reveal position in editor", "fold node"];
+      // root node only have one button
+      const titles = ["fold node"];
       const buttons = page.locator(".react-flow__node-toolbar").getByRole("button");
       const cnt = await buttons.count();
 

@@ -1,4 +1,4 @@
-import { splitParentPointer } from "@/lib/idgen";
+import { getParentId, splitParentPointer } from "@/lib/idgen";
 import { getRawValue, ParseOptions, Tree } from "@/lib/parser";
 import { parseAndFormat } from "@/lib/worker/command/parse";
 import { readFileIfNeed } from "./utils";
@@ -45,17 +45,17 @@ function expectOffsetAndText(tree: Tree, aa: TestData[]) {
 function expectFindNodeAtOffset(tree: Tree, aa: TestData[]) {
   for (const { id, offset, length, boundOffset, boundLength } of aa) {
     {
-      const node = tree.findNodeAtOffset(boundOffset);
-      const { parent } = splitParentPointer(id);
-      expect(node?.id).toEqual(parent);
+      const r = tree.findNodeAtOffset(boundOffset);
+      const parentId = getParentId(id);
+      expect(r?.node?.id).toEqual(parentId);
     }
     {
-      const node = tree.findNodeAtOffset(boundOffset + boundLength)!;
-      expect(node?.id).toEqual(id);
+      const r = tree.findNodeAtOffset(boundOffset + boundLength);
+      expect(r?.node?.id).toEqual(id);
     }
     {
-      const node = tree.findNodeAtOffset(offset + 1)!;
-      expect(node?.id).toEqual(id);
+      const r = tree.findNodeAtOffset(offset + 1);
+      expect(r?.node?.id).toEqual(id);
     }
   }
 }

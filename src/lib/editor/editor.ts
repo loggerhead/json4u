@@ -1,4 +1,3 @@
-import { toPath, toPointer } from "@/lib/idgen";
 import { ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
@@ -86,14 +85,6 @@ export class EditorWrapper {
     this.revealPosition(lineNumber, column);
   }
 
-  revealJsonPath(path: string[], index?: number) {
-    const id = toPointer(index !== undefined ? path.slice(0, index + 1) : path);
-    const offset = this.tree.node(id)?.offset;
-    if (offset !== undefined) {
-      this.revealOffset(offset);
-    }
-  }
-
   setTree({ treeObject }: ParsedTree, resetCursor: boolean = true) {
     const tree = Tree.fromObject(treeObject);
     getEditorState().resetHighlight();
@@ -166,27 +157,38 @@ export class EditorWrapper {
 
   // 监听光标改变事件。显示光标停留位置的 json path
   listenOnDidChangeCursorPosition() {
-    this.editor.onDidChangeCursorPosition((e) => {
-      const model = this.model();
-      const { lineNumber, column } = e.position;
-      const selectionLength = model.getValueInRange(this.editor.getSelection()!).length;
-      getStatusState().setCursorPosition(lineNumber, column, selectionLength);
+    const onDidChangeCursorPosition = debounce(
+      (e) => {
+        const model = this.model();
+        const { lineNumber, column } = e.position;
+        const selectionLength = model.getValueInRange(this.editor.getSelection()!).length;
+        getStatusState().setCursorPosition(lineNumber, column, selectionLength);
 
-      if (this.tree.valid()) {
-        const text = this.text();
+        if (this.tree.valid()) {
+          const text = this.text();
 
-        // 获取当前光标在整个文档中的偏移量（offset）
-        let offset = model.getOffsetAt(e.position);
-        if (text[offset] === "\n" && text[offset - 1] === ",") {
-          offset--;
+          // 获取当前光标在整个文档中的偏移量（offset）
+          let offset = model.getOffsetAt(e.position);
+          if (text[offset] === "\n" && text[offset - 1] === ",") {
+            offset--;
+          }
+
+          const r = this.tree.findNodeAtOffset(offset);
+
+          if (r?.node) {
+            getStatusState().setRevealPosition({
+              treeNodeId: r.node.id,
+              type: r.type,
+              from: "editor",
+            });
+          }
         }
+      },
+      200,
+      { trailing: true },
+    );
 
-        const nodeId = this.tree.findNodeAtOffset(offset)?.id;
-        if (nodeId) {
-          getStatusState().setJsonPath(toPath(nodeId));
-        }
-      }
-    });
+    this.editor.onDidChangeCursorPosition(onDidChangeCursorPosition);
   }
 
   // 注册拖拽事件处理器，支持拖拽文件到编辑器上
