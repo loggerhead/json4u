@@ -33,8 +33,10 @@ export function useViewportChange(
       console.l(
         "compute virtual graph since resize:",
         changed,
-        [width, height],
-        [nodes.length, edges.length],
+        width,
+        height,
+        nodes.length,
+        edges.length,
         nodes.slice(0, 10),
         edges.slice(0, 10),
       );

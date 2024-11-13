@@ -1,4 +1,4 @@
-import { globalStyle, newGraph } from "@/lib/graph/layout";
+import { globalStyle } from "@/lib/graph/layout";
 import type { NodeWithData, GraphVirtual, Graph, EdgeWithData } from "@/lib/graph/types";
 import { type Viewport, type Rect } from "@xyflow/react";
 import { getOverlappingArea } from "@xyflow/system";
@@ -19,23 +19,26 @@ export default function computeVirtualGraph(
   height: number,
   viewport: Viewport,
 ): { renderable: Graph; changed: boolean } {
+  if (graph.nodes.length <= minVirtualizeNodeNum) {
+    return { renderable: graph, changed: false };
+  }
+
   if (width <= 0 || height <= 0 || viewport.zoom <= 0) {
     console.error("invalid viewport", width, height, viewport);
-    return { renderable: newGraph(), changed: graph.nodes.length > 0 };
-  } else if (graph.nodes.length <= minVirtualizeNodeNum) {
-    return { renderable: graph, changed: false };
+
+    width = 1000;
+    height = 1000;
+    viewport = { ...viewport, zoom: 1 };
   }
 
   const oldRenderMeta = graph.virtual;
   const viewportRect = getRenderRect(viewport, width, height);
-
   const { nodes } = computeRealSubgraph(viewportRect, graph);
   let changed = computeRealKV(viewportRect, nodes);
-
   virtualize(graph);
-
   const renderable = generateVirtualGraph(graph);
   changed = changed || isSubgraphChanged(oldRenderMeta, graph.virtual);
+
   return { renderable, changed };
 }
 
@@ -175,12 +178,15 @@ function isSubgraphChanged(oldVirtual: GraphVirtual | undefined, newVirtual: Gra
     return a.size === b.size && a.size === a.intersection(b).size;
   };
 
-  return !(
-    isEq("realNodeIds") &&
-    isEq("realEdgeIds") &&
-    isEq("omitEdgeIds") &&
-    isEq("virtualSourceNodeIds") &&
-    isEq("virtualTargetNodeIds")
+  return (
+    !!oldVirtual !== !!newVirtual ||
+    !(
+      isEq("realNodeIds") &&
+      isEq("realEdgeIds") &&
+      isEq("omitEdgeIds") &&
+      isEq("virtualSourceNodeIds") &&
+      isEq("virtualTargetNodeIds")
+    )
   );
 }
 
