@@ -1,5 +1,5 @@
-import { ParseOptions } from "@/lib/parser";
-import { get, set, del, UseStore, createStore } from "idb-keyval";
+import { type ParseOptions } from "@/lib/parser";
+import { get, set, del, type UseStore, createStore } from "idb-keyval";
 import { type StateStorage } from "zustand/middleware";
 
 export const keyName = "config";
@@ -44,20 +44,51 @@ export function init() {
   globalStore = createStore("json4u", "kv");
 }
 
+export async function safeGet(key: IDBValidKey) {
+  try {
+    return (await get(key, globalStore)) || null;
+  } catch (e) {
+    if ((e as unknown as Error).name === "InvalidStateError") {
+      console.error("InvalidStateError", e);
+      return null;
+    } else {
+      throw e;
+    }
+  }
+}
+
+export async function safeSet(key: IDBValidKey, value: any) {
+  try {
+    await set(key, value, globalStore);
+  } catch (e) {
+    if ((e as unknown as Error).name === "InvalidStateError") {
+      console.error("InvalidStateError", e);
+    } else {
+      throw e;
+    }
+  }
+}
+
+export async function safeDel(key: IDBValidKey) {
+  try {
+    await del(key, globalStore);
+  } catch (e) {
+    if ((e as unknown as Error).name === "InvalidStateError") {
+      console.error("InvalidStateError", e);
+    } else {
+      throw e;
+    }
+  }
+}
+
 const storage: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    return (await get(name, globalStore)) || null;
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    await set(name, value, globalStore);
-  },
-  removeItem: async (name: string): Promise<void> => {
-    await del(name, globalStore);
-  },
+  getItem: safeGet,
+  setItem: safeSet,
+  removeItem: safeDel,
 };
 
 async function getConfig() {
-  const stateStr = await get(keyName, globalStore);
+  const stateStr = await safeGet(keyName);
   try {
     return JSON.parse(stateStr).state as Config;
   } catch (e) {
