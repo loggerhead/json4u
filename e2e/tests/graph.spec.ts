@@ -151,7 +151,7 @@ test.describe("graph", () => {
       // it should render popover when a key node is hovered by mouse.
       const box = (await page.locator(".graph-k").first().boundingBox())!;
       await expect(box).toBeTruthy();
-      await page.mouse.move(box.x, box.y);
+      await page.mouse.move(box.x + 3, box.y + 3);
       await expect(page.getByTestId("graph-popover").first()).toBeVisible();
     }
 
@@ -159,7 +159,7 @@ test.describe("graph", () => {
       // it should render popover when a value node is hovered by mouse.
       const box = (await page.locator(".graph-v").first().boundingBox())!;
       await expect(box).toBeTruthy();
-      await page.mouse.move(box.x, box.y);
+      await page.mouse.move(box.x + 3, box.y + 3);
       await expect(page.getByTestId("graph-popover").first()).toBeVisible();
     }
   });

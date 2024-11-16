@@ -36,7 +36,7 @@ export default function ModePanel() {
       <CollapsibleContent id="cmd-panel" className="min-w-80 max-w-xl" style={{ width: leftPanelWidth }}>
         {commandMode && (
           <ModeComponent
-            className="ml-4 my-2 grow"
+            className="ml-2 my-1 grow"
             ref={(el) => {
               ref.current[commandMode] = el;
               el?.focus && el.focus();
@@ -49,7 +49,6 @@ export default function ModePanel() {
   );
 }
 
-// TODO: change to use css variable to decide the color
 function CloseButton() {
   const setCommandMode = useStatusStore((state) => state.setCommandMode);
 

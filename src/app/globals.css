@@ -40,12 +40,12 @@
     --kbd-color: #171717;
     --kbd-bg-color: #fafafa;
     --search-hl-color: #f9c9b2;
-    --search-width: 240px;
+    --search-width: 300px;
     --search-height: 300px;
 
     --max-header-width: 1280px;
     /* height of <Container/> */
-    --container-height: 42px;
+    --container-height: 40px;
     --statusbar-height: 24px;
 
     --graph-font-size: 12px;
