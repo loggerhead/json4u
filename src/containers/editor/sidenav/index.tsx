@@ -15,6 +15,7 @@ import {
   Share2,
   SquareStack,
   BarChartBig,
+  AlignHorizontalJustifyCenter,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
@@ -31,17 +32,27 @@ import Toggle from "./Toggle";
 
 export default function SideNav() {
   const t = useTranslations();
-  const { sideNavExpanded, setSideNavExpanded, enableAutoFormat, enableAutoSort, enableNestParse, setParseOptions } =
-    useStatusStore(
-      useShallow((state) => ({
-        sideNavExpanded: !!state.sideNavExpanded,
-        setSideNavExpanded: state.setSideNavExpanded,
-        enableAutoFormat: !!state.parseOptions.format,
-        enableAutoSort: !!state.parseOptions.sort,
-        enableNestParse: !!state.parseOptions.nest,
-        setParseOptions: state.setParseOptions,
-      })),
-    );
+  const {
+    sideNavExpanded,
+    setSideNavExpanded,
+    enableAutoFormat,
+    enableAutoSort,
+    enableNestParse,
+    setParseOptions,
+    enableSyncScroll,
+    setEnableSyncScroll,
+  } = useStatusStore(
+    useShallow((state) => ({
+      sideNavExpanded: !!state.sideNavExpanded,
+      setSideNavExpanded: state.setSideNavExpanded,
+      enableAutoFormat: !!state.parseOptions.format,
+      enableAutoSort: !!state.parseOptions.sort,
+      enableNestParse: !!state.parseOptions.nest,
+      setParseOptions: state.setParseOptions,
+      enableSyncScroll: state.enableSyncScroll,
+      setEnableSyncScroll: state.setEnableSyncScroll,
+    })),
+  );
 
   return (
     <div
@@ -89,6 +100,12 @@ export default function SideNav() {
             title={t("Auto Sort")}
             isPressed={enableAutoSort}
             onPressedChange={(pressed) => setParseOptions({ sort: pressed ? "asc" : undefined })}
+          />
+          <Toggle
+            icon={<AlignHorizontalJustifyCenter className="icon" />}
+            title={t("sync scroll")}
+            isPressed={enableSyncScroll}
+            onPressedChange={(pressed) => setEnableSyncScroll(pressed)}
           />
         </ul>
         <ul className="flex flex-col px-1 gap-y-2">

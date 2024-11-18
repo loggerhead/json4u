@@ -84,7 +84,7 @@ export function useRevealNode(
   const { getZoom, setCenter } = useReactFlow();
   const { isNeedReveal, revealPosition } = useStatusStore(
     useShallow((state) => ({
-      isNeedReveal: state.viewMode === ViewMode.Graph && state.revealPosition.from !== "graphClick",
+      isNeedReveal: state.viewMode === ViewMode.Graph && state.isNeedReveal("graph"),
       revealPosition: state.revealPosition,
     })),
   );
@@ -163,8 +163,12 @@ export function useClearSearchHl() {
 
   return useCallback(
     (nodeId?: string) => {
-      // TODO: add comments
-      if (nodeId !== getParentId(revealPosition.treeNodeId)) {
+      const isCurrentNode =
+        revealPosition.type === "node"
+          ? nodeId === revealPosition.treeNodeId
+          : nodeId === getParentId(revealPosition.treeNodeId);
+
+      if (!isCurrentNode) {
         clearHighlight();
       }
     },

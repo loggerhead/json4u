@@ -2,6 +2,7 @@ import { type Config, defaultConfig, keyName, type ViewMode, type ViewModeValue,
 import type { RevealPosition } from "@/lib/graph/types";
 import { type ParseOptions } from "@/lib/parser";
 import { type FunctionKeys } from "@/lib/utils";
+import { includes } from "lodash-es";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -36,6 +37,7 @@ export interface StatusState extends Config {
   setRightPanelCollapsed: (collapsed: boolean) => void;
   setParseOptions: (options: ParseOptions) => void;
   setRevealPosition: (pos: Partial<RevealPosition>) => void;
+  isNeedReveal: (scene: "editor" | "graph") => boolean;
   setEnableSyncScroll: (enable: boolean) => void;
   setSideNavExpanded: (expanded: boolean) => void;
   setShowPricingOverlay: (show: boolean) => void;
@@ -119,6 +121,21 @@ export const useStatusStore = create<StatusState>()(
             },
           });
         }
+      },
+
+      isNeedReveal(scene: "editor" | "graph") {
+        const {
+          enableSyncScroll,
+          revealPosition: { from },
+        } = get();
+
+        if (scene === "editor") {
+          return enableSyncScroll ? from !== "editor" : includes(["statusBar", "graphAll"], from);
+        } else if (scene === "graph") {
+          return enableSyncScroll ? from !== "graphOthers" : includes(["statusBar", "search", "graphAll"], from);
+        }
+
+        return false;
       },
 
       setEnableSyncScroll(enable: boolean) {

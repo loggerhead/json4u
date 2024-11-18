@@ -57,10 +57,11 @@ export interface Graph {
 }
 
 export type RevealType = "node" | "key" | "value";
+export type RevealFrom = "editor" | "statusBar" | "search" | "graphAll" | "graphOthers";
 
 export interface RevealPosition {
   version: number; // version is used to re-trigger when assigned same id by caller
   type: RevealType;
-  from: "editor" | "statusBar" | "search" | "graphBtn" | "graphClick";
+  from: RevealFrom;
   treeNodeId: string;
 }

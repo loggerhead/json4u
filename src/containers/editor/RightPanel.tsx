@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import ViewSearchInput from "@/components/ui/search/ViewSearchInput";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Toggle } from "@/components/ui/toggle";
 import Editor from "@/containers/editor/editor/loader";
 import Graph from "@/containers/editor/graph/Graph";
 import SwapButton from "@/containers/editor/mode/SwapButton";
@@ -15,7 +14,7 @@ import { JsonTable } from "@/containers/editor/table/JsonTable";
 import { ViewMode, ViewModeValue } from "@/lib/db/config";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { AlignHorizontalJustifyCenter, Expand, Shrink, Table2, Text, Waypoints } from "lucide-react";
+import { Expand, Shrink, Table2, Text, Waypoints } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
 
@@ -57,12 +56,10 @@ export default function RightPanel() {
 function Buttons({ viewMode }: { viewMode: ViewMode }) {
   const t = useTranslations();
   const runCommand = useEditorStore((state) => state.runCommand);
-  const { enableTextCompare, setEnableTextCompare, enableSyncScroll, setEnableSyncScroll } = useStatusStore(
+  const { enableTextCompare, setEnableTextCompare } = useStatusStore(
     useShallow((state) => ({
       enableTextCompare: state.enableTextCompare,
       setEnableTextCompare: state.setEnableTextCompare,
-      enableSyncScroll: state.enableSyncScroll,
-      setEnableSyncScroll: state.setEnableSyncScroll,
     })),
   );
 
@@ -76,14 +73,6 @@ function Buttons({ viewMode }: { viewMode: ViewMode }) {
               {t(enableTextCompare ? "TextCompare" : "compare")}
             </Button>
           </div>
-          <Toggle
-            title={t("sync scroll")}
-            defaultPressed={enableSyncScroll}
-            pressed={enableSyncScroll}
-            onPressedChange={setEnableSyncScroll}
-          >
-            <AlignHorizontalJustifyCenter className="icon" />
-          </Toggle>
           <SwapButton variant="icon-outline" className="px-2" />
         </>
       )}

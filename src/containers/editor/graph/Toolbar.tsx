@@ -51,7 +51,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
               const { nodes, edges } = await window.worker.toggleGraphNodeSelected(parentId);
               setNodes(nodes);
               setEdges(edges);
-              setRevealPosition({ treeNodeId: parentId, type: "node", from: "graphBtn" });
+              setRevealPosition({ treeNodeId: parentId, type: "node", from: "graphAll" });
             }
           }}
         >
