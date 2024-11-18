@@ -86,24 +86,28 @@ export default function SideNav() {
           <Toggle
             icon={<Braces className="icon" />}
             title={t("Auto Format")}
+            description={t("auto_format_desc")}
             isPressed={enableAutoFormat}
             onPressedChange={(pressed) => setParseOptions({ format: pressed })}
           />
           <Toggle
             icon={<SquareStack className="icon" />}
             title={t("Nested Parse")}
+            description={t("nested_parse_desc")}
             isPressed={enableNestParse}
             onPressedChange={(pressed) => setParseOptions({ nest: pressed })}
           />
           <Toggle
             icon={<ArrowDownNarrowWide className="icon" />}
             title={t("Auto Sort")}
+            description={t("auto_sort_desc")}
             isPressed={enableAutoSort}
             onPressedChange={(pressed) => setParseOptions({ sort: pressed ? "asc" : undefined })}
           />
           <Toggle
             icon={<AlignHorizontalJustifyCenter className="icon" />}
             title={t("sync scroll")}
+            description={t("sync_scroll_desc")}
             isPressed={enableSyncScroll}
             onPressedChange={(pressed) => setEnableSyncScroll(pressed)}
           />
