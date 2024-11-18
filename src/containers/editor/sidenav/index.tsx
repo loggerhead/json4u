@@ -106,8 +106,8 @@ export default function SideNav() {
           />
           <Toggle
             icon={<AlignHorizontalJustifyCenter className="icon" />}
-            title={t("sync scroll")}
-            description={t("sync_scroll_desc")}
+            title={t("sync_reveal")}
+            description={t("sync_reveal_desc")}
             isPressed={enableSyncScroll}
             onPressedChange={(pressed) => setEnableSyncScroll(pressed)}
           />
