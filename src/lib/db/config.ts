@@ -21,6 +21,7 @@ export interface Config {
   formatTabWidth: number;
   prettyFormat: boolean;
   enableSyncScroll: boolean; // the left and right side editors scroll in sync
+  isTouchpad?: boolean;
 }
 
 export const defaultConfig: Config = {
@@ -36,6 +37,7 @@ export const defaultConfig: Config = {
   formatTabWidth: 2,
   prettyFormat: true,
   enableSyncScroll: true,
+  isTouchpad: undefined,
 };
 
 let globalStore: UseStore | undefined;

@@ -39,6 +39,7 @@ export interface StatusState extends Config {
   setEnableSyncScroll: (enable: boolean) => void;
   setSideNavExpanded: (expanded: boolean) => void;
   setShowPricingOverlay: (show: boolean) => void;
+  setIsTouchpad: (isTouchpad: boolean) => void;
   toggleFoldNode: (nodeId: string) => void;
   toggleFoldSibingsNode: (nodeId: string) => void;
   resetFoldStatus: () => void;
@@ -130,6 +131,10 @@ export const useStatusStore = create<StatusState>()(
 
       setShowPricingOverlay(show: boolean) {
         set({ showPricingOverlay: show });
+      },
+
+      setIsTouchpad(isTouchpad: boolean) {
+        set({ isTouchpad });
       },
 
       toggleFoldNode(nodeId: string) {

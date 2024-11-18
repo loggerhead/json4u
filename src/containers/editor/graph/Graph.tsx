@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { config } from "@/lib/graph/layout";
-import { detectOS } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { type Node as FlowNode } from "@xyflow/react";
@@ -26,7 +25,7 @@ export default function Graph() {
 function LayoutGraph() {
   const ref = useRef<HTMLDivElement>(null);
   const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
-  const [isTouchPad, setIsTouchPad] = useState(detectOS() === "Mac");
+  const isTouchpad = useStatusStore((state) => state.isTouchpad);
 
   // The graph will render three times because:
   // 1. Modify text in the editor will cause `treeVersion` to change.
@@ -40,7 +39,7 @@ function LayoutGraph() {
   return (
     <ReactFlow
       ref={ref}
-      panOnScroll={isTouchPad}
+      panOnScroll={isTouchpad}
       panOnScrollSpeed={config.panOnScrollSpeed}
       minZoom={config.minZoom}
       maxZoom={config.maxZoom}
@@ -102,7 +101,7 @@ function LayoutGraph() {
       multiSelectionKeyCode={null}
     >
       <Controls showInteractive={false}>
-        <MouseButton isTouchPad={isTouchPad} setIsTouchPad={setIsTouchPad} />
+        <MouseButton />
       </Controls>
       <Background />
     </ReactFlow>
