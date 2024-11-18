@@ -63,13 +63,15 @@ export default function useVirtualGraph() {
       resetFoldStatus();
 
       const [w, h] = viewportSize;
+      const px = Math.max(config.translateMargin, w / 2);
+      const py = Math.max(config.translateMargin, h / 2);
       const maxX = maxBy<XYPosition>(levelMeta, "x")?.x ?? 0;
       const maxY = maxBy<XYPosition>(levelMeta, "y")?.y ?? 0;
 
+      // fix https://github.com/xyflow/xyflow/issues/3633
       translateExtentRef.current = [
-        [-config.translateMargin, -config.translateMargin],
-        // fix https://github.com/xyflow/xyflow/issues/3633
-        [Math.max(maxX + config.translateMargin, w), Math.max(maxY + config.translateMargin, h)],
+        [-px, -py],
+        [maxX + px, maxY + py],
       ];
 
       console.l(
