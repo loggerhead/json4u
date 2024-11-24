@@ -78,7 +78,8 @@ export default function useVirtualGraph() {
         "create a new graph:",
         treeVersion,
         translateExtentRef.current,
-        [nodes.length, edges.length],
+        nodes.length,
+        edges.length,
         nodes.slice(0, 10),
         edges.slice(0, 10),
       );

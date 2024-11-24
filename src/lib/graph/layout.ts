@@ -18,13 +18,13 @@ export const config: Readonly<Record<string, any>> = {
 
 // measured in MainPanel when mounted. The value should remain consistent between the main thread and the web worker.
 export const globalStyle: GraphNodeStyle = {
-  fontWidth: 0,
-  padding: 0,
-  borderWidth: 0,
-  kvGap: 0,
-  maxKeyWidth: 0,
-  maxValueWidth: 0,
-  kvHeight: 0,
+  fontWidth: 7.2,
+  padding: 20,
+  borderWidth: 1,
+  kvGap: 20,
+  kvHeight: 18,
+  maxKeyWidth: 300,
+  maxValueWidth: 500,
   nodeGap: 25,
   levelGap: 75,
 };

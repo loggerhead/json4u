@@ -53,20 +53,19 @@ function useInit() {
   useEffect(() => {
     initLogger();
 
-    (async () => {
-      dbInit();
-      await useStatusStore.persist.rehydrate();
-      updateActiveOrder(user);
+    window.rawWorker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
+    window.worker = wrap<MyWorker>(window.rawWorker);
+    window.addEventListener("beforeunload", () => {
+      console.l("worker is terminated.");
+      window.rawWorker?.terminate();
+    });
 
-      window.rawWorker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
-      window.worker = wrap<MyWorker>(window.rawWorker);
-      window.addEventListener("beforeunload", () => {
-        console.l("worker is terminated.");
-        window.rawWorker?.terminate();
-      });
-      console.l("finished worker initial.");
+    dbInit();
+    updateActiveOrder(user);
+    Promise.resolve(useStatusStore.persist.rehydrate()).then(() => {
       setHydrated(true);
-    })();
+      console.l("finished worker initial.");
+    });
   }, []);
 
   return hydrated;
