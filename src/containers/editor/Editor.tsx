@@ -2,31 +2,22 @@
 
 import { useEffect, type ComponentPropsWithoutRef } from "react";
 import Loading from "@/components/Loading";
+import { vsURL } from "@/lib/editor/cdn";
 import { EditorWrapper, type Kind } from "@/lib/editor/editor";
-import { cn } from "@/lib/utils";
 import { getEditorState, useEditor, useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { getTree } from "@/stores/treeStore";
-import { Editor as MonacoEditor } from "@monaco-editor/react";
+import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
+
+loader.config({ paths: { vs: vsURL } });
 
 interface EditorProps extends ComponentPropsWithoutRef<typeof MonacoEditor> {
   kind: Kind;
 }
 
-export default function Editor({ kind, className, ...props }: EditorProps) {
-  const editor = useEditor(kind);
-
-  return (
-    <>
-      <Loading className={cn(editor && "hidden")} />
-      <MyEditor kind={kind} className={cn(className, !editor && "invisible")} {...props} />
-    </>
-  );
-}
-
-function MyEditor({ kind, ...props }: EditorProps) {
+export default function Editor({ kind, ...props }: EditorProps) {
   const translations = useTranslations();
   const setEditor = useEditorStore((state) => state.setEditor);
   const setTranslations = useEditorStore((state) => state.setTranslations);
@@ -37,6 +28,7 @@ function MyEditor({ kind, ...props }: EditorProps) {
   return (
     <MonacoEditor
       language="json"
+      loading={<Loading />}
       options={{
         fontSize: 13, // 设置初始字体大小
         scrollBeyondLastLine: false, // 行数超过一屏时才展示滚动条
@@ -48,7 +40,17 @@ function MyEditor({ kind, ...props }: EditorProps) {
           defaultModel: "foldingProviderModel",
         },
       }}
-      onMount={(editor) => {
+      onMount={(editor, monaco) => {
+        if (kind === "main") {
+          window.monacoApi = {
+            KeyCode: monaco.KeyCode,
+            MinimapPosition: monaco.editor.MinimapPosition,
+            OverviewRulerLane: monaco.editor.OverviewRulerLane,
+            Range: monaco.Range,
+            RangeFromPositions: monaco.Range.fromPositions,
+          };
+        }
+
         const wrapper = new EditorWrapper(editor, kind);
         wrapper.init();
         setEditor(wrapper);
@@ -83,7 +85,7 @@ export function useRevealNode() {
         editor.revealOffset((type === "key" ? node.boundOffset : node.offset) + 1);
       }
     }
-  }, [revealPosition, isNeedReveal]);
+  }, [editor, revealPosition, isNeedReveal]);
 }
 
 const exampleData = `{

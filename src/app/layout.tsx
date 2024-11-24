@@ -1,5 +1,7 @@
+import Script from "next/script";
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { loaderURL } from "@/lib/editor/cdn";
 import { env, isCN } from "@/lib/env";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NextIntlClientProvider } from "next-intl";
@@ -67,6 +69,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <Toaster richColors position="bottom-right" />
       </body>
       <GoogleAnalytics gaId="G-TLYE3CBLPW" />
+      <Script src={loaderURL} />
     </html>
   );
 }

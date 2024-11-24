@@ -110,7 +110,6 @@
     "happy-dom": "^14.12.3",
     "jiti": "^1.21.6",
     "monaco-editor": "^0.49.0",
-    "monaco-editor-webpack-plugin": "^7.1.0",
     "postcss": "^8.4.41",
     "prettier": "^3.3.3",
     "prettier-plugin-packagejson": "^2.5.1",

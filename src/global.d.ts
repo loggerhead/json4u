@@ -19,7 +19,6 @@ declare global {
   interface Window {
     rawWorker: Worker;
     worker: Remote<MyWorker>;
-    monacoLoadAwaiter?: Promise<void>;
     monacoApi: MonacoApi;
     leftPanelHandle: ImperativePanelHandle | null;
     searchComponents: Record<string, any>;

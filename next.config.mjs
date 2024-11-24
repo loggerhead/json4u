@@ -2,7 +2,6 @@ import NextBundleAnalyzer from "@next/bundle-analyzer";
 import createMDX from "@next/mdx";
 import { withSentryConfig } from "@sentry/nextjs";
 import createJiti from "jiti";
-import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 import createNextIntlPlugin from "next-intl/plugin";
 import { fileURLToPath } from "node:url";
 import path from "path";
@@ -55,23 +54,6 @@ const nextConfig = {
         "@": __dirname,
       };
       config.output.webassemblyModuleFilename = "static/wasm/[modulehash].wasm";
-
-      config.plugins.push(
-        new MonacoWebpackPlugin({
-          languages: ["json"],
-          features: [
-            "find", // 查找
-            "folding", // 折叠
-            "bracketMatching", // 高亮匹配的括号
-            "indentation", // 缩进
-            "unusualLineTerminators", // invalid 换行符提示
-            "wordHighlighter", // 高亮光标停留位置的词
-            "stickyScroll", // https://learn.microsoft.com/en-us/visualstudio/ide/editor-sticky-scroll
-          ],
-          filename: "static/[name].[contenthash:8].worker.js",
-        }),
-      );
-
       // can't use experiments
       // config.experiments = { asyncWebAssembly: true };
     }

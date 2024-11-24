@@ -5,7 +5,6 @@ import Loading from "@/components/Loading";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MainPanel from "@/containers/editor/MainPanel";
-import { loadEditor } from "@/containers/editor/editor/loader";
 import SideNav from "@/containers/editor/sidenav";
 import { PricingOverlay } from "@/containers/pricing";
 import { init as dbInit } from "@/lib/db/config";
@@ -56,7 +55,7 @@ function useInit() {
 
     (async () => {
       dbInit();
-      await Promise.all([useStatusStore.persist.rehydrate(), loadEditor()]);
+      await useStatusStore.persist.rehydrate();
       updateActiveOrder(user);
 
       window.rawWorker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
