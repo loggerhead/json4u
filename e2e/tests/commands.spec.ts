@@ -93,6 +93,7 @@ test.describe("commands", () => {
   test("jq", async ({ page }) => {
     await clickCmd(page, "jq");
     await page.locator("#cmd-panel input").fill('."Aidan Gillen".array.[1]');
+    await getEditor(page, { rightEditor: true });
     const text = await getEditorText(page, { rightEditor: true });
     await expect(text).toBe('"The Wire"');
   });
