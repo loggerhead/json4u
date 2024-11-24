@@ -10,4 +10,7 @@ export interface MonacoApi {
   OverviewRulerLane: typeof monaco.OverviewRulerLane;
   Range: typeof monaco.Range;
   RangeFromPositions: typeof monaco.Range.fromPositions;
+  // used for e2e tests.
+  main?: editorApi.IStandaloneCodeEditor;
+  secondary?: editorApi.IStandaloneCodeEditor;
 }

@@ -1,6 +1,7 @@
+import type { Kind } from "@/lib/editor/editor";
+import type { editorApi } from "@/lib/editor/types";
 import { expect, type Locator, type Page } from "@playwright/test";
 import fs from "fs";
-import { filter } from "lodash-es";
 import path from "path";
 
 interface Options {
@@ -22,6 +23,7 @@ export async function getEditor(page: Page, options?: Options) {
   const id = getEditorId(options?.rightEditor);
   const editor = await page.locator(id).locator(options?.textarea ? "textarea" : ".view-lines");
   await expect(editor).toBeAttached();
+  await page.waitForFunction(() => window.monacoApi);
 
   // Wait for the completion of setting the text of the tutorial
   if (options?.needTutorial) {
@@ -35,53 +37,51 @@ export async function getEditor(page: Page, options?: Options) {
 }
 
 export async function getMaxLineNumber(page: Page, rightEditor?: boolean) {
-  const id = getEditorId(rightEditor);
-  const lns = filter(await page.locator(`${id} .line-numbers`).allInnerTexts());
-
-  try {
-    return Number(lns[lns.length - 1]);
-  } catch {
-    return 0;
-  }
+  const kind = rightEditor ? "secondary" : "main";
+  return page.evaluate(
+    ([kind]) => {
+      const editor: editorApi.IStandaloneCodeEditor = window.monacoApi[kind as Kind];
+      return editor.getValue().split("\n").length;
+    },
+    [kind],
+  );
 }
 
 export async function clearEditor(page: Page, options?: Options) {
-  const id = getEditorId(options?.rightEditor);
-  const editor = await getEditor(page, { ...options, textarea: true });
-
-  // For an unknown reason, Ctrl+A will not select all the text and `locator.fill("")` will only remove part of it.
-  // So we need to loop and check the number of line numbers to clear all the text.
-  while (true) {
-    await editor.fill("", { force: true });
-    const ln = await getMaxLineNumber(page, options?.rightEditor);
-    if (ln <= 1) {
-      break;
-    }
-  }
-
-  await editor.fill("", { force: true });
+  const kind = options?.rightEditor ? "secondary" : "main";
+  return page.evaluate(
+    ([kind]) => {
+      const editor: editorApi.IStandaloneCodeEditor = window.monacoApi[kind as Kind];
+      editor.setSelection(new window.monacoApi.Range(0, 0, Infinity, Infinity));
+      editor.getAction("editor.action.deleteLines")?.run();
+      editor.focus();
+    },
+    [kind],
+  );
 }
 
 // A tricky way to copy all the text in the editor since `ControlOrMeta+A` does not work for unknown reason.
 export async function selectAllInEditor(page: Page, options?: Options & { lines?: number }) {
-  const lineCount = options?.lines ?? 50;
-  const id = getEditorId(options?.rightEditor);
-
-  await page.locator(`${id} .view-lines > div:nth-child(1)`).click();
-  await page.keyboard.press("Home");
-  await page.keyboard.down("Shift");
-
-  for (let i = 0; i < lineCount; i++) {
-    await page.keyboard.press("ArrowDown");
-  }
-
-  await page.keyboard.up("Shift");
+  const kind = options?.rightEditor ? "secondary" : "main";
+  return page.evaluate(
+    ([kind]) => {
+      const editor: editorApi.IStandaloneCodeEditor = window.monacoApi[kind as Kind];
+      editor.setSelection(new window.monacoApi.Range(0, 0, Infinity, Infinity));
+      editor.focus();
+    },
+    [kind],
+  );
 }
 
-// NOTICE: for unknown reasons, this function can only get partial text
 export async function getEditorText(page: Page, options?: Options) {
-  const editor = await getEditor(page, { ...options, textarea: true });
-  return editor.inputValue();
+  const kind = options?.rightEditor ? "secondary" : "main";
+  return page.evaluate(
+    ([kind]) => {
+      const editor: editorApi.IStandaloneCodeEditor = window.monacoApi[kind as Kind];
+      return editor.getValue();
+    },
+    [kind],
+  );
 }
 
 export async function importJsonFile(page: Page, fileName: string) {

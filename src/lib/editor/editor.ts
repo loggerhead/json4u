@@ -29,6 +29,7 @@ export class EditorWrapper {
   }
 
   init() {
+    this.listenOnChange();
     this.listenOnDidPaste();
     this.listenOnKeyDown();
     this.listenOnDropFile();
@@ -124,17 +125,19 @@ export class EditorWrapper {
     return { set: true, parse: tree.valid() };
   }
 
-  async onChange(text: string | undefined, ev: editorApi.IModelContentChangedEvent) {
-    const prevText = this.tree.text;
-    text = text ?? "";
+  listenOnChange() {
+    this.editor.onDidChangeModelContent(async (ev) => {
+      const prevText = this.tree.text;
+      const text = this.text();
 
-    if (text !== prevText) {
-      console.l("onChange:", ev.versionId);
-      this.delayParseAndSet.cancel();
-      await this.delayParseAndSet(text, { format: false }, false);
-    } else {
-      console.l("skip onChange:", ev.versionId);
-    }
+      if (text !== prevText) {
+        console.l("onChange:", ev.versionId);
+        this.delayParseAndSet.cancel();
+        await this.delayParseAndSet(text, { format: false }, false);
+      } else {
+        console.l("skip onChange:", ev.versionId);
+      }
+    });
   }
 
   listenOnDidPaste() {

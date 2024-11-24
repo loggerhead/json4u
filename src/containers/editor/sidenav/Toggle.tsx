@@ -19,17 +19,20 @@ const Toggle = forwardRef<ElementRef<typeof RToggle>, ToggleProps>(
   ({ title, description, isPressed, onPressedChange, icon, className, ...props }, ref) => (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger>
-          <RToggle
-            className={cn(btnVariants({}), "text-btn hover:bg-muted", className)}
-            ref={ref}
-            defaultPressed={isPressed}
-            pressed={isPressed}
-            onPressedChange={onPressedChange}
-            {...props}
-          >
-            <IconLabel icon={icon} title={title} />
-          </RToggle>
+        <TooltipTrigger asChild>
+          {/* https://github.com/radix-ui/primitives/discussions/560#discussioncomment-3477536 */}
+          <span>
+            <RToggle
+              className={cn(btnVariants({}), "text-btn hover:bg-muted", className)}
+              ref={ref}
+              defaultPressed={isPressed}
+              pressed={isPressed}
+              onPressedChange={onPressedChange}
+              {...props}
+            >
+              <IconLabel icon={icon} title={title} />
+            </RToggle>
+          </span>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-72">
           <p>{description}</p>

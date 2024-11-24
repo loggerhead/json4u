@@ -4,7 +4,7 @@ import { useEffect, type ComponentPropsWithoutRef } from "react";
 import Loading from "@/components/Loading";
 import { vsURL } from "@/lib/editor/cdn";
 import { EditorWrapper, type Kind } from "@/lib/editor/editor";
-import { getEditorState, useEditor, useEditorStore } from "@/stores/editorStore";
+import { useEditor, useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { getTree } from "@/stores/treeStore";
 import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
@@ -41,7 +41,7 @@ export default function Editor({ kind, ...props }: EditorProps) {
         },
       }}
       onMount={(editor, monaco) => {
-        if (kind === "main") {
+        if (!window.monacoApi) {
           window.monacoApi = {
             KeyCode: monaco.KeyCode,
             MinimapPosition: monaco.editor.MinimapPosition,
@@ -50,16 +50,14 @@ export default function Editor({ kind, ...props }: EditorProps) {
             RangeFromPositions: monaco.Range.fromPositions,
           };
         }
+        // used for e2e tests.
+        window.monacoApi[kind] = editor;
 
         const wrapper = new EditorWrapper(editor, kind);
         wrapper.init();
         setEditor(wrapper);
         setTranslations(translations);
         console.l(`finished initial editor ${kind}:`, wrapper);
-      }}
-      onChange={(value, ev) => {
-        const editor = getEditorState()[kind];
-        editor && editor.onChange(value, ev);
       }}
       {...props}
     />
