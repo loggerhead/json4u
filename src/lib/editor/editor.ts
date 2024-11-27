@@ -44,7 +44,7 @@ export class EditorWrapper {
   }
 
   model() {
-    return this.editor.getModel()!;
+    return this.editor.getModel();
   }
 
   text() {
@@ -63,8 +63,9 @@ export class EditorWrapper {
     return this.tree.valid();
   }
 
-  getPositionAt(offset: number) {
-    return this.model().getPositionAt(offset);
+  // convert offset at text to {lineNumber, column}
+  getPositionAt(offset: number): { lineNumber: number; column: number } {
+    return this.model()?.getPositionAt(offset) ?? { lineNumber: 1, column: 1 };
   }
 
   range(offset: number, length: number) {
@@ -82,8 +83,10 @@ export class EditorWrapper {
   }
 
   revealOffset(offset: number) {
-    const { lineNumber, column } = this.getPositionAt(offset);
-    this.revealPosition(lineNumber, column);
+    const p = this.getPositionAt(offset);
+    if (p) {
+      this.revealPosition(p.lineNumber, p.column);
+    }
   }
 
   setTree({ treeObject }: ParsedTree, resetCursor: boolean = true) {
@@ -97,7 +100,12 @@ export class EditorWrapper {
     this.editor.executeEdits(null, [
       {
         text: tree.text,
-        range: this.model().getFullModelRange(),
+        range: this.model()?.getFullModelRange() ?? {
+          startLineNumber: 1,
+          startColumn: 1,
+          endLineNumber: Infinity,
+          endColumn: Infinity,
+        },
       },
     ]);
     // Indicates the above edit is a complete undo/redo change.
@@ -142,10 +150,12 @@ export class EditorWrapper {
 
   listenOnDidPaste() {
     this.editor.onDidPaste(async (ev) => {
-      const versionId = this.model().getVersionId();
+      const model = this.model();
       const text = this.text();
+      const versionId = model?.getVersionId();
+
       // if all text is replaced by pasted text
-      if (text.length > 0 && ev.range.equalsRange(this.model().getFullModelRange())) {
+      if (model && text.length > 0 && ev.range.equalsRange(model.getFullModelRange())) {
         console.l("onDidPaste:", versionId, text.length, text.slice(0, 20));
         // for avoid triggering onChange
         this.tree.text = text;
@@ -164,10 +174,10 @@ export class EditorWrapper {
       (e) => {
         const model = this.model();
         const { lineNumber, column } = e.position;
-        const selectionLength = model.getValueInRange(this.editor.getSelection()!).length;
+        const selectionLength = model?.getValueInRange(this.editor.getSelection()!).length ?? 0;
         getStatusState().setCursorPosition(lineNumber, column, selectionLength);
 
-        if (this.tree.valid()) {
+        if (model && this.tree.valid()) {
           const text = this.text();
 
           // 获取当前光标在整个文档中的偏移量（offset）
