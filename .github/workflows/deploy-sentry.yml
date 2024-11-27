@@ -1,0 +1,36 @@
+name: Deploy Sentry
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Sentry release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Build
+        run: pnpm build
+      - name: Read version from package.json
+        id: version-number
+        run: echo "VERSION=$(cat ./package.json | jq -r '.version')" >> $GITHUB_ENV
+      - name: Create sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          ignore_missing: true
+          environment: production
+          version: ${{ env.VERSION }}
+          finalize: true
+          set_commits: auto
+          ignore_empty: true
