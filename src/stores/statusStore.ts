@@ -40,6 +40,7 @@ export interface StatusState extends Config {
   isNeedReveal: (scene: "editor" | "graph") => boolean;
   setEnableSyncScroll: (enable: boolean) => void;
   setSideNavExpanded: (expanded: boolean) => void;
+  setFixSideNav: (fix: boolean) => void;
   setShowPricingOverlay: (show: boolean) => void;
   setIsTouchpad: (isTouchpad: boolean) => void;
   toggleFoldNode: (nodeId: string) => void;
@@ -144,6 +145,10 @@ export const useStatusStore = create<StatusState>()(
 
       setSideNavExpanded(expanded: boolean) {
         set({ sideNavExpanded: expanded });
+      },
+
+      setFixSideNav(fix: boolean) {
+        set({ fixSideNav: fix });
       },
 
       setShowPricingOverlay(show: boolean) {

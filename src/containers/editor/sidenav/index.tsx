@@ -11,11 +11,12 @@ import {
   Download,
   FileUp,
   MessageCircleQuestion,
-  Settings,
   Share2,
   SquareStack,
   BarChartBig,
   AlignHorizontalJustifyCenter,
+  ArrowLeftToLine,
+  ArrowRightFromLine,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
@@ -35,6 +36,8 @@ export default function SideNav() {
   const {
     sideNavExpanded,
     setSideNavExpanded,
+    fixSideNav,
+    setFixSideNav,
     enableAutoFormat,
     enableAutoSort,
     enableNestParse,
@@ -45,6 +48,8 @@ export default function SideNav() {
     useShallow((state) => ({
       sideNavExpanded: !!state.sideNavExpanded,
       setSideNavExpanded: state.setSideNavExpanded,
+      fixSideNav: state.fixSideNav,
+      setFixSideNav: state.setFixSideNav,
       enableAutoFormat: !!state.parseOptions.format,
       enableAutoSort: !!state.parseOptions.sort,
       enableNestParse: !!state.parseOptions.nest,
@@ -58,7 +63,7 @@ export default function SideNav() {
     <div
       className="flex flex-col h-full w-8"
       onMouseEnter={(event) => {
-        if ((event.target as HTMLElement).closest(`.${popoverBtnClass}`)) {
+        if (fixSideNav || (event.target as HTMLElement).closest(`.${popoverBtnClass}`)) {
           return;
         }
         setSideNavExpanded(true);
@@ -120,10 +125,17 @@ export default function SideNav() {
             newWindow
           />
           <PopoverBtn title={t("statistics")} icon={<BarChartBig className="icon" />} content={<StatisticsPopover />} />
-          {/* TODO: consider to allow user custom some configs */}
-          <Button className="hidden" icon={<Settings className="icon" />} title={t("Settings")} onClick={() => null} />
           {/* can't connect to supabase in China, so disable the function temporarily */}
-          {!isCN && <AccountButton avatarClassName="w-6 h-6" buttonClassName="my-1.5" />}
+          {!isCN && <AccountButton avatarClassName="w-6 h-6" />}
+          <Button
+            className="my-1.5"
+            icon={fixSideNav ? <ArrowRightFromLine className="icon" /> : <ArrowLeftToLine className="icon" />}
+            title={t(fixSideNav ? "Expand" : "Collapse")}
+            onClick={() => {
+              setFixSideNav(!fixSideNav);
+              setSideNavExpanded(fixSideNav);
+            }}
+          />
         </ul>
       </nav>
     </div>

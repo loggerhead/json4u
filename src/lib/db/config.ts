@@ -22,6 +22,7 @@ export interface Config {
   prettyFormat: boolean;
   enableSyncScroll: boolean; // the left and right side editors scroll in sync
   isTouchpad?: boolean;
+  fixSideNav: boolean;
 }
 
 export const defaultConfig: Config = {
@@ -38,6 +39,7 @@ export const defaultConfig: Config = {
   prettyFormat: true,
   enableSyncScroll: true,
   isTouchpad: undefined,
+  fixSideNav: false,
 };
 
 let globalStore: UseStore | undefined;
