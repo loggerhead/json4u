@@ -4,7 +4,6 @@ import Background from "@/components/Background";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Typography from "@/components/ui/typography";
-import EmailForm from "@/containers/login/EmailForm";
 import OAuthButton from "@/containers/login/OAuthButton";
 import { useTranslations } from "next-intl";
 
@@ -30,7 +29,8 @@ export default function LoginPage() {
               <Typography affects="xs">{t("or")}</Typography>
               <Separator className="flex-1" />
             </div>
-            <EmailForm />
+            {/* TODO: temp disable */}
+            {/* <EmailForm /> */}
           </div>
         </CardContent>
         <CardFooter>
