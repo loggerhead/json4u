@@ -3,7 +3,7 @@ import { ViewMode } from "@/lib/db/config";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeVersion } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 export function useTableHTML() {
   const { count, usable } = useUserStore(
@@ -22,7 +22,7 @@ export function useTableHTML() {
   const [innerHTML, setInnerHTML] = useState("");
 
   useEffect(() => {
-    if (!isTableView) {
+    if (!(window.worker && isTableView)) {
       console.l("skip table render:", isTableView, treeVersion);
       return;
     }

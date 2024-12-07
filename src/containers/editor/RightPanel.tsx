@@ -13,15 +13,17 @@ import SwapButton from "@/containers/editor/mode/SwapButton";
 import { JsonTable } from "@/containers/editor/table/JsonTable";
 import { ViewMode, ViewModeValue } from "@/lib/db/config";
 import { useEditorStore } from "@/stores/editorStore";
+import { useConfigFromCookies } from "@/stores/hook";
 import { useStatusStore } from "@/stores/statusStore";
 import { Expand, Shrink, Table2, Text, Waypoints } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 export default function RightPanel() {
+  const cc = useConfigFromCookies();
   const { viewMode, setViewMode } = useStatusStore(
     useShallow((state) => ({
-      viewMode: state.viewMode,
+      viewMode: state._hasHydrated ? state.viewMode : cc.viewMode,
       setViewMode: state.setViewMode,
     })),
   );
@@ -54,11 +56,12 @@ export default function RightPanel() {
 }
 
 function Buttons({ viewMode }: { viewMode: ViewMode }) {
+  const cc = useConfigFromCookies();
   const t = useTranslations();
   const runCommand = useEditorStore((state) => state.runCommand);
   const { enableTextCompare, setEnableTextCompare } = useStatusStore(
     useShallow((state) => ({
-      enableTextCompare: state.enableTextCompare,
+      enableTextCompare: state._hasHydrated ? state.enableTextCompare : cc.enableTextCompare,
       setEnableTextCompare: state.setEnableTextCompare,
     })),
   );

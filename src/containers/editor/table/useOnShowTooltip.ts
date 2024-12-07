@@ -4,7 +4,7 @@ import { genKeyAndTypeList } from "@/lib/table";
 import { isApproximatelyEqual } from "@/lib/utils";
 import { useTreeStore, useTree, TooltipPosition } from "@/stores/treeStore";
 import { Side, sides } from "@/stores/treeStore";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 import { intervalToHide, intervalToShow, resetTimeout, globalStyle, TimeoutIdMap, tooltipId } from "./Tooltip";
 
 export function useOnShowTooltip(timeoutIdMap: TimeoutIdMap) {

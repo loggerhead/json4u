@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { type CommandMode, useStatusStore } from "@/stores/statusStore";
 import { X } from "lucide-react";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 import JqInput from "./JqInput";
 
 type FC<T extends HTMLElement = HTMLElement> = React.FC<{

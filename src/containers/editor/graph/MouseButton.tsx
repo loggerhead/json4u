@@ -3,7 +3,7 @@ import { detectOS } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { ControlButton } from "@xyflow/react";
 import { Mouse, Touchpad } from "lucide-react";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 export default function MouseButton() {
   const { isTouchpad, setIsTouchpad } = useStatusStore(

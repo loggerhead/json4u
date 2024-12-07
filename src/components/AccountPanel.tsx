@@ -9,7 +9,7 @@ import { Order } from "@/lib/supabase/table.types";
 import { cn, dateToYYYYMMDD } from "@/lib/utils";
 import { useUserStore } from "@/stores/userStore";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 import UserAvatar from "./UserAvatar";
 import Typography from "./ui/typography";
 

@@ -9,7 +9,7 @@ import { useStatusStore } from "@/stores/statusStore";
 import { getTree } from "@/stores/treeStore";
 import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 loader.config({ paths: { vs: vsURL } });
 

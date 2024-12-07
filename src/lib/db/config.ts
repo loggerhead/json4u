@@ -1,5 +1,6 @@
 import { type ParseOptions } from "@/lib/parser";
 import { get, set, del, type UseStore, createStore } from "idb-keyval";
+import Cookies from "js-cookie";
 import { type StateStorage } from "zustand/middleware";
 
 export const keyName = "config";
@@ -48,8 +49,16 @@ export function init() {
   globalStore = createStore("json4u", "kv");
 }
 
-export async function safeGet(key: IDBValidKey) {
+export async function safeGet(key: string) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   try {
+    if (!globalStore) {
+      init();
+    }
+
     return (await get(key, globalStore)) || null;
   } catch (e) {
     if ((e as unknown as Error).name === "InvalidStateError") {
@@ -61,8 +70,20 @@ export async function safeGet(key: IDBValidKey) {
   }
 }
 
-export async function safeSet(key: IDBValidKey, value: any) {
+export async function safeSet(key: string, value: any) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
+    if (!globalStore) {
+      init();
+    }
+
+    Cookies.set(key, value, {
+      expires: 365,
+      path: "/editor",
+    });
     await set(key, value, globalStore);
   } catch (e) {
     if ((e as unknown as Error).name === "InvalidStateError") {
@@ -73,8 +94,16 @@ export async function safeSet(key: IDBValidKey, value: any) {
   }
 }
 
-export async function safeDel(key: IDBValidKey) {
+export async function safeDel(key: string) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   try {
+    if (!globalStore) {
+      init();
+    }
+
     await del(key, globalStore);
   } catch (e) {
     if ((e as unknown as Error).name === "InvalidStateError") {

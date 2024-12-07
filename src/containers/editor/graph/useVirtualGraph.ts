@@ -9,7 +9,7 @@ import { useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
 import { XYPosition } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { maxBy } from "lodash-es";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 const viewportSize: [number, number] = [0, 0];
 
@@ -40,7 +40,7 @@ export default function useVirtualGraph() {
   );
 
   useEffect(() => {
-    if (!isGraphView) {
+    if (!(window.worker && isGraphView)) {
       console.l("skip graph render:", isGraphView, treeVersion);
       return;
     }

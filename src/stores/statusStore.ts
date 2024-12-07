@@ -14,6 +14,7 @@ interface Position {
 export type CommandMode = "jq";
 
 export interface StatusState extends Config {
+  _hasHydrated: boolean;
   editorInitCount: number;
   cursorPosition: Position; // line and column number in the left editor which displayed to the status bar
   selectionLength: number; // selection chars number in the left editor which displayed to the status bar
@@ -50,6 +51,7 @@ export interface StatusState extends Config {
 
 const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   ...defaultConfig,
+  _hasHydrated: false,
   editorInitCount: 0,
   cursorPosition: { line: 0, column: 0 },
   selectionLength: 0,

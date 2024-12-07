@@ -17,7 +17,7 @@ import { useEditor } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 export default function StatusBar() {
   return (

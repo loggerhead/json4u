@@ -11,7 +11,7 @@ import { useOnViewportChange, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { keyBy } from "lodash-es";
 import { useResizeObserver } from "usehooks-ts";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 import { setViewportSize } from "./useVirtualGraph";
 
 export function useViewportChange(

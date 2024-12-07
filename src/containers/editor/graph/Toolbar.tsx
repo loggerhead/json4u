@@ -9,7 +9,7 @@ import { useTreeStore } from "@/stores/treeStore";
 import { NodeToolbar, Position, useReactFlow } from "@xyflow/react";
 import { ArrowLeft, CopyMinus, CopyPlus, SquareMinus, SquarePlus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 interface ToolbarProps {
   id: string;

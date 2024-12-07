@@ -6,7 +6,7 @@ import { type StatisticsKeys } from "@/lib/env";
 import { dateToYYYYMMDD } from "@/lib/utils";
 import { freeQuota, initialStatistics, useUserStore } from "@/stores/userStore";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 import BasePopover from "./BasePopover";
 
 const i18nMap: Record<StatisticsKeys, MessageKey> = {

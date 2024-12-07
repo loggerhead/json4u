@@ -3,24 +3,26 @@ import { type MessageKey } from "@/global";
 import { type Command, useEditorStore } from "@/stores/editorStore";
 import fuzzysort from "fuzzysort";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 export default function CommandSearch() {
   const t = useTranslations();
   const { commands, runCommand } = useEditorStore(
     useShallow((state) => ({
-      commands: state.commands.filter((c) => !c.hidden),
+      commands: state.commands,
       runCommand: state.runCommand,
     })),
   );
+  const displayCommands = commands.filter((c) => !c.hidden);
+
   const search = (input: string) =>
     input.trim()
       ? fuzzysort
-          .go(input, commands, {
+          .go(input, displayCommands, {
             keys: [(cmd) => cmd.id, (cmd) => t(cmd.id)],
           })
           .map((r) => r.obj)
-      : commands;
+      : displayCommands;
 
   return (
     <SearchInput

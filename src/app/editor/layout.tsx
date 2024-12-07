@@ -1,3 +1,4 @@
+import { CookiesProvider } from "next-client-cookies/server";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export async function generateMetadata() {
@@ -8,5 +9,9 @@ export async function generateMetadata() {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <main className="w-screen h-screen">{children}</main>;
+  return (
+    <main className="w-screen h-screen">
+      <CookiesProvider>{children}</CookiesProvider>
+    </main>
+  );
 }

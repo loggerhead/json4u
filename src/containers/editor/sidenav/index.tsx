@@ -4,6 +4,7 @@ import Link from "next/link";
 import Logo from "@/components/icons/Logo";
 import { Separator } from "@/components/ui/separator";
 import { isCN, version } from "@/lib/env";
+import { useConfigFromCookies } from "@/stores/hook";
 import { useStatusStore } from "@/stores/statusStore";
 import {
   ArrowDownNarrowWide,
@@ -19,7 +20,7 @@ import {
   ArrowRightFromLine,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 import AccountButton from "./AccountButton";
 import Button from "./Button";
 import ExportPopover from "./ExportPopover";
@@ -32,6 +33,7 @@ import StatisticsPopover from "./StatisticsPopover";
 import Toggle from "./Toggle";
 
 export default function SideNav() {
+  const cc = useConfigFromCookies();
   const t = useTranslations();
   const {
     sideNavExpanded,
@@ -45,18 +47,21 @@ export default function SideNav() {
     enableSyncScroll,
     setEnableSyncScroll,
   } = useStatusStore(
-    useShallow((state) => ({
-      sideNavExpanded: !!state.sideNavExpanded,
-      setSideNavExpanded: state.setSideNavExpanded,
-      fixSideNav: state.fixSideNav,
-      setFixSideNav: state.setFixSideNav,
-      enableAutoFormat: !!state.parseOptions.format,
-      enableAutoSort: !!state.parseOptions.sort,
-      enableNestParse: !!state.parseOptions.nest,
-      setParseOptions: state.setParseOptions,
-      enableSyncScroll: state.enableSyncScroll,
-      setEnableSyncScroll: state.setEnableSyncScroll,
-    })),
+    useShallow((state) => {
+      const parseOptions = state._hasHydrated ? state.parseOptions : cc.parseOptions;
+      return {
+        sideNavExpanded: !!state.sideNavExpanded,
+        setSideNavExpanded: state.setSideNavExpanded,
+        fixSideNav: state._hasHydrated ? state.fixSideNav : cc.fixSideNav,
+        setFixSideNav: state.setFixSideNav,
+        enableAutoFormat: !!parseOptions.format,
+        enableAutoSort: !!parseOptions.sort,
+        enableNestParse: !!parseOptions.nest,
+        setParseOptions: state.setParseOptions,
+        enableSyncScroll: state._hasHydrated ? state.enableSyncScroll : cc.enableSyncScroll,
+        setEnableSyncScroll: state.setEnableSyncScroll,
+      };
+    }),
   );
 
   return (

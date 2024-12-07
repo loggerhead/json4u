@@ -7,20 +7,27 @@ import ModePanel from "@/containers/editor/mode/ModePanel";
 import { setupGlobalGraphStyle } from "@/lib/graph/layout";
 import { cn } from "@/lib/utils";
 import { px2num } from "@/lib/utils";
+import { initLogger } from "@/lib/utils";
+import { type MyWorker } from "@/lib/worker/worker";
+import { useConfigFromCookies } from "@/stores/hook";
 import { useStatusStore } from "@/stores/statusStore";
-import { useShallow } from "zustand/react/shallow";
+import { useUserStore } from "@/stores/userStore";
+import { wrap } from "comlink";
+import { useShallow } from "zustand/shallow";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 import StatusBar from "./StatusBar";
 
 const leftPanelId = "left-panel";
 const rightPanelId = "right-panel";
+initLogger();
 
 export default function MainPanel() {
+  const cc = useConfigFromCookies();
   const { rightPanelSize, rightPanelCollapsed, setRightPanelSize, setRightPanelCollapsed } = useStatusStore(
     useShallow((state) => ({
-      rightPanelSize: state.rightPanelSize,
-      rightPanelCollapsed: state.rightPanelCollapsed,
+      rightPanelSize: state._hasHydrated ? state.rightPanelSize : cc.rightPanelSize,
+      rightPanelCollapsed: state._hasHydrated ? state.rightPanelCollapsed : cc.rightPanelCollapsed,
       setRightPanelSize: state.setRightPanelSize,
       setRightPanelCollapsed: state.setRightPanelCollapsed,
     })),
@@ -28,7 +35,6 @@ export default function MainPanel() {
 
   useObserveResize();
 
-  // TODO: fix the performance problem with resize when there are a large number of nodes in the table view
   // see https://github.com/bvaughn/react-resizable-panels/issues/128#issuecomment-1523343548
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden">
@@ -99,7 +105,42 @@ function useObserveResize() {
 }
 
 function WidthMeasure() {
+  useInitial();
+
+  return (
+    <div id="width-measure" className="absolute invisible graph-node">
+      <div className="graph-kv">
+        <div className="graph-k">
+          <span>{"measure"}</span>
+        </div>
+        <div className="graph-v" />
+      </div>
+    </div>
+  );
+}
+
+function useInitial() {
+  const cc = useConfigFromCookies();
+  const { user, updateActiveOrder } = useUserStore(
+    useShallow((state) => ({
+      user: state.user,
+      updateActiveOrder: state.updateActiveOrder,
+    })),
+  );
+
   useEffect(() => {
+    updateActiveOrder(user);
+    useStatusStore.setState({ _hasHydrated: true, ...cc });
+
+    // initial worker
+    window.rawWorker = new Worker(new URL("@/lib/worker/worker.ts", import.meta.url));
+    window.worker = wrap<MyWorker>(window.rawWorker);
+    window.addEventListener("beforeunload", () => {
+      console.l("worker is terminated.");
+      window.rawWorker?.terminate();
+    });
+
+    // measure graph style
     const el = document.getElementById("width-measure")!;
     const span = el.querySelector("span")!;
     const { lineHeight } = getComputedStyle(span);
@@ -121,15 +162,4 @@ function WidthMeasure() {
     window.worker.setupGlobalGraphStyle(measured);
     console.l("finished measuring graph base style:", measured);
   }, []);
-
-  return (
-    <div id="width-measure" className="absolute invisible graph-node">
-      <div className="graph-kv">
-        <div className="graph-k">
-          <span>{"measure"}</span>
-        </div>
-        <div className="graph-v" />
-      </div>
-    </div>
-  );
 }
