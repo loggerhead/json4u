@@ -1,6 +1,6 @@
 import { Container, ContainerContent, ContainerHeader } from "@/components/Container";
 import CommandSearchInput from "@/components/ui/search/CommandSearchInput";
-import Editor from "@/containers/editor/Editor";
+import Editor from "@/containers/editor/editor";
 
 export default function LeftPanel() {
   return (

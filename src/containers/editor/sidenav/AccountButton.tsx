@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import AccountPanel from "@/components/AccountPanel";
 import RLinkButton from "@/components/LinkButton";
 import UserAvatar from "@/components/UserAvatar";
@@ -20,6 +21,7 @@ interface AccountButtonProps {
 }
 
 export default function AccountButton({ notOnSideNav, avatarClassName, buttonClassName }: AccountButtonProps) {
+  const path = usePathname();
   const t = useTranslations("Home");
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -27,8 +29,7 @@ export default function AccountButton({ notOnSideNav, avatarClassName, buttonCla
   const loginHref = {
     pathname: "/login",
     query: {
-      // FIX: Prop `href` did not match on SSR and CSR.
-      redirectTo: typeof window !== "undefined" ? window.location.href : env.NEXT_PUBLIC_APP_URL,
+      redirectTo: `${env.NEXT_PUBLIC_APP_URL}${path}`,
     },
   };
 
