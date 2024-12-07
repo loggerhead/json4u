@@ -122,6 +122,10 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
       id: "show_jq",
       run: () => getStatusState().setCommandMode("jq"),
     },
+    {
+      id: "show_json_path",
+      run: () => getStatusState().setCommandMode("json_path"),
+    },
   ],
 
   async runCommand(id: MessageKey) {

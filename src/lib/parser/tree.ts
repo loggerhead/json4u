@@ -286,6 +286,22 @@ export class Tree implements TreeObject {
     fixOffset(this.root());
     this.text = jsonc.applyEdits(this.text, edits).trim();
   }
+
+  toJSON(node = this.root()): string | number | boolean | object | any[] | null {
+    if (!isIterable(node)) {
+      return node.value;
+    }
+
+    if (node.type === "object") {
+      const obj: Record<string, unknown> = {};
+      this.mapChildren(node, (node, key, i) => {
+        obj[key] = this.toJSON(node);
+      });
+      return obj;
+    } else {
+      return this.mapChildren(node, (node) => this.toJSON(node));
+    }
+  }
 }
 
 export function getGenTabsFn(tabWidth: number) {

@@ -4,6 +4,7 @@ import * as Comlink from "comlink";
 import { compareText, compareTree } from "./command/compare";
 import { csv2json, json2csv } from "./command/csv";
 import { escape, unescape } from "./command/escape";
+import { jsonPath } from "./command/jsonPath";
 import { parseAndFormat } from "./command/parse";
 import { pythonDictToJSON } from "./command/pythonDictToJSON";
 import { urlToJSON } from "./command/urlToJSON";
@@ -30,6 +31,7 @@ const worker = {
   urlToJSON,
   csv2json,
   json2csv,
+  jsonPath,
   setupGlobalGraphStyle,
   createTable,
   createGraph,

@@ -4,6 +4,7 @@ import { type CommandMode, useStatusStore } from "@/stores/statusStore";
 import { X } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 import JqInput from "./JqInput";
+import JsonPathInput from "./JsonPathInput";
 
 type FC<T extends HTMLElement = HTMLElement> = React.FC<{
   className?: string;
@@ -11,7 +12,8 @@ type FC<T extends HTMLElement = HTMLElement> = React.FC<{
 }>;
 
 const mode2component: Record<CommandMode, FC> = {
-  jq: JqInput as FC,
+  jq: JqInput,
+  json_path: JsonPathInput,
 };
 
 export default function ModePanel() {

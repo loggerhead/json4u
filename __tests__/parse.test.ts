@@ -8,6 +8,7 @@ function expectEq(text: string, expected: string, options: ParseOptions = {}) {
   const tree = parseJSON(text, options);
   expect(tree.hasError()).toEqual(false);
   expect(tree.stringify(options)).toEqual(expected);
+  expect(tree.toJSON()).toEqual(JSON.parse(expected));
 
   const check = (node: Node) => {
     expect(node.id.startsWith(rootMarker)).toEqual(true);

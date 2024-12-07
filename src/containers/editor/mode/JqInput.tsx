@@ -1,66 +1,15 @@
-import { type ComponentPropsWithoutRef, type ElementRef, forwardRef, useEffect, useState } from "react";
-import LoadingButton from "@/components/LoadingButton";
+import { type ComponentPropsWithoutRef, type ElementRef, type FC, forwardRef } from "react";
 import { Input } from "@/components/ui/input";
 import { ViewMode } from "@/lib/db/config";
-import { useDebounceFn } from "@/lib/hooks";
 import { jq } from "@/lib/jq";
 import { init as jqInit } from "@/lib/jq";
-import { cn, toastErr, toastSucc } from "@/lib/utils";
+import { toastErr, toastSucc } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useUserStore } from "@/stores/userStore";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
-
-const elementId = "jq-input";
-
-const JqInput = forwardRef<ElementRef<typeof Input>, ComponentPropsWithoutRef<typeof Input>>(
-  ({ className, ...props }, ref) => {
-    const t = useTranslations();
-    const usable = useUserStore((state) => state.usable("jqExecutions"));
-    const setCommandMode = useStatusStore((state) => state.setCommandMode);
-    const execJq = useExecJq();
-    const onChange = useDebounceFn(async (ev) => execJq(ev.target.value), 1000, [execJq]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      (async () => {
-        await jqInit();
-        setLoading(false);
-      })();
-    }, []);
-
-    return (
-      <div className={cn("flex items-center space-x-2", className)}>
-        <Input
-          id={elementId}
-          type="text"
-          disabled={loading || !usable}
-          placeholder={loading ? t("jq_loading") : usable ? t("jq_placeholder") : t("jq_disabled")}
-          ref={ref}
-          onChange={onChange}
-          onKeyDown={(ev) => {
-            if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) {
-              return;
-            }
-
-            const el = ev.target as HTMLInputElement;
-
-            if (ev.key === "Enter") {
-              execJq(el.value);
-              onChange.cancel();
-            } else if (ev.key === "Escape") {
-              setCommandMode(undefined);
-            }
-          }}
-        />
-        <LoadingButton loading={loading} variant="outline" onClick={async () => execJq()}>
-          {t("Execute")}
-        </LoadingButton>
-      </div>
-    );
-  },
-);
+import InputBox from "./InputBox";
 
 function useExecJq() {
   const t = useTranslations();
@@ -79,10 +28,7 @@ function useExecJq() {
   );
   const count = useUserStore((state) => state.count);
 
-  return async (filter?: string) => {
-    if (filter === "undefined") {
-      filter = (document.getElementById(elementId) as HTMLInputElement).value;
-    }
+  return async (filter: string) => {
     if (!filter) {
       toastSucc(t("cmd_exec_succ", { name: "jq" }));
       return;
@@ -103,6 +49,24 @@ function useExecJq() {
     }
   };
 }
+
+const JqInput: FC = forwardRef<ElementRef<typeof Input>, ComponentPropsWithoutRef<typeof Input>>(
+  ({ className, ...props }, ref) => {
+    const t = useTranslations();
+    const usable = useUserStore((state) => state.usable("jqExecutions"));
+    const execJq = useExecJq();
+
+    return (
+      <InputBox
+        id="jq-input"
+        initial={jqInit}
+        run={execJq}
+        placeholderFn={(loading) => (loading ? t("jq_loading") : usable ? t("jq_placeholder") : t("jq_disabled"))}
+        {...props}
+      />
+    );
+  },
+);
 
 JqInput.displayName = "JqInput";
 export default JqInput;

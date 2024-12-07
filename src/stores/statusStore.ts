@@ -11,7 +11,7 @@ interface Position {
   column: number;
 }
 
-export type CommandMode = "jq";
+export type CommandMode = "jq" | "json_path";
 
 export interface StatusState extends Config {
   _hasHydrated: boolean;
