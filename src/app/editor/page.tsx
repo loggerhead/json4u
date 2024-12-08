@@ -4,7 +4,6 @@ import MainPanel from "@/containers/editor/MainPanel";
 import SideNav from "@/containers/editor/sidenav";
 import { PricingOverlay } from "@/containers/pricing";
 
-// TODO: sentry errorboundry
 export default async function Page() {
   return (
     <TooltipProvider delayDuration={0}>
