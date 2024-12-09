@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, type ComponentPropsWithoutRef } from "react";
 import Loading from "@/components/Loading";
 import { vsURL } from "@/lib/editor/cdn";
@@ -8,15 +10,6 @@ import { getTree } from "@/stores/treeStore";
 import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
-
-// https://github.com/suren-atoyan/monaco-react/issues/48#issuecomment-583863391
-if (typeof window !== "undefined") {
-  delete window.exports;
-  // @ts-ignore
-  delete window.require;
-  // @ts-ignore
-  delete window.module;
-}
 
 loader.config({ paths: { vs: vsURL } });
 
