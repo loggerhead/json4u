@@ -83,6 +83,7 @@ export async function safeSet(key: string, value: any) {
     Cookies.set(key, value, {
       expires: 365,
       path: "/editor",
+      sameSite: "strict",
     });
     await set(key, value, globalStore);
   } catch (e) {
