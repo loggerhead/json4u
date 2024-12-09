@@ -17,7 +17,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG APP_URL=http://localhost:3000
+ARG APP_URL=http://localhost.json4u.cn:3000
 ARG FREE_QUOTA=30
 
 ENV NEXT_TELEMETRY_DISABLED=1

@@ -40,7 +40,7 @@ export const env = createEnv({
     SUPABASE_KEY: z.string().min(1),
   },
   client: {
-    NEXT_PUBLIC_APP_URL: z.string().regex(/https?:\/\/(\w+\.)+\w+/g),
+    NEXT_PUBLIC_APP_URL: z.string().regex(/https?:\/\/(\w+\.)+\w+(:\d+)?/g),
     NEXT_PUBLIC_SUPABASE_URL: z.string().regex(/https:\/\/\w+\.supabase\.\w+/g),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
     NEXT_PUBLIC_FREE_QUOTA: stringToJSONSchema.pipe(StatisticsSchema),
