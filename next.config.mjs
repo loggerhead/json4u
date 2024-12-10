@@ -80,13 +80,19 @@ const withBundleAnalyzer = NextBundleAnalyzer({
 
 const config = withBundleAnalyzer(withNextIntl(withMDX(nextConfig)));
 
+const enableSourceMap = !!process.env.SENTRY_AUTH_TOKEN;
+
 export default withSentryConfig(config, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
   org: "loggerhead",
   project: "json4u",
   enable: !isDev,
-
+  authToken: enableSourceMap ? process.env.SENTRY_AUTH_TOKEN : undefined,
+  // avoid build failed when miss SENTRY_AUTH_TOKEN
+  sourcemaps: {
+    disable: !enableSourceMap,
+  },
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 

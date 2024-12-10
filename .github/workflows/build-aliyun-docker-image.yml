@@ -28,6 +28,10 @@ jobs:
       - name: Build and push image
         run: |
           IMAGE_NAME=registry.cn-heyuan.aliyuncs.com/json4u/json4u
-          docker build . --build-arg APP_URL=${{ secrets.ALIYUN_APP_URL }} --build-arg FREE_QUOTA=${{ secrets.ALIYUN_FREE_QUOTA }}  --tag $IMAGE_NAME:${{ env.VERSION }}
+          docker build . \
+            --build-arg APP_URL=${{ secrets.ALIYUN_APP_URL }} \
+            --build-arg FREE_QUOTA=${{ secrets.ALIYUN_FREE_QUOTA }} \
+            --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+            --tag $IMAGE_NAME:${{ env.VERSION }}
           docker tag $IMAGE_NAME:${{ env.VERSION }} $IMAGE_NAME:latest
           docker push $IMAGE_NAME:latest
