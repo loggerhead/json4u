@@ -73,6 +73,7 @@
     "next-client-cookies": "^2.0.0",
     "next-intl": "^3.25.3",
     "next-themes": "^0.3.0",
+    "next-view-transitions": "^0.3.4",
     "papaparse": "^5.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

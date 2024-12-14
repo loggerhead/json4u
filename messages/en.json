@@ -86,6 +86,7 @@
     "Features": "Features",
     "Pricing": "Pricing",
     "FAQ": "FAQ",
+    "Tutorial": "Tutorial",
     "Changelog": "Changelog",
     "Feedback": "Feedback",
     "Currently Free": "Currently Free",
@@ -204,11 +205,7 @@
     "name": "JSON For You",
     "title": "JSON For You | The best online JSON tool",
     "keywords": "json viewer, json formatter, json beautifier, pretty json, json validate, json compare",
-    "description": "Online JSON view, format, minify, validate and compare. It also provides graph view to preview JSON data, semantic comparing two JSON diffs, convert JSON to CSV or CSV to JSON and support jq online.",
-    "Editor": "Editor",
-    "Changelog": "Changelog",
-    "Terms": "Terms",
-    "Privacy": "Privacy"
+    "description": "Online JSON view, format, minify, validate and compare. It also provides graph view to preview JSON data, semantic comparing two JSON diffs, convert JSON to CSV or CSV to JSON and support jq online."
   },
   "NotFound": {
     "not_found": "404 Not Found",

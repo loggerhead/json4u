@@ -8,11 +8,13 @@ import Typography from "@/components/ui/typography";
 import AccountButton from "@/containers/editor/sidenav/AccountButton";
 import { isCN, version } from "@/lib/env";
 import { useTranslations } from "next-intl";
+import { Link as LinkTransition } from "next-view-transitions";
 
 export default function Header() {
   const t = useTranslations("Home");
   const items = [
     // { href: "/#pricing", title: t("Pricing") },
+    { href: "/tutorial", title: t("Tutorial") },
     { href: "/changelog", title: t("Changelog") },
   ];
 
@@ -24,10 +26,9 @@ export default function Header() {
           <span className="font-bold">{"JSON For You"}</span>
         </Link>
         <Badge variant="secondary">{`v${version}`}</Badge>
-        <div className="ml-auto" />
-        <div className="md:flex hidden items-center gap-4 mr-4">
+        <div className="md:flex hidden items-center gap-4 ml-4">
           {items.map((item) => (
-            <Link
+            <LinkTransition
               prefetch={false}
               href={item.href as Href}
               key={item.title}
@@ -37,11 +38,12 @@ export default function Header() {
               <Typography variant="p" className="text-primary">
                 {item.title}
               </Typography>
-            </Link>
+            </LinkTransition>
           ))}
-          {!isCN && <AccountButton notOnSideNav avatarClassName="w-8 h-8" />}
         </div>
+        <div className="ml-auto" />
         <div className="flex items-center h-full py-3 gap-4">
+          {!isCN && <AccountButton notOnSideNav avatarClassName="w-8 h-8" />}
           <LinkButton href="/editor" variant="default">
             {t("Editor")}
           </LinkButton>

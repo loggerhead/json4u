@@ -1,13 +1,9 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import EnContent from "./en.mdx";
+import MdxPage, { mdxGenMetadata } from "../MdxPage";
 
 export async function generateMetadata() {
-  const locale = await getLocale();
-  const t = await getTranslations({ locale, namespace: "Metadata" });
-
-  return { title: t("Terms") };
+  return mdxGenMetadata(__dirname);
 }
 
-export default function Page() {
-  return <EnContent />;
+export default async function Page() {
+  return <MdxPage dir={__dirname} />;
 }

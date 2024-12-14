@@ -11,10 +11,15 @@ export default function Footer() {
   const t = useTranslations("Home");
   const items: FooterLinkProps[] = [
     { href: "https://www.trustpilot.com/review/json4u.com", title: t("Give a rating") },
-    { href: "https://github.com/loggerhead/json4u/issues/new", title: t("Feedback") },
-    isCN
-      ? { href: "https://weibo.com/loggerhead", title: <Weibo className="icon" /> }
-      : { href: "https://x.com/1oggerhead", title: <Twitter className="icon" /> },
+    ...(isCN
+      ? [
+          { href: "https://support.qq.com/product/670462", title: t("Feedback") },
+          { href: "https://weibo.com/loggerhead", title: <Weibo className="icon" /> },
+        ]
+      : [
+          { href: "https://github.com/loggerhead/json4u/issues/new", title: t("Feedback") },
+          { href: "https://x.com/1oggerhead", title: <Twitter className="icon" /> },
+        ]),
     { href: "https://github.com/loggerhead/json4u", title: <GitHub className="icon" /> },
   ];
 

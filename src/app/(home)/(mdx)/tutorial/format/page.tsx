@@ -1,4 +1,4 @@
-import MdxPage, { mdxGenMetadata } from "../MdxPage";
+import MdxPage, { mdxGenMetadata } from "../../MdxPage";
 
 export async function generateMetadata() {
   return mdxGenMetadata(__dirname);

@@ -86,6 +86,7 @@
     "Features": "功能",
     "Pricing": "价格",
     "FAQ": "常见问题",
+    "Tutorial": "使用教程",
     "Changelog": "更新日志",
     "Feedback": "问题反馈",
     "Currently Free": "当前免费",
@@ -204,11 +205,7 @@
     "name": "JSON For You",
     "title": "JSON For You | 在线JSON工具",
     "keywords": "json视图, json可视化, json格式化, json美化, json校验, json对比, json比较, json比对",
-    "description": "在线JSON预览、格式化/美化、最小化、校验、比较。同时支持用图预览JSON数据，语义化/结构化比较两个JSON数据的差异，将JSON转换成CSV，将CSV转换成JSON，支持在线使用jq",
-    "Editor": "编辑器",
-    "Changelog": "更新日志",
-    "Terms": "服务协议",
-    "Privacy": "隐私政策"
+    "description": "在线JSON预览、格式化/美化、最小化、校验、比较。同时支持用图预览JSON数据，语义化/结构化比较两个JSON数据的差异，将JSON转换成CSV，将CSV转换成JSON，支持在线使用jq"
   },
   "NotFound": {
     "not_found": "404 页面找不到",
