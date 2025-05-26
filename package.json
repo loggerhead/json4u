@@ -89,6 +89,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.4",
+    "@cloudflare/next-on-pages": "^1.13.12",
     "@hcaptcha/types": "^1.0.4",
     "@next/bundle-analyzer": "^14.2.6",
     "@playwright/test": "^1.48.2",
