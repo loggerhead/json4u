@@ -74,6 +74,15 @@
     --diff-bg-red: #ff9b9533;
     --diff-fg-green: #2ddf5966;
     --diff-bg-green: #82ffa433;
+
+    --graph-bg-color: #fff;
+    --graph-text-color: #222;
+    --tbl-bg-color: #fff;
+    --tbl-text-color: #222;
+    --popover-bg-color: #f8f9fa;
+    --popover-text-color: #222;
+    --tooltip-bg-color: #fff;
+    --tooltip-text-color: #000;
   }
 
   [data-theme="dark"] {
@@ -104,6 +113,22 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    --graph-bg-color: #23272e;
+    --graph-text-color: #eee;
+    --tbl-bg-color: #23272e;
+    --tbl-text-color: #eee;
+    --popover-bg-color: #2a2d32;
+    --popover-text-color: #eee;
+    --tooltip-bg-color: #23272e;
+    --tooltip-text-color: #eee;
+
+    --hl-key: #9cdcfe;
+    --hl-string: #ce9178;
+    --hl-number: #b5cea8;
+    --hl-null: #d16969;
+    --hl-empty: #ffffff4d;
+    --hl-index: #ffffff4d;
   }
 }
 
@@ -229,7 +254,8 @@ body {
 .graph-node {
   min-width: fit-content;
   border-width: 1px;
-  background-color: rgb(255 255 255);
+  background-color: var(--graph-bg-color);
+  color: var(--graph-text-color);
   font-size: var(--graph-font-size);
   font-family: var(--graph-font-family);
 }
@@ -272,7 +298,8 @@ body {
 
   .popover-item {
     width: max-content;
-    background: #f8f9fa;
+    background: var(--popover-bg-color);
+    color: var(--popover-text-color);
     border: 1px solid #dee2e6;
     word-wrap: break-word;
     font-size: 12px;
@@ -287,7 +314,8 @@ body {
   border-collapse: collapse;
 
   th {
-    background-color: var(--tbl-key-bg-color);
+    background-color: var(--tbl-bg-color);
+    color: var(--tbl-text-color);
     font-weight: normal;
     text-align: left;
     vertical-align: top;
@@ -301,6 +329,8 @@ body {
 
   td {
     position: relative;
+    background-color: var(--tbl-bg-color);
+    color: var(--tbl-text-color);
     font-weight: normal;
     text-align: left;
     vertical-align: top;
@@ -366,12 +396,10 @@ body {
   padding: 15px;
   position: absolute;
   z-index: 1;
-  color: #000000;
+  color: var(--tooltip-text-color);
   font-family: var(--graph-font-family);
-
-  /* stolen from https://www.radix-ui.com/primitives/docs/components/popover */
   border-radius: 4px;
-  background-color: white;
+  background-color: var(--tooltip-bg-color);
   box-shadow:
     hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
     hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
@@ -502,4 +530,23 @@ body {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.text-hl-key {
+  color: var(--hl-key);
+}
+.text-hl-string {
+  color: var(--hl-string);
+}
+.text-hl-number {
+  color: var(--hl-number);
+}
+.text-hl-null {
+  color: var(--hl-null);
+}
+.text-hl-empty {
+  color: var(--hl-empty);
+}
+.text-hl-index {
+  color: var(--hl-index);
 }
