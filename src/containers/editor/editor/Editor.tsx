@@ -10,6 +10,7 @@ import { getTree } from "@/stores/treeStore";
 import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
+import { useTheme } from "next-themes";
 
 loader.config({ paths: { vs: vsURL } });
 
@@ -21,6 +22,7 @@ export default function Editor({ kind, ...props }: EditorProps) {
   const translations = useTranslations();
   const setEditor = useEditorStore((state) => state.setEditor);
   const setTranslations = useEditorStore((state) => state.setTranslations);
+  const { theme } = useTheme();
 
   useDisplayExample();
   useRevealNode();
@@ -29,6 +31,7 @@ export default function Editor({ kind, ...props }: EditorProps) {
     <MonacoEditor
       language="json"
       loading={<Loading />}
+      theme={theme === "dark" ? "vs-dark" : "light"}
       options={{
         fontSize: 13, // 设置初始字体大小
         scrollBeyondLastLine: false, // 行数超过一屏时才展示滚动条
@@ -58,6 +61,8 @@ export default function Editor({ kind, ...props }: EditorProps) {
         setEditor(wrapper);
         setTranslations(translations);
         console.l(`finished initial editor ${kind}:`, wrapper);
+        // 同步设置monaco主题
+        monaco.editor.setTheme(theme === "dark" ? "vs-dark" : "light");
       }}
       {...props}
     />

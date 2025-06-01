@@ -18,6 +18,7 @@ import {
   AlignHorizontalJustifyCenter,
   ArrowLeftToLine,
   ArrowRightFromLine,
+  SunMoon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
@@ -31,6 +32,8 @@ import PopoverBtn, { popoverBtnClass } from "./PopoverButton";
 import SharePopover from "./SharePopover";
 import StatisticsPopover from "./StatisticsPopover";
 import Toggle from "./Toggle";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function SideNav() {
   const cc = useConfigFromCookies();
@@ -63,6 +66,9 @@ export default function SideNav() {
       };
     }),
   );
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   return (
     <div
@@ -132,6 +138,12 @@ export default function SideNav() {
           <PopoverBtn title={t("statistics")} icon={<BarChartBig className="icon" />} content={<StatisticsPopover />} />
           {/* can't connect to supabase in China, so disable the function temporarily */}
           {!isCN && <AccountButton avatarClassName="w-6 h-6" />}
+          <Button
+            className="my-1.5"
+            icon={<SunMoon className="icon" />}
+            title={mounted ? (theme === "dark" ? "切换为亮色模式" : "切换为暗色模式") : "切换主题"}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          />
           <Button
             className="my-1.5"
             icon={fixSideNav ? <ArrowRightFromLine className="icon" /> : <ArrowLeftToLine className="icon" />}
