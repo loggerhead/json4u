@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useState } from "react";
 import { Container, ContainerContent, ContainerHeader } from "@/components/Container";
-import { Button } from "@/components/ui/button";
 import ViewSearchInput from "@/components/ui/search/ViewSearchInput";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,9 +14,11 @@ import { ViewMode, ViewModeValue } from "@/lib/db/config";
 import { useEditorStore } from "@/stores/editorStore";
 import { useConfigFromCookies } from "@/stores/hook";
 import { useStatusStore } from "@/stores/statusStore";
-import { Expand, Shrink, Table2, Text, Waypoints } from "lucide-react";
+import { Expand, Shrink, Table2, Text, Waypoints, Sun, Moon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
+import { useTheme } from "next-themes";
+import Button from "@/containers/editor/sidenav/Button";
 
 export default function RightPanel() {
   const cc = useConfigFromCookies();
@@ -65,6 +66,9 @@ function Buttons({ viewMode }: { viewMode: ViewMode }) {
       setEnableTextCompare: state.setEnableTextCompare,
     })),
   );
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
 
   return (
     <div className="flex items-center ml-auto space-x-2">
@@ -72,16 +76,30 @@ function Buttons({ viewMode }: { viewMode: ViewMode }) {
         <>
           <div className="flex items-center rounded-md pl-1 bg-muted text-zinc-600">
             <Switch checked={enableTextCompare} onCheckedChange={setEnableTextCompare} />
-            <Button className="px-2" onClick={() => runCommand("compare")}>
-              {t(enableTextCompare ? "TextCompare" : "compare")}
-            </Button>
+            <Button className="px-2" icon={null} title={t(enableTextCompare ? "TextCompare" : "compare")} onClick={() => runCommand("compare")} />
           </div>
           <SwapButton variant="icon-outline" className="px-2" />
         </>
       )}
       {viewMode === ViewMode.Graph && <ViewSearchInput />}
+      <ThemeButton />
       <FullScreenButton />
     </div>
+  );
+}
+
+function ThemeButton() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
+  const isDark = theme === "dark";
+  return (
+    <Button
+      className="px-2 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground"
+      icon={isDark ? <Moon className="icon" /> : <Sun className="icon" />}
+      // TODO: add title
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+    />
   );
 }
 
@@ -92,9 +110,9 @@ function FullScreenButton() {
 
   return (
     <Button
+      className="px-2 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground"
+      icon={<Icon className="icon" />}
       title={t(fullscreen ? "shrink_screen" : "expand_screen")}
-      className="px-2"
-      variant="icon-outline"
       onClick={() => {
         if (fullscreen) {
           setFullscreen(false);
@@ -104,9 +122,7 @@ function FullScreenButton() {
           window.leftPanelHandle?.collapse();
         }
       }}
-    >
-      <Icon className="icon" />
-    </Button>
+    />
   );
 }
 
