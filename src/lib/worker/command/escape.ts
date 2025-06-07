@@ -1,26 +1,28 @@
-export function escape(text: string) {
-  return (
-    text
-      .replace(/[\\]/g, "\\\\")
-      .replace(/[\"]/g, '\\"')
-      .replace(/[\/]/g, "\\/")
-      .replace(/[\b]/g, "\\b")
-      .replace(/[\f]/g, "\\f")
-      // FIXME: 换行符会被转义成 \n
-      .replace(/[\n]/g, "\\n")
-      .replace(/[\r]/g, "\\r")
-      .replace(/[\t]/g, "\\t")
-  );
+const ESCAPE_MAP: Record<string, string> = {
+  '\\': '\\\\', '"': '\\"', '/': '\\/',
+  '\b': '\\b', '\f': '\\f', '\n': '\\n',
+  '\r': '\\r', '\t': '\\t',
+};
+
+const UNESCAPE_MAP: Record<string, string> = {
+  b: '\b', f: '\f', n: '\n',
+  r: '\r', t: '\t', '"': '"',
+  '\\': '\\', '/': '/',
+};
+
+const ESCAPE_RE = /[\\"\u0000-\u001F\/]/g;
+const UNESCAPE_RE = /(\\+)(.)/g;
+
+export function escape(text: string): string {
+  return text.replace(ESCAPE_RE, ch => ESCAPE_MAP[ch] || ch);
 }
 
-export function unescape(text: string) {
-  return text
-    .replace(/[\\]n/g, "\n")
-    .replace(/[\\]'/g, "'")
-    .replace(/[\\]"/g, '"')
-    .replace(/[\\]&/g, "&")
-    .replace(/[\\]r/g, "\r")
-    .replace(/[\\]t/g, "\t")
-    .replace(/[\\]b/g, "\b")
-    .replace(/[\\]f/g, "\f");
+export function unescape(text: string): string {
+  return text.replace(UNESCAPE_RE, (_m, bs, c) => {
+    const cnt = bs.length, half = cnt >> 1;
+    const prefix = '\\'.repeat(half);
+    return cnt % 2 === 1 && UNESCAPE_MAP[c] !== undefined
+        ? prefix + UNESCAPE_MAP[c]
+        : prefix + (cnt % 2 ? '\\' : '') + c;
+  });
 }
