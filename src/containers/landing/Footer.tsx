@@ -4,9 +4,7 @@ import GitHub from "@/components/icons/GitHub";
 import Logo from "@/components/icons/Logo";
 import Twitter from "@/components/icons/Twitter";
 import Weibo from "@/components/icons/Weibo";
-import Typography from "@/components/ui/typography";
 import { isCN } from "@/lib/env";
-import { filter } from "lodash-es";
 import { useTranslations } from "next-intl";
 
 export default function Footer() {
@@ -25,10 +23,10 @@ export default function Footer() {
       <div className="flex items-center w-full max-w-page-header md:px-8 px-4 gap-x-8 text-xs text-slate-500">
         <div className="flex items-center gap-2">
           <Logo className="w-[20px] h-[20px] text-slate-500" />
-          <span>{"© 2024 JSON For You"}</span>
+          <span>{"© 2025 JSON For You"}</span>
         </div>
         <Legal />
-        <FriendLinks />
+        {isCN && <Upyun />}
         <div className="ml-auto lg:flex hidden gap-8">
           {items.map((item, i) => (
             <FooterLink key={i} title={item.title} href={item.href} />
@@ -39,21 +37,23 @@ export default function Footer() {
   );
 }
 
-function FriendLinks() {
-  const t = useTranslations("Home");
-  const friends = filter([isCN ? { href: "https://www.apiyi.com", title: "API易" } : undefined]) as FooterLinkProps[];
-
-  if (friends.length === 0) {
-    return null;
-  }
-
+function Upyun() {
   return (
-    <div className="lg:flex hidden items-center justify-center gap-1">
-      <Typography>{t("Friends")}</Typography>
-      {friends.map((item, i) => (
-        <FooterLink key={i} title={item.title} href={item.href} />
-      ))}
-    </div>
+    <FooterLink
+      nofollow
+      href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral"
+      title={
+        <div className="inline-flex items-center justify-center h-6">
+          <span className="flex">{"本网站由"}</span>
+          <img
+            src="https://o.json4u.cn/upyun-logo.png"
+            className="h-full px-0.5 mx-0.5 bg-blue-500"
+            alt="又拍云 logo"
+          />
+          <span>{"提供CDN加速/云存储服务"}</span>
+        </div>
+      }
+    />
   );
 }
 
