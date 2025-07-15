@@ -69,7 +69,7 @@
     "jsonpath-plus": "^10.2.0",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.390.0",
-    "next": "^14.2.18",
+    "next": "^14.2.30",
     "next-client-cookies": "^2.0.0",
     "next-intl": "^3.25.3",
     "next-themes": "^0.3.0",
