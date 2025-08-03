@@ -78,6 +78,10 @@ describe("parseJSON", () => {
     expectEq(String.raw`{"a":"{\"bb\":\"{\\\"ccc\\\":3}\"}"}`, '{"a":{"bb":{"ccc":3}}}', { nest: true });
   });
 
+  test("escaped key", () => {
+    expectEq(String.raw`{"{\"a\":   0}": 1}`, String.raw`{"{\"a\":   0}":1}`);
+  });
+
   test("equal with JSON.parse", () => {
     const ss = [
       `[

@@ -1,4 +1,5 @@
 import { getParentId, rootMarker } from "@/lib/idgen";
+import { escape } from "@/lib/worker/command/escape";
 import * as jsonc from "jsonc-parser";
 import { isEmpty, repeat } from "lodash-es";
 import { union } from "lodash-es";
@@ -225,7 +226,8 @@ export class Tree implements TreeObject {
 
       const childBoundOffset = offset + stringified.length;
       if (isObject) {
-        stringified += `"${key}":${isFormat ? " " : ""}`;
+        const keyText = escape(key);
+        stringified += `"${keyText}":${isFormat ? " " : ""}`;
       }
       const childOffset = offset + stringified.length;
 
