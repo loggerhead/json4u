@@ -5,6 +5,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
+import ClientOnly from "@/components/ClientOnly";
 
 export async function generateMetadata() {
   const locale = await getLocale();
@@ -62,7 +63,9 @@ export default async function MainLayout({ children }: { children: React.ReactNo
       <body>
         {/* TODO: support dark theme */}
         <ThemeProvider defaultTheme="light" disableTransitionOnChange>
-          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+          <ClientOnly>
+            <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+          </ClientOnly>
         </ThemeProvider>
         <Toaster richColors position="bottom-right" />
       </body>

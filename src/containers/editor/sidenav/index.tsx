@@ -31,6 +31,8 @@ import PopoverBtn, { popoverBtnClass } from "./PopoverButton";
 import SharePopover from "./SharePopover";
 import StatisticsPopover from "./StatisticsPopover";
 import Toggle from "./Toggle";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function SideNav() {
   const cc = useConfigFromCookies();
@@ -63,6 +65,9 @@ export default function SideNav() {
       };
     }),
   );
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   return (
     <div
