@@ -259,10 +259,12 @@ class HistogramDiffer {
       const aDiff = newDiff(apos, lineLen(aaStr), "del");
       const bDiff = newDiff(bpos, lineLen(bbStr), "ins");
 
-      pairs.push({
-        left: aDiff.length > 0 ? aDiff : undefined,
-        right: bDiff.length > 0 ? bDiff : undefined,
-      });
+      if (aDiff.length > 0 || bDiff.length > 0) {
+        pairs.push({
+          left: aDiff.length > 0 ? aDiff : undefined,
+          right: bDiff.length > 0 ? bDiff : undefined,
+        });
+      }
 
       // 去除首尾空白字符后进行行内比较
       if (aaStr.length > 0 && bbStr.length > 0) {
