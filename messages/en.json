@@ -37,6 +37,7 @@
   "sync_reveal_desc": "Sync scrolling the left editor and the right editor when viewing the compare result. Sync the cursor position in the editor and the highlighting of the node in the graph view.",
   "Share": "Share",
   "Copy": "Copy",
+  "Copied": "Copied",
   "share_desc": "Anyone who has this link will be able to view this (Link valid for 7 days).",
   "Settings": "Settings",
   "Collapse": "Collapse",

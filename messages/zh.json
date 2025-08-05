@@ -37,6 +37,7 @@
   "sync_reveal_desc": "在查看 JSON 对比结果时，同步左右两侧编辑器的滚动；对编辑器中的光标位置和 graph 视图中节点的高亮做同步展示。",
   "Share": "分享",
   "Copy": "复制",
+  "Copied": "复制成功",
   "share_desc": "任何拥有此链接的人都可以查看（链接有效期 7 天）。",
   "Settings": "设置",
   "Collapse": "折叠",
