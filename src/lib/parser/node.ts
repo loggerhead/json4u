@@ -39,7 +39,11 @@ export function isIterable(node: Node) {
 }
 
 export function hasChildren(node: Node | undefined) {
-  return !!node?.childrenKeys?.length;
+  return !!getChildCount(node);
+}
+
+export function getChildCount(node: Node | undefined): number {
+  return node?.childrenKeys?.length ?? 0;
 }
 
 export function getChildrenKeys(node: Node): string[] {

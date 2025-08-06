@@ -1,5 +1,5 @@
 import { genExpanderId, genTableId, toPath, toPointer } from "@/lib/idgen";
-import { hasChildren, isIterable, type Tree, type Node, NodeType, getRawValue } from "@/lib/parser";
+import { hasChildren, getChildCount, isIterable, type Tree, type Node, NodeType, getRawValue } from "@/lib/parser";
 import { reduce, union } from "lodash-es";
 import { h, H } from "./tag";
 
@@ -88,9 +88,16 @@ function genObjectDom(tree: Tree, node: Node) {
     "table",
     h("tbody").addChildren(
       // generate key:value pair as the row
-      tree.mapChildren(node, (child, key) =>
-        h("tr", genTableHeader(tree, node, key, key2ExpanderId[key]), h("td", genDom(tree, child))),
-      ),
+      tree.mapChildren(node, (child, key) => {
+        const cnt = getChildCount(child);
+        const childCntText = hasChildren(child) ? (child.type === "array" ? `[${cnt}]` : `{${cnt}}`) : undefined;
+
+        return h(
+          "tr",
+          genTableHeader(tree, node, key, key2ExpanderId[key], childCntText),
+          h("td", genDom(tree, child)),
+        );
+      }),
     ),
   ).class("tbl");
 }
@@ -100,7 +107,7 @@ const nodeTypeToPrefixMap: Partial<Record<NodeType, string>> = {
   array: "[]",
 };
 
-function genTableHeader(tree: Tree, node: Node, key: string, expanderId?: string) {
+function genTableHeader(tree: Tree, node: Node, key: string, expanderId?: string, cntText?: string) {
   const path = genKeyAndTypeList(tree, node.id, key);
   const title = path
     .map(({ nodeType, key }, i) => {
@@ -109,7 +116,12 @@ function genTableHeader(tree: Tree, node: Node, key: string, expanderId?: string
       return `${prefix}${key.replaceAll('"', "&quot;")}`;
     })
     .join("\n");
-  const keyDom = h("span", key || '""').class(key ? "text-hl-key" : "text-hl-empty");
+
+  const keyDom = h(
+    "span",
+    h("span", key || '""').class(key ? "text-hl-key" : "text-hl-empty"),
+    cntText ? h("span", cntText).class("text-hl-empty") : "",
+  );
 
   return h("th", h("div", keyDom, genExpander(expanderId)).class("tbl-key")).title(title);
 }

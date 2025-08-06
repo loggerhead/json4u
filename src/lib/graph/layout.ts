@@ -1,6 +1,14 @@
 import { type CSSProperties } from "react";
 import { rootMarker } from "@/lib/idgen";
-import { type Tree, type Node, hasChildren, getRawValue, isIterable, getChildrenKeys } from "@/lib/parser";
+import {
+  type Tree,
+  type Node,
+  hasChildren,
+  getRawValue,
+  isIterable,
+  getChildrenKeys,
+  getChildCount,
+} from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
 import type { EdgeWithData, Graph, GraphNodeStyle, NodeWithData } from "./types";
 
@@ -223,7 +231,8 @@ export function genValueAttrs(node: Node) {
 
   if (isIterable(node)) {
     classSuffix = hasChildren(node) ? "empty" : "null";
-    text = node.type === "array" ? "[]" : "{}";
+    const cnt = getChildCount(node);
+    text = node.type === "array" ? `[${cnt}]` : `{${cnt}}`;
   } else if (node.type === "string") {
     if (node.value) {
       text = node.value;

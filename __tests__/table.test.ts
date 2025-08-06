@@ -65,11 +65,11 @@ describe("genFlowNodes", () => {
       `<table>
   <tbody>
     <tr>
-      <th><div><span>int64</span></div></th>
+      <th><div><span><span>int64</span></span></div></th>
       <td><span>12345678987654321</span></td>
     </tr>
     <tr>
-      <th><div><span>key</span></div></th>
+      <th><div><span><span>key</span></span></div></th>
       <td><span>value</span></td>
     </tr>
   </tbody>
@@ -88,24 +88,24 @@ describe("genFlowNodes", () => {
       `<table>
   <tbody>
     <tr>
-      <th><div><span>int64</span></div></th>
+      <th><div><span><span>int64</span></span></div></th>
       <td><span>12345678987654321</span></td>
     </tr>
     <tr>
-      <th><div><span>key</span></div></th>
+      <th><div><span><span>key</span></span></div></th>
       <td><span>value</span></td>
     </tr>
     <tr>
-      <th><div><span>array</span><div id="exp$/array"></div></div></th>
+      <th><div><span><span>array</span><span>{2}</span></span><div id="exp$/array"></div></div></th>
       <td>
         <table>
           <tbody>
             <tr>
-              <th><div><span>a</span></div></th>
+              <th><div><span><span>a</span></span></div></th>
               <td><span>1</span></td>
             </tr>
             <tr>
-              <th><div><span>b</span></div></th>
+              <th><div><span><span>b</span></span></div></th>
               <td><span>2</span></td>
             </tr>
           </tbody>
@@ -127,17 +127,17 @@ describe("genFlowNodes", () => {
       `<table>
 <tbody>
   <tr>
-    <th><div><span>int64</span></div></th>
+    <th><div><span><span>int64</span></span></div></th>
     <td><span>12345678987654321</span></td>
   </tr>
   <tr>
-    <th><div><span>key</span></div></th>
+    <th><div><span><span>key</span></span></div></th>
     <td><span>value</span></td>
   </tr>
   <tr>
     <th>
       <div>
-        <span>array</span>
+        <span><span>array</span><span>[2]</span></span>
         <div id="exp$/array"></div>
       </div>
     </th>
@@ -174,8 +174,8 @@ describe("genFlowNodes", () => {
 <table>
   <tbody>
     <tr>
-      <th><div><span>a</span></div></th>
-      <th><div><span>b</span></div></th>
+      <th><div><span><span>a</span></span></div></th>
+      <th><div><span><span>b</span></span></div></th>
     </tr>
     <tr>
       <td><span>1</span></td>
@@ -198,8 +198,8 @@ describe("genFlowNodes", () => {
 <table>
   <tbody>
     <tr>
-      <th><div><span>0</span></div></th>
-      <th><div><span>1</span></div></th>
+      <th><div><span><span>0</span></span></div></th>
+      <th><div><span><span>1</span></span></div></th>
     </tr>
     <tr>
       <td><span>11</span></td>
