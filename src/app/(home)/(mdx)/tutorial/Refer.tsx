@@ -1,12 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type Href } from "@/components/LinkButton";
 import Typography from "@/components/ui/typography";
 import { isCN } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
-import { Link as LinkTransition } from "next-view-transitions";
 
 interface ReferProps {
   disableHeading?: boolean;
@@ -51,7 +51,7 @@ export default function Refer({ disableHeading }: ReferProps) {
       <ul>
         {otherItems.map((item) => (
           <li key={item.title}>
-            <LinkTransition href={item.href as Href}>{item.title}</LinkTransition>
+            <Link href={item.href as Href}>{item.title}</Link>
           </li>
         ))}
       </ul>

@@ -8,7 +8,6 @@ import Typography from "@/components/ui/typography";
 import AccountButton from "@/containers/editor/sidenav/AccountButton";
 import { isCN, version } from "@/lib/env";
 import { useTranslations } from "next-intl";
-import { Link as LinkTransition } from "next-view-transitions";
 
 export default function Header() {
   const t = useTranslations("Home");
@@ -28,7 +27,7 @@ export default function Header() {
         <Badge variant="secondary">{`v${version}`}</Badge>
         <div className="md:flex hidden items-center gap-4 ml-4">
           {items.map((item) => (
-            <LinkTransition
+            <Link
               prefetch={false}
               href={item.href as Href}
               key={item.title}
@@ -38,7 +37,7 @@ export default function Header() {
               <Typography variant="p" className="text-primary">
                 {item.title}
               </Typography>
-            </LinkTransition>
+            </Link>
           ))}
         </div>
         <div className="ml-auto" />

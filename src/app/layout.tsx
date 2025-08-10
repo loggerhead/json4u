@@ -5,7 +5,6 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
-import { ViewTransitions } from "next-view-transitions";
 
 export async function generateMetadata() {
   const locale = await getLocale();
@@ -59,17 +58,15 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <ViewTransitions>
-      <html lang={locale} suppressHydrationWarning>
-        <body>
-          {/* TODO: support dark theme */}
-          <ThemeProvider defaultTheme="light" disableTransitionOnChange>
-            <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
-          </ThemeProvider>
-          <Toaster richColors position="bottom-right" />
-        </body>
-        <GoogleAnalytics gaId="G-TLYE3CBLPW" />
-      </html>
-    </ViewTransitions>
+    <html lang={locale} suppressHydrationWarning>
+      <body>
+        {/* TODO: support dark theme */}
+        <ThemeProvider defaultTheme="light" disableTransitionOnChange>
+          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        </ThemeProvider>
+        <Toaster richColors position="bottom-right" />
+      </body>
+      <GoogleAnalytics gaId="G-TLYE3CBLPW" />
+    </html>
   );
 }
