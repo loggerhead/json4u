@@ -1,0 +1,96 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "如何进行 JSON 转义与去除转义？",
+  keywords: "JSON转义, JSON去除转义，JSON反转义, JSON字符串处理, 特殊字符转义, JSON安全格式",
+  description: "学习如何在开发中正确转义与去除转义JSON字符串，包含示例、使用场景和工具的详细操作步骤。",
+};
+
+# 如何进行 JSON 转义与去除转义？
+
+转义和去除转义操作在 JSON For You 中非常简单、易用：
+
+1. 将原始 JSON 字符串粘贴到左侧编辑器中；
+2. 点击顶部的「搜索命令」，找到「**转义**」或「**反转义**」，点击执行。
+
+## JSON 转义的应用场景
+
+JSON 字符串转义是将特殊字符转换为可安全传输、存储或显示的格式，而不会破坏JSON结构的过程。去除转义则是将转义后的字符恢复为原始形式的过程。
+
+- **API 开发**：数据中包含特殊字符的 JSON payload；
+- **配置文件**：正确格式化包含文件路径和特殊符号的 JSON；
+- **日志管理**：转义 JSON 日志中的换行符和特殊字符；
+- **数据导入/导出**：确保 JSON 数据在传输过程中的完整性；
+- **数据库操作**：安全存储和检索包含特殊字符的 JSON 字符串；
+
+JSON 字符串转义至关重要，因为正确的转义可以确保：
+
+- **数据完整性**：防止特殊字符导致的JSON解析错误；
+- **安全性**：避免 JSON API 中的注入攻击；
+- **兼容性**：确保在不同编程语言中一致处理；
+- **可读性**：在日志和显示中保持清晰的字符串表示；
+
+## 需要转义的常见特殊字符
+
+<table>
+  <thead>
+    <tr>
+      <th>字符</th>
+      <th>描述</th>
+      <th>转义序列</th>
+      <th>示例用法</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>`"`</code></td>
+      <td>双引号</td>
+      <td><code>`\"`</code></td>
+      <td><code>`{"name": "张\"三"}`</code></td>
+    </tr>
+    <tr>
+      <td><code>`\`</code></td>
+      <td>反斜杠</td>
+      <td><code>\\\\</code></td>
+      <td><code>`{"path": "C:\\数据\\文件.json"}`</code></td>
+    </tr>
+    <tr>
+      <td><code>`/`</code></td>
+      <td>正斜杠</td>
+      <td><code>`\/`</code></td>
+      <td><code>`{"url": "https:\/\/example.com"}`</code></td>
+    </tr>
+    <tr>
+      <td><code>`\b`</code></td>
+      <td>退格符</td>
+      <td><code>`\\b`</code></td>
+      <td><code>`{"text": "你好\\b世界"}`</code></td>
+    </tr>
+    <tr>
+      <td><code>`\f`</code></td>
+      <td>换页符</td>
+      <td><code>`\\f`</code></td>
+      <td><code>`{"data": "报告\\f第2页"}`</code></td>
+    </tr>
+    <tr>
+      <td><code>`\n`</code></td>
+      <td>换行符</td>
+      <td><code>`\\n`</code></td>
+      <td><code>`{"message": "第一行\\n第二行"}`</code></td>
+    </tr>
+    <tr>
+      <td><code>`\r`</code></td>
+      <td>回车符</td>
+      <td><code>`\\r`</code></td>
+      <td><code>`{"log": "状态\\r已更新"}`</code></td>
+    </tr>
+    <tr>
+      <td><code>`\t`</code></td>
+      <td>水平制表符</td>
+      <td><code>`\\t`</code></td>
+      <td><code>`{"table": "姓名\\t年龄"}`</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<Refer />

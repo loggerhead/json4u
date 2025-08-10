@@ -11,13 +11,14 @@ import {
   Braces,
   Download,
   FileUp,
-  MessageCircleQuestion,
+  CircleHelp,
   Share2,
   SquareStack,
   BarChartBig,
   AlignHorizontalJustifyCenter,
   ArrowLeftToLine,
   ArrowRightFromLine,
+  Bug,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
@@ -124,7 +125,13 @@ export default function SideNav() {
         </ul>
         <ul className="flex flex-col px-1 gap-y-2">
           <LinkButton
-            icon={<MessageCircleQuestion className="icon" />}
+            icon={<CircleHelp className="icon" />}
+            title={t("Tutorial")}
+            href={"/tutorial"}
+            newWindow
+          />
+          <LinkButton
+            icon={<Bug className="icon" />}
             title={t("Feedback")}
             href={isCN ? "https://support.qq.com/product/670462" : "https://github.com/loggerhead/json4u/issues/new"}
             newWindow

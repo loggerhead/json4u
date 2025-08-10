@@ -1,3 +1,4 @@
+.trae
 e2e/foo.spec.ts
 *.report.html
 tsconfig.tsbuildinfo

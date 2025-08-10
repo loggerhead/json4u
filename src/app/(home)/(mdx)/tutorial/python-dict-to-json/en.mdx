@@ -1,0 +1,87 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "How to Convert Python Dict to JSON?",
+  keywords: ["python dict to json", "python dictionary to json", "convert python dict to json", "python to json", "dict to json", "python json converter"],
+  description: "Effortlessly convert Python dictionaries to JSON format online. Paste your dict for instant, accurate JSON output. A simple, free tool for developers.",
+};
+
+# How to Convert Python Dict to JSON?
+
+The key-value pair structure of a Python dict is very similar to that of JSON, but there are differences in syntax and data types. If you need to visualize or process a python dict, you can first convert it to JSON and then use the powerful JSON editing and visualization features on JSON For You. The steps are as follows:
+
+1. Paste the original JSON string into the left editor;
+2. Click "Search Command" at the top, find "**Python dict to JSON**", and click to execute.
+
+Since there are significant differences between python dict and JSON, JSON For You currently only supports simple text replacement, so converting complex dicts may fail.
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Python Dictionary</th>
+      <th>JSON</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>String Quotes</td>
+      <td>Single or double quotes</td>
+      <td>Double quotes only</td>
+    </tr>
+    <tr>
+      <td>Trailing Commas</td>
+      <td>Allowed</td>
+      <td>Not allowed</td>
+    </tr>
+    <tr>
+      <td>Comments</td>
+      <td>Allowed in code (not in dictionary literals)</td>
+      <td>Not supported</td>
+    </tr>
+    <tr>
+      <td>Key Type</td>
+      <td>Can be any hashable type</td>
+      <td>String</td>
+    </tr>
+    <tr>
+      <td>Value Type</td>
+      <td>Supports tuples, sets, datetime, and custom objects</td>
+      <td>Only supports strings, numbers, booleans, null, arrays, and objects</td>
+    </tr>
+  </tbody>
+</table>
+
+## Example
+
+**Python dict:**
+
+```python
+{
+    'name': 'John Doe',
+    'age': 30,
+    'is_student': False,
+    'hobbies': ['reading', 'coding', 'hiking'],
+    'address': {
+        'street': '123 Main St',
+        'city': 'Anytown'
+    },
+}
+```
+
+**Converted JSON:**
+
+```json
+{
+  "name": "John Doe",
+  "age": 30,
+  "is_student": false,
+  "hobbies": ["reading", "coding", "hiking"],
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown"
+  }
+}
+```
+
+<Refer />

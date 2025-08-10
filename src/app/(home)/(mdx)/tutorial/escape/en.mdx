@@ -1,0 +1,96 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "How to Escape and Unescape JSON?",
+  keywords: "JSON escape, JSON unescape, online JSON tool, json string escape, developer tools, escape special characters in JSON",
+  description: "Easily escape and unescape JSON strings online. Our free tool helps you format JSON data for inclusion in strings or other contexts in one click.",
+};
+
+# How to Escape and Unescape JSON?
+
+Escaping and unescaping operations are very simple and easy to use in JSON For You:
+
+1. Paste the original JSON string into the left editor;
+2. Click "Search Command" at the top, find "**Escape**" or "**Unescape**", and click to execute.
+
+## Use Cases for JSON Escaping
+
+JSON string escaping is the process of converting special characters into a format that can be safely transmitted, stored, or displayed without breaking the JSON structure. Unescaping is the process of restoring escaped characters to their original form.
+
+- **API Development**: JSON payloads with special characters in the data;
+- **Configuration Files**: Correctly format JSON containing file paths and special symbols;
+- **Log Management**: Escape newlines and special characters in JSON logs;
+- **Data Import/Export**: Ensure data integrity during JSON data transfer;
+- **Database Operations**: Safely store and retrieve JSON strings containing special characters;
+
+JSON string escaping is crucial because correct escaping ensures:
+
+- **Data Integrity**: Prevents JSON parsing errors caused by special characters;
+- **Security**: Avoids injection attacks in JSON APIs;
+- **Compatibility**: Ensures consistent handling across different programming languages;
+- **Readability**: Maintains a clear string representation in logs and displays;
+
+## Common Special Characters That Need Escaping
+
+<table>
+  <thead>
+    <tr>
+      <th>Character</th>
+      <th>Description</th>
+      <th>Escape Sequence</th>
+      <th>Example Usage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>`"`</td>
+      <td>Double quote</td>
+      <td>`\"`</td>
+      <td>`{"name": "John\"Doe"}`</td>
+    </tr>
+    <tr>
+      <td>`\`</td>
+      <td>Backslash</td>
+      <td>`\\`</td>
+      <td>`{"path": "C:\\data\\file.json"}`</td>
+    </tr>
+    <tr>
+      <td>`/`</td>
+      <td>Forward slash</td>
+      <td>`\/`</td>
+      <td>`{"url": "https://example.com"}`</td>
+    </tr>
+    <tr>
+      <td>`\b`</td>
+      <td>Backspace</td>
+      <td>`\\b`</td>
+      <td>`{"text": "Hello\\bWorld"}`</td>
+    </tr>
+    <tr>
+      <td>`\f`</td>
+      <td>Form feed</td>
+      <td>`\\f`</td>
+      <td>`{"data": "Report\\fPage 2"}`</td>
+    </tr>
+    <tr>
+      <td>`\n`</td>
+      <td>Newline</td>
+      <td>`\\n`</td>
+      <td>`{"message": "Line 1\\nLine 2"}`</td>
+    </tr>
+    <tr>
+      <td>`\r`</td>
+      <td>Carriage return</td>
+      <td>`\\r`</td>
+      <td>`{"log": "Status\\rUpdated"}`</td>
+    </tr>
+    <tr>
+      <td>`	`</td>
+      <td>Horizontal tab</td>
+      <td>`\\t`</td>
+      <td>`{"table": "Name\\tAge"}`</td>
+    </tr>
+  </tbody>
+</table>
+
+<Refer />

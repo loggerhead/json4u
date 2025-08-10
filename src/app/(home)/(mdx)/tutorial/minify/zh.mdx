@@ -1,0 +1,78 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "如何进行 JSON 压缩/最小化？",
+  keywords: ["JSON压缩", "JSON精简", "JSON最小化", "在线JSON压缩工具", "JSON minify", "JSON压缩方法"],
+  description: "学习如何高效压缩JSON字符串以减小文件大小、提升加载速度并优化数据传输，包含实用示例和最佳实践。",
+};
+
+# 如何进行 JSON 压缩/最小化？
+
+JSON 最小化（又称 JSON 精简、JSON 压缩）是指在保持数据结构和含义不变的前提下，移除 JSON 中的所有不必要字符（空格、换行符、注释等）的过程，它可以极大的减小 JSON 字符串的大小，从而提高数据传输效率。
+
+在 JSON For You 中压缩 JSON 字符串非常简单，只需按照以下步骤操作：
+
+1. 将原始 JSON 字符串粘贴到左侧编辑器中；
+2. 点击顶部的「搜索命令」，找到「**最小化**」，点击执行。
+
+## JSON 最小化的应用场景
+
+<table>
+  <thead>
+    <tr>
+      <th>使用场景</th>
+      <th>主要优势</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>API 请求/响应数据</td>
+      <td>加快客户端收发数据的速度</td>
+    </tr>
+    <tr>
+      <td>配置文件</td>
+      <td>减小部署包体积</td>
+    </tr>
+    <tr>
+      <td>移动应用</td>
+      <td>节省带宽并提高电池续航</td>
+    </tr>
+    <tr>
+      <td>Web 存储（localStorage/sessionStorage）</td>
+      <td>最大化存储效率</td>
+    </tr>
+    <tr>
+      <td>IoT设备</td>
+      <td>在带宽受限环境中优化数据传输</td>
+    </tr>
+  </tbody>
+</table>
+
+## 示例
+
+**原始JSON（86 个字符）：**
+
+```json
+{
+  "name": "张三",
+  "age": 30,
+  "isStudent": false,
+  "hobbies": ["阅读", "编程", "徒步"]
+}
+```
+
+**压缩后（67 个字符）：**
+
+```json
+{"name":"张三","age":30,"isStudent":false,"hobbies":["阅读","编程","徒步"]}
+```
+
+## JSON 最小化的最佳实践
+
+- 部署前务必验证压缩后的 JSON 有效性
+- 为开发和调试保留未压缩版本
+- 考虑在构建过程中实现自动化压缩
+- 将压缩与 gzip 压缩结合使用以获得最大效率
+- 对于超大 JSON 文件，采用流式压缩方式
+
+<Refer />

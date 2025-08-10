@@ -1,0 +1,87 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "如何将 Python dict 转换为 JSON？",
+  keywords: ["Python 字典转 JSON", "Python dict 转 JSON", "Python 到 JSON 转换器", "Python dict 转 JSON 在线工具"],
+  description: "学习如何将 Python dict 转换为 JSON 格式，包含实用示例、数据类型处理和解决常见转换问题的完整教程。",
+};
+
+# 如何将 Python dict 转换为 JSON？
+
+Python dict 与 JSON 的键值对结构很相似，但在语法和数据类型上存在差异。如果您需要对 python dict 做可视化或处理，可以先将它转换为 JSON，然后使用 JSON For You 上强大的 JSON 编辑和可视化功能。操作步骤如下：
+
+1. 将原始 JSON 字符串粘贴到左侧编辑器中；
+2. 点击顶部的「搜索命令」，找到「**Python dict 转 JSON**」，点击执行。
+
+由于 python dict 与 JSON 存在显著区别，JSON For You 目前只支持简单的文本替换，因此对复杂的 dict 做转换可能会失败。
+
+<table>
+  <thead>
+    <tr>
+      <th>特性</th>
+      <th>Python 字典</th>
+      <th>JSON</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>字符串引号</td>
+      <td>单引号或双引号</td>
+      <td>仅双引号</td>
+    </tr>
+    <tr>
+      <td>尾随逗号</td>
+      <td>允许</td>
+      <td>不允许</td>
+    </tr>
+    <tr>
+      <td>注释</td>
+      <td>代码中允许（不在字典字面量中）</td>
+      <td>不支持</td>
+    </tr>
+    <tr>
+      <td>key 类型</td>
+      <td>可以是任何可哈希类型</td>
+      <td>字符串</td>
+    </tr>
+    <tr>
+      <td>value 类型</td>
+      <td>支持元组、集合、datetime 和自定义对象</td>
+      <td>仅支持字符串、数字、布尔值、null、数组和对象</td>
+    </tr>
+  </tbody>
+</table>
+
+## 示例
+
+**Python dict：**
+
+```python
+{
+    '姓名': '张三',
+    '年龄': 30,
+    '是否学生': False,
+    '爱好': ['阅读', '编程', '徒步'],
+    '地址': {
+        '街道': ' Main St 123号',
+        '城市': '任意市'
+    },
+}
+```
+
+**转换后的 JSON：**
+
+```json
+{
+  "姓名": "张三",
+  "年龄": 30,
+  "是否学生": false,
+  "爱好": ["阅读", "编程", "徒步"],
+  "地址": {
+    "街道": "MainSt123号",
+    "城市": "任意市"
+  }
+}
+```
+
+<Refer />

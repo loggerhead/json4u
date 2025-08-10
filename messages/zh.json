@@ -75,6 +75,7 @@
   "CsvErrEmptyInput": "CSV 解析失败：输入为空",
   "CsvCvrtErrNotArray": "CSV 转换失败：不是 JSON 数组",
   "CsvCvrtErrNotMatchHeader": "CSV 转换失败：表头与数据行格式不匹配",
+  "Tutorial": "使用教程",
   "Feedback": "反馈",
   "statistics": "统计",
   "stats_graph": "图",
@@ -82,6 +83,7 @@
   "stats_compare": "文本比较",
   "stats_jq": "jq 执行",
   "stats_description": "下次额度刷新日期为: {date}",
+  "related_features": "相关功能",
   "Home": {
     "Features": "功能",
     "Pricing": "价格",

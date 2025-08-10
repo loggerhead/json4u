@@ -1,0 +1,161 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "How to Use JSONPath?",
+  keywords: "JSONPath, JSONPath evaluator, online tool, JSON query, JSON tester, JSONPath expressions",
+  description: "An easy-to-use online tool to evaluate and test JSONPath expressions against your JSON data. Instantly validate and debug your JSON queries.",
+};
+
+# How to Use JSONPath?
+
+JSONPath is a powerful JSON query language that allows you to accurately select and extract data from JSON documents, similar to XPath for XML. It provides a flexible way to navigate and filter JSON structures.
+
+JSON For You supports online JSONPath processing, just follow these steps:
+
+1. Paste the JSON string into the left editor;
+2. Click "Search Command" at the top, find "**Show JSONPath filter box**", and an input box will appear at the bottom after clicking;
+3. Enter a JSONPath expression to execute it automatically;
+4. You can view the results in the right editor;
+5. When you need to edit multiple times, you can quickly swap the text in the left and right editors with the `Ctrl+Enter` shortcut;
+
+## JSONPath Syntax Basics
+
+<table>
+  <thead>
+    <tr>
+      <th>Expression</th>
+      <th>Description</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>$</code>
+      </td>
+      <td>Root object</td>
+      <td>
+        <code>$</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>@</code>
+      </td>
+      <td>Current object</td>
+      <td>
+        <code>@</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`.`</code>
+      </td>
+      <td>Child property</td>
+      <td>
+        <code>$.name</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`[]`</code>
+      </td>
+      <td>Subscript operator</td>
+      <td>
+        <code>$[0]</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`*`</code>
+      </td>
+      <td>Wildcard (matches all elements)</td>
+      <td>
+        <code>$.store.book[*]</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`..`</code>
+      </td>
+      <td>Recursive descent</td>
+      <td>
+        <code>$..price</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`?()`</code>
+      </td>
+      <td>Filter expression</td>
+      <td>
+        <code>$..book[?(@.price < 10)]</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`()`</code>
+      </td>
+      <td>Script expression</td>
+      <td>
+        <code>$..book[(@.length-1)]</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## JSONPath Practical Examples
+
+### Example 1: Basic Property Access
+
+JSON data:
+
+```json
+{
+  "name": "JSON For You",
+  "features": ["formatting", "validation", "JSONPath"]
+}
+```
+
+JSONPath expression: `$.name`, result: `"JSON For You"`
+
+### Example 2: Array Indexing
+
+JSON data:
+
+```json
+{
+  "users": [
+    { "id": 1, "name": "John" },
+    { "id": 2, "name": "Doe" }
+  ]
+}
+```
+
+JSONPath expression: `$.users[1].name`, result: `"Doe"`
+
+### Example 3: Conditional Filtering
+
+JSON data:
+
+```json
+{
+  "products": [
+    { "id": 1, "name": "Laptop", "price": 999 },
+    { "id": 2, "name": "Mouse", "price": 25 },
+    { "id": 3, "name": "Keyboard", "price": 50 }
+  ]
+}
+```
+
+JSONPath expression: `$.products[?(@.price < 100)]`, result: returns the mouse and keyboard objects
+
+## Use Cases
+
+- **API Development**: Extract specific fields from complex API responses
+- **Data Analysis**: Filter and aggregate JSON data for reports
+- **Configuration Management**: Retrieve settings from nested JSON configuration files
+- **Test Automation**: Validate JSON responses in API tests
+- **Log Analysis**: Extract meaningful information from JSON formatted logs
+
+<Refer />

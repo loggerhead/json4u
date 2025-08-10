@@ -1,0 +1,97 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "How to Use jq?",
+  keywords: "jq online, json formatter, json validator, jq playground, json query, jq cheatsheet, online jq tool, json parser, json viewer, jq filter, jq syntax, json processor, web-based jq, json manipulation, jq tester",
+  description: "Powerful online tool to format, validate, query, and transform JSON data using jq syntax. A real-time jq playground for developers.",
+};
+
+# How to Use jq?
+
+jq is a powerful command-line JSON processor that allows developers to easily filter, map, and transform JSON data just like using `sed`, `awk`, and `grep` to process text. jq offers many advantages for processing JSON data:
+
+- **Lightweight and efficient**: Process JSON without loading the entire dataset
+- **Powerful query language**: Support complex data transformation and filtering
+- **High performance**: Maintain fast response even when processing large JSON files
+- **Rich community support**: Complete documentation and numerous examples
+
+Typical application scenarios include:
+
+- **API response processing**: Extract relevant data from complex API responses
+- **Log analysis**: Parse and filter JSON formatted log files
+- **Data cleaning**: Preprocess JSON data for data analysis
+- **Configuration transformation**: Batch modify JSON configuration files
+
+## Using jq in JSON For You
+
+JSON For You supports online jq processing, just follow these steps:
+
+1. Paste the JSON string into the left editor;
+2. Click "Search Command" at the top, find "**Show jq input box**", and a jq input box will appear at the bottom after clicking;
+3. Enter a jq expression (for example: `.[] | select(.status == "active")`) to automatically execute the jq command;
+4. You can view the results in the right editor;
+5. When you need to edit multiple times, you can quickly swap the text in the left and right editors with the `Ctrl+Enter` shortcut;
+
+<img src="/example/jq.gif" alt="Using jq in JSON For You" />
+
+## Common jq Command Examples
+
+### Basic Filtering
+
+Extract specific fields from a JSON object:
+
+```bash
+# Get all usernames in an array
+.[] | .name
+
+# Extract nested fields
+.users[] | {id: .user_id, name: .profile.name}
+```
+
+### Data Transformation
+
+Modify the JSON structure and values:
+
+```bash
+# Add a new field
+.[] | . + {full_name: (.first_name + " " + .last_name)}
+
+# Transform values
+.items[] | {product: .name, price: (.price * 1.1)} # Add 10% tax
+```
+
+### Conditional Selection
+
+Filter data based on conditions:
+
+```bash
+# Select active users
+.users[] | select(.status == "active" and .login_count > 5)
+
+# Exclude null values
+.data[] | select(.value != null and .value != "")
+```
+
+## jq Advanced Techniques
+
+### Array Operations
+
+```bash
+# Get unique values
+.[] | .category | unique
+
+# Count the number of elements
+.[] | .tags | length as $len | {item: ., tag_count:$len}
+```
+
+### Complex Transformations
+
+```bash
+# Group items by category
+.group_by(.category)[] | {categoryKey: .[].category, items:.}
+
+# Flatten nested arrays
+.recursive_field[] | .[] | {id: .id, value: .data.value}
+```
+
+<Refer />

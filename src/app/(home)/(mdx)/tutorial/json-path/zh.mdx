@@ -1,0 +1,161 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "如何使用 JSON path？",
+  keywords: "JSON path教程, JSON查询语言, JSON path语法, JSON数据提取, JSON path示例",
+  description: "学习如何使用JSON path进行高效的JSON数据查询，包含实用示例、语法指南和实际应用场景。",
+};
+
+# 如何使用 JSON path？
+
+JSON path 是一种强大的 JSON 查询语言，允许您从 JSON 文档中精确选择和提取数据，类似于 XML 的 XPath。它提供了灵活的方式来导航和筛选 JSON 结构。
+
+JSON For You 支持您进行在线 JSON path 处理，只需按如下步骤操作：
+
+1. 将 JSON 字符串粘贴到左侧编辑器中；
+2. 点击顶部的「搜索命令」，找到「**展示 JSON path 过滤框**」，点击后在底部会出现输入框；
+3. 输入 JSON path 表达式会自动执行；
+4. 在右侧编辑器可以查看结果；
+5. 当您需要多次编辑时，可以通过 `Ctrl+Enter` 快捷键快速交换左右两侧编辑器的文本；
+
+## JSON path 语法基础
+
+<table>
+  <thead>
+    <tr>
+      <th>表达式</th>
+      <th>描述</th>
+      <th>示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>$</code>
+      </td>
+      <td>根对象</td>
+      <td>
+        <code>$</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>@</code>
+      </td>
+      <td>当前对象</td>
+      <td>
+        <code>@</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`.`</code>
+      </td>
+      <td>子属性</td>
+      <td>
+        <code>$.name</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`[]`</code>
+      </td>
+      <td>下标运算符</td>
+      <td>
+        <code>$[0]</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`*`</code>
+      </td>
+      <td>通配符（匹配所有元素）</td>
+      <td>
+        <code>$.store.book[*]</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`..`</code>
+      </td>
+      <td>递归下降</td>
+      <td>
+        <code>$..price</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`?()`</code>
+      </td>
+      <td>筛选表达式</td>
+      <td>
+        <code>$..book[?(@.price &lt; 10)]</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>`()`</code>
+      </td>
+      <td>脚本表达式</td>
+      <td>
+        <code>$..book[(@.length-1)]</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## JSON path 实用示例
+
+### 示例 1：基本属性访问
+
+JSON 数据：
+
+```json
+{
+  "name": "JSON For You",
+  "features": ["格式化", "验证", "JSON path"]
+}
+```
+
+JSON path 表达式：`$.name`，结果：`"JSON For You"`
+
+### 示例 2：数组索引
+
+JSON 数据：
+
+```json
+{
+  "users": [
+    { "id": 1, "name": "张三" },
+    { "id": 2, "name": "李四" }
+  ]
+}
+```
+
+JSON path 表达式: `$.users[1].name`，结果: `"李四"`
+
+### 示例 3：条件筛选
+
+JSON 数据：
+
+```json
+{
+  "products": [
+    { "id": 1, "name": "笔记本电脑", "price": 999 },
+    { "id": 2, "name": "鼠标", "price": 25 },
+    { "id": 3, "name": "键盘", "price": 50 }
+  ]
+}
+```
+
+JSON path 表达式：`$.products[?(@.price < 100)]`，结果：返回鼠标和键盘对象
+
+## 应用场景
+
+- **API 开发**：从复杂的 API 响应中提取特定字段
+- **数据分析**︰筛选和聚合 JSON 数据用于报告
+- **配置管理**︰从嵌套的 JSON 配置文件中检索设置
+- **测试自动化**︰在 API测试中验证 JSON 响应
+- **日志分析**︰从 JSON 格式的日志中提取有意义的信息
+
+<Refer />

@@ -93,7 +93,7 @@ function ParseErrorMsg({ kind }: ParseErrorMsgProps) {
   return (
     <div
       data-testid="parse-error"
-      className="flex text-error"
+      className="flex text-error cursor-pointer"
       onClick={() => editor?.revealPosition(startLineNumber, startColumn)}
     >
       <span className="mr-1">{msg}</span>

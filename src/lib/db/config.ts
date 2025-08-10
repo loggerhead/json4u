@@ -122,8 +122,8 @@ const storage: StateStorage = {
 };
 
 async function getConfig() {
-  const stateStr = await safeGet(keyName);
   try {
+    const stateStr = await safeGet(keyName);
     return JSON.parse(stateStr).state as Config;
   } catch (e) {
     console.log("fallback to use default config.");
