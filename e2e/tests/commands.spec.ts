@@ -76,7 +76,7 @@ test.describe("commands", () => {
       await clickCmd(page, "convert url to json");
       const text = await getEditorText(page);
       await expect(text.replace(/\s/g, "")).toBe(
-        '{"Scheme":"https:","Host":"json4u.com","Path":"/editor","Query":{"foo":"bar"}}',
+        '{"Protocol":"https","Host":"json4u.com","Path":"/editor","Query":{"foo":"bar"}}',
       );
     }
 

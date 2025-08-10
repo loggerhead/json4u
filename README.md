@@ -46,7 +46,7 @@ The best JSON visualization and processing tool.
   - [ ] ~~Support search via JSON path (synchronize reveal)~~.
   - [ ] Support modifications in view mode.
   - [ ] Support synchronize fold and unfold between left and right panels.
-  - [ ] Support displaying the key count of an object/array node after folding.
+  - [x] Support displaying the key count of an object/array node after folding.
 - [ ] Add a group API to support file upload and retrieval.
   - [ ] Support share with an expiration date.
   - [ ] Support auto upload local files to server.

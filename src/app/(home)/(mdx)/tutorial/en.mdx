@@ -1,12 +1,29 @@
+import Refer from "./Refer";
+
 export const metadata = {
-  title: "foo",
+  title: "Powerful Online JSON Tool Tutorial",
+  keywords: "online JSON tools, JSON formatter tutorial, JSON validation method, JSON visualization tool, JSON comparison tool, JSONPath tutorial, jq command tutorial, JSON conversion tool",
+  description: "JSON For You Online JSON Tool Tutorial: Detailed explanation of how to use functions such as JSON formatting, validation, visualization, and comparison to help developers quickly master JSON data processing skills and improve work efficiency.",
 };
 
-# 教程
+# JSON For You Tutorial
 
-JSON For You 是一个在线的 JSON 工具，支持 JSON 的格式化、压缩、验证、对比、转换等操作。由一系列的教程组成，帮助你快速上手。
+JSON For You is a powerful online JSON editor and visualization toolbox designed to maximize your efficiency in processing and browsing JSON data. It not only supports basic functions such as JSON validation, formatting, and compression, but also provides two feature-rich visualization capabilities: graph and table. This tutorial will introduce each function in detail to help you get started quickly and improve your work efficiency.
 
-- [如何启用自动格式化？](/tutorial/format)
-- [如何使用 JSON path 过滤？](/tutorial/json-path)
-- [如何使用 jq？](/tutorial/jq)
-- [如何导入 CSV 文件？](/tutorial/csv)
+<Refer disableHeading={true} />
+
+## Other Features
+
+JSON For You also provides the following features to fully meet user needs:
+
+- Drag and drop upload: Both the left and right editors support direct drag and drop file uploads.
+
+  <img src="/example/drag-drop.webp" alt="Drag and drop upload" style={{ marginBottom: 10 }} />
+
+- Show JSON path: When the cursor is on the left editor, the JSON path of the current cursor position will be displayed in the bottom status bar.
+
+  <img src="/example/json-path.webp" alt="Show JSON path" style={{ marginBottom: 10 }} />
+
+- JSON parsing error prompt: When the JSON format is incorrect, an error prompt will be displayed in the bottom status bar. If you click the error message, the cursor will be located at the error position in the editor.
+
+  <img src="/example/validate-in-tutorial.webp" alt="Validate JSON" style={{ marginBottom: 10 }} />

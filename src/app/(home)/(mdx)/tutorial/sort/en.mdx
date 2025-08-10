@@ -1,0 +1,47 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "How to Sort JSON by Key?",
+  keywords: ["JSON sort", "sort JSON", "JSON key sort", "online JSON sorter", "JSON formatter", "JSON tools"],
+  description: "A free online tool to sort JSON data alphabetically. Sorts keys in JSON objects, including nested objects and arrays. Simple, fast, and efficient.",
+};
+
+# How to Sort JSON by Key?
+
+JSON sorting is the process of organizing key-value pairs in a specific order, which can enhance readability, ensure consistent data presentation, and facilitate modification or comparison of JSON objects. Properly sorted JSON is particularly valuable in debugging and documentation.
+
+JSON For You supports automatic sorting (ascending by default, not enabled by default) and manual sorting (both ascending and descending are supported), and the sorting is recursive, which means that nested JSON objects will also be sorted. To enable automatic sorting:
+
+1. Click "Auto Sort" on the sidebar to enable automatic sorting;
+2. Paste the original JSON string into the left editor, and it will be sorted automatically upon pasting.
+
+If you need to manually sort in descending order, you can do this:
+
+1. Paste the original JSON string into the left editor;
+2. Click "Search Command" at the top, find "**JSON Sort (Descending)**", and click to execute.
+
+## Example
+
+**Unsorted JSON:**
+
+```json
+{
+  "email": "user@example.com",
+  "name": "John Doe",
+  "age": 30,
+  "is_active": true
+}
+```
+
+**Sorted (Ascending):**
+
+```json
+{
+  "age": 30,
+  "email": "user@example.com",
+  "is_active": true,
+  "name": "John Doe"
+}
+```
+
+<Refer />

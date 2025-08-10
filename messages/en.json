@@ -75,6 +75,7 @@
   "CsvErrEmptyInput": "Parse CSV failed: input is empty",
   "CsvCvrtErrNotArray": "Convert to CSV failed: not a JSON array",
   "CsvCvrtErrNotMatchHeader": "Convert to CSV failed: headers are not match with data",
+  "Tutorial": "Tutorial",
   "Feedback": "Feedback",
   "statistics": "Statistics",
   "stats_graph": "Graph mode view",
@@ -82,6 +83,7 @@
   "stats_compare": "Text comparisons",
   "stats_jq": "jq executions",
   "stats_description": "Next quota refresh date: {date}",
+  "related_features": "Related Features",
   "Home": {
     "Features": "Features",
     "Pricing": "Pricing",

@@ -1,0 +1,97 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "如何使用 jq？",
+  keywords: "jq教程, jq命令示例, JSON数据处理, jq过滤器, JSON提取工具",
+  description: "全面的 jq 教程，包含常用 jq 命令示例、JSON 数据提取与转换方法，帮助开发者高效处理 JSON 数据。",
+};
+
+# 如何使用 jq？
+
+jq 是一个功能强大的命令行 JSON 处理器，让开发者能够像使用 `sed`、`awk` 和 `grep` 处理文本一样轻松地过滤、映射和转换 JSON 数据。jq 提供了众多处理 JSON 数据的优势：
+
+- **轻量级高效**：无需加载整个数据集即可处理 JSON
+- **强大的查询语言**：支持复杂的数据转换和过滤
+- **高性能**：即使处理大型 JSON 文件也能保持快速响应
+- **丰富的社区支持**：完善的文档和大量示例
+
+典型的应用场景包括：
+
+- **API 响应处理**：从复杂的 API 响应中提取相关数据
+- **日志分析**：解析和过滤 JSON 格式的日志文件
+- **数据清洗**：预处理 JSON 数据以用于数据分析
+- **配置转换**：批量修改 JSON 配置文件
+
+## 在 JSON For You 中使用 jq
+
+JSON For You 支持您进行在线 jq 处理，只需按如下步骤操作：
+
+1. 将 JSON 字符串粘贴到左侧编辑器中；
+2. 点击顶部的「搜索命令」，找到「**展示 jq 输入框**」，点击后在底部会出现一个 jq 输入框；
+3. 输入 jq 表达式（例如：`.[] | select(.status == "active")`）会自动执行 jq 命令；
+4. 在右侧编辑器可以查看结果；
+5. 当您需要多次编辑时，可以通过 `Ctrl+Enter` 快捷键快速交换左右两侧编辑器的文本；
+
+<img src="/example/jq.gif" alt="在 JSON For You 中使用 jq" />
+
+## 常用 jq 命令示例
+
+### 基本过滤
+
+从 JSON 对象中提取特定字段：
+
+```bash
+# 获取数组中的所有用户名
+.[] | .name
+
+# 提取嵌套字段
+.users[] | {id: .user_id, name: .profile.name}
+```
+
+### 数据转换
+
+修改 JSON 结构和值：
+
+```bash
+# 添加新字段
+.[] | . + {full_name: (.first_name + " " + .last_name)}
+
+# 转换值
+.items[] | {product: .name, price: (.price * 1.1)} # 添加 10% 税费
+```
+
+### 条件选择
+
+基于条件过滤数据：
+
+```bash
+# 选择活跃用户
+.users[] | select(.status == "active" and .login_count > 5)
+
+# 排除空值
+.data[] | select(.value != null and .value != "")
+```
+
+## jq 高级技巧
+
+### 数组操作
+
+```bash
+# 获取唯一值
+.[] | .category | unique
+
+# 计算元素数量
+.[] | .tags | length as $len | {item: ., tag_count:$len}
+```
+
+### 复杂转换
+
+```bash
+# 按类别分组项目
+.group_by(.category)[] | {categoryKey: .[].category, items:.}
+
+# 展平嵌套数组
+.recursive_field[] | .[] | {id: .id, value: .data.value}
+```
+
+<Refer />

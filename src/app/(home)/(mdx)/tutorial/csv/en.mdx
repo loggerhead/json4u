@@ -1,0 +1,86 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "How to Import or Export CSV?",
+  keywords: "CSV to JSON, JSON to CSV, CSV converter, online CSV tool, convert CSV to JSON, export JSON to CSV",
+  description: "Easily convert your CSV data to JSON or export JSON to CSV with our online tool. Handles headers, nested structures, and various delimiters.",
+};
+
+# How to Import or Export CSV?
+
+CSV (Comma-Separated Values) is a plain text format widely used for storing tabular data, while JSON (JavaScript Object Notation) is a very popular data exchange format in web development. In different application scenarios, you may need to convert data between CSV and JSON.
+
+<img src="/example/import-csv.webp" alt="Import CSV" style={{ marginBottom: 10 }} />
+
+JSON For You supports converting CSV to JSON format, and also supports exporting JSON to CSV format.
+
+1. Click the "**Upload**" button in the sidebar and select CSV as the file type;
+2. Click the red dashed box and select your CSV file in the pop-up dialog;
+3. JSON For You will automatically convert the CSV data to JSON format and display it in the left editor, while the original CSV data will be displayed in the right editor.
+
+### CSV to JSON Example
+
+**Input CSV file:**
+
+```csv
+name,age,city
+John,30,New York
+Jane,25,London
+```
+
+**Converted to JSON (with header):**
+
+```json
+[
+  {
+    "name": "John",
+    "age": 30,
+    "city": "New York"
+  },
+  {
+    "name": "Jane",
+    "age": 25,
+    "city": "London"
+  }
+]
+```
+
+## JSON to CSV
+
+Exporting JSON to CSV makes it easy to import data into spreadsheet software (such as Excel, Google Sheets) for further analysis and visualization.
+
+JSON For You supports converting JSON to CSV format and downloading it locally.
+
+1. Paste the JSON data into the left editor;
+2. Click the "**Export**" button in the sidebar and select CSV as the file type;
+3. Click the "**Preview**" button, and the converted CSV data will be displayed in the right editor;
+4. Click the "**Download**" button to save the JSON data as a CSV file.
+
+### JSON to CSV Example
+
+**Input JSON data:**
+
+```json
+[
+  {
+    "product": "Laptop",
+    "price": 1200,
+    "in_stock": true
+  },
+  {
+    "product": "Mouse",
+    "price": 25,
+    "in_stock": false
+  }
+]
+```
+
+**Exported CSV file:**
+
+```csv
+product,price,in_stock
+Laptop,1200,true
+Mouse,25,false
+```
+
+<Refer />

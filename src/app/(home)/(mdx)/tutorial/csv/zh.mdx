@@ -1,0 +1,87 @@
+import Refer from "../Refer";
+
+export const metadata = {
+  title: "如何进行 CSV 与 JSON 的相互转换？",
+  keywords: "CSV 转 JSON, JSON 转 CSV, CSV to JSON, JSON to CSV, 在线转换工具",
+  description:
+    "了解如何使用 JSON For You 在线工具高效地将 CSV 文件转换为 JSON，或将 JSON 导出为 CSV。本教程包含详细的操作步骤、实用示例和常见问题解答。",
+};
+
+# 如何进行 CSV 与 JSON 的相互转换？
+
+CSV（逗号分隔值）是一种广泛用于存储表格数据的纯文本格式，而 JSON（JavaScript 对象表示法）则是在 Web 开发中极为流行的数据交换格式。在不同的应用场景下，您可能需要在 CSV 和 JSON 之间进行数据转换。
+
+<img src="/example/import-csv.webp" alt="导入 CSV" style={{ marginBottom: 10 }} />
+
+JSON For You 支持将 CSV 转换为 JSON 格式，同时也支持将 JSON 导出为 CSV 格式。
+
+1. 点击侧边栏中的「**上传**」按钮，文件类型选择 CSV；
+2. 点击红色虚线的框，在弹出的对话框中选择您的 CSV 文件；
+3. JSON For You 会自动将 CSV 数据转换为 JSON 格式并显示在左侧编辑器中，而原始的 CSV 数据则会显示在右侧编辑器中。
+
+### CSV 转 JSON 示例
+
+**输入的 CSV 文件:**
+
+```csv
+name,age,city
+John,30,New York
+Jane,25,London
+```
+
+**转换为 JSON (包含表头):**
+
+```json
+[
+  {
+    "name": "John",
+    "age": 30,
+    "city": "New York"
+  },
+  {
+    "name": "Jane",
+    "age": 25,
+    "city": "London"
+  }
+]
+```
+
+## JSON 转 CSV
+
+将 JSON 导出为 CSV 可以方便地将数据导入到电子表格软件（如 Excel、Google Sheets）中进行进一步的分析和可视化。
+
+JSON For You 支持将 JSON 转换为 CSV 格式并下载到本地。
+
+1. 将 JSON 数据黏贴到左侧编辑器中；
+2. 点击侧边栏中的「**导出**」按钮，文件类型选择 CSV；
+3. 点击「**预览**」按钮，转换后的 CSV 数据会展示在右侧编辑器中；
+4. 点击「**下载**」按钮，即可将 JSON 数据保存为 CSV 文件。
+
+### JSON 转 CSV 示例
+
+**输入的 JSON 数据:**
+
+```json
+[
+  {
+    "product": "Laptop",
+    "price": 1200,
+    "in_stock": true
+  },
+  {
+    "product": "Mouse",
+    "price": 25,
+    "in_stock": false
+  }
+]
+```
+
+**导出的 CSV 文件:**
+
+```csv
+product,price,in_stock
+Laptop,1200,true
+Mouse,25,false
+```
+
+<Refer />
