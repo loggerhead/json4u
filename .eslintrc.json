@@ -12,14 +12,6 @@
     "quotes": ["error", "double", { "avoidEscape": true }],
     "prefer-const": "error",
     "react-hooks/exhaustive-deps": "off",
-    "space-before-function-paren": [
-      "error",
-      {
-        "anonymous": "always",
-        "named": "never",
-        "asyncArrow": "always"
-      }
-    ],
     // Avoid hardcoded labels in component markup
     "react/jsx-no-literals": "warn"
   },
