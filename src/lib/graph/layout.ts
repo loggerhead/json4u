@@ -232,7 +232,11 @@ export function genValueAttrs(node: Node) {
   if (isIterable(node)) {
     classSuffix = hasChildren(node) ? "empty" : "null";
     const cnt = getChildCount(node);
-    text = node.type === "array" ? `[${cnt}]` : `{${cnt}}`;
+    if (cnt == 0) {
+      text = node.type === "array" ? "[]" : "{}";
+    } else {
+      text = node.type === "array" ? `[${cnt}]` : `{${cnt}}`;
+    }
   } else if (node.type === "string") {
     if (node.value) {
       text = node.value;
