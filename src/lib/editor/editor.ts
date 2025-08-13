@@ -5,7 +5,8 @@ import { getStatusState } from "@/stores/statusStore";
 import { getTreeState } from "@/stores/treeStore";
 import { sendGAEvent } from "@next/third-parties/google";
 import { debounce, type DebouncedFunc } from "lodash-es";
-import { editorApi, IScrollEvent } from "./types";
+import { HoverProvider } from "./handler/hoverProvider";
+import { editorApi, IPosition, IScrollEvent } from "./types";
 
 export type Kind = "main" | "secondary";
 type ScrollEvent = IScrollEvent & { _oldScrollTop: number; _oldScrollLeft: number };
@@ -35,6 +36,7 @@ export class EditorWrapper {
     this.listenOnDropFile();
 
     if (this.isMain()) {
+      new HoverProvider(this);
       this.listenOnDidChangeCursorPosition();
     }
   }
@@ -173,35 +175,44 @@ export class EditorWrapper {
     const onDidChangeCursorPosition = debounce(
       (e) => {
         const model = this.model();
-        const { lineNumber, column } = e.position;
         const selectionLength = model?.getValueInRange(this.editor.getSelection()!).length ?? 0;
+        const { lineNumber, column } = e.position;
         getStatusState().setCursorPosition(lineNumber, column, selectionLength);
+        const r = this.getNodeAtPosition(e.position);
 
-        if (model && this.tree.valid()) {
-          const text = this.text();
-
-          // 获取当前光标在整个文档中的偏移量（offset）
-          let offset = model.getOffsetAt(e.position);
-          if (text[offset] === "\n" && text[offset - 1] === ",") {
-            offset--;
-          }
-
-          const r = this.tree.findNodeAtOffset(offset);
-
-          if (r?.node) {
-            getStatusState().setRevealPosition({
-              treeNodeId: r.node.id,
-              type: r.type,
-              from: "editor",
-            });
-          }
+        if (!r?.node) {
+          return;
         }
+
+        getStatusState().setRevealPosition({
+          treeNodeId: r.node.id,
+          type: r.type,
+          from: "editor",
+        });
       },
       200,
       { trailing: true },
     );
 
     this.editor.onDidChangeCursorPosition(onDidChangeCursorPosition);
+  }
+
+  getNodeAtPosition(pos: IPosition) {
+    const model = this.model();
+
+    if (!(model && this.tree.valid())) {
+      return undefined;
+    }
+
+    const text = this.text();
+
+    // 获取当前光标在整个文档中的偏移量（offset）
+    let offset = model.getOffsetAt(pos);
+    if (text[offset] === "\n" && text[offset - 1] === ",") {
+      offset--;
+    }
+
+    return this.tree.findNodeAtOffset(offset);
   }
 
   // 注册拖拽事件处理器，支持拖拽文件到编辑器上

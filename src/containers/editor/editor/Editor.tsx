@@ -43,6 +43,7 @@ export default function Editor({ kind, ...props }: EditorProps) {
       onMount={(editor, monaco) => {
         if (!window.monacoApi) {
           window.monacoApi = {
+            Raw: monaco,
             KeyCode: monaco.KeyCode,
             MinimapPosition: monaco.editor.MinimapPosition,
             OverviewRulerLane: monaco.editor.OverviewRulerLane,

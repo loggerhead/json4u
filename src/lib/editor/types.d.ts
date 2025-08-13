@@ -5,6 +5,7 @@ export type * from "monaco-editor/esm/vs/editor/editor.api.d.ts";
 
 // For avoid load monaco in store, we need to export monaco api
 export interface MonacoApi {
+  Raw: typeof monaco;
   KeyCode: typeof monaco.KeyCode;
   MinimapPosition: typeof monaco.MinimapPosition;
   OverviewRulerLane: typeof monaco.OverviewRulerLane;

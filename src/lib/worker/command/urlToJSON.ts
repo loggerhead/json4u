@@ -16,7 +16,7 @@ export async function urlToJSON(text: string): Promise<{ text: string; parse: bo
   }
 }
 
-export function urlToMap(s: string) {
+export function urlToMap(s: string): Map<string, string | Map<string, any>> {
   const isFullURI = isURI(s);
   const u = new URL(isFullURI ? s : `http://json4u.com/${s.replace(/^\//, "")}`);
   const m = new Map();

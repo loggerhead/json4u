@@ -1,7 +1,7 @@
 import type { Diff, DiffPair, DiffType, Range } from "@/lib/compare";
 import { newRange } from "@/lib/compare";
 import { getStatusState } from "@/stores/statusStore";
-import { getInlineClass, getLineClass, getMarginClass, getMinimapColor, getOverviewRulerColor } from "./color";
+import { getInlineClass, getLineClass, getMarginClass, getMinimapColor, getOverviewRulerColor } from "./diffColor";
 import type { EditorWrapper, Kind } from "./editor";
 import { editorApi } from "./types";
 
