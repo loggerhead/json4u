@@ -6,7 +6,7 @@ describe("convertColor", () => {
     expect(result).toEqual({
       hex: "#ff0000",
       rgb: "rgb(255, 0, 0)",
-      hsl: "hsl(0, 100%, 50%)"
+      hsl: "hsl(0, 100%, 50%)",
     });
   });
 
@@ -15,7 +15,7 @@ describe("convertColor", () => {
     expect(result).toEqual({
       hex: "#00ff0080",
       rgb: "rgba(0, 255, 0, 0.5)",
-      hsl: "hsla(120, 100%, 50%, 0.5)"
+      hsl: "hsla(120, 100%, 50%, 0.5)",
     });
   });
 
@@ -24,7 +24,7 @@ describe("convertColor", () => {
     expect(result).toEqual({
       hex: "#00ff00",
       rgb: "rgb(0, 255, 0)",
-      hsl: "hsl(120, 100%, 50%)"
+      hsl: "hsl(120, 100%, 50%)",
     });
   });
 
@@ -33,7 +33,7 @@ describe("convertColor", () => {
     expect(result).toEqual({
       hex: "#00ff0080",
       rgb: "rgba(0, 255, 0, 0.5)",
-      hsl: "hsla(120, 100%, 50%, 0.5)"
+      hsl: "hsla(120, 100%, 50%, 0.5)",
     });
   });
 
@@ -42,7 +42,7 @@ describe("convertColor", () => {
     expect(result).toEqual({
       hex: "#0000ff",
       rgb: "rgb(0, 0, 255)",
-      hsl: "hsl(240, 100%, 50%)"
+      hsl: "hsl(240, 100%, 50%)",
     });
   });
 
@@ -51,7 +51,7 @@ describe("convertColor", () => {
     expect(result).toEqual({
       hex: "#0000ff80",
       rgb: "rgba(0, 0, 255, 0.5)",
-      hsl: "hsla(240, 100%, 50%, 0.5)"
+      hsl: "hsla(240, 100%, 50%, 0.5)",
     });
   });
 

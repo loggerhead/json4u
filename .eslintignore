@@ -1,2 +1,5 @@
 src/lib/utils.ts
 src/lib/supabase/database.types.ts
+src/components/ui/
+sentry.client.config.ts
+pnpm-lock.yaml

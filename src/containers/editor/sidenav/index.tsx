@@ -124,12 +124,7 @@ export default function SideNav() {
           />
         </ul>
         <ul className="flex flex-col px-1 gap-y-2">
-          <LinkButton
-            icon={<CircleHelp className="icon" />}
-            title={t("Tutorial")}
-            href={"/tutorial"}
-            newWindow
-          />
+          <LinkButton icon={<CircleHelp className="icon" />} title={t("Tutorial")} href={"/tutorial"} newWindow />
           <LinkButton
             icon={<Bug className="icon" />}
             title={t("Feedback")}

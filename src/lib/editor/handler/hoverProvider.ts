@@ -157,7 +157,7 @@ function genTable(
 ): string {
   const rows = Object.entries(data)
     .map(([key, value]) => {
-      const { keyStyle, valueStyle } = styleFn ? styleFn(key, value) : {};
+      const { keyStyle, valueStyle } = styleFn ? styleFn(key, value) : { keyStyle: "", valueStyle: "" };
       return `<tr>
         <td>
           <span ${keyStyle ? `style="${keyStyle}"` : ""}>

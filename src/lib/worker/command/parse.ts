@@ -15,10 +15,7 @@ export interface ParsedTree {
   tableHTML?: string;
 }
 
-export async function parseAndFormat(
-  text: string,
-  options?: ParseAndFormatOptions,
-): Promise<ParsedTree> {
+export async function parseAndFormat(text: string, options?: ParseAndFormatOptions): Promise<ParsedTree> {
   // 5MB costs 240ms
   const tree = parseJSON(text, options);
 

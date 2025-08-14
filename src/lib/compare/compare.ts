@@ -1,5 +1,5 @@
-import { classify, type Diff, type DiffPair, DiffType, newDiff } from "@/lib/compare/";
 import { getChildrenKeys, getRawValue, Node, Tree } from "@/lib/parser";
+import { classify, type Diff, type DiffPair, DiffType, newDiff } from "./diff";
 import { histogramDiff } from "./histogram";
 import { arrayDiff, MaxEditLength, myersDiff } from "./myers";
 

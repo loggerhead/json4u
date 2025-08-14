@@ -111,5 +111,3 @@ I'm really excited that you are interested in contributing to JSON For You. Befo
 ## License
 
 [Apache](./LICENSE) License © 2022-Present [loggerhead](https://github.com/loggerhead)
-
-
