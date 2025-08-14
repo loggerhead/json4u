@@ -86,6 +86,16 @@ function Buttons({ viewMode }: { viewMode: ViewMode }) {
 }
 
 function FullScreenButton() {
+  const [show, setShow] = React.useState(false);
+
+  React.useEffect(() => {
+    setShow(true);
+  }, []);
+
+  return show ? <ClientFullScreenButton /> : null;
+}
+
+function ClientFullScreenButton() {
   const t = useTranslations();
   const [fullscreen, setFullscreen] = useState(false);
   const Icon = fullscreen ? Shrink : Expand;
