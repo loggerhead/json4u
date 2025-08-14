@@ -22,6 +22,8 @@ export interface StatusState extends Config {
   revealPosition: RevealPosition; // id of node in the tree to be revealed in the graph view
   leftPanelWidth?: number;
   rightPanelWidth?: number;
+  rightPanelCollapsed: boolean;
+  leftPanelCollapsed: boolean;
   sideNavExpanded?: boolean;
   showPricingOverlay?: boolean;
   unfoldNodeMap: Record<string, boolean>;
@@ -36,6 +38,7 @@ export interface StatusState extends Config {
   setEnableTextCompare: (enable: boolean) => void;
   setRightPanelSize: (size: number) => void;
   setRightPanelCollapsed: (collapsed: boolean) => void;
+  setLeftPanelCollapsed: (collapsed: boolean) => void;
   setParseOptions: (options: ParseOptions) => void;
   setRevealPosition: (pos: Partial<RevealPosition>) => void;
   isNeedReveal: (scene: "editor" | "graph") => boolean;
@@ -102,6 +105,10 @@ export const useStatusStore = create<StatusState>()(
 
       setRightPanelCollapsed(collapsed: boolean) {
         set({ rightPanelCollapsed: collapsed });
+      },
+
+      setLeftPanelCollapsed(collapsed: boolean) {
+        set({ leftPanelCollapsed: collapsed });
       },
 
       setParseOptions(options: ParseOptions) {

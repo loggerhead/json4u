@@ -18,6 +18,7 @@ export interface Config {
   enableTextCompare: boolean;
   rightPanelSize: number;
   rightPanelCollapsed: boolean;
+  leftPanelCollapsed: boolean;
   parseOptions: ParseOptions;
   formatTabWidth: number;
   prettyFormat: boolean;
@@ -31,6 +32,7 @@ export const defaultConfig: Config = {
   enableTextCompare: false,
   rightPanelSize: 70,
   rightPanelCollapsed: false,
+  leftPanelCollapsed: false,
   parseOptions: {
     nest: true,
     format: true,

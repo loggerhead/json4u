@@ -90,18 +90,34 @@ function FullScreenButton() {
   const [fullscreen, setFullscreen] = useState(false);
   const Icon = fullscreen ? Shrink : Expand;
 
+  const el = document.documentElement;
+  const requestFullscreenFn =
+    el?.requestFullscreen ||
+    (el as any).webkitRequestFullscreen ||
+    (el as any).mozRequestFullScreen ||
+    (el as any).msRequestFullscreen;
+  const exitFullscreenFn =
+    document.exitFullscreen ||
+    (document as any).webkitExitFullscreen ||
+    (document as any).mozCancelFullScreen ||
+    (document as any).msExitFullscreen;
+
+  if (!requestFullscreenFn || !exitFullscreenFn) {
+    return null;
+  }
+
   return (
     <Button
       title={t(fullscreen ? "shrink_screen" : "expand_screen")}
       className="px-2"
       variant="icon-outline"
-      onClick={() => {
+      onClick={async () => {
         if (fullscreen) {
+          await exitFullscreenFn.call(document);
           setFullscreen(false);
-          window.leftPanelHandle?.expand();
         } else {
+          await requestFullscreenFn.call(el);
           setFullscreen(true);
-          window.leftPanelHandle?.collapse();
         }
       }}
     >

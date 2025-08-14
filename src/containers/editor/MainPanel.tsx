@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
 import ModePanel from "@/containers/editor/mode/ModePanel";
@@ -14,6 +14,7 @@ import { useStatusStore } from "@/stores/statusStore";
 import { useUserStore } from "@/stores/userStore";
 import { wrap } from "comlink";
 import { useShallow } from "zustand/shallow";
+import { CollapseHint } from "./CollapseHint";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 import StatusBar from "./StatusBar";
@@ -24,20 +25,31 @@ initLogger();
 
 export default function MainPanel() {
   const cc = useConfigFromCookies();
-  const { rightPanelSize, rightPanelCollapsed, setRightPanelSize, setRightPanelCollapsed } = useStatusStore(
+  const {
+    rightPanelSize,
+    rightPanelCollapsed,
+    leftPanelCollapsed,
+    setRightPanelSize,
+    setRightPanelCollapsed,
+    setLeftPanelCollapsed,
+  } = useStatusStore(
     useShallow((state) => ({
       rightPanelSize: state._hasHydrated ? state.rightPanelSize : cc.rightPanelSize,
       rightPanelCollapsed: state._hasHydrated ? state.rightPanelCollapsed : cc.rightPanelCollapsed,
+      leftPanelCollapsed: state._hasHydrated ? state.leftPanelCollapsed : cc.leftPanelCollapsed,
       setRightPanelSize: state.setRightPanelSize,
       setRightPanelCollapsed: state.setRightPanelCollapsed,
+      setLeftPanelCollapsed: state.setLeftPanelCollapsed,
     })),
   );
+  const [showLeftCollapseHint, setShowLeftCollapseHint] = useState(false);
+  const [showRightCollapseHint, setShowRightCollapseHint] = useState(false);
 
   useObserveResize();
 
   // see https://github.com/bvaughn/react-resizable-panels/issues/128#issuecomment-1523343548
   return (
-    <div className="relative w-full h-full flex flex-col overflow-hidden">
+    <div className="relative w-full h-full flex flex-col">
       <ResizablePanelGroup
         className="flex-grow"
         direction="horizontal"
@@ -45,26 +57,46 @@ export default function MainPanel() {
       >
         <ResizablePanel
           id={leftPanelId}
-          ref={(ref) => {
-            window.leftPanelHandle = ref;
-          }}
-          collapsible
           defaultSize={100 - rightPanelSize}
-          minSize={0}
+          minSize={10}
+          collapsible
+          onCollapse={() => {
+            setLeftPanelCollapsed(true);
+            setShowLeftCollapseHint(false);
+          }}
+          onExpand={() => setLeftPanelCollapsed(false)}
+          onResize={(size) => setShowLeftCollapseHint(5 < size && size < 15)}
+          className={cn(leftPanelCollapsed && "w-0 hidden transition-all duration-300 ease-in-out")}
+          // The preview displayed by the hover provider of the monaco editor
+          // will be obscured by the right panel, so this style needs to be set.
+          style={{ overflow: "visible" }}
         >
-          <LeftPanel />
+          <div className="relative h-full w-full">
+            {showLeftCollapseHint && <CollapseHint side="left" />}
+            <LeftPanel />
+          </div>
         </ResizablePanel>
-        <ResizableHandle withHandle className={cn("hover:bg-blue-600", rightPanelCollapsed && "w-3")} />
+        <ResizableHandle
+          withHandle
+          className={cn("hover:bg-blue-600", (leftPanelCollapsed || rightPanelCollapsed) && "bg-blue-200 w-2")}
+        />
         <ResizablePanel
           id={rightPanelId}
           defaultSize={rightPanelSize}
           minSize={10}
-          collapsible={true}
-          onCollapse={() => setRightPanelCollapsed(true)}
+          collapsible
+          onCollapse={() => {
+            setRightPanelCollapsed(true);
+            setShowRightCollapseHint(false);
+          }}
           onExpand={() => setRightPanelCollapsed(false)}
+          onResize={(size) => setShowRightCollapseHint(5 < size && size < 15)}
           className={cn(rightPanelCollapsed && "transition-all duration-300 ease-in-out")}
         >
-          <RightPanel />
+          <div className="relative h-full w-full">
+            {showRightCollapseHint && <CollapseHint side="right" />}
+            <RightPanel />
+          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
       <ModePanel />

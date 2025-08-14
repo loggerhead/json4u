@@ -2,7 +2,6 @@ import type { MonacoApi } from "@/lib/editor/types.d.ts";
 import type { MyWorker } from "@/lib/worker/worker";
 import "@hcaptcha/types";
 import type { Remote } from "comlink";
-import type { ImperativePanelHandle } from "react-resizable-panels";
 import en from "../messages/en.json";
 
 type Messages = typeof en;
@@ -20,7 +19,6 @@ declare global {
     rawWorker: Worker;
     worker: Remote<MyWorker>;
     monacoApi: MonacoApi;
-    leftPanelHandle: ImperativePanelHandle | null;
     searchComponents: Record<string, any>;
 
     createLemonSqueezy: () => void;
