@@ -12,8 +12,8 @@
   "unescape": "Unescape",
   "sortAsc": "Sort JSON (ascending)",
   "sortDesc": "Sort JSON (descending)",
-  "pythonDictToJSON": "Convert Python dict to JSON",
-  "urlToJson": "Convert URL to JSON",
+  "pythonDictToJSON": "Python dict → JSON",
+  "urlToJson": "URL → JSON",
   "swapLeftRight": "Swap left and right text",
   "show_jq": "Show jq input box",
   "show_json_path": "Show JSON path filter box",
@@ -84,6 +84,7 @@
   "stats_jq": "jq executions",
   "stats_description": "Next quota refresh date: {date}",
   "related_features": "Related Features",
+  "collapse_hint": "Drag here to collapse",
   "Home": {
     "Features": "Features",
     "Pricing": "Pricing",

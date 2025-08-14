@@ -84,6 +84,7 @@
   "stats_jq": "jq 执行",
   "stats_description": "下次额度刷新日期为: {date}",
   "related_features": "相关功能",
+  "collapse_hint": "拖动到此处折叠",
   "Home": {
     "Features": "功能",
     "Pricing": "价格",
