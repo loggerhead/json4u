@@ -12,7 +12,7 @@ const Command = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
-    className={cn("group relative flex flex-col h-7 w-search box-border bg-popover text-popover-foreground", className)}
+    className={cn("group relative flex flex-col h-7 min-w-48 max-w-search box-border bg-popover text-popover-foreground", className)}
     vimBindings={false}
     {...props}
   />

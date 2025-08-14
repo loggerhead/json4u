@@ -42,9 +42,9 @@ export default function CommandSearch() {
 function Item({ id, Icon }: Command) {
   const t = useTranslations();
   return (
-    <div className="w-full h-8 flex items-center">
+    <div className="h-8 flex items-center whitespace-nowrap overflow-x-hidden" title={t(id as MessageKey)}>
       {Icon && <Icon className="icon mr-2" />}
-      {t(id as MessageKey)}
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap">{t(id as MessageKey)}</span>
     </div>
   );
 }
