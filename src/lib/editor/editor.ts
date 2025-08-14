@@ -6,6 +6,7 @@ import { getTreeState } from "@/stores/treeStore";
 import { sendGAEvent } from "@next/third-parties/google";
 import { debounce, type DebouncedFunc } from "lodash-es";
 import { HoverProvider } from "./handler/hoverProvider";
+import { InlayHintsProvider } from "./handler/inlayHintsProvider";
 import { editorApi, IPosition, IScrollEvent } from "./types";
 
 export type Kind = "main" | "secondary";
@@ -37,6 +38,7 @@ export class EditorWrapper {
 
     if (this.isMain()) {
       new HoverProvider(this);
+      new InlayHintsProvider(this);
       this.listenOnDidChangeCursorPosition();
     }
   }
