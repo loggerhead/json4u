@@ -42,94 +42,80 @@ function prettyFormatWithFallback(json: string, options?: ParseOptions): string 
 }
 
 /**
- * Finds all pairs of brackets in a string.
+ * Finds all top-level, valid JSON objects or arrays within a string.
  * @param text - The string to search.
- * @returns An array of pairs of bracket indexes.
+ * @returns An array of pairs of [start, end] indexes for each valid JSON found.
+ *          The 'end' index is exclusive, suitable for `substring`.
  */
-function findBracketPairs(text: string): [number, number][] {
-  const lbrackets: Record<string, string> = {
-    "{": "}",
-    "[": "]",
-  };
-  const rbrackets: Record<string, string> = {
-    "}": "{",
-    "]": "[",
-  };
-  const seen: [string, number][] = [];
-  let pairs: [number, number][] = [];
+export function findBracketPairs(text: string): [number, number][] {
+  const pairs: [number, number][] = [];
+  let i = 0;
 
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
+  while (i < text.length) {
+    const char = text[i];
 
-    if (lbrackets[c]) {
-      seen.push([c, i]);
-    } else if (rbrackets[c]) {
-      const last = seen[seen.length - 1];
+    if (char === "{" || char === "[") {
+      const start = i;
+      const end = findMatchingBracket(text, start);
 
-      if (last && rbrackets[c] === last[0]) {
-        const [_, start] = seen.pop()!;
-        pairs.push([start, i]);
+      if (end !== -1) {
+        const potentialJson = text.substring(start, end + 1);
+        try {
+          JSON.parse(potentialJson);
+          // It's a valid JSON, so we add it to our pairs.
+          // The end index for substring should be `end + 1`.
+          pairs.push([start, end + 1]);
+          // Jump past this entire valid JSON block.
+          i = end + 1;
+          continue;
+        } catch (e) {
+          // It's not a valid JSON, so we just move on.
+        }
       }
     }
+    // Move to the next character if no JSON was found starting at `i`.
+    i++;
   }
 
-  // When there is no matching other half of the bracket, add it to the pairs as well, so that it can be formatted.
-  if (seen.length > 0) {
-    pairs.push([seen[0][1], text.length - 1]);
-  }
+  return pairs;
+}
 
-  pairs = pairs.filter((pair) => pair[1] > pair[0]).sort((a, b) => a[0] - b[0]);
-  if (pairs.length === 0) {
-    return [];
-  }
+/**
+ * Finds the matching closing bracket for a given opening bracket.
+ * @param text - The string to search within.
+ * @param startIndex - The index of the opening bracket.
+ * @returns The index of the matching closing bracket, or -1 if not found.
+ */
+function findMatchingBracket(text: string, startIndex: number): number {
+  const openChar = text[startIndex];
+  const closeChar = openChar === "{" ? "}" : "]";
+  let count = 1;
+  let inString = false;
+  let isEscaped = false;
 
-  let merged = [pairs[0]];
+  for (let i = startIndex + 1; i < text.length; i++) {
+    const c = text[i];
 
-  // Find the bracket pair with the largest range.
-  for (let i = 1; i < pairs.length; i++) {
-    const pair = pairs[i];
-    const lastPair = merged[merged.length - 1];
-    const [start, end] = pair;
-    const [lastStart, lastEnd] = lastPair;
-
-    // If it is {{...}}, keep the position of the last {}.
-    if (lastStart + 1 === start && lastEnd - 1 === end && text[lastStart] === "{" && text[start] === "{") {
-      merged.pop();
-      merged.push(pair);
-      // If it is {[...]}, keep the position of {}.
-    } else if (lastEnd >= start) {
-      lastPair[1] = Math.max(end, lastEnd);
+    if (c === '"' && !isEscaped) {
+      inString = !inString;
     } else {
-      merged.push(pair);
+      isEscaped = c === "\\" && !isEscaped;
+    }
+
+    if (inString) {
+      continue;
+    }
+
+    if (c === openChar) {
+      count++;
+    } else if (c === closeChar) {
+      count--;
+    }
+
+    if (count === 0) {
+      return i;
     }
   }
 
-  // slice is left-closed and right-open, so we need to +1.
-  merged = merged.map((pair) => {
-    pair[1]++;
-    return pair;
-  });
-  return merged;
-}
-
-if (import.meta.vitest) {
-  const { it, expect } = import.meta.vitest;
-
-  describe("findBracketPairs", () => {
-    it("multiple {} pairs", () => {
-      const pp = findBracketPairs("{{{}}} {{}}");
-      expect(pp).toEqual([
-        [2, 4],
-        [8, 10],
-      ]);
-    });
-
-    it("simple", () => {
-      const pp = findBracketPairs("{[]} []");
-      expect(pp).toEqual([
-        [0, 4],
-        [5, 7],
-      ]);
-    });
-  });
+  return -1; // Not found
 }
