@@ -44,12 +44,12 @@ export class Comparer {
     this.reset();
     this.genRanges(diffPairs);
 
-    // 高亮 diff
+    // Highlight diffs.
     const decorations = genHighlightDecorations(diffPairs);
     this.applyDecorations(decorations);
     isTextCompare && this.fillBlankHunkDoms(diffPairs);
 
-    // 滚动到第一个 diff pair
+    // Scroll to the first diff pair.
     const hasDiff = diffPairs.length > 0;
     if (hasDiff) {
       const { left, right } = diffPairs[0];
@@ -58,7 +58,7 @@ export class Comparer {
     }
   }
 
-  // 计算 diff 在 editor 中的 range，生成区域
+  // Calculates the range of the diff in the editor and generates a region.
   genRanges(diffPairs: DiffPair[]) {
     const newRangeFromDiff = (editor: EditorWrapper, diff: Diff) => {
       const range: Range = {
@@ -66,7 +66,8 @@ export class Comparer {
         ...diff,
       };
 
-      // 如果区域长度为 1 并且列号都为 1，说明只有一个换行符，此时校准一下，避免高亮展示到下一行
+      // If the region length is 1 and the column numbers are both 1, it means there is only one newline character.
+      // In this case, we need to adjust it to avoid highlighting to the next line.
       if (range.length === 1 && range.startColumn === 1 && range.endColumn === 1) {
         range.endLineNumber = range.startLineNumber;
       }
@@ -90,13 +91,14 @@ export class Comparer {
     });
   }
 
-  // 应用装饰
+  // Apply decorations.
   applyDecorations({ left, right }: { left: Decoration[]; right: Decoration[] }) {
     this.leftDecorations = this.monacoEditor("main").createDecorationsCollection(left);
     this.rightDecorations = this.monacoEditor("secondary").createDecorationsCollection(right);
   }
 
-  // 如果是对文本比较的结果进行高亮，则需要在相交的两个 diff 上生成空白块做填充，让左右两侧的 diff 看上去一样高
+  // If highlighting the result of a text comparison, you need to generate blank blocks on the two intersecting diffs to fill them,
+  // so that the diffs on the left and right sides look the same height.
   fillBlankHunkDoms(diffPairs: DiffPair[]) {
     const applyViewZones = (kind: Kind, ranges: Range[]) => {
       let ids: string[] = [];
@@ -120,7 +122,7 @@ export class Comparer {
   }
 
   reset() {
-    // NOTICE: 不能使用 model.getAllDecorations 全删了，会导致折叠按钮消失
+    // NOTICE: You cannot use model.getAllDecorations to delete all of them, as this will cause the collapse button to disappear.
     this.leftDecorations?.clear();
     this.rightDecorations?.clear();
 
@@ -142,11 +144,11 @@ export class Comparer {
   }
 }
 
-// 生成填充块的 ranges
+// Generate ranges for fill blocks.
 function genFillRanges(pairs: DiffPair[]): { left: Range[]; right: Range[] } {
   const leftRanges: Range[] = [];
   const rightRanges: Range[] = [];
-  // laggr: 填充块填充的累积行数
+  // The cumulative number of lines filled by the fill block.
   let lAggr = 0;
   let rAggr = 0;
 
@@ -159,7 +161,9 @@ function genFillRanges(pairs: DiffPair[]): { left: Range[]; right: Range[] } {
     rAggr += countRange(fill);
   };
 
-  // 需要多遍历一次，处理最后一个 last
+  // Iterate through all diff pairs to calculate and add filler decorations to align the diffs in a side-by-side view.
+  // For each pair, it determines whether filler lines need to be added to the left or right editor to visually align the mismatched lines.
+  // If a block exists only on one side, filler is added to the other. If both blocks exist but have different lengths, filler is added below the shorter block.
   for (const { left, right } of pairs) {
     const lStart = left?.range?.startLineNumber ?? 0;
     const lEnd = left?.range?.endLineNumber ?? 0;
@@ -170,7 +174,7 @@ function genFillRanges(pairs: DiffPair[]): { left: Range[]; right: Range[] } {
     const rFillStart = right ? rStart + rAggr : 0;
     const rFillEnd = right ? rEnd + rAggr : 0;
 
-    // 如果两者不重合
+    // If the two do not overlap.
     if (lFillEnd < rFillStart || rFillEnd < lFillStart) {
       if (left) {
         addRightFill(newRange(lStart + lAggr, lEnd + lAggr));
@@ -179,7 +183,7 @@ function genFillRanges(pairs: DiffPair[]): { left: Range[]; right: Range[] } {
         addLeftFill(newRange(rStart + rAggr, rEnd + rAggr));
       }
     } else {
-      // 注意：因为 ls === rs 恒成立，所以永远是在下方填充
+      // Note: Because ls === rs always holds, the filling is always done at the bottom.
       if (lFillEnd <= rFillEnd) {
         addLeftFill(newRange(Math.max(lFillEnd + 1, rFillStart), rFillEnd));
       } else if (rFillEnd < lFillEnd) {
@@ -197,7 +201,7 @@ function genBlankHunkDom() {
   return node;
 }
 
-// 生成 diff 块高亮和行内高亮
+// Generate diff block highlights and inline highlights.
 function genHighlightDecorations(diffPairs: DiffPair[]): { left: Decoration[]; right: Decoration[] } {
   const leftHunks: Decoration[] = [];
   const rightHunks: Decoration[] = [];
@@ -259,33 +263,33 @@ interface Decoration {
   options: editorApi.IModelDecorationOptions;
 }
 
-// 生成高亮的装饰
+// Generate highlighted decorations.
 function newDecoration(range: Range, isInlineDiff: boolean, diffType: DiffType): Decoration {
   if (isInlineDiff) {
     return {
       range,
       options: {
-        // 行内文本的装饰 class
+        // Decoration class for inline text.
         inlineClassName: getInlineClass(diffType),
       },
     };
   } else {
     return {
       range,
-      // 示例：https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
-      // 参数定义：https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
+      // Example: https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
+      // Parameter definition: https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IModelDecorationOptions.html
       options: {
-        // 高亮整行
+        // Highlight the entire line.
         isWholeLine: true,
-        // 整行文本的装饰 class
+        // Decoration class for the entire line of text.
         className: getLineClass(diffType),
         marginClassName: getMarginClass(diffType),
-        // 高亮右侧的 minimap
+        // Highlight the minimap on the right.
         minimap: {
           color: getMinimapColor(diffType),
           position: window.monacoApi.MinimapPosition.Inline,
         },
-        // 高亮 minimap 右侧的 overview ruler
+        // Highlight the overview ruler on the right of the minimap.
         overviewRuler: {
           color: getOverviewRulerColor(diffType),
           position: window.monacoApi.OverviewRulerLane.Full,

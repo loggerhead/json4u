@@ -33,7 +33,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number; a: number } |
   if (!match) return;
 
   let hexStr = match[1];
-  let a = 1; // 默认不透明
+  let a = 1; // Default to opaque
 
   // Handle 3 or 4-digit hex (expand to 6 or 8 digits)
   if (hexStr.length === 3) {
@@ -60,7 +60,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number; a: number } |
     r: hexToDec(hexStr.slice(0, 2)),
     g: hexToDec(hexStr.slice(2, 4)),
     b: hexToDec(hexStr.slice(4, 6)),
-    a: Math.round(a * 100) / 100, // 保留两位小数
+    a: Math.round(a * 100) / 100, // Round to two decimal places
   };
 }
 
@@ -229,6 +229,11 @@ export function convertColor(color: string): { hex: string; rgb: string; hsl: st
   };
 }
 
+/**
+ * Checks if a string is a valid color string.
+ * @param value - The string to check.
+ * @returns True if the string is a valid color, false otherwise.
+ */
 export function isColor(value: string) {
   return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(value) || /^(rgb|rgba|hsl)\(.*\)$/.test(value);
 }

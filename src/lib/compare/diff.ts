@@ -6,11 +6,11 @@ export interface DiffPair {
 }
 
 export interface Diff {
-  offset: number; // 整个文档中的偏移量
-  length: number; // 差异部分的长度
-  type: DiffType; // 差异类型
-  range?: Range; // 差异区域
-  inlineDiffs?: Diff[]; // 行内差异
+  offset: number; // Offset in the entire document.
+  length: number; // Length of the difference.
+  type: DiffType; // Type of the difference.
+  range?: Range; // The range of the difference.
+  inlineDiffs?: Diff[]; // Inline differences.
 }
 
 export interface Range {
@@ -42,12 +42,22 @@ export function newDiff(offset: number, length: number, type: DiffType): Diff {
   return { offset, length, type };
 }
 
+/**
+ * Classifies an array of differences into left and right differences.
+ * @param diffs - The array of differences.
+ * @returns An object containing the left and right differences.
+ */
 export function classify(diffs: Diff[]): { left: Diff[]; right: Diff[] } {
   const left = sort(diffs.filter((d) => d.type === "del"));
   const right = sort(diffs.filter((d) => d.type === "ins"));
   return { left, right };
 }
 
+/**
+ * Sorts an array of differences by type and offset.
+ * @param diffs - The array of differences.
+ * @returns The sorted array of differences.
+ */
 export function sort(diffs: Diff[]): Diff[] {
   return diffs.sort((a, b) => {
     if (a.type !== b.type) {

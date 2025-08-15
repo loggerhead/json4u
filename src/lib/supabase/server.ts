@@ -7,6 +7,11 @@ import type { Order } from "./table.types";
 // On the server, it basically configures a fetch call.
 // You need to reconfigure the fetch call anew for every request to your server,
 // because you need the cookies from the request.
+/**
+ * Creates a Supabase client on the server.
+ * @param component - Whether the client is created in a component.
+ * @returns The Supabase client.
+ */
 export function createClient(component: boolean = false) {
   const cookieStore = cookies();
 

@@ -306,6 +306,11 @@ export class Tree implements TreeObject {
   }
 }
 
+/**
+ * Returns a function that generates tabs for a given level.
+ * @param tabWidth - The width of a tab.
+ * @returns A function that generates tabs for a given level.
+ */
 export function getGenTabsFn(tabWidth: number) {
   const tab = repeat(" ", tabWidth);
   const cached = [""];
@@ -318,6 +323,12 @@ export function getGenTabsFn(tabWidth: number) {
   };
 }
 
+/**
+ * Checks if two trees are equal.
+ * @param tree1 - The first tree.
+ * @param tree2 - The second tree.
+ * @returns True if the two trees are equal, false otherwise.
+ */
 export function isEquals(tree1: Tree, tree2: Tree): boolean {
   const doIsEquals = (node1: Node, node2: Node): boolean => {
     if (node1.type !== node2.type) {

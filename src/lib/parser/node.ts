@@ -2,17 +2,17 @@ import { rootMarker } from "@/lib/idgen";
 
 export type SortType = "asc" | "desc";
 export interface ParseOptions {
-  nest?: boolean; // 进行嵌套解析吗？
-  format?: boolean | "minify"; // stringify 时进行格式化吗？
-  prettyMaxWidth?: number; // prettier 格式化参考的字符数
-  tabWidth?: number; // prettier 格式化时，缩进的空白数
-  sort?: SortType; // 指定 stringify 排序的顺序
+  nest?: boolean; // Perform nested parsing?
+  format?: boolean | "minify"; // Format when stringifying?
+  prettyMaxWidth?: number; // The number of characters to use as a reference for prettier formatting.
+  tabWidth?: number; // The number of spaces to use for indentation when formatting with prettier.
+  sort?: SortType; // The order in which to sort when stringifying.
 }
 
 export interface ContextError {
   offset: number;
   length: number;
-  context: [string, string, string]; // 错误上下文，包含 left, errorText, right
+  context: [string, string, string]; // The error context, including left, errorText, and right.
 }
 
 export type NodeType = "object" | "array" | "string" | "number" | "boolean" | "null";

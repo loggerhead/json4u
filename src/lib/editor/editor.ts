@@ -17,7 +17,7 @@ const parseWait = 300;
 export class EditorWrapper {
   editor: editorApi.IStandaloneCodeEditor;
   kind: Kind;
-  // 滚动中吗？
+  // Is it scrolling?
   scrolling: number;
   tree: Tree;
   delayParseAndSet: DebouncedFunc<(text: string, extraOptions: ParseOptions, resetCursor: boolean) => void>;
@@ -172,7 +172,7 @@ export class EditorWrapper {
     });
   }
 
-  // 监听光标改变事件。显示光标停留位置的 json path
+  // Listen for cursor change events. Displays the json path of the cursor position.
   listenOnDidChangeCursorPosition() {
     const onDidChangeCursorPosition = debounce(
       (e) => {
@@ -208,7 +208,7 @@ export class EditorWrapper {
 
     const text = this.text();
 
-    // 获取当前光标在整个文档中的偏移量（offset）
+    // Get the offset of the current cursor in the entire document.
     let offset = model.getOffsetAt(pos);
     if (text[offset] === "\n" && text[offset - 1] === ",") {
       offset--;
@@ -217,14 +217,14 @@ export class EditorWrapper {
     return this.tree.findNodeAtOffset(offset);
   }
 
-  // 注册拖拽事件处理器，支持拖拽文件到编辑器上
+  // Register a drag event handler to support dragging files to the editor.
   listenOnDropFile() {
     this.editor.getDomNode()?.addEventListener("drop", (e: DragEvent) => {
       e.preventDefault();
       const file = e.dataTransfer?.files[0];
 
       if (file) {
-        // 读取拖拽的文件内容，并设置为编辑器的内容
+        // Read the content of the dragged file and set it as the content of the editor.
         const reader = new FileReader();
         reader.onload = (event) => {
           const text = event.target?.result;
@@ -249,7 +249,7 @@ export class EditorWrapper {
     });
   }
 
-  // 监听滚动事件实现同步滚动
+  // Listen for scroll events to achieve synchronous scrolling.
   listenOnScroll() {
     this.editor.onDidScrollChange((e) => {
       this.scrolling = Math.min(this.scrolling + 1, 1);

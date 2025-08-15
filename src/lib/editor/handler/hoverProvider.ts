@@ -63,6 +63,11 @@ export class HoverProvider {
 
 type PreviewType = "img" | "url" | "date" | "color";
 
+/**
+ * Guesses the preview type of a string value.
+ * @param value - The string value to guess.
+ * @returns The preview type, or undefined if it cannot be guessed.
+ */
 async function guessPreviewType(value: string): Promise<PreviewType | undefined> {
   // url or img
   if (/^https?:\/\/.*/.test(value)) {
@@ -103,6 +108,12 @@ async function guessPreviewType(value: string): Promise<PreviewType | undefined>
   return;
 }
 
+/**
+ * Generates the HTML for a preview.
+ * @param type - The preview type.
+ * @param value - The value to generate the preview for.
+ * @returns The HTML for the preview.
+ */
 async function genPreviewHTML(type: PreviewType, value: string): Promise<string | string[]> {
   if (type === "img") {
     return `<img src="${value}">`;

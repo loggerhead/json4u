@@ -3,6 +3,9 @@ import Aioli from "@biowasm/aioli";
 
 let CLI: unknown = null;
 
+/**
+ * Initializes the jq CLI.
+ */
 export async function init() {
   CLI = await new Aioli(
     [
@@ -19,6 +22,12 @@ export async function init() {
   console.log("load jq success.");
 }
 
+/**
+ * Runs a jq filter on a string.
+ * @param text - The string to filter.
+ * @param filter - The jq filter.
+ * @returns The output and error of the jq command.
+ */
 export async function jq(text: string, filter: string): Promise<{ output: string; error: string }> {
   if (!CLI) {
     await init();

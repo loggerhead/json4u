@@ -17,7 +17,7 @@ export function histogramDiff(a: string, b: string): DiffPair[] {
   return new HistogramDiffer(aa, bb).solve();
 }
 
-// 统计图
+// Histogram of lines.
 class Histogram {
   lines: Map<string, number[]>;
 
@@ -64,8 +64,8 @@ class Histogram {
 
 // HistogramDiffer implements the histogram diff algorithm.
 class HistogramDiffer {
-  aa: string[]; // 左侧行数组
-  bb: string[]; // 右侧行数组
+  aa: string[]; // The left array of lines.
+  bb: string[]; // The right array of lines.
 
   constructor(aa: string[], bb: string[]) {
     this.aa = aa;
@@ -77,11 +77,11 @@ class HistogramDiffer {
   }
 
   /** longestSubstring finds the longest matching region in the given area of the inputs A and B.
-   * @param aStart - 左侧文本起始行
-   * @param aEnd - 左侧文本结束行
-   * @param bStart - 右侧文本起始行
-   * @param bEnd - 右侧文本结束行
-   * @returns 匹配的区域
+   * @param aStart - The starting line of the left text.
+   * @param aEnd - The ending line of the left text.
+   * @param bStart - The starting line of the right text.
+   * @param bEnd - The ending line of the right text.
+   * @returns The matching region.
    */
   longestSubstring(aStart: number, aEnd: number, bStart: number, bEnd: number): MatchRegion | null {
     const histogram = Histogram.fromLines(this.aa, aStart, aEnd);
@@ -155,11 +155,11 @@ class HistogramDiffer {
    * First the longest matching region is found, then we recurse on the area before the match,
    * and then on the area after the match.
    *
-   * @param aStart - 左侧文本起始行
-   * @param aEnd - 左侧文本结束行
-   * @param bStart - 右侧文本起始行
-   * @param bEnd - 右侧文本结束行
-   * @returns 匹配的区域
+   * @param aStart - The starting line of the left text.
+   * @param aEnd - The ending line of the left text.
+   * @param bStart - The starting line of the right text.
+   * @param bEnd - The ending line of the right text.
+   * @returns The matching regions.
    */
   solveRange(aStart: number, aEnd: number, bStart: number, bEnd: number): MatchRegion[] {
     if (bEnd - bStart <= 1) {
@@ -245,11 +245,11 @@ class HistogramDiffer {
     let apos = 0;
     let bpos = 0;
     let prevRegion = new MatchRegion(0, 0, 0, 0, 0);
-    // 找到公共行
+    // Find common lines.
     const regions = this.fineSolveRegion(this.solveRange(0, this.aa.length, 0, this.bb.length));
     const pairs: DiffPair[] = [];
 
-    // 计算块差异
+    // Calculate block differences.
     for (let i = 0; i <= regions.length; i++) {
       const region = regions[i];
       const aEnd = region ? region.aStart : this.aa.length;
@@ -266,7 +266,7 @@ class HistogramDiffer {
         });
       }
 
-      // 去除首尾空白字符后进行行内比较
+      // Perform inline comparison after removing leading and trailing whitespace.
       if (aaStr.length > 0 && bbStr.length > 0) {
         const { left, right } = classify(myersDiff(aaStr, bbStr, { maxEditLength: 100 }));
         left.forEach((d) => (d.offset += aDiff.offset));
@@ -276,7 +276,7 @@ class HistogramDiffer {
       }
 
       if (region) {
-        // 相等部分。因为进行了 trim，所以相等部分的长度需要分别计算
+        // Equal parts. Because trim is performed, the length of the equal parts needs to be calculated separately.
         const aaComm = joinLines(this.aa, region.aStart, region.aEnd);
         const bbComm = joinLines(this.bb, region.bStart, region.bEnd);
         apos += aaStr.length + aaComm.length;

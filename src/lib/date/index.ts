@@ -2,6 +2,11 @@ export const dateRe = /20\d{2}-[01]\d-[0-3]\d/;
 export const timeRe = /[0-2]\d:[0-5]\d:[0-5]\d/;
 export const timeZoneRe = /([+-])([0-2]\d):([0-5]\d)/;
 
+/**
+ * Generates a Date object from a string value.
+ * @param value - The string value to convert.
+ * @returns A Date object.
+ */
 export function genDate(value: string): Date {
   if (isTimestamp(value)) {
     const numValue = Number(value);
@@ -33,14 +38,30 @@ export function genDate(value: string): Date {
   }
 }
 
+/**
+ * Checks if a string is a valid date string.
+ * @param value - The string to check.
+ * @returns True if the string is a valid date, false otherwise.
+ */
 export function isDate(value: string) {
   return concatRe("^", dateRe).test(value);
 }
 
+/**
+ * Checks if a string is a valid timestamp.
+ * @param value - The string to check.
+ * @returns True if the string is a valid timestamp, false otherwise.
+ */
 export function isTimestamp(value: string) {
   return /^1(\d{9}|\d{12})$/.test(value);
 }
 
+/**
+ * Concatenates multiple regular expressions into a single regular expression.
+ * @param re1 - The first regular expression.
+ * @param re2 - The remaining regular expressions.
+ * @returns A new regular expression.
+ */
 export function concatRe(re1: RegExp | string, ...re2: (RegExp | string)[]) {
   const first = typeof re1 === "string" ? re1 : re1.source;
   return new RegExp([first, ...re2.map((r) => (typeof r === "string" ? r : r.source))].join(""));

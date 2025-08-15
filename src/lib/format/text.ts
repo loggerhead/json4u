@@ -1,6 +1,12 @@
 import { type ParseOptions, getGenTabsFn } from "@/lib/parser";
 
 // stolen from https://github.com/zgrossbart/jdd/blob/main/jsl/jsl.format.js
+/**
+ * Formats a JSON string with proper indentation and spacing.
+ * @param json - The JSON string to format.
+ * @param options - The parsing options.
+ * @returns The formatted JSON string.
+ */
 export function textFormat(json: string, options?: ParseOptions): string {
   const genTabs = getGenTabsFn(options?.tabWidth || 2);
   let i = 0;

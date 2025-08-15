@@ -3,12 +3,18 @@ import { classify, type Diff, type DiffPair, DiffType, newDiff } from "./diff";
 import { histogramDiff } from "./histogram";
 import { arrayDiff, MaxEditLength, myersDiff } from "./myers";
 
+/**
+ * Compares two JSON trees and returns an array of difference pairs.
+ * @param ltree - The left JSON tree.
+ * @param rtree - The right JSON tree.
+ * @returns An array of difference pairs.
+ */
 export function compareJSON(ltree: Tree, rtree: Tree): DiffPair[] {
   const Diff = (node: Node, type: DiffType, includeBound: boolean = true) => {
     return includeBound ? newDiff(node.boundOffset, node.boundLength, type) : newDiff(node.offset, node.length, type);
   };
 
-  // 行内 diff 转成全局 diff
+  // Converts inline diffs to global diffs.
   const newInlineDiffs = (node: Node, inlineDiffs: Diff[]) =>
     inlineDiffs.map((d) => {
       d.offset += node.offset;
@@ -18,7 +24,7 @@ export function compareJSON(ltree: Tree, rtree: Tree): DiffPair[] {
   const pairs: DiffPair[] = [];
 
   const comparer = {
-    // 比较值
+    // Compares two nodes.
     diff(lnode: Node, rnode: Node) {
       if (lnode.type !== rnode.type) {
         pairs.push({
@@ -44,7 +50,7 @@ export function compareJSON(ltree: Tree, rtree: Tree): DiffPair[] {
           right.inlineDiffs = newInlineDiffs(rnode, rightInlineDiffs);
           pairs.push({ left, right });
         }
-        // 其他类型容易辨别差异，因此不需要进行行内比较
+        // Other types are easy to identify differences, so there is no need for inline comparison.
       } else if (lnode.value !== rnode.value) {
         pairs.push({
           left: Diff(lnode, "del", false),
@@ -53,7 +59,7 @@ export function compareJSON(ltree: Tree, rtree: Tree): DiffPair[] {
       }
     },
 
-    // 比较数组
+    // Compares two arrays.
     diffArray(lnode: Node, rnode: Node) {
       const diffs = compareArray(
         ltree.mapChildren(lnode, (child) => ltree.getNodeToken(child)),
@@ -65,11 +71,11 @@ export function compareJSON(ltree: Tree, rtree: Tree): DiffPair[] {
       for (let i = 0; i < n; i++) {
         const delDiff = left[i];
         const insDiff = right[i];
-        // 数组下标
+        // Array index.
         const l = delDiff?.offset;
         const r = insDiff?.offset;
 
-        // 如果两边差异的下标相同，则递归比较
+        // If the indexes of the differences on both sides are the same, recursively compare.
         if (delDiff && insDiff && l === r) {
           this.diff(ltree.getChild(lnode, String(l))!, rtree.getChild(rnode, String(r))!);
         } else {
@@ -81,16 +87,16 @@ export function compareJSON(ltree: Tree, rtree: Tree): DiffPair[] {
       }
     },
 
-    // 比较对象
+    // Compares two objects.
     diffObject(lnode: Node, rnode: Node) {
       const { intersection, leftOnly, rightOnly } = splitKeys(getChildrenKeys(lnode), getChildrenKeys(rnode));
 
-      // 比较相同的 key
+      // Compare the same keys.
       intersection.forEach((k) => {
         this.diff(ltree.getChild(lnode, k)!, rtree.getChild(rnode, k)!);
       });
 
-      // 将左右两侧剩余的 key 全都算作差异
+      // The remaining keys on the left and right sides are all considered differences.
       leftOnly.forEach((k) => {
         pairs.push({ left: Diff(ltree.getChild(lnode, k)!, "del") });
       });
@@ -105,6 +111,12 @@ export function compareJSON(ltree: Tree, rtree: Tree): DiffPair[] {
   return pairs;
 }
 
+/**
+ * Compares two texts and returns an array of differences.
+ * @param ltext - The left text.
+ * @param rtext - The right text.
+ * @returns An array of differences.
+ */
 export function compareText(ltext: string, rtext: string) {
   return histogramDiff(ltext, rtext);
 }

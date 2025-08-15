@@ -19,6 +19,10 @@ import { useTree } from "@/stores/treeStore";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 
+/**
+ * Renders the status bar at the bottom of the editor, displaying information
+ * such as JSON path, parsing errors, and cursor position.
+ */
 export default function StatusBar() {
   return (
     <div data-testid="statusbar" className="w-full min-h-fit h-statusbar px-4 py-1 flex text-xs gap-4">
@@ -31,6 +35,10 @@ export default function StatusBar() {
   );
 }
 
+/**
+ * Displays the JSON path of the currently selected node in the editor.
+ * Allows users to click on a path segment to navigate to the corresponding node.
+ */
 function JsonPath() {
   const editor = useEditor();
   const tree = useTree();
@@ -76,6 +84,10 @@ interface ParseErrorMsgProps {
   className?: string;
 }
 
+/**
+ * Displays a message when a JSON parsing error occurs in the specified editor.
+ * Clicking on the message reveals the position of the error in the editor.
+ */
 function ParseErrorMsg({ kind }: ParseErrorMsgProps) {
   const t = useTranslations();
   const editor = useEditor(kind);
@@ -110,6 +122,9 @@ interface CursorPositionProps {
   className?: string;
 }
 
+/**
+ * Displays the current cursor position (line and column number) and the length of the selection.
+ */
 function CursorPosition({ className }: CursorPositionProps) {
   const t = useTranslations();
   const { cursorPosition, selectionLength } = useStatusStore(

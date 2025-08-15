@@ -4,6 +4,12 @@ import { textFormat } from "./text";
 
 const fallbackThreshold = 100000;
 
+/**
+ * Formats a JSON string with proper indentation and spacing.
+ * @param text - The JSON string to format.
+ * @param options - The parsing options.
+ * @returns The formatted JSON string.
+ */
 export function prettyFormat(text: string, options?: ParseOptions): string {
   if (text.length > fallbackThreshold) {
     return textFormat(text, options);
@@ -35,6 +41,11 @@ function prettyFormatWithFallback(json: string, options?: ParseOptions): string 
   return tree.valid() ? tree.stringify({ format: true }) : textFormat(json, options);
 }
 
+/**
+ * Finds all pairs of brackets in a string.
+ * @param text - The string to search.
+ * @returns An array of pairs of bracket indexes.
+ */
 function findBracketPairs(text: string): [number, number][] {
   const lbrackets: Record<string, string> = {
     "{": "}",
@@ -62,7 +73,7 @@ function findBracketPairs(text: string): [number, number][] {
     }
   }
 
-  // 没有匹配的另一半括号时，也将其加入 pairs 中，以便能够格式化
+  // When there is no matching other half of the bracket, add it to the pairs as well, so that it can be formatted.
   if (seen.length > 0) {
     pairs.push([seen[0][1], text.length - 1]);
   }
@@ -74,18 +85,18 @@ function findBracketPairs(text: string): [number, number][] {
 
   let merged = [pairs[0]];
 
-  // 找出范围最大的括号对
+  // Find the bracket pair with the largest range.
   for (let i = 1; i < pairs.length; i++) {
     const pair = pairs[i];
     const lastPair = merged[merged.length - 1];
     const [start, end] = pair;
     const [lastStart, lastEnd] = lastPair;
 
-    // 如果是 {{...}}，保留最后一个 {} 的位置
+    // If it is {{...}}, keep the position of the last {}.
     if (lastStart + 1 === start && lastEnd - 1 === end && text[lastStart] === "{" && text[start] === "{") {
       merged.pop();
       merged.push(pair);
-      // 如果是 {[...]}，保留 {} 的位置
+      // If it is {[...]}, keep the position of {}.
     } else if (lastEnd >= start) {
       lastPair[1] = Math.max(end, lastEnd);
     } else {
@@ -93,7 +104,7 @@ function findBracketPairs(text: string): [number, number][] {
     }
   }
 
-  // slice 是左闭右开，所以需要 +1
+  // slice is left-closed and right-open, so we need to +1.
   merged = merged.map((pair) => {
     pair[1]++;
     return pair;

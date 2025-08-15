@@ -1,6 +1,6 @@
 import { Diff, newDiff } from "./diff";
 
-// 最大编辑距离，控制比较的深度。影响比较性能、用户感知到的耗时
+// The maximum edit distance, which controls the depth of the comparison. This affects the comparison performance and the perceived delay for the user.
 export const MaxEditLength = 1000;
 
 export interface DiffOptions {
@@ -8,6 +8,13 @@ export interface DiffOptions {
   maxEditLength?: number;
 }
 
+/**
+ * Diffs two arrays of primitive values.
+ * @param lvals - The left array.
+ * @param rvals - The right array.
+ * @param options - The diff options.
+ * @returns An array of differences.
+ */
 export function arrayDiff<T extends number | string | boolean | null>(
   lvals: T[],
   rvals: T[],
@@ -17,7 +24,7 @@ export function arrayDiff<T extends number | string | boolean | null>(
   const lineHash: Record<string, number> = {};
   let n = lineArray.length;
 
-  // 将 array 映射成 unicode 字符串，然后进行 text compare
+  // Maps an array of lines to a string of unicode characters, then performs a text compare.
   const lines2chars = (lines: string[]) => {
     const baseChar = "0".charCodeAt(0);
     let chars = "";
@@ -35,10 +42,10 @@ export function arrayDiff<T extends number | string | boolean | null>(
     return chars;
   };
 
-  // 每一行是一个数组元素
+  // Each line is an array element.
   const llines = lvals.map(String);
   const rlines = rvals.map(String);
-  // 每一个字符是一个数组元素
+  // Each character is an array element.
   const lchars = lines2chars(llines);
   const rchars = lines2chars(rlines);
   let lpos = 0;
@@ -67,11 +74,17 @@ export function arrayDiff<T extends number | string | boolean | null>(
   return diffs;
 }
 
-// word 维度的 myers diff
+/**
+ * Performs a word-level Myers diff.
+ * @param a - The left string.
+ * @param b - The right string.
+ * @param options - The diff options.
+ * @returns An array of differences.
+ */
 export function myersDiff(a: string, b: string, options?: DiffOptions): Diff[] {
   let lpos = 0;
   let rpos = 0;
-  // 如果超过 MaxEditLength 的长度时，不进行 inline diff
+  // If the length exceeds MaxEditLength, do not perform an inline diff.
   const diffs = (diff(a, b, options) || [])
     .map((diff) => {
       const n = diff.value?.length!;
@@ -92,7 +105,7 @@ export function myersDiff(a: string, b: string, options?: DiffOptions): Diff[] {
     })
     .filter((d) => d) as Diff[];
 
-  // 对存在 diff 的 word 做优化，将 common prefix 和 suffix 从 diff 中去除
+  // Optimizes words with diffs by removing common prefixes and suffixes from the diff.
   let i = 0;
 
   while (i < diffs.length) {
@@ -100,7 +113,7 @@ export function myersDiff(a: string, b: string, options?: DiffOptions): Diff[] {
     const next = diffs[i + 1];
 
     if (diff?.type === "del" && next?.type === "ins") {
-      // 去除公共前缀
+      // Remove common prefix.
       let n = Math.min(diff.length, next.length);
       for (let j = 0; j < n && a[diff.offset] === b[next.offset]; j++) {
         diff.offset++;
@@ -109,7 +122,7 @@ export function myersDiff(a: string, b: string, options?: DiffOptions): Diff[] {
         next.length--;
       }
 
-      // 去除公共后缀
+      // Remove common suffix.
       n = Math.min(diff.length, next.length);
       for (let j = 0; j < n && a[diff.offset + diff.length - 1] === b[next.offset + next.length - 1]; j++) {
         diff.length--;

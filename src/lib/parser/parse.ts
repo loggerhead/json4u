@@ -11,6 +11,13 @@ import {
 } from "./node";
 import { Tree } from "./tree";
 
+/**
+ * Parses a JSON string and returns a tree.
+ * @param text - The JSON string to parse.
+ * @param options - The parsing options.
+ * @param parentMeta - The parent metadata.
+ * @returns The parsed tree.
+ */
 export function parseJSON(text: string, options?: ParseOptions, parentMeta?: ParentMeta): Tree {
   const { nodeMap, nestNodeMap, parseErrors } = doParseJSON(text, options, parentMeta);
   const errors: ContextError[] =
@@ -104,7 +111,7 @@ function doParseJSON(text: string, options?: ParseOptions, parentMeta?: ParentMe
   };
 }
 
-// 嵌套解析时，父节点的信息
+// The information of the parent node during nested parsing.
 interface ParentMeta {
   path: jsonc.JSONPath;
 }
@@ -120,11 +127,11 @@ class Visitor {
   options?: ParseOptions;
 
   nodeMap: Record<string, ParseNode>;
-  // 嵌套解析的节点
+  // The nodes of nested parsing.
   nestNodeMap: Record<string, Node>;
   parseErrors: jsonc.ParseError[];
   currentParent: ParseNode;
-  parentMeta: ParentMeta; // 嵌套解析时，父节点信息
+  parentMeta: ParentMeta; // The information of the parent node during nested parsing.
 
   constructor(text: string, options: ParseOptions = {}, parentMeta: ParentMeta = { path: [] }) {
     this.nodeMap = {};

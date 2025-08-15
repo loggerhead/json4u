@@ -46,6 +46,15 @@ export class InlayHintsProvider {
   }
 }
 
+/**
+ * Collects the child count of each node in the tree.
+ * @param editorWrapper - The editor wrapper.
+ * @param model - The editor model.
+ * @param tree - The tree.
+ * @param node - The current node.
+ * @param res - The array of results.
+ * @returns The array of results.
+ */
 function collectChildCount(
   editorWrapper: EditorWrapper,
   model: editorApi.ITextModel,

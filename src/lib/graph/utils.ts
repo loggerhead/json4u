@@ -4,6 +4,13 @@ import { getParentId } from "@/lib/idgen";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
 import { filter, keyBy } from "lodash-es";
 
+/**
+ * Gets the descendants of a node.
+ * @param graph - The graph.
+ * @param nodeId - The ID of the node.
+ * @param prefixId - The prefix ID of the descendants to get.
+ * @returns The descendants of the node.
+ */
 export function getDescendant(graph: Graph, nodeId: string, prefixId?: string) {
   const nodes: NodeWithData[] = [];
   const edges: EdgeWithData[] = [];
@@ -31,6 +38,12 @@ export function getDescendant(graph: Graph, nodeId: string, prefixId?: string) {
   return { nodes, edges };
 }
 
+/**
+ * Gets the ancestors of a node.
+ * @param graph - The graph.
+ * @param nodeId - The ID of the node.
+ * @returns The ancestors of the node.
+ */
 export function getAncestor(graph: Graph, nodeId: string) {
   const nodes: NodeWithData[] = [];
   const edges: EdgeWithData[] = [];
@@ -54,6 +67,13 @@ export function getAncestor(graph: Graph, nodeId: string) {
   return { nodes, edges };
 }
 
+/**
+ * Applies a function to a subset of an array.
+ * @param all - The array to apply the pickFn or omitFn function to.
+ * @param pick - The subset of the array to apply the pickFn function to.
+ * @param pickFn - The function to apply to the pick subset.
+ * @param omitFn - The function to apply to the rest of the array (all - pick).
+ */
 export function matchApply<T extends NodeWithData | EdgeWithData>(
   all: T[],
   pick: T[],
@@ -76,6 +96,13 @@ export function matchApply<T extends NodeWithData | EdgeWithData>(
   }
 }
 
+/**
+ * Highlights a node.
+ * @param node - The node to highlight.
+ * @param enable - Whether to highlight the node.
+ * @param isSelected - Whether the node is selected.
+ * @returns The highlighted node.
+ */
 export function highlightNode(node: NodeWithData, enable: boolean, isSelected?: boolean) {
   let style = undefined;
 
@@ -91,6 +118,12 @@ export function highlightNode(node: NodeWithData, enable: boolean, isSelected?: 
   return node;
 }
 
+/**
+ * Highlights an edge.
+ * @param edge - The edge to highlight.
+ * @param enable - Whether to highlight the edge.
+ * @returns The highlighted edge.
+ */
 export function highlightEdge(edge: EdgeWithData, enable: boolean) {
   const style = enable ? edgeHighlightStyle : undefined;
 
@@ -103,11 +136,23 @@ export function highlightEdge(edge: EdgeWithData, enable: boolean) {
   return edge;
 }
 
+/**
+ * Toggles the toolbar of a node.
+ * @param node - The node to toggle the toolbar of.
+ * @param clicked - The clicked node.
+ * @returns The node with the toggled toolbar.
+ */
 export function toggleToolbar(node: NodeWithData, clicked: NodeWithData | undefined) {
   node.data.toolbarVisible = node.id === clicked?.id || undefined;
   return node;
 }
 
+/**
+ * Toggles the hidden state of a node or edge.
+ * @param v - The node or edge to toggle.
+ * @param hide - Whether to hide the node or edge.
+ * @returns The node or edge with the toggled hidden state.
+ */
 export function toggleHidden<T extends FlowNode | Edge>(v: T, hide?: boolean) {
   v.hidden = hide;
   return v;

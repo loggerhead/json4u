@@ -47,6 +47,9 @@ export const defaultConfig: Config = {
 
 let globalStore: UseStore | undefined;
 
+/**
+ * Initializes the global store.
+ */
 export function init() {
   globalStore = createStore("json4u", "kv");
 }
@@ -123,6 +126,10 @@ const storage: StateStorage = {
   removeItem: safeDel,
 };
 
+/**
+ * Gets the config from the store.
+ * @returns The config, or the default config if it does not exist.
+ */
 async function getConfig() {
   try {
     const stateStr = await safeGet(keyName);

@@ -14,6 +14,14 @@ import {
 } from "./utils";
 import { generateVirtualGraph } from "./virtual";
 
+/**
+ * Toggles the hidden state of a node and its descendants.
+ * @param graph - The graph.
+ * @param nodeId - The ID of the node to toggle.
+ * @param handleId - The ID of the handle to toggle.
+ * @param hide - Whether to hide the node.
+ * @returns The updated graph.
+ */
 export function toggleNodeHidden(graph: Graph, nodeId: string, handleId?: string, hide?: boolean) {
   const prefixId = handleId !== undefined ? idJoin(nodeId, handleId) : undefined;
   const { nodes: descendantNodes, edges: descendantEdges } = getDescendant(graph, nodeId, prefixId);
@@ -24,7 +32,12 @@ export function toggleNodeHidden(graph: Graph, nodeId: string, handleId?: string
   return generateVirtualGraph(graph);
 }
 
-// highlight nodes and edges when click on a node
+/**
+ * Toggles the selected state of a node and its ancestors and descendants.
+ * @param graph - The graph.
+ * @param id - The ID of the node to toggle.
+ * @returns The updated graph.
+ */
 export function toggleNodeSelected(graph: Graph, id: string) {
   const node = graph.nodeMap?.[id]!;
   const { nodes: ancestorNodes, edges: ancestorEdges } = getAncestor(graph, id);
@@ -46,12 +59,24 @@ export function toggleNodeSelected(graph: Graph, id: string) {
   return generateVirtualGraph(graph);
 }
 
+/**
+ * Clears the selected state of all nodes.
+ * @param graph - The graph.
+ * @returns The updated graph.
+ */
 export function clearNodeSelected(graph: Graph) {
   graph.edges.forEach((ed) => highlightEdge(ed, false));
   graph.nodes.forEach((nd) => toggleToolbar(highlightNode(nd, false), undefined));
   return generateVirtualGraph(graph);
 }
 
+/**
+ * Triggers the folding of siblings of a node.
+ * @param graph - The graph.
+ * @param nodeId - The ID of the node.
+ * @param fold - Whether to fold the siblings.
+ * @returns The updated graph.
+ */
 export function triggerFoldSiblings(graph: Graph, nodeId: string, fold: boolean) {
   const parentId = getParentId(nodeId);
 
@@ -74,6 +99,15 @@ export function triggerFoldSiblings(graph: Graph, nodeId: string, fold: boolean)
   return generateVirtualGraph(graph);
 }
 
+/**
+ * Computes the reveal position of a node.
+ * @param width - The width of the viewport.
+ * @param height - The height of the viewport.
+ * @param graph - The graph.
+ * @param tree - The tree.
+ * @param revealPosition - The reveal position.
+ * @returns The center and viewport position.
+ */
 export function computeRevealPosition(
   width: number,
   height: number,

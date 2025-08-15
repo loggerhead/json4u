@@ -10,9 +10,16 @@ const smoothPaddingGap = 200;
 const minVirtualizeNodeNum = 100;
 const maxVirtualEdgesForTwoNodes = 10;
 
-// the x,y values of the viewport here are coordinates of the left-top point,
-// it's different from what it means in xyflow which means transform.
-// https://github.com/xyflow/xyflow/discussions/4311#discussioncomment-9602692
+/**
+ * Computes the visible subgraph of a large graph based on the current viewport.
+ * @param graph - The full graph data.
+ * @param width - The width of the viewport.
+ * @param height - The height of the viewport.
+ * @param viewport - The current viewport position and zoom level. The x,y values here are coordinates of the left-top point,
+ *                   which is different from what it means in xyflow where it represents transform.
+ *                   See https://github.com/xyflow/xyflow/discussions/4311#discussioncomment-9602692
+ * @returns An object containing the renderable subgraph and a boolean indicating if it changed.
+ */
 export default function computeVirtualGraph(
   graph: Graph,
   width: number,
@@ -42,6 +49,12 @@ export default function computeVirtualGraph(
   return { renderable, changed };
 }
 
+/**
+ * Computes the real subgraph, which consists of nodes and edges that are currently visible in the viewport.
+ * @param viewportRect - The rectangle representing the current viewport.
+ * @param graph - The full graph data.
+ * @returns The visible subgraph.
+ */
 function computeRealSubgraph(viewportRect: Rect, graph: Graph): Graph {
   const isInViewport = (rect: Rect) => getOverlappingArea(rect, viewportRect) > 0;
   const isNodeInViewport = (node: NodeWithData) =>
@@ -78,6 +91,13 @@ function computeRealSubgraph(viewportRect: Rect, graph: Graph): Graph {
   return { nodes, edges };
 }
 
+/**
+ * Since a node may be at the edge of the viewport, not all of its key-value pairs need to be displayed.
+ * So we can compute the visible properties (key-value pairs) for each visible node as rendering key-value pairs affects performance.
+ * @param viewportRect - The rectangle representing the current viewport.
+ * @param nodes - The array of visible nodes.
+ * @returns A boolean indicating whether the visible properties have changed.
+ */
 function computeRealKV(viewportRect: Rect, nodes: NodeWithData[]) {
   let changed = false;
 
@@ -100,6 +120,11 @@ function computeRealKV(viewportRect: Rect, nodes: NodeWithData[]) {
   return changed;
 }
 
+/**
+ * Determines which nodes and edges should be virtualized based on viewport visibility.
+ * It identifies nodes that are off-screen but connected to on-screen elements.
+ * @param graph - The graph data, which will be mutated with virtualization info.
+ */
 function virtualize(graph: Graph) {
   // sourceId => { targetNodeId, virtualHandleIndex }
   const virtualMap: Record<string, { id: string; index: number }[]> = {};
@@ -116,10 +141,10 @@ function virtualize(graph: Graph) {
     const { kvStart, kvEnd } = realSourceNode?.data?.render ?? { kvStart: -1, kvEnd: -1 };
     const isVirtualSourceHandle = !(realSourceNode && kvStart <= sourceHandleIndex && sourceHandleIndex < kvEnd);
 
-    // if both the target node and the source handle is in the viewport
+    // Case 1: Both the target node and the source handle are in the viewport.
     if (realTargetNode && !isVirtualSourceHandle) {
       return;
-      // if the target node is in the viewport, but the source handle is not
+      // Case 2: The target node is in the viewport, but the source handle is not.
     } else if (realTargetNode && isVirtualSourceHandle) {
       const sourceNode = realSourceNode ?? nodeMap[sourceId];
 
@@ -128,10 +153,10 @@ function virtualize(graph: Graph) {
       }
 
       sourceNode.data.render.virtualHandleIndices[sourceHandleIndex] = true;
-      // if the source handle is in the viewport, but the target node is not
+      // Case 3: The source handle is in the viewport, but the target node is not.
     } else if (!realTargetNode && !isVirtualSourceHandle) {
       virtualTargetNodeIds![targetId] = true;
-      // if neither the target node nor the source handle is in the viewport
+      // Case 4: Neither the target node nor the source handle is in the viewport.
     } else if (!realTargetNode && isVirtualSourceHandle) {
       if (!virtualMap[sourceId]) {
         virtualMap[sourceId] = [];
@@ -141,9 +166,9 @@ function virtualize(graph: Graph) {
     }
   });
 
-  // if neither the source handle nor the target node is in the viewport,
-  // we can render only parts of the edges for better performance
-  // since the user can't see the difference when there are too many edges.
+  // If neither the source handle nor the target node is in the viewport,
+  // we can render only a subset of the edges for better performance,
+  // as the user can't see the difference when there are too many edges.
   for (const sourceId in virtualMap) {
     const sourceNode = nodeMap[sourceId];
     const step = Math.ceil(virtualMap[sourceId].length / maxVirtualEdgesForTwoNodes);
@@ -190,6 +215,11 @@ function isSubgraphChanged(oldVirtual: GraphVirtual | undefined, newVirtual: Gra
   );
 }
 
+/**
+ * Generates the final renderable graph, including real nodes and virtual nodes used as placeholders.
+ * @param graph - The full graph with virtualization metadata.
+ * @returns The renderable graph containing only the elements to be displayed.
+ */
 export function generateVirtualGraph(graph: Graph): Graph {
   if (!graph.virtual) {
     return graph;

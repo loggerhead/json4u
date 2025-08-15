@@ -54,7 +54,11 @@ export function newGraph(): Graph {
   return { nodes: [], edges: [] };
 }
 
-// nodes are in DFS order and edges are in BFS order
+/**
+ * Generates flow nodes from a tree.
+ * @param tree - The tree.
+ * @returns The graph.
+ */
 export function genFlowNodes(tree: Tree): Graph {
   const nodes: NodeWithData[] = [];
   const edges: EdgeWithData[] = [];

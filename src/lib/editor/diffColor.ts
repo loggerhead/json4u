@@ -46,22 +46,47 @@ function filterByType(classes: Readonly<DiffStyle[]>, t: DiffType): DiffStyle {
   return undefined as unknown as DiffStyle;
 }
 
+/**
+ * Gets the line class for a given diff type.
+ * @param diffType - The diff type.
+ * @returns The line class.
+ */
 export function getLineClass(diffType: DiffType) {
   return filterByType(hunkClasses, diffType).lineClass;
 }
 
+/**
+ * Gets the inline class for a given diff type.
+ * @param diffType - The diff type.
+ * @returns The inline class.
+ */
 export function getInlineClass(diffType: DiffType) {
   return filterByType(inlineClasses, diffType).lineClass;
 }
 
+/**
+ * Gets the margin class for a given diff type.
+ * @param diffType - The diff type.
+ * @returns The margin class.
+ */
 export function getMarginClass(diffType: DiffType) {
   return filterByType(hunkClasses, diffType).marginClass;
 }
 
+/**
+ * Gets the minimap color for a given diff type.
+ * @param diffType - The diff type.
+ * @returns The minimap color.
+ */
 export function getMinimapColor(diffType: DiffType) {
   return filterByType(inlineClasses, diffType).rgba;
 }
 
+/**
+ * Gets the overview ruler color for a given diff type.
+ * @param diffType - The diff type.
+ * @returns The overview ruler color.
+ */
 export function getOverviewRulerColor(diffType: DiffType) {
   return filterByType(inlineClasses, diffType).rgba;
 }
