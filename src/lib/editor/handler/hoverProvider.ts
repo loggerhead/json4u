@@ -2,6 +2,7 @@ import { convertColor, isColor } from "@/lib/color";
 import { genDate, isDate, isTimestamp } from "@/lib/date";
 import type { EditorWrapper } from "@/lib/editor/editor";
 import type { editorApi, IPosition, MonacoApi } from "@/lib/editor/types";
+import { isIterable } from "@/lib/parser";
 import { urlToMap } from "@/lib/worker/command/urlToJSON";
 
 export class HoverProvider {
@@ -17,12 +18,12 @@ export class HoverProvider {
   private registerHoverProvider() {
     const previewProvider = async (model: editorApi.ITextModel, position: IPosition) => {
       const r = this.editorWrapper.getNodeAtPosition(position);
-      if (r?.type !== "value") {
+      if (!r || r?.type === "key") {
         return;
       }
 
       const v = r.node.value;
-      if (v === undefined) {
+      if (v === undefined || isIterable(r.node)) {
         return;
       }
 
@@ -179,10 +180,10 @@ async function genPreviewHTML(type: PreviewType, value: string): Promise<string 
     return genTableForMap(m);
   } else if (type === "base64_encoded") {
     const decoded = atob(value);
-    return genTable({ "Base64 Decoded": decoded });
+    return ["**Base64 Decoded**", decoded];
   } else if (type === "uri_encoded") {
     const decoded = decodeURIComponent(value);
-    return genTable({ "URI Decoded": decoded });
+    return ["**URI Decoded**", decoded];
   } else if (type === "color") {
     const r = convertColor(value);
     if (!r) {
