@@ -16,7 +16,7 @@ Use these commands from the project root directory.
 
 - **Install all dependencies:** `pnpm install`
 - **Run tests:** `timeout 5s pnpm test` (unit/integration)
-- **Run e2e tests:** `pnpm e2e` (end-to-end)
+- **Run e2e tests:** `timeout 600s pnpm e2e` (Run end-to-end tests using MCP `playwright`)
 - **Run linting and formatting check:** `pnpm lint`
 - **Start the development server:** `pnpm dev`
 - **Build for production:** `pnpm build`

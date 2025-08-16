@@ -63,7 +63,7 @@ test.describe("commands", () => {
     const editor = await getEditor(page, { textarea: true, goto: true });
     await editor.fill("{'a':True}", { force: true });
 
-    await clickCmd(page, "convert python dict to json");
+    await clickCmd(page, "Python dict → JSON");
     const text = await getEditorText(page);
     await expect(text.replace(/\s/g, "")).toBe('{"a":true}');
   });
@@ -73,7 +73,7 @@ test.describe("commands", () => {
 
     {
       await editor.fill("https://json4u.com/editor?foo=bar", { force: true });
-      await clickCmd(page, "convert url to json");
+      await clickCmd(page, "URL → JSON");
       const text = await getEditorText(page);
       await expect(text.replace(/\s/g, "")).toBe(
         '{"Protocol":"https","Host":"json4u.com","Path":"/editor","Query":{"foo":"bar"}}',
@@ -84,7 +84,7 @@ test.describe("commands", () => {
 
     {
       await editor.fill("/editor?foo=bar", { force: true });
-      await clickCmd(page, "convert url to json");
+      await clickCmd(page, "URL → JSON");
       const text = await getEditorText(page);
       await expect(text.replace(/\s/g, "")).toBe('{"Path":"/editor","Query":{"foo":"bar"}}');
     }
