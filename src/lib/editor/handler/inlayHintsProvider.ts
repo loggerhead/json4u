@@ -30,7 +30,7 @@ export class InlayHintsProvider {
 
           Object.values(tree.nodeMap).forEach((node) => {
             const count = getChildCount(node);
-            if (count === 0) {
+            if (!(count > 0 && node.type === "array")) {
               return;
             }
 
@@ -41,7 +41,7 @@ export class InlayHintsProvider {
             };
 
             this.hints.push({
-              label: node.type === "array" ? `[${count}]` : `{${count}}`,
+              label: `[${count}]`,
               position: position,
               kind: this.monaco.languages.InlayHintKind.Type,
               paddingLeft: true,
