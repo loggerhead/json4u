@@ -85,6 +85,7 @@
   "stats_description": "下次额度刷新日期为: {date}",
   "related_features": "相关功能",
   "collapse_hint": "拖动到此处折叠",
+  "copy_json_path": "复制 JSON path",
   "Home": {
     "Features": "功能",
     "Pricing": "价格",

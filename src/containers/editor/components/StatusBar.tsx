@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { useEditor } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
+import { Copy, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 
@@ -40,19 +41,23 @@ export default function StatusBar() {
  * Allows users to click on a path segment to navigate to the corresponding node.
  */
 function JsonPath() {
+  const t = useTranslations();
   const editor = useEditor();
   const tree = useTree();
   const id = useStatusStore((state) => state.revealPosition.treeNodeId);
   const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
+  const [copied, setCopied] = React.useState(false);
 
   if (!(editor && tree.valid() && id)) {
     return null;
   }
 
   const jsonPath = [rootMarker, ...toPath(id)];
+  const pathString = jsonPath.join(".");
+  const Icon = copied ? Check : Copy;
 
   return (
-    <Breadcrumb className="max-w-[80%]">
+    <Breadcrumb className="group max-w-[80%]">
       <BreadcrumbList className="flex-nowrap whitespace-nowrap overflow-x-auto">
         {jsonPath.map((k, i) => (
           <Fragment key={`${i}-${k}`}>
@@ -74,6 +79,18 @@ function JsonPath() {
             {i < jsonPath.length - 1 ? <BreadcrumbSeparator /> : null}
           </Fragment>
         ))}
+        <div
+          className="opacity-0 group-hover:opacity-100 hover:cursor-pointer transition-opacity duration-2000 ease-in-out"
+          title={t("copy_json_path")}
+          onClick={() => {
+            navigator.clipboard.writeText(pathString).then(() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 1000);
+            });
+          }}
+        >
+          <Icon className="icon" />
+        </div>
       </BreadcrumbList>
     </Breadcrumb>
   );

@@ -85,6 +85,7 @@
   "stats_description": "Next quota refresh date: {date}",
   "related_features": "Related Features",
   "collapse_hint": "Drag here to collapse",
+  "copy_json_path": "Copy JSON path",
   "Home": {
     "Features": "Features",
     "Pricing": "Pricing",
