@@ -1,6 +1,6 @@
 import type { EditorWrapper } from "@/lib/editor/editor";
-import type { languages, Range, editorApi, MonacoApi, IPosition } from "@/lib/editor/types";
-import { getChildCount, type Tree, type Node, type NodeType, isIterable } from "@/lib/parser";
+import type { languages, Range, editorApi, MonacoApi } from "@/lib/editor/types";
+import { getChildCount } from "@/lib/parser";
 
 // Duplicate hints may appear after folding, which seems to be a bug in the Monaco editor:
 // https://github.com/microsoft/monaco-editor/issues/4700
@@ -23,62 +23,36 @@ export class InlayHintsProvider {
     const provider = {
       provideInlayHints: (model: editorApi.ITextModel, range: Range) => {
         const tree = this.editorWrapper.tree;
-        if (this.treeVersion === tree.version) {
-          return { hints: this.hints, dispose: () => {} };
+
+        if (this.treeVersion !== tree.version) {
+          this.treeVersion = tree.version;
+          this.hints = [];
+
+          Object.values(tree.nodeMap).forEach((node) => {
+            const count = getChildCount(node);
+            if (count === 0) {
+              return;
+            }
+
+            const { lineNumber, column } = this.editorWrapper.getPositionAt(node.offset);
+            const position = {
+              lineNumber,
+              column: column + 1,
+            };
+
+            this.hints.push({
+              label: node.type === "array" ? `[${count}]` : `{${count}}`,
+              position: position,
+              kind: this.monaco.languages.InlayHintKind.Type,
+              paddingLeft: true,
+            });
+          });
         }
 
-        const res = collectChildCount(this.editorWrapper, model, tree, tree.root(), []);
-        const hints: languages.InlayHint[] = res.map(({ count, position, type }) => ({
-          label: type === "array" ? `[${count}]` : `{${count}}`,
-          position: position,
-          kind: this.monaco.languages.InlayHintKind.Type,
-          paddingLeft: true,
-          tooltip: type === "array" ? `${count} items` : `${count} keys`,
-        }));
-
-        this.hints = hints;
-        this.treeVersion = tree.version;
-        return { hints, dispose: () => {} };
+        return { hints: this.hints, dispose: () => {} };
       },
     };
 
     this.monaco.languages.registerInlayHintsProvider("json", provider);
   }
-}
-
-/**
- * Collects the child count of each node in the tree.
- * @param editorWrapper - The editor wrapper.
- * @param model - The editor model.
- * @param tree - The tree.
- * @param node - The current node.
- * @param res - The array of results.
- * @returns The array of results.
- */
-function collectChildCount(
-  editorWrapper: EditorWrapper,
-  model: editorApi.ITextModel,
-  tree: Tree,
-  node: Node,
-  res: { count: number; position: IPosition; type: NodeType }[],
-) {
-  if (!(tree && node && isIterable(node))) {
-    return [];
-  }
-
-  const { lineNumber, column } = editorWrapper.getPositionAt(node.offset);
-  res.push({
-    count: getChildCount(node),
-    position: {
-      lineNumber,
-      column: column + 1,
-    },
-    type: node.type,
-  });
-
-  tree.nonLeafChildrenNodes(node).forEach((node) => {
-    collectChildCount(editorWrapper, model, tree, node, res);
-  });
-
-  return res;
 }
