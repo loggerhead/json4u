@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import ViewSearchInput from "@/components/ui/search/ViewSearchInput";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Editor from "@/containers/editor/editor";
+import Editor from "@/containers/editor/editor/Editor";
 import Graph from "@/containers/editor/graph/Graph";
 import SwapButton from "@/containers/editor/mode/SwapButton";
 import { JsonTable } from "@/containers/editor/table/JsonTable";

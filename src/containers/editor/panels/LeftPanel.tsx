@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container, ContainerContent, ContainerHeader } from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import CommandSearchInput from "@/components/ui/search/CommandSearchInput";
-import Editor from "@/containers/editor/editor";
+import Editor from "@/containers/editor/editor/Editor";
 import { toastSucc } from "@/lib/utils";
 import { useEditor } from "@/stores/editorStore";
 import { Copy, CopyCheck } from "lucide-react";

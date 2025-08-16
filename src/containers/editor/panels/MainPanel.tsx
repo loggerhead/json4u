@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
+import { CollapseHint } from "@/containers/editor/components/CollapseHint";
+import StatusBar from "@/containers/editor/components/StatusBar";
 import ModePanel from "@/containers/editor/mode/ModePanel";
 import { setupGlobalGraphStyle } from "@/lib/graph/layout";
 import { cn } from "@/lib/utils";
@@ -14,10 +16,8 @@ import { useStatusStore } from "@/stores/statusStore";
 import { useUserStore } from "@/stores/userStore";
 import { wrap } from "comlink";
 import { useShallow } from "zustand/shallow";
-import { CollapseHint } from "./CollapseHint";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
-import StatusBar from "./StatusBar";
 
 const leftPanelId = "left-panel";
 const rightPanelId = "right-panel";
