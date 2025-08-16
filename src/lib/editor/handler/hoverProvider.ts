@@ -61,7 +61,7 @@ export class HoverProvider {
   }
 }
 
-type PreviewType = "img" | "url" | "date" | "color";
+type PreviewType = "img" | "url" | "date" | "color" | "base64_encoded" | "uri_encoded";
 
 /**
  * Guesses the preview type of a string value.
@@ -86,6 +86,10 @@ async function guessPreviewType(value: string): Promise<PreviewType | undefined>
     }
 
     return "url";
+  } else if (/^data:image\/\w+;base64,/.test(value)) {
+    return "img";
+  } else if (/^[a-z]+[a-z0-9+.-]*:\/\//.test(value)) {
+    return "url";
   }
 
   // timestamp
@@ -99,13 +103,66 @@ async function guessPreviewType(value: string): Promise<PreviewType | undefined>
 
   if (isDate(value)) {
     return "date";
-  }
-
-  if (isColor(value)) {
+  } else if (isColor(value)) {
     return "color";
+  } else if (isBase64(value)) {
+    return "base64_encoded";
+  } else if (isUriEncoded(value)) {
+    return "uri_encoded";
   }
 
   return;
+}
+
+/**
+ * Checks if a string is a valid Base64 encoded string.
+ * This function supports both standard and URL-safe Base64 variants.
+ * @param {string} str The string to check.
+ * @returns {boolean} True if the string is a valid Base64 string, false otherwise.
+ */
+function isBase64(str: string): boolean {
+  if (str.length === 0) {
+    return false;
+    // If the string consists of only numbers, it is considered not to be Base64 encoded.
+  } else if (/^\d+(\.\d+)?$/.test(str)) {
+    return false;
+  }
+
+  // Replace URL-safe characters with standard characters for uniform validation.
+  const normalizedStr = str.replace(/-/g, "+").replace(/_/g, "/");
+
+  // The regex checks for valid Base64 characters and correct padding.
+  const base64Regex = /^[A-Za-z0-9+/]*=?=?$/;
+  if (!base64Regex.test(normalizedStr)) {
+    return false;
+  } else if (normalizedStr.length % 4 !== 0) {
+    return false;
+  }
+
+  const upperCaseProb = (str.match(/[A-Z]/g) || []).length / str.length;
+  const lowerCaseProb = (str.match(/[a-z]/g) || []).length / str.length;
+  const numberProb = (str.match(/[0-9]/g) || []).length / str.length;
+
+  // Ensure that there is a reasonable distribution of character types based on the 26:26:10 ratio
+  if (upperCaseProb < 0.1 && lowerCaseProb < 0.1 && numberProb < 0.04) {
+    return false;
+  }
+
+  // Finally, try to decode it. The atob function will throw an error for invalid Base64.
+  try {
+    atob(normalizedStr);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function isUriEncoded(str: string): boolean {
+  try {
+    return decodeURIComponent(str) !== str;
+  } catch (e) {
+    return false;
+  }
 }
 
 /**
@@ -120,6 +177,12 @@ async function genPreviewHTML(type: PreviewType, value: string): Promise<string 
   } else if (type === "url") {
     const m = urlToMap(value);
     return genTableForMap(m);
+  } else if (type === "base64_encoded") {
+    const decoded = atob(value);
+    return genTable({ "Base64 Decoded": decoded });
+  } else if (type === "uri_encoded") {
+    const decoded = decodeURIComponent(value);
+    return genTable({ "URI Decoded": decoded });
   } else if (type === "color") {
     const r = convertColor(value);
     if (!r) {
@@ -175,6 +238,7 @@ function genTable(
             <b>${key}</b>
           </span>
         </td>
+        <td><span>${"　"}</span></td>
         <td>
           <span ${valueStyle ? `style="${valueStyle}"` : ""}>
             ${value}
