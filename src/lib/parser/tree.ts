@@ -37,11 +37,11 @@ const emptyTree: Readonly<TreeObject> = {
 const treeProperties = Object.keys(emptyTree) as (keyof TreeObject)[];
 
 export class Tree implements TreeObject {
-  nodeMap: Record<string, Node>;
-  text: string;
-  nestNodeMap?: Record<string, Node>;
-  errors?: ContextError[];
-  version?: number;
+  nodeMap: Record<string, Node>; // A map from node ID to the Node object for quick lookup.
+  text: string; // The raw text content of the JSON string.
+  nestNodeMap?: Record<string, Node>; // A map from node ID to the root Node of a nested JSON string that has been parsed into its own tree.
+  errors?: ContextError[]; // An array of parsing errors.
+  version?: number; // A version number for the tree, can be used to track changes.
 
   constructor(text: string = "") {
     this.nodeMap = {};
@@ -257,6 +257,11 @@ export class Tree implements TreeObject {
     return this.text;
   }
 
+  /**
+   * Stringifies nested JSON sub-trees and applies the changes to the original text.
+   * It replaces the original string literals with their stringified content and updates node offsets and lengths to maintain tree integrity.
+   * @param {StringifyOptions} options - The options to use for stringifying the nested nodes.
+   */
   stringifyNestNodes(options: StringifyOptions = {}) {
     let acc = 0;
     const edits: jsonc.Edit[] = [];
