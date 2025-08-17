@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/icons/Logo";
 import { Separator } from "@/components/ui/separator";
@@ -32,7 +33,6 @@ import PopoverBtn, { popoverBtnClass } from "./PopoverButton";
 import SharePopover from "./SharePopover";
 import StatisticsPopover from "./StatisticsPopover";
 import Toggle from "./Toggle";
-import { useEffect, useState } from "react";
 
 export default function SideNav() {
   const [transition, setTransition] = useState(false);

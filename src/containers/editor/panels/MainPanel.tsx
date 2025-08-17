@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
 import { CollapseHint, InitialSetup, StatusBar } from "@/containers/editor/components";
@@ -39,6 +39,8 @@ export default function MainPanel() {
   );
   const [showLeftCollapseHint, setShowLeftCollapseHint] = useState(false);
   const [showRightCollapseHint, setShowRightCollapseHint] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const layoutRef = useRef<number[]>();
 
   useObserveResize(leftPanelId, rightPanelId);
 
@@ -48,7 +50,7 @@ export default function MainPanel() {
       <ResizablePanelGroup
         className="flex-grow"
         direction="horizontal"
-        onLayout={(layout) => setRightPanelSize(layout[1])}
+        onLayout={(layout) => (layoutRef.current = layout)}
       >
         <ResizablePanel
           id={leftPanelId}
@@ -67,12 +69,18 @@ export default function MainPanel() {
           style={{ overflow: "visible" }}
         >
           <div className="relative h-full w-full">
-            {showLeftCollapseHint && <CollapseHint side="left" />}
+            {isDragging && showLeftCollapseHint && <CollapseHint side="left" />}
             <LeftPanel />
           </div>
         </ResizablePanel>
         <ResizableHandle
           withHandle
+          onDragging={(dragging) => {
+            setIsDragging(dragging);
+            if (!dragging) {
+              setRightPanelSize(layoutRef.current![1]);
+            }
+          }}
           className={cn("hover:bg-blue-600", (leftPanelCollapsed || rightPanelCollapsed) && "bg-blue-200 w-2")}
         />
         <ResizablePanel
@@ -89,7 +97,7 @@ export default function MainPanel() {
           className={cn(rightPanelCollapsed && "transition-all duration-300 ease-in-out")}
         >
           <div className="relative h-full w-full">
-            {showRightCollapseHint && <CollapseHint side="right" />}
+            {isDragging && showRightCollapseHint && <CollapseHint side="right" />}
             <RightPanel />
           </div>
         </ResizablePanel>
