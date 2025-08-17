@@ -3,6 +3,7 @@ import { genDate, isDate, isTimestamp } from "@/lib/date";
 import type { EditorWrapper } from "@/lib/editor/editor";
 import type { editorApi, IPosition, MonacoApi } from "@/lib/editor/types";
 import { isIterable } from "@/lib/parser";
+import { h } from "@/lib/table/tag";
 import { urlToMap } from "@/lib/worker/command/urlToJSON";
 
 export class HoverProvider {
@@ -192,7 +193,7 @@ async function genPreviewHTML(type: PreviewType, value: string): Promise<string 
 
     const { hex, rgb, hsl } = r;
     return [
-      `<span style="background-color:${hex};">${"　".repeat(16)}</span>`,
+      h("span", "　".repeat(16)).style(`background-color:${hex};`).toString(),
       genTable(
         {
           HEX: hex,
@@ -230,23 +231,16 @@ function genTable(
   data: Record<string, string>,
   styleFn?: (k: string, v: string) => { keyStyle?: string; valueStyle?: string },
 ): string {
-  const rows = Object.entries(data)
-    .map(([key, value]) => {
+  return h(
+    "table",
+    ...Object.entries(data).map(([key, value]) => {
       const { keyStyle, valueStyle } = styleFn ? styleFn(key, value) : { keyStyle: "", valueStyle: "" };
-      return `<tr>
-        <td>
-          <span ${keyStyle ? `style="${keyStyle}"` : ""}>
-            <b>${key}</b>
-          </span>
-        </td>
-        <td><span>${"　"}</span></td>
-        <td>
-          <span ${valueStyle ? `style="${valueStyle}"` : ""}>
-            ${value}
-          </span>
-        </td>
-      </tr>`;
-    })
-    .join("");
-  return `<table>${rows}</table>`;
+      return h(
+        "tr",
+        h("td", h("span", h("b", key)).style(keyStyle)),
+        h("td", h("span", "　")),
+        h("td", h("span", value).style(valueStyle)),
+      );
+    }),
+  ).toString();
 }

@@ -9,6 +9,7 @@ export class H {
   attrId?: string;
   attrClass: string[];
   attrTitle?: string;
+  attrStyle?: string;
   children: (H | string)[];
 
   constructor(tag: string = "", ...children: (H | string)[]) {
@@ -24,6 +25,11 @@ export class H {
 
   class(...clss: string[]): H {
     clss.length && this.attrClass.push(...clss);
+    return this;
+  }
+
+  style(style: string | undefined): H {
+    this.attrStyle = style;
     return this;
   }
 
@@ -51,9 +57,10 @@ export class H {
       return childrenStr;
     } else {
       const attrs = [];
-      this.attrId && attrs.push(`id="${this.attrId}"`);
-      this.attrClass.length && attrs.push(`class="${this.attrClass.join(" ")}"`);
-      this.attrTitle && attrs.push(`title="${this.attrTitle}"`);
+      if (this.attrId) attrs.push(`id="${escape(this.attrId)}"`);
+      if (this.attrClass.length) attrs.push(`class="${escape(this.attrClass.join(" "))}"`);
+      if (this.attrTitle) attrs.push(`title="${escape(this.attrTitle)}"`);
+      if (this.attrStyle) attrs.push(`style="${escape(this.attrStyle)}"`);
       return `<${this.tag} ${attrs.join(" ")}>${childrenStr}</${this.tag}>`;
     }
   }
@@ -65,6 +72,7 @@ export class H {
           if (this.attrId) el.setAttribute("id", this.attrId);
           if (this.attrClass.length) el.setAttribute("class", this.attrClass.join(" "));
           if (this.attrTitle) el.setAttribute("title", this.attrTitle);
+          if (this.attrStyle) el.setAttribute("style", this.attrStyle);
           return el;
         })()
       : document.createDocumentFragment();
