@@ -35,10 +35,10 @@ export class EditorWrapper {
     this.listenOnDidPaste();
     this.listenOnKeyDown();
     this.listenOnDropFile();
+    new HoverProvider(this);
+    new InlayHintsProvider(this);
 
     if (this.isMain()) {
-      new HoverProvider(this);
-      new InlayHintsProvider(this);
       this.listenOnDidChangeCursorPosition();
     }
   }
