@@ -10,7 +10,7 @@ interface LoadingProps {
 export default function Loading({ className }: LoadingProps) {
   const t = useTranslations();
   return (
-    <div className={cn("z-10 h-screen flex items-center justify-center", className)}>
+    <div className={cn("h-screen flex items-center justify-center", className)}>
       <LoaderCircle className="animate-spin icon mr-2" />
       {`${t("Loading")}...`}
     </div>

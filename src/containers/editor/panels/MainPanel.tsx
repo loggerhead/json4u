@@ -63,12 +63,12 @@ export default function MainPanel() {
           }}
           onExpand={() => setLeftPanelCollapsed(false)}
           onResize={(size) => setShowLeftCollapseHint(5 < size && size < 15)}
-          className={cn(leftPanelCollapsed && "w-0 hidden transition-all duration-300 ease-in-out")}
+          className={cn(leftPanelCollapsed && "w-0 invisible transition-all duration-300 ease-in-out")}
           // The preview displayed by the hover provider of the monaco editor
           // will be obscured by the right panel, so this style needs to be set.
           style={{ overflow: "visible" }}
         >
-          <div className="relative h-full w-full">
+          <div className={cn("relative h-full w-full", leftPanelCollapsed && "invisible")}>
             {isDragging && showLeftCollapseHint && <CollapseHint side="left" />}
             <LeftPanel />
           </div>
