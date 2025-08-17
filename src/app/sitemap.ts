@@ -27,5 +27,5 @@ function getEntry(pathname: string) {
 }
 
 function getUrl(pathname: string, appURL: string = env.NEXT_PUBLIC_APP_URL) {
-  return `${appURL}/${pathname === "/" ? "" : pathname}`;
+  return `${appURL}/${pathname.startsWith("/") ? pathname.slice(1) : pathname}`;
 }
