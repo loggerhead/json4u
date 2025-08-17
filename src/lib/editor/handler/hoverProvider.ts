@@ -34,7 +34,13 @@ export class HoverProvider {
         return;
       }
 
-      const htmlOrHtmls = await genPreviewHTML(t, valueInStr);
+      let htmlOrHtmls: Awaited<ReturnType<typeof genPreviewHTML>> = [];
+      try {
+        htmlOrHtmls = await genPreviewHTML(t, valueInStr);
+      } catch (error) {
+        console.error("Failed to generate preview HTML:", error);
+      }
+
       if (htmlOrHtmls.length === 0) {
         return;
       }
