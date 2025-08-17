@@ -2,6 +2,13 @@ export const metadata = {
   title: "Changelog",
 };
 
+- 2025-08-17:
+  - Fix the issue where inlay hints are still displayed when there is no tree in the right editor.
+  - Fix the issues of the main panel overflowing and the left panel's collapse animation not working.
+  - Optimize the UX of panel resizing and collapsing.
+  - Fix the CLS issue caused by the sidebar.
+  - Fix the issue where `/tutorial` is missing from the `sitemap`.
+  - Fix the XSS issue when generating HTML strings and add error handling for `genPreviewHTML`.
 - 2025-08-16:
   - Support hovering over to preview URLs, colors, images, etc. in the left editor.
   - Support displaying the number of child elements in the left editor.
