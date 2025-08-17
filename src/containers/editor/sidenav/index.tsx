@@ -5,6 +5,7 @@ import Link from "next/link";
 import Logo from "@/components/icons/Logo";
 import { Separator } from "@/components/ui/separator";
 import { isCN, version } from "@/lib/env";
+import { cn } from "@/lib/utils";
 import { useConfigFromCookies } from "@/stores/hook";
 import { useStatusStore } from "@/stores/statusStore";
 import {
@@ -83,7 +84,10 @@ export default function SideNav() {
       onMouseLeave={() => setSideNavExpanded(false)}
     >
       <nav
-        className={`group z-50 h-full py-1.5 w-8 data-[expanded=true]:w-32 box-content border-r border-default shadow-xl ${transition ? "transition-width" : ""} duration-200 hide-scrollbar flex flex-col justify-between bg-background overflow-hidden`}
+        className={cn(
+          "group z-50 h-full py-1.5 w-8 data-[expanded=true]:w-32 box-content border-r border-default shadow-xl duration-200 hide-scrollbar flex flex-col justify-between bg-background overflow-hidden gap-y-2",
+          transition && "transition-width",
+        )}
         data-expanded={sideNavExpanded}
       >
         <ul className="relative flex flex-col justify-start px-1 gap-y-1">

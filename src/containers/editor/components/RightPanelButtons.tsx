@@ -22,7 +22,7 @@ export default function RightPanelButtons({ viewMode }: { viewMode: ViewMode }) 
   );
 
   return (
-    <div className="flex items-center ml-auto space-x-2">
+    <div className="flex items-center pl-2 ml-auto space-x-2">
       {viewMode === ViewMode.Text && (
         <>
           <div className="flex items-center rounded-md pl-1 bg-muted text-zinc-600">
