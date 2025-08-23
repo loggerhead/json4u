@@ -4,7 +4,7 @@ import type { Kind, EditorWrapper } from "@/lib/editor/editor";
 import { toastErr, toastSucc, toastWarn } from "@/lib/utils";
 import { sendGAEvent } from "@next/third-parties/google";
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, type LucideIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import type { TranslationValues, useTranslations } from "next-intl";
 import { create } from "zustand";
 import { getStatusState } from "./statusStore";
 import { getUserState } from "./userStore";
@@ -216,4 +216,10 @@ export function useEditor(kind: Kind = "main") {
 
 export function getEditorState() {
   return useEditorStore.getState();
+}
+
+export function t(key: string, values?: TranslationValues): string {
+  const fn = getEditorState().translations;
+  const k = key as MessageKey;
+  return fn ? fn(k, values) : key;
 }

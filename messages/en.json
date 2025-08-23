@@ -218,5 +218,15 @@
   "LoginError": {
     "login_error": "Login Error",
     "go_back_home": "Click here to go back home page"
+  },
+  "Preview": {
+    "ISO": "ISO",
+    "Local": "Local",
+    "Timestamp": "Timestamp",
+    "RelativeTime": "Relative Time",
+    "TimeAgo": "{duration} ago",
+    "TimeFromNow": "{duration} from now",
+    "Decoded": "Decoded",
+    "SignatureLength": "Signature Length"
   }
 }

@@ -218,5 +218,15 @@
   "LoginError": {
     "login_error": "登录失败",
     "go_back_home": "点击返回首页"
+  },
+  "Preview": {
+    "ISO": "ISO",
+    "Local": "本地时间",
+    "Timestamp": "时间戳",
+    "RelativeTime": "距今",
+    "TimeAgo": "{duration} 前",
+    "TimeFromNow": "{duration} 后",
+    "Decoded": "解码",
+    "SignatureLength": "签名长度"
   }
 }
