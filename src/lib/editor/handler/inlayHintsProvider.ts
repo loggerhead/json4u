@@ -2,8 +2,6 @@ import type { EditorWrapper } from "@/lib/editor/editor";
 import type { languages, Range, editorApi, MonacoApi } from "@/lib/editor/types";
 import { getChildCount } from "@/lib/parser";
 
-// Duplicate hints may appear after folding, which seems to be a bug in the Monaco editor:
-// https://github.com/microsoft/monaco-editor/issues/4700
 export class InlayHintsProvider {
   private editorWrapper: EditorWrapper;
   private monaco: MonacoApi["Raw"];
@@ -21,6 +19,7 @@ export class InlayHintsProvider {
 
   private registerInlayHintsProvider() {
     const provider = {
+      // @param range The range of the document that is visible in the editor.
       provideInlayHints: (model: editorApi.ITextModel, range: Range) => {
         const tree = this.editorWrapper.tree;
 
@@ -49,7 +48,15 @@ export class InlayHintsProvider {
           });
         }
 
-        return { hints: this.hints, dispose: () => {} };
+        // Filter hints based on the visible range to avoid duplicates when folding.
+        const { startLineNumber, endLineNumber } = range;
+        const filteredHints = this.hints.filter(
+          (hint) =>
+            hint.position.lineNumber >= startLineNumber &&
+            hint.position.lineNumber <= endLineNumber
+        );
+
+        return { hints: filteredHints, dispose: () => {} };
       },
     };
 
