@@ -24,12 +24,13 @@ export class HoverProvider {
       }
 
       const v = r.node.value;
-      if (v === undefined || isIterable(r.node)) {
+      const rawValue = r.node.rawValue;
+      if (v === undefined || rawValue === undefined || isIterable(r.node)) {
         return;
       }
 
       const valueInStr = String(v);
-      const t = await guessPreviewType(valueInStr);
+      const t = await guessPreviewType(valueInStr, rawValue);
       if (!t) {
         return;
       }
@@ -69,14 +70,14 @@ export class HoverProvider {
   }
 }
 
-type PreviewType = "img" | "url" | "date" | "color" | "base64_encoded" | "uri_encoded" | "jwt";
+type PreviewType = "img" | "url" | "date" | "color" | "base64_encoded" | "uri_encoded" | "jwt" | "unicode_string";
 
 /**
  * Guesses the preview type of a string value.
  * @param value - The string value to guess.
  * @returns The preview type, or undefined if it cannot be guessed.
  */
-async function guessPreviewType(value: string): Promise<PreviewType | undefined> {
+async function guessPreviewType(value: string, rawValue: string): Promise<PreviewType | undefined> {
   // url or img
   if (/^https?:\/\/.*/.test(value)) {
     if (/\.(png|jpg|jpeg|gif|webp|bmp)\b/i.test(value)) {
@@ -119,6 +120,8 @@ async function guessPreviewType(value: string): Promise<PreviewType | undefined>
     return "uri_encoded";
   } else if (isJWT(value)) {
     return "jwt";
+  } else if (/\\u[0-9a-fA-F]{4}/.test(rawValue)) {
+    return "unicode_string";
   }
 
   return;
@@ -186,7 +189,9 @@ function isJWT(str: string): boolean {
  * @returns The HTML for the preview.
  */
 async function genPreviewHTML(type: PreviewType, value: string): Promise<string | string[]> {
-  if (type === "img") {
+  if (type === "unicode_string") {
+    return value;
+  } else if (type === "img") {
     return `<img src="${value}">`;
   } else if (type === "url") {
     const m = urlToMap(value);
