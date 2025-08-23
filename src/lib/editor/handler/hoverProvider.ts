@@ -69,7 +69,7 @@ export class HoverProvider {
   }
 }
 
-type PreviewType = "img" | "url" | "date" | "color" | "base64_encoded" | "uri_encoded";
+type PreviewType = "img" | "url" | "date" | "color" | "base64_encoded" | "uri_encoded" | "jwt";
 
 /**
  * Guesses the preview type of a string value.
@@ -117,6 +117,8 @@ async function guessPreviewType(value: string): Promise<PreviewType | undefined>
     return "base64_encoded";
   } else if (isUriEncoded(value)) {
     return "uri_encoded";
+  } else if (isJWT(value)) {
+    return "jwt";
   }
 
   return;
@@ -173,6 +175,10 @@ function isUriEncoded(str: string): boolean {
   }
 }
 
+function isJWT(str: string): boolean {
+  return /^(eyJ[A-Za-z0-9_\/-]+\.){2}([A-Za-z0-9_\/-]+)?$/.test(str);
+}
+
 /**
  * Generates the HTML for a preview.
  * @param type - The preview type.
@@ -191,6 +197,9 @@ async function genPreviewHTML(type: PreviewType, value: string): Promise<string 
   } else if (type === "uri_encoded") {
     const decoded = decodeURIComponent(value);
     return ["**URI Decoded**", decoded];
+  } else if (type === "jwt") {
+    const decoded = decodeJWT(value);
+    return decoded ? ["**JWT Decoded**", genTable(decoded)] : "";
   } else if (type === "color") {
     const r = convertColor(value);
     if (!r) {
@@ -225,6 +234,22 @@ async function genPreviewHTML(type: PreviewType, value: string): Promise<string 
   }
 
   return "";
+}
+
+function decodeJWT(str: string): Record<string, any> | undefined {
+  try {
+    const parts = str.split(".").map(atob);
+    const decodedParts = parts.slice(0, 2).map((part) => JSON.parse(part));
+    return Object.assign(
+      {
+        signature_length: parts[2].length,
+      },
+      ...decodedParts,
+    );
+  } catch (error) {
+    console.error("Failed to parse JWT parts as JSON:", error);
+    return;
+  }
 }
 
 function genTableForMap(m: Map<string, string | Map<string, any>>): string {

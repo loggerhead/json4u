@@ -15,7 +15,7 @@ export class H {
   constructor(tag: string = "", ...children: (H | string)[]) {
     this.tag = tag;
     this.attrClass = [];
-    this.children = filter(children);
+    this.children = filter(children, (child) => child !== "");
   }
 
   id(id: string | undefined): H {
