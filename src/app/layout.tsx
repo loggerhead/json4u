@@ -59,6 +59,13 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6579013241267492"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
       <body>
         {/* TODO: support dark theme */}
         <ThemeProvider defaultTheme="light" disableTransitionOnChange>
