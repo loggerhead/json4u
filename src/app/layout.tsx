@@ -1,6 +1,6 @@
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { env, isCN } from "@/lib/env";
+import { env } from "@/lib/env";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -17,7 +17,7 @@ export async function generateMetadata() {
       languages: {
         en: "https://json4u.com",
         zh: "https://json4u.cn",
-        "x-default": isCN ? "/zh" : "/en",
+        "x-default": "https://json4u.com",
       },
     },
     applicationName: t("name"),
