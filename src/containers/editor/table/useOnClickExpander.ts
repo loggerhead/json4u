@@ -37,7 +37,7 @@ export function useOnClickExpander() {
 
 function toggle(id: string, hidden: boolean) {
   const el = document.getElementById(genTableId(id));
-  const bindExpander = document.getElementById(genExpanderId(id))!;
+  const bindExpander = document.getElementById(genExpanderId(id));
 
   if (!el) {
     console.error("cannot find element to toggle hidden");
@@ -46,11 +46,15 @@ function toggle(id: string, hidden: boolean) {
 
   if (hidden) {
     el.classList.add("hidden");
-    bindExpander.classList.remove("codicon-folding-expanded");
-    bindExpander.classList.add("codicon-folding-collapsed");
+    if (bindExpander) {
+      bindExpander.classList.remove("codicon-folding-expanded");
+      bindExpander.classList.add("codicon-folding-collapsed");
+    }
   } else {
     el.classList.remove("hidden");
-    bindExpander.classList.add("codicon-folding-expanded");
-    bindExpander.classList.remove("codicon-folding-collapsed");
+    if (bindExpander) {
+      bindExpander.classList.add("codicon-folding-expanded");
+      bindExpander.classList.remove("codicon-folding-collapsed");
+    }
   }
 }
