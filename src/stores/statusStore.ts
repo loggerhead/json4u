@@ -140,9 +140,9 @@ export const useStatusStore = create<StatusState>()(
         } = get();
 
         if (scene === "editor") {
-          return enableSyncScroll ? from !== "editor" : includes(["statusBar", "graphAll"], from);
+          return enableSyncScroll ? from !== "editor" : includes(["statusBar", "graphSync"], from);
         } else if (scene === "graph") {
-          return enableSyncScroll ? from !== "graphOthers" : includes(["statusBar", "search", "graphAll"], from);
+          return enableSyncScroll ? from !== "noGraphSync" : includes(["statusBar", "search", "graphSync"], from);
         }
 
         return false;

@@ -69,7 +69,7 @@ function LayoutGraph() {
       }}
       onNodeClick={(_: React.MouseEvent, node: FlowNode) => {
         clearSearchHl(node.id);
-        setRevealPosition({ treeNodeId: node.id, type: "node", from: "graphOthers" });
+        setRevealPosition({ treeNodeId: node.id, type: "node", from: "noGraphSync" });
 
         (async () => {
           const { nodes, edges } = await window.worker.toggleGraphNodeSelected(node.id);
