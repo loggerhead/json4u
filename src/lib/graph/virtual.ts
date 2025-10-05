@@ -40,8 +40,11 @@ export default function computeVirtualGraph(
 
   const oldRenderMeta = graph.virtual;
   const viewportRect = getRenderRect(viewport, width, height);
-  const { nodes } = computeRealSubgraph(viewportRect, graph);
+
+  const { virtual, nodes } = computeRealSubgraph(viewportRect, graph);
   let changed = computeRealKV(viewportRect, nodes);
+  graph.virtual = virtual;
+
   virtualize(graph);
   const renderable = generateVirtualGraph(graph);
   changed = changed || isSubgraphChanged(oldRenderMeta, graph.virtual);
@@ -81,14 +84,15 @@ function computeRealSubgraph(viewportRect: Rect, graph: Graph): Graph {
   nodes.forEach((nd) => (realNodeIds[nd.id] = true));
   edges.forEach((ed) => (realEdgeIds[ed.id] = true));
 
-  graph.virtual = {
+  const virtual = {
     realNodeIds,
     realEdgeIds,
     omitEdgeIds: {},
     virtualSourceNodeIds: {},
     virtualTargetNodeIds: {},
   };
-  return { nodes, edges };
+
+  return { nodes, edges, virtual };
 }
 
 /**
@@ -141,17 +145,16 @@ function virtualize(graph: Graph) {
     const { kvStart, kvEnd } = realSourceNode?.data?.render ?? { kvStart: -1, kvEnd: -1 };
     const isVirtualSourceHandle = !(realSourceNode && kvStart <= sourceHandleIndex && sourceHandleIndex < kvEnd);
 
+    if (!realSourceNode && isVirtualSourceHandle) {
+      virtualSourceNodeIds![sourceId] = true;
+    }
+
     // Case 1: Both the target node and the source handle are in the viewport.
     if (realTargetNode && !isVirtualSourceHandle) {
       return;
       // Case 2: The target node is in the viewport, but the source handle is not.
     } else if (realTargetNode && isVirtualSourceHandle) {
       const sourceNode = realSourceNode ?? nodeMap[sourceId];
-
-      if (!realSourceNode) {
-        virtualSourceNodeIds![sourceId] = true;
-      }
-
       sourceNode.data.render.virtualHandleIndices[sourceHandleIndex] = true;
       // Case 3: The source handle is in the viewport, but the target node is not.
     } else if (!realTargetNode && !isVirtualSourceHandle) {
