@@ -250,6 +250,7 @@ function newVirtualSourceNode(node: NodeWithData): NodeWithData {
       depth: 0,
       width: node.data.width,
       height: node.data.height,
+      kvWidthMap: {},
       parentId: "",
       targetIds: [],
       render: {
@@ -277,6 +278,7 @@ function newVirtualTargetNode(node: NodeWithData): NodeWithData {
       depth: 0,
       width: 1,
       height: 1,
+      kvWidthMap: {},
       parentId: "",
       targetIds: [],
       render: {

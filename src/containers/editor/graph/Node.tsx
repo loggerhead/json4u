@@ -68,6 +68,8 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                   isChildrenHidden={getNode(child.id)?.hidden}
                   selected={data.idOfSelectedKV === child.id}
                   width={width}
+                  keyWidth={flowNode.data.kvWidthMap[key][0]}
+                  valueWidth={flowNode.data.kvWidthMap[key][1]}
                 />
               );
             } else {
@@ -91,6 +93,8 @@ interface KvProps {
   valueText: string;
   hasChildren: boolean;
   width: number; // used to avoid width jump when viewport changes
+  keyWidth: number;
+  valueWidth: number;
   isChildrenHidden?: boolean;
   selected?: boolean;
 }
@@ -144,6 +148,7 @@ const KV = memo((props: KvProps) => {
           isInput ? (
             <input
               className={cn("graph-v", props.valueClassName)}
+              style={{ width: props.valueWidth }}
               value={content}
               // Stop the click event from propagating to prevent unwanted parent element clicks
               onClick={(e) => e.stopPropagation()}

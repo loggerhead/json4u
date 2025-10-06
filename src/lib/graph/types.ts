@@ -19,6 +19,7 @@ export type NodeWithData = FlowNode<{
   depth: number; // max distance from leaf node
   width: number; // The width of the node in pixels
   height: number; // The height of the node in pixels
+  kvWidthMap: Record<string, [number, number]>; // child key-value pair width map. type is {key: [keyWidth, valueWidth]}
   render: NodeRender; // The rendering configuration of the node
   toolbarVisible?: boolean; // Whether the node's toolbar is visible
   style?: React.CSSProperties; // Custom CSS styles for the node

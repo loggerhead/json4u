@@ -84,12 +84,15 @@ function doGenFlowNodes(
   let maxKvWidth = 0;
   let maxChildDepth = hasChildren(node) ? 0 : -1;
 
+  // compute max key-value width and max child depth
   tree.mapChildren(node, (child, key, i) => {
     const keyText = genKeyText(key);
     const { text } = genValueAttrs(child);
     const keyWidth = Math.min(computeTextWidth(keyText, globalStyle.fontWidth), globalStyle.maxKeyWidth);
     const valueWidth = Math.min(computeTextWidth(text, globalStyle.fontWidth), globalStyle.maxValueWidth);
     const kvWidth = globalStyle.padding + keyWidth + globalStyle.kvGap + valueWidth + 2 * globalStyle.borderWidth;
+
+    flowNode.data.kvWidthMap[key] = [keyWidth, valueWidth];
     maxKvWidth = Math.max(maxKvWidth, kvWidth);
 
     if (hasChildren(child)) {
@@ -116,6 +119,7 @@ function newFlowNode(node: Node, parentId: string, level: number): NodeWithData 
       depth: 0,
       width: 0,
       height: childrenNum * globalStyle.kvHeight + 2 * globalStyle.borderWidth,
+      kvWidthMap: {},
       parentId,
       targetIds: [],
       render: {

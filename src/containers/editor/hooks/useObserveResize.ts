@@ -20,7 +20,7 @@ export function useObserveResize(leftPanelId: string, rightPanelId: string) {
       for (const entry of entries) {
         if (entry.target.id === leftPanelId) {
           setLeftPanelWidth(entry.contentRect.width);
-        } else {
+        } else if (entry.target.id === rightPanelId) {
           setRightPanelWidth(entry.contentRect.width);
         }
       }
