@@ -8,7 +8,8 @@ import "@xyflow/react/dist/style.css";
 import { debounce } from "lodash-es";
 import MouseButton from "./MouseButton";
 import { ObjectNode, RootNode, VirtualTargetNode } from "./Node";
-import { useClearSearchHl, useRevealNode, useViewportChange } from "./useViewportChange";
+import { useClearSearchHl } from "./useClickNode";
+import { useRevealNode, useViewportChange } from "./useViewportChange";
 import useVirtualGraph from "./useVirtualGraph";
 
 export default function Graph() {

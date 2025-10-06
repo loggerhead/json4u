@@ -1,10 +1,9 @@
-import { memo, useState, type MouseEvent } from "react";
+import { memo, useState } from "react";
 import { computeSourceHandleOffset, genKeyText, genValueAttrs, globalStyle } from "@/lib/graph/layout";
-import type { EdgeWithData, NodeWithData, RevealFrom, RevealType } from "@/lib/graph/types";
-import { getParentId, rootMarker } from "@/lib/idgen/pointer";
+import type { NodeWithData } from "@/lib/graph/types";
+import { rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren, isIterableType, type NodeType } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
-import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
 import { Handle, Position, useReactFlow, type NodeProps } from "@xyflow/react";
 import { filter } from "lodash-es";
@@ -12,7 +11,7 @@ import { useTranslations } from "next-intl";
 import { SourceHandle, TargetHandle } from "./Handle";
 import Popover from "./Popover";
 import Toolbar from "./Toolbar";
-import { useClearSearchHl } from "./useViewportChange";
+import useClickNode from "./useClickNode";
 
 export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   const { getNode } = useReactFlow();
@@ -98,32 +97,13 @@ interface KvProps {
 const KV = memo((props: KvProps) => {
   const keyText = genKeyText(props.property);
   const keyClass = typeof props.property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
-  const parentId = getParentId(props.id);
   const isIterable = isIterableType(props.nodeType);
 
   const [isInput, setIsInput] = useState(false);
   const [content, setContent] = useState(props.valueText);
   const tree = useTree();
-  const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
-  const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
-  const clearSearchHl = useClearSearchHl();
+  const onClick = useClickNode();
   const t = useTranslations();
-
-  const onClick = (e: MouseEvent, id: string, type: RevealType, from: RevealFrom = "graph") => {
-    e.stopPropagation();
-    clearSearchHl(getParentId(id));
-    setRevealPosition({
-      treeNodeId: id,
-      type,
-      from,
-    });
-
-    (async () => {
-      const { nodes, edges } = await window.worker.toggleGraphNodeSelected(parentId, props.id);
-      setNodes(nodes);
-      setEdges(edges);
-    })();
-  };
 
   return (
     <div

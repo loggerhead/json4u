@@ -1,10 +1,9 @@
-import { type Dispatch, type RefObject, type SetStateAction, useCallback, useEffect, useState } from "react";
+import { type Dispatch, type RefObject, type SetStateAction, useEffect, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
 import { clearHighlight, highlightElement } from "@/lib/graph/utils";
 import { refreshInterval } from "@/lib/graph/virtual";
 import { useDebounceFn } from "@/lib/hooks";
-import { getParentId } from "@/lib/idgen";
 import { useStatusStore } from "@/stores/statusStore";
 import { getTree } from "@/stores/treeStore";
 import { useOnViewportChange, useReactFlow } from "@xyflow/react";
@@ -155,23 +154,4 @@ export function useRevealNode(
       setWaitToMeasure([]);
     }
   }, [revealPosition, isNeedReveal, isMeasured]);
-}
-
-// clear highlight of search result
-export function useClearSearchHl() {
-  const revealPosition = useStatusStore((state) => state.revealPosition);
-
-  return useCallback(
-    (nodeId?: string) => {
-      const isCurrentNode =
-        revealPosition.type === "node"
-          ? nodeId === revealPosition.treeNodeId
-          : nodeId === getParentId(revealPosition.treeNodeId);
-
-      if (!isCurrentNode) {
-        clearHighlight();
-      }
-    },
-    [revealPosition],
-  );
 }

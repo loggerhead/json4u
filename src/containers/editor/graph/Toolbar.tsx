@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, ReactNode } from "react";
+import { memo, type MouseEventHandler, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
 import { getParentId } from "@/lib/idgen";
@@ -10,6 +10,7 @@ import { NodeToolbar, Position, useReactFlow } from "@xyflow/react";
 import { ArrowLeft, CopyMinus, CopyPlus, SquareMinus, SquarePlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
+import useClickNode from "./useClickNode";
 
 interface ToolbarProps {
   id: string;
@@ -18,10 +19,10 @@ interface ToolbarProps {
 const Toolbar = memo(({ id }: ToolbarProps) => {
   const t = useTranslations();
   const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
+  const onClick = useClickNode();
 
-  const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode, setRevealPosition } = useStatusStore(
+  const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode } = useStatusStore(
     useShallow((state) => ({
-      setRevealPosition: state.setRevealPosition,
       toggleFoldNode: state.toggleFoldNode,
       toggleFoldSibingsNode: state.toggleFoldSibingsNode,
       fold: !state.unfoldNodeMap[id],
@@ -46,13 +47,8 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
       {!isRoot && (
         <ToolbarButton
           title={t("go to parent")}
-          onClick={async () => {
-            if (parentId) {
-              const { nodes, edges } = await window.worker.toggleGraphNodeSelected(parentId);
-              setNodes(nodes);
-              setEdges(edges);
-              setRevealPosition({ treeNodeId: parentId, type: "node", from: "graphButton" });
-            }
+          onClick={(e) => {
+            parentId && onClick(e, parentId, "node", "graphButton");
           }}
         >
           <ArrowLeft className="icon" />
@@ -91,7 +87,7 @@ Toolbar.displayName = "Toolbar";
 
 interface ToolbarButtonProps {
   title: string;
-  onClick: () => void;
+  onClick: MouseEventHandler<HTMLButtonElement>;
   children: ReactNode;
 }
 
@@ -104,7 +100,7 @@ const ToolbarButton = memo(({ title, onClick, children }: ToolbarButtonProps) =>
       onClick={(ev) => {
         ev.preventDefault();
         ev.stopPropagation();
-        onClick();
+        onClick(ev);
       }}
     >
       {children}
