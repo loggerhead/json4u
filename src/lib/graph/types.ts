@@ -17,12 +17,13 @@ export type NodeWithData = FlowNode<{
   targetIds: string[];
   level: number; // distance from root node
   depth: number; // max distance from leaf node
-  width: number;
-  height: number;
-  render: NodeRender;
-  toolbarVisible?: boolean;
-  style?: React.CSSProperties;
-  selected?: boolean;
+  width: number; // The width of the node in pixels
+  height: number; // The height of the node in pixels
+  render: NodeRender; // The rendering configuration of the node
+  toolbarVisible?: boolean; // Whether the node's toolbar is visible
+  style?: React.CSSProperties; // Custom CSS styles for the node
+  selected?: boolean; // Whether the node is selected
+  idOfSelectedKV?: string; // Index of the selected key-value pair in the node
 }>;
 
 interface NodeRender {

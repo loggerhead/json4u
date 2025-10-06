@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { config } from "@/lib/graph/layout";
 import { useStatusStore } from "@/stores/statusStore";
 import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
-import { type Node as FlowNode } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { debounce } from "lodash-es";
 import MouseButton from "./MouseButton";
@@ -62,15 +61,6 @@ function LayoutGraph() {
 
         (async () => {
           const { nodes, edges } = await window.worker.clearGraphNodeSelected();
-          setNodes(nodes);
-          setEdges(edges);
-        })();
-      }}
-      onNodeClick={(_: React.MouseEvent, node: FlowNode) => {
-        clearSearchHl(node.id);
-
-        (async () => {
-          const { nodes, edges } = await window.worker.toggleGraphNodeSelected(node.id);
           setNodes(nodes);
           setEdges(edges);
         })();

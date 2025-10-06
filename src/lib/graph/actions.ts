@@ -38,7 +38,7 @@ export function toggleNodeHidden(graph: Graph, nodeId: string, handleId?: string
  * @param id - The ID of the node to toggle.
  * @returns The updated graph.
  */
-export function toggleNodeSelected(graph: Graph, id: string) {
+export function toggleNodeSelected(graph: Graph, id: string, selectedChildId?: string) {
   const node = graph.nodeMap?.[id]!;
   const { nodes: ancestorNodes, edges: ancestorEdges } = getAncestor(graph, id);
   const { nodes: descendantNodes, edges: descendantEdges } = getDescendant(graph, id);
@@ -55,6 +55,15 @@ export function toggleNodeSelected(graph: Graph, id: string) {
     (nd) => toggleToolbar(highlightNode(nd, true, nd.id === id), node),
     (nd) => toggleToolbar(highlightNode(nd, false), node),
   );
+
+  if (selectedChildId) {
+    node.data.idOfSelectedKV = selectedChildId;
+  }
+
+  ancestorEdges.forEach((ed) => {
+    const nd = graph.nodeMap?.[ed.source]!;
+    nd.data.idOfSelectedKV = ed.id;
+  });
 
   return generateVirtualGraph(graph);
 }

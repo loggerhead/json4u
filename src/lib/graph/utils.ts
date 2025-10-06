@@ -111,6 +111,7 @@ export function highlightNode(node: NodeWithData, enable: boolean, isSelected?: 
     node.data.selected = isSelected;
   } else {
     node.data.selected = undefined;
+    node.data.idOfSelectedKV = undefined;
   }
 
   node.style = style;

@@ -1,6 +1,6 @@
-import { memo } from "react";
+import { memo, type MouseEvent } from "react";
 import { computeSourceHandleOffset, genKeyText, genValueAttrs, globalStyle } from "@/lib/graph/layout";
-import type { NodeWithData } from "@/lib/graph/types";
+import type { EdgeWithData, NodeWithData, RevealType } from "@/lib/graph/types";
 import { rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { filter } from "lodash-es";
 import { SourceHandle, TargetHandle } from "./Handle";
 import Popover from "./Popover";
 import Toolbar from "./Toolbar";
+import { useClearSearchHl } from "./useViewportChange";
 
 export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   const { getNode } = useReactFlow();
@@ -59,10 +60,12 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                   key={i}
                   index={i}
                   property={node.type === "array" ? i : key}
+                  parentId={node.id}
                   valueClassName={className}
                   valueText={text}
                   hasChildren={hasChildren(child)}
                   isChildrenHidden={getNode(child.id)?.hidden ?? false}
+                  selected={data.idOfSelectedKV === child.id}
                   width={width}
                 />
               );
@@ -82,50 +85,60 @@ interface KvProps {
   id: string;
   index: number;
   property: string | number;
+  parentId: string;
   valueClassName: string;
   valueText: string;
   hasChildren: boolean;
   width: number; // used to avoid width jump when viewport changes
   isChildrenHidden: boolean;
+  selected?: boolean;
 }
 
-const KV = memo(({ id, index, property, valueClassName, valueText, hasChildren, width, isChildrenHidden }: KvProps) => {
-  const keyText = genKeyText(property);
-  const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
+const KV = memo((props: KvProps) => {
+  const keyText = genKeyText(props.property);
+  const keyClass = typeof props.property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
+
+  const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
   const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
+  const clearSearchHl = useClearSearchHl();
+
+  const onClick = (e: MouseEvent, type: RevealType) => {
+    e.stopPropagation();
+    clearSearchHl(props.parentId);
+    setRevealPosition({
+      treeNodeId: props.id,
+      type: type,
+      from: "graph",
+    });
+
+    (async () => {
+      const { nodes, edges } = await window.worker.toggleGraphNodeSelected(props.parentId, props.id);
+      setNodes(nodes);
+      setEdges(edges);
+    })();
+  };
 
   return (
     <div
-      className={"graph-kv hover:bg-blue-100 dark:hover:bg-blue-900"}
-      style={{ width }}
-      data-tree-id={id}
-      onClick={() => {
-        setRevealPosition({
-          treeNodeId: id,
-          type: "key",
-          from: "graph",
-        });
-      }}
+      className={cn(
+        "graph-kv hover:bg-blue-100 dark:hover:bg-blue-900",
+        props.selected && "bg-blue-100 dark:bg-blue-900",
+      )}
+      style={{ width: props.width }}
+      data-tree-id={props.id}
+      onClick={(e) => onClick(e, "key")}
     >
-      <Popover width={width} hlClass={keyClass} text={keyText}>
+      <Popover width={props.width} hlClass={keyClass} text={keyText}>
         <div className={cn("graph-k hover:bg-yellow-100", keyClass)}>{keyText}</div>
       </Popover>
-      <Popover width={width} hlClass={valueClassName} text={valueText}>
-        <div
-          className={cn("graph-v hover:bg-yellow-100", valueClassName)}
-          onClick={(e) => {
-            e.stopPropagation();
-            setRevealPosition({
-              treeNodeId: id,
-              type: "value",
-              from: "graph",
-            });
-          }}
-        >
-          {valueText}
+      <Popover width={props.width} hlClass={props.valueClassName} text={props.valueText}>
+        <div className={cn("graph-v hover:bg-yellow-100", props.valueClassName)} onClick={(e) => onClick(e, "value")}>
+          {props.valueText}
         </div>
       </Popover>
-      {hasChildren && <SourceHandle id={keyText} indexInParent={index} isChildrenHidden={isChildrenHidden} />}
+      {props.hasChildren && (
+        <SourceHandle id={keyText} indexInParent={props.index} isChildrenHidden={props.isChildrenHidden} />
+      )}
     </div>
   );
 });
