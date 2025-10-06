@@ -22,8 +22,9 @@ export default function Editor({ kind, ...props }: EditorProps) {
   const setEditor = useEditorStore((state) => state.setEditor);
   const setTranslations = useEditorStore((state) => state.setTranslations);
 
-  useDisplayExample();
-  useRevealNode();
+  useDisplayExample(kind);
+  useRevealNode(kind);
+  useEditTree(kind);
 
   return (
     <MonacoEditor
@@ -66,7 +67,7 @@ export default function Editor({ kind, ...props }: EditorProps) {
 }
 
 // reveal position in text
-export function useRevealNode() {
+export function useRevealNode(kind: Kind) {
   const editor = useEditor("main");
   const { isNeedReveal, revealPosition } = useStatusStore(
     useShallow((state) => ({
@@ -78,13 +79,30 @@ export function useRevealNode() {
   useEffect(() => {
     const { treeNodeId, type } = revealPosition;
 
-    if (editor && isNeedReveal && treeNodeId) {
+    if (kind === "main" && editor && isNeedReveal && treeNodeId) {
       const node = getTree().node(treeNodeId);
       if (node) {
         editor.revealOffset((type === "key" ? node.boundOffset : node.offset) + 1);
       }
     }
   }, [editor, revealPosition, isNeedReveal]);
+}
+
+export function useEditTree(kind: Kind) {
+  const editor = useEditor("main");
+  const { editQueue, clearEditQueue } = useStatusStore(
+    useShallow((state) => ({
+      editQueue: state.editQueue,
+      clearEditQueue: state.clearEditQueue,
+    })),
+  );
+
+  useEffect(() => {
+    if (kind === "main" && editor && editQueue.length > 0) {
+      editor.editNodes(editQueue);
+      clearEditQueue();
+    }
+  }, [editor, editQueue]);
 }
 
 const exampleData = `{
@@ -135,12 +153,12 @@ const exampleData = `{
   "Clarke Peters": null
 }`;
 
-function useDisplayExample() {
+function useDisplayExample(kind: Kind) {
   const editor = useEditor("main");
   const incrEditorInitCount = useStatusStore((state) => state.incrEditorInitCount);
 
   useEffect(() => {
-    if (editor && incrEditorInitCount() <= 1) {
+    if (kind === "main" && editor && incrEditorInitCount() <= 1) {
       editor.parseAndSet(exampleData);
     }
   }, [editor]);

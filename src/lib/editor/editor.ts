@@ -1,7 +1,7 @@
 import { ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
-import { getStatusState } from "@/stores/statusStore";
+import { getStatusState, type TreeEdit } from "@/stores/statusStore";
 import { getTreeState } from "@/stores/treeStore";
 import { sendGAEvent } from "@next/third-parties/google";
 import { debounce, type DebouncedFunc } from "lodash-es";
@@ -118,6 +118,29 @@ export class EditorWrapper {
     resetCursor && this.revealPosition(1, 1);
     console.l("set tree:", tree);
     return tree;
+  }
+
+  editNodes(treeEdits: Array<TreeEdit>) {
+    // Keep the last value for each treeNodeId in edits
+    const uniqueEdits: Array<TreeEdit> = [];
+    const idMap = new Map<string, number>();
+    treeEdits.forEach((edit, index) => idMap.set(edit.nodeId, index));
+    idMap.forEach((index) => uniqueEdits.push(treeEdits[index]));
+    treeEdits = uniqueEdits;
+
+    const nodes = treeEdits
+      .map((edit) => ({ ...this.tree.node(edit.nodeId), newValue: edit.value }))
+      .filter((node) => node);
+    if (nodes.length === 0) {
+      return;
+    }
+
+    const edits = nodes.map((node) => ({
+      text: node.type === "string" ? `"${node.newValue}"` : node.newValue,
+      range: this.range(node.offset, node.length),
+    }));
+    this.editor.executeEdits(null, edits);
+    this.editor.pushUndoStop();
   }
 
   async parseAndSet(

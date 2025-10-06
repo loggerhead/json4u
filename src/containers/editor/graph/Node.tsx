@@ -1,9 +1,10 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { computeSourceHandleOffset, genKeyText, genValueAttrs, globalStyle } from "@/lib/graph/layout";
 import type { NodeWithData } from "@/lib/graph/types";
 import { rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren, isIterableType, type NodeType } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
+import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
 import { Handle, Position, useReactFlow, type NodeProps } from "@xyflow/react";
 import { filter } from "lodash-es";
@@ -104,6 +105,13 @@ const KV = memo((props: KvProps) => {
   const tree = useTree();
   const onClick = useClickNode();
   const t = useTranslations();
+  const addToEditQueue = useStatusStore((state) => state.addToEditQueue);
+
+  useEffect(() => {
+    if (!isInput && content !== props.valueText) {
+      addToEditQueue({ nodeId: props.id, value: content });
+    }
+  }, [props.id, isInput, content]);
 
   return (
     <div
@@ -141,7 +149,9 @@ const KV = memo((props: KvProps) => {
               onClick={(e) => e.stopPropagation()}
               onChange={(e) => setContent(e.target.value)}
               onBlur={() => setIsInput(false)}
+              onKeyDown={(e) => e.key === "Enter" && setIsInput(false)}
               autoFocus
+              onFocus={(e) => (e.target as HTMLInputElement).select()}
             />
           ) : (
             // If not in input mode, render a div displaying the content

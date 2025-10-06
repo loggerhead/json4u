@@ -11,6 +11,11 @@ interface Position {
   column: number;
 }
 
+export interface TreeEdit {
+  nodeId: string;
+  value: string;
+}
+
 export type CommandMode = "jq" | "json_path";
 
 export interface StatusState extends Config {
@@ -28,6 +33,7 @@ export interface StatusState extends Config {
   showPricingOverlay?: boolean;
   unfoldNodeMap: Record<string, boolean>;
   unfoldSiblingsNodeMap: Record<string, boolean>;
+  editQueue: Array<TreeEdit>;
 
   incrEditorInitCount: () => number;
   setLeftPanelWidth: (width: number) => void;
@@ -47,6 +53,8 @@ export interface StatusState extends Config {
   setFixSideNav: (fix: boolean) => void;
   setShowPricingOverlay: (show: boolean) => void;
   setIsTouchpad: (isTouchpad: boolean) => void;
+  addToEditQueue: (...edits: TreeEdit[]) => void;
+  clearEditQueue: () => void;
   toggleFoldNode: (nodeId: string) => void;
   toggleFoldSibingsNode: (nodeId: string) => void;
   resetFoldStatus: () => void;
@@ -61,6 +69,7 @@ const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   revealPosition: { version: 0, treeNodeId: "", type: "node", from: "editor" },
   unfoldNodeMap: {},
   unfoldSiblingsNodeMap: {},
+  editQueue: [],
 };
 
 export const useStatusStore = create<StatusState>()(
@@ -170,6 +179,16 @@ export const useStatusStore = create<StatusState>()(
 
       setIsTouchpad(isTouchpad: boolean) {
         set({ isTouchpad });
+      },
+
+      addToEditQueue(...edits: TreeEdit[]) {
+        const { editQueue } = get();
+        editQueue.push(...edits);
+        set({ editQueue: [...editQueue] });
+      },
+
+      clearEditQueue() {
+        set({ editQueue: [] });
       },
 
       toggleFoldNode(nodeId: string) {
