@@ -45,12 +45,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
       offset={0}
     >
       {!isRoot && (
-        <ToolbarButton
-          title={t("go to parent")}
-          onClick={(e) => {
-            parentId && onClick(e, parentId, "node", "graphButton");
-          }}
-        >
+        <ToolbarButton title={t("go to parent")} onClick={(e) => parentId && onClick(e, id, "key", "graphButton")}>
           <ArrowLeft className="icon" />
         </ToolbarButton>
       )}

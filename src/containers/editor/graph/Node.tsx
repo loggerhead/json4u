@@ -116,15 +116,16 @@ const KV = memo((props: KvProps) => {
       style={{ width: props.width }}
       data-tree-id={props.id}
       onClick={isInput ? undefined : (e) => onClick(e, props.id, "key")}
-      // Double-click to trigger the click event on the first child node
-      onDoubleClick={
-        !isIterable || isInput
-          ? undefined
-          : (e) => {
-              const childrenIds = tree.childrenIds(tree.node(props.id));
-              childrenIds.length > 0 && onClick(e, childrenIds[0], "key", "graphButton");
-            }
-      }
+      onDoubleClick={(e) => {
+        // Prevent double-click from triggering viewport zoom (https://reactflow.dev/learn/concepts/the-viewport)
+        e.stopPropagation();
+
+        // Double-click to trigger the click event on the first child node
+        if (isIterable && !isInput) {
+          const childrenIds = tree.childrenIds(tree.node(props.id));
+          childrenIds.length > 0 && onClick(e, childrenIds[0], "key", "graphButton");
+        }
+      }}
     >
       <Popover width={props.width} hlClass={keyClass} text={keyText}>
         <div className={cn("graph-k hover:bg-yellow-100", keyClass)}>{keyText}</div>
