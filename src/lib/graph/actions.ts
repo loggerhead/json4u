@@ -38,7 +38,11 @@ export function toggleNodeHidden(graph: Graph, nodeId: string, handleId?: string
  * @param id - The ID of the node to toggle.
  * @returns The updated graph.
  */
-export function toggleNodeSelected(graph: Graph, id: string, selectedChildId?: string) {
+export function toggleNodeSelected(graph: Graph, id?: string, selectedChildId?: string) {
+  if (!id) {
+    return graph;
+  }
+
   const node = graph.nodeMap?.[id]!;
   const { nodes: ancestorNodes, edges: ancestorEdges } = getAncestor(graph, id);
   const { nodes: descendantNodes, edges: descendantEdges } = getDescendant(graph, id);

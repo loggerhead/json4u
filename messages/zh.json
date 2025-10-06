@@ -86,6 +86,8 @@
   "related_features": "相关功能",
   "collapse_hint": "拖动到此处折叠",
   "copy_json_path": "复制 JSON path",
+  "double_click_to_reveal_first_child": "双击聚焦到第一个子节点",
+  "double_click_to_enter_edit_mode": "双击进入编辑模式",
   "Home": {
     "Features": "功能",
     "Pricing": "价格",

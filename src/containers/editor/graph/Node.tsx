@@ -1,13 +1,14 @@
-import { memo, type MouseEvent } from "react";
+import { memo, useState, type MouseEvent } from "react";
 import { computeSourceHandleOffset, genKeyText, genValueAttrs, globalStyle } from "@/lib/graph/layout";
-import type { EdgeWithData, NodeWithData, RevealType } from "@/lib/graph/types";
-import { rootMarker } from "@/lib/idgen/pointer";
-import { getChildrenKeys, hasChildren } from "@/lib/parser/node";
+import type { EdgeWithData, NodeWithData, RevealFrom, RevealType } from "@/lib/graph/types";
+import { getParentId, rootMarker } from "@/lib/idgen/pointer";
+import { getChildrenKeys, hasChildren, isIterableType, type NodeType } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
 import { Handle, Position, useReactFlow, type NodeProps } from "@xyflow/react";
 import { filter } from "lodash-es";
+import { useTranslations } from "next-intl";
 import { SourceHandle, TargetHandle } from "./Handle";
 import Popover from "./Popover";
 import Toolbar from "./Toolbar";
@@ -59,12 +60,12 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                   id={child.id}
                   key={i}
                   index={i}
+                  nodeType={child.type}
                   property={node.type === "array" ? i : key}
-                  parentId={node.id}
                   valueClassName={className}
                   valueText={text}
                   hasChildren={hasChildren(child)}
-                  isChildrenHidden={getNode(child.id)?.hidden ?? false}
+                  isChildrenHidden={getNode(child.id)?.hidden}
                   selected={data.idOfSelectedKV === child.id}
                   width={width}
                 />
@@ -84,35 +85,41 @@ ObjectNode.displayName = "ObjectNode";
 interface KvProps {
   id: string;
   index: number;
+  nodeType: NodeType;
   property: string | number;
-  parentId: string;
   valueClassName: string;
   valueText: string;
   hasChildren: boolean;
   width: number; // used to avoid width jump when viewport changes
-  isChildrenHidden: boolean;
+  isChildrenHidden?: boolean;
   selected?: boolean;
 }
 
 const KV = memo((props: KvProps) => {
   const keyText = genKeyText(props.property);
   const keyClass = typeof props.property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
+  const parentId = getParentId(props.id);
+  const isIterable = isIterableType(props.nodeType);
 
+  const [isInput, setIsInput] = useState(false);
+  const [content, setContent] = useState(props.valueText);
+  const tree = useTree();
   const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
   const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
   const clearSearchHl = useClearSearchHl();
+  const t = useTranslations();
 
-  const onClick = (e: MouseEvent, type: RevealType) => {
+  const onClick = (e: MouseEvent, id: string, type: RevealType, from: RevealFrom = "graph") => {
     e.stopPropagation();
-    clearSearchHl(props.parentId);
+    clearSearchHl(getParentId(id));
     setRevealPosition({
-      treeNodeId: props.id,
-      type: type,
-      from: "graph",
+      treeNodeId: id,
+      type,
+      from,
     });
 
     (async () => {
-      const { nodes, edges } = await window.worker.toggleGraphNodeSelected(props.parentId, props.id);
+      const { nodes, edges } = await window.worker.toggleGraphNodeSelected(parentId, props.id);
       setNodes(nodes);
       setEdges(edges);
     })();
@@ -123,18 +130,51 @@ const KV = memo((props: KvProps) => {
       className={cn(
         "graph-kv hover:bg-blue-100 dark:hover:bg-blue-900",
         props.selected && "bg-blue-100 dark:bg-blue-900",
+        isIterable && "cursor-pointer",
       )}
+      title={isIterable ? t("double_click_to_reveal_first_child") : ""}
       style={{ width: props.width }}
       data-tree-id={props.id}
-      onClick={(e) => onClick(e, "key")}
+      onClick={(e) => onClick(e, props.id, "key")}
+      onDoubleClick={(e) => {
+        if (isIterable) {
+          const childrenIds = tree.childrenIds(tree.node(props.id));
+          if (childrenIds.length > 0) {
+            onClick(e, childrenIds[0], "key", "graphButton");
+          }
+        }
+      }}
     >
       <Popover width={props.width} hlClass={keyClass} text={keyText}>
         <div className={cn("graph-k hover:bg-yellow-100", keyClass)}>{keyText}</div>
       </Popover>
-      <Popover width={props.width} hlClass={props.valueClassName} text={props.valueText}>
-        <div className={cn("graph-v hover:bg-yellow-100", props.valueClassName)} onClick={(e) => onClick(e, "value")}>
-          {props.valueText}
-        </div>
+      <Popover width={props.width} hlClass={props.valueClassName} text={content}>
+        {isInput ? (
+          <input
+            className={cn("graph-v", props.valueClassName)}
+            value={content}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => setContent(e.target.value)}
+            onBlur={() => setIsInput(false)}
+            autoFocus
+          />
+        ) : (
+          <div
+            className={cn("graph-v hover:bg-yellow-100", props.valueClassName)}
+            title={isIterable ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
+            onClick={(e) => onClick(e, props.id, "value")}
+            onDoubleClick={
+              isIterable
+                ? undefined
+                : (e) => {
+                    setIsInput(true);
+                    setContent(props.valueText);
+                  }
+            }
+          >
+            {content}
+          </div>
+        )}
       </Popover>
       {props.hasChildren && (
         <SourceHandle id={keyText} indexInParent={props.index} isChildrenHidden={props.isChildrenHidden} />

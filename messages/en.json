@@ -86,6 +86,8 @@
   "related_features": "Related Features",
   "collapse_hint": "Drag here to collapse",
   "copy_json_path": "Copy JSON path",
+  "double_click_to_reveal_first_child": "Double-click to focus on the first child node",
+  "double_click_to_enter_edit_mode": "Double-click to enter edit mode",
   "Home": {
     "Features": "Features",
     "Pricing": "Pricing",

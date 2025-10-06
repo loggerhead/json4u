@@ -35,7 +35,11 @@ export function isRoot(node: Node) {
 }
 
 export function isIterable(node: Node) {
-  return node.type === "array" || node.type === "object";
+  return isIterableType(node.type);
+}
+
+export function isIterableType(t: NodeType) {
+  return t === "array" || t === "object";
 }
 
 export function hasChildren(node: Node | undefined) {

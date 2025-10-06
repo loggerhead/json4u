@@ -268,14 +268,15 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
 
 .popover-container {
   display: flex;
+  flex-direction: column;
   height: auto;
   max-height: 250px;
   overflow: hidden;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
 
   .popover-item {
     width: max-content;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
     word-wrap: break-word;
     font-size: 12px;
     padding: 10px;

@@ -174,7 +174,7 @@ export function toggleGraphNodeHidden(nodeId: string, handleId?: string, hide?: 
   return toggleNodeHidden(getViewState().graph, nodeId, handleId, hide);
 }
 
-export function toggleGraphNodeSelected(nodeId: string, selectedChildId?: string) {
+export function toggleGraphNodeSelected(nodeId?: string, selectedChildId?: string) {
   return toggleNodeSelected(getViewState().graph, nodeId, selectedChildId);
 }
 
