@@ -1,5 +1,5 @@
 import { type Config, defaultConfig, keyName, type ViewMode, type ViewModeValue, storage } from "@/lib/db/config";
-import type { RevealPosition } from "@/lib/graph/types";
+import type { RevealFrom, RevealPosition } from "@/lib/graph/types";
 import { type ParseOptions } from "@/lib/parser";
 import { type FunctionKeys } from "@/lib/utils";
 import { includes } from "lodash-es";
@@ -139,13 +139,17 @@ export const useStatusStore = create<StatusState>()(
           revealPosition: { from },
         } = get();
 
-        if (scene === "editor") {
-          return enableSyncScroll ? from !== "editor" : includes(["statusBar", "graphSync"], from);
+        let ok = false;
+
+        if (enableSyncScroll) {
+          ok = from !== scene;
+        } else if (scene === "editor") {
+          ok = includes<RevealFrom>(["statusBar"], from);
         } else if (scene === "graph") {
-          return enableSyncScroll ? from !== "noGraphSync" : includes(["statusBar", "search", "graphSync"], from);
+          ok = includes<RevealFrom>(["statusBar", "search", "graphButton"], from);
         }
 
-        return false;
+        return ok;
       },
 
       setEnableSyncScroll(enable: boolean) {

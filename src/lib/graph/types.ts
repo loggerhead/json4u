@@ -57,12 +57,7 @@ export interface Graph {
 }
 
 export type RevealType = "node" | "key" | "value";
-export type RevealFrom =
-  | "editor"
-  | "statusBar"
-  | "search"
-  | "graphSync" // Indicates reveal action should sync to editor view
-  | "noGraphSync"; // Indicates reveal action should NOT sync to graph view
+export type RevealFrom = "editor" | "statusBar" | "search" | "graph" | "graphButton";
 
 export interface RevealPosition {
   version: number; // version is used to re-trigger when assigned same id by caller

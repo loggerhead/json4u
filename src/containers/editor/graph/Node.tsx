@@ -4,6 +4,7 @@ import type { NodeWithData } from "@/lib/graph/types";
 import { rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
+import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
 import { Handle, Position, useReactFlow, type NodeProps } from "@xyflow/react";
 import { filter } from "lodash-es";
@@ -91,14 +92,38 @@ interface KvProps {
 const KV = memo(({ id, index, property, valueClassName, valueText, hasChildren, width, isChildrenHidden }: KvProps) => {
   const keyText = genKeyText(property);
   const keyClass = typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
+  const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
 
   return (
-    <div className="graph-kv" style={{ width }} data-tree-id={id}>
+    <div
+      className={"graph-kv hover:bg-blue-100 dark:hover:bg-blue-900"}
+      style={{ width }}
+      data-tree-id={id}
+      onClick={() => {
+        setRevealPosition({
+          treeNodeId: id,
+          type: "key",
+          from: "graph",
+        });
+      }}
+    >
       <Popover width={width} hlClass={keyClass} text={keyText}>
-        <div className={cn("graph-k", keyClass)}>{keyText}</div>
+        <div className={cn("graph-k hover:bg-yellow-100", keyClass)}>{keyText}</div>
       </Popover>
       <Popover width={width} hlClass={valueClassName} text={valueText}>
-        <div className={cn("graph-v", valueClassName)}>{valueText}</div>
+        <div
+          className={cn("graph-v hover:bg-yellow-100", valueClassName)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setRevealPosition({
+              treeNodeId: id,
+              type: "value",
+              from: "graph",
+            });
+          }}
+        >
+          {valueText}
+        </div>
       </Popover>
       {hasChildren && <SourceHandle id={keyText} indexInParent={index} isChildrenHidden={isChildrenHidden} />}
     </div>

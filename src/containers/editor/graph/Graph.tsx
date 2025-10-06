@@ -24,7 +24,6 @@ export default function Graph() {
 
 function LayoutGraph() {
   const ref = useRef<HTMLDivElement>(null);
-  const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
   const isTouchpad = useStatusStore((state) => state.isTouchpad);
 
   // The graph will render three times because:
@@ -69,7 +68,6 @@ function LayoutGraph() {
       }}
       onNodeClick={(_: React.MouseEvent, node: FlowNode) => {
         clearSearchHl(node.id);
-        setRevealPosition({ treeNodeId: node.id, type: "node", from: "noGraphSync" });
 
         (async () => {
           const { nodes, edges } = await window.worker.toggleGraphNodeSelected(node.id);

@@ -186,11 +186,13 @@ export class EditorWrapper {
           return;
         }
 
-        getStatusState().setRevealPosition({
-          treeNodeId: r.node.id,
-          type: r.type,
-          from: "editor",
-        });
+        if (e.source == "mouse") {
+          getStatusState().setRevealPosition({
+            treeNodeId: r.node.id,
+            type: r.type,
+            from: "editor",
+          });
+        }
       },
       200,
       { trailing: true },
