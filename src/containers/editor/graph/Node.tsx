@@ -115,46 +115,46 @@ const KV = memo((props: KvProps) => {
       title={isIterable ? t("double_click_to_reveal_first_child") : ""}
       style={{ width: props.width }}
       data-tree-id={props.id}
-      onClick={(e) => onClick(e, props.id, "key")}
-      onDoubleClick={(e) => {
-        if (isIterable) {
-          const childrenIds = tree.childrenIds(tree.node(props.id));
-          if (childrenIds.length > 0) {
-            onClick(e, childrenIds[0], "key", "graphButton");
-          }
-        }
-      }}
+      onClick={isInput ? undefined : (e) => onClick(e, props.id, "key")}
+      // Double-click to trigger the click event on the first child node
+      onDoubleClick={
+        !isIterable || isInput
+          ? undefined
+          : (e) => {
+              const childrenIds = tree.childrenIds(tree.node(props.id));
+              childrenIds.length > 0 && onClick(e, childrenIds[0], "key", "graphButton");
+            }
+      }
     >
       <Popover width={props.width} hlClass={keyClass} text={keyText}>
         <div className={cn("graph-k hover:bg-yellow-100", keyClass)}>{keyText}</div>
       </Popover>
       <Popover width={props.width} hlClass={props.valueClassName} text={content}>
-        {isInput ? (
-          <input
-            className={cn("graph-v", props.valueClassName)}
-            value={content}
-            onClick={(e) => e.stopPropagation()}
-            onChange={(e) => setContent(e.target.value)}
-            onBlur={() => setIsInput(false)}
-            autoFocus
-          />
-        ) : (
-          <div
-            className={cn("graph-v hover:bg-yellow-100", props.valueClassName)}
-            title={isIterable ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
-            onClick={(e) => onClick(e, props.id, "value")}
-            onDoubleClick={
-              isIterable
-                ? undefined
-                : (e) => {
-                    setIsInput(true);
-                    setContent(props.valueText);
-                  }
-            }
-          >
-            {content}
-          </div>
-        )}
+        {
+          // If in input mode, render an input field for editing the content
+          isInput ? (
+            <input
+              className={cn("graph-v", props.valueClassName)}
+              value={content}
+              // Stop the click event from propagating to prevent unwanted parent element clicks
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => setContent(e.target.value)}
+              onBlur={() => setIsInput(false)}
+              autoFocus
+            />
+          ) : (
+            // If not in input mode, render a div displaying the content
+            <div
+              className={cn("graph-v hover:bg-yellow-100", props.valueClassName)}
+              title={isIterable ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
+              onClick={(e) => onClick(e, props.id, "value")}
+              // Double-click to enter input mode
+              onDoubleClick={() => !isIterable && setIsInput(true)}
+            >
+              {content}
+            </div>
+          )
+        }
       </Popover>
       {props.hasChildren && (
         <SourceHandle id={keyText} indexInParent={props.index} isChildrenHidden={props.isChildrenHidden} />
