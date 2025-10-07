@@ -163,9 +163,7 @@ export class Tree implements TreeObject {
       return undefined;
     }
 
-    if (this.isGraphNode(node)) {
-      return { node, target: "graphNode" };
-    } else if (node.offset < offset && offset <= node.offset + node.length) {
+    if (node.offset < offset && offset <= node.offset + node.length) {
       return { node, target: "value" };
     } else {
       return { node, target: "key" };
