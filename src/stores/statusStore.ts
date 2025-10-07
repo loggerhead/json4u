@@ -1,5 +1,5 @@
 import { type Config, defaultConfig, keyName, type ViewMode, type ViewModeValue, storage } from "@/lib/db/config";
-import type { RevealFrom, RevealPosition } from "@/lib/graph/types";
+import type { RevealFrom, RevealPosition, RevealType } from "@/lib/graph/types";
 import { GraphNodeId } from "@/lib/idgen";
 import { type ParseOptions } from "@/lib/parser";
 import { type FunctionKeys } from "@/lib/utils";
@@ -14,6 +14,7 @@ interface Position {
 
 export interface TreeEdit {
   treeNodeId: string;
+  type: RevealType;
   value: string;
   version?: number;
 }
@@ -68,7 +69,7 @@ const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   editorInitCount: 0,
   cursorPosition: { line: 0, column: 0 },
   selectionLength: 0,
-  revealPosition: { version: 0, treeNodeId: "", type: "node", from: "editor" },
+  revealPosition: { version: 0, treeNodeId: "", type: "graphNode", from: "editor" },
   unfoldNodeMap: {},
   unfoldSiblingsNodeMap: {},
   editQueue: [],

@@ -110,7 +110,8 @@ export interface SubGraph {
   edges: EdgeWithData[];
 }
 
-export type RevealType = "node" | "key" | "value";
+// The type of the node in the graph to be revealed.
+export type RevealType = "graphNode" | "keyValue" | "key" | "value";
 export type RevealFrom =
   | "editor"
   | "statusBar"

@@ -120,6 +120,7 @@ interface ParseNode extends Node {
   path: jsonc.JSONPath;
   parent?: ParseNode;
   childrenOffset?: Record<string, number>;
+  childrenKeyLength?: Record<string, number>;
 }
 
 class Visitor {
@@ -146,12 +147,14 @@ class Visitor {
       type: "object",
       offset: 0,
       length: 0,
+      keyLength: 0,
       boundOffset: 0,
       boundLength: 0,
       path: this.parentMeta.path,
       childrenKeys: [],
       childrenKey2Id: {},
       childrenOffset: {},
+      childrenKeyLength: {},
     };
   }
 
@@ -165,6 +168,7 @@ class Visitor {
       type,
       offset,
       length,
+      keyLength: 0,
       boundOffset: offset,
       boundLength: length,
       path,
@@ -175,6 +179,7 @@ class Visitor {
       node.childrenKeys = [];
       node.childrenKey2Id = {};
       node.childrenOffset = {};
+      node.childrenKeyLength = {};
     }
 
     this.nodeMap[node.id] = node;
@@ -191,10 +196,14 @@ class Visitor {
   addChild(child: ParseNode) {
     const key = String(last(child.path));
     const childOffset = this.currentParent.childrenOffset?.[key];
+    const childKeyLength = this.currentParent.childrenKeyLength?.[key];
 
     if (childOffset !== undefined) {
       child.boundOffset = childOffset;
       computeAndSetBoundLength(child);
+    }
+    if (childKeyLength !== undefined) {
+      child.keyLength = childKeyLength;
     }
 
     this.currentParent.childrenKeys!.push(key);
@@ -240,6 +249,7 @@ class Visitor {
     }
 
     this.currentParent.childrenOffset![key] = offset;
+    this.currentParent.childrenKeyLength![key] = key.length;
   }
 
   onLiteralValue(value: any, offset: number, length: number, pathSupplier: () => jsonc.JSONPath) {

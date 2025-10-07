@@ -1,11 +1,12 @@
 import { memo, useCallback, useState } from "react";
+import type { RevealType } from "@/lib/graph/types";
 import { isIterableType, type NodeType } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
 import { useTranslations } from "next-intl";
+import EditableText from "./EditableText";
 import { SourceHandle } from "./Handle";
-import Popover from "./Popover";
 import useClickNode from "./useClickNode";
 
 interface KvProps {
@@ -26,20 +27,22 @@ interface KvProps {
 
 const KV = memo((props: KvProps) => {
   const isIterable = isIterableType(props.nodeType);
-  const keyClassNamesWithoutHighlight = props.keyClassNames.slice(0, 1);
-  const valueClassNamesWithoutHighlight = props.valueClassNames.slice(0, 1);
 
-  const [isInput, setIsInput] = useState(false);
-  const [content, setContent] = useState(props.valueText);
+  const [inputMode, setInputMode] = useState<RevealType | "">("");
   const tree = useTree();
   const { onClick, cancelClickNode } = useClickNode();
   const t = useTranslations();
 
   const addToEditQueue = useStatusStore((state) => state.addToEditQueue);
-  const callEdit = useCallback(() => {
-    setIsInput(false);
-    addToEditQueue({ treeNodeId: props.id, value: content, version: tree.version });
-  }, [props.id, content, tree.version]);
+  const onEdit = useCallback(
+    (value: string) => {
+      if (inputMode) {
+        addToEditQueue({ treeNodeId: props.id, type: inputMode, value, version: tree.version });
+        setInputMode("");
+      }
+    },
+    [props.id, inputMode, tree.version, addToEditQueue],
+  );
 
   return (
     <div
@@ -51,9 +54,9 @@ const KV = memo((props: KvProps) => {
       title={isIterable ? t("double_click_to_reveal_first_child") : ""}
       style={{ width: props.width }}
       data-tree-id={props.id}
-      onClick={isInput ? undefined : (e) => onClick(e, props.id, "key", "graphClick")}
+      onClick={inputMode ? undefined : (e) => onClick(e, props.id, "keyValue", "graphClick")}
       onDoubleClick={(e) => {
-        if (!(isIterable && !isInput)) {
+        if (!(isIterable && !inputMode)) {
           return;
         }
 
@@ -68,50 +71,33 @@ const KV = memo((props: KvProps) => {
         }
       }}
     >
-      <Popover width={props.width} hlClassNames={keyClassNamesWithoutHighlight} text={props.keyText}>
-        <div className={cn("graph-k hover:bg-yellow-100", ...props.keyClassNames)}>{props.keyText}</div>
-      </Popover>
-      <Popover width={props.width} hlClassNames={valueClassNamesWithoutHighlight} text={content}>
-        {
-          // If in input mode, render an input field for editing the content
-          isInput ? (
-            <input
-              className={cn("graph-v", ...valueClassNamesWithoutHighlight)}
-              style={{ width: props.valueWidth }}
-              value={content}
-              // Stop the click event from propagating to prevent unwanted parent element clicks
-              onClick={(e) => e.stopPropagation()}
-              onChange={(e) => setContent(e.target.value)}
-              onFocus={(e) => (e.target as HTMLInputElement).select()}
-              autoFocus
-              onBlur={callEdit}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  callEdit();
-                }
-              }}
-            />
-          ) : (
-            // If not in input mode, render a div displaying the content
-            <div
-              className={cn("graph-v hover:bg-yellow-100", ...props.valueClassNames)}
-              title={isIterable ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
-              onClick={(e) => onClick(e, props.id, "value", "graphClick")}
-              // Double-click to enter input mode
-              onDoubleClick={() => {
-                if (isIterable) {
-                  return;
-                }
-
-                cancelClickNode();
-                setIsInput(true);
-              }}
-            >
-              {content}
-            </div>
-          )
-        }
-      </Popover>
+      <EditableText
+        classNames={["graph-k", ...props.keyClassNames]}
+        text={props.keyText}
+        onDoubleClick={() => {
+          cancelClickNode();
+          setInputMode("key");
+        }}
+        onClick={(e) => onClick(e, props.id, "key", "graphClick")}
+        onEdit={(value) => onEdit(value)}
+        title={t("double_click_to_enter_edit_mode")}
+        popoverWidth={props.width}
+        widthInInput={props.keyWidth}
+      />
+      <EditableText
+        classNames={["graph-v", ...props.valueClassNames]}
+        text={props.valueText}
+        isIterable={isIterable}
+        onDoubleClick={() => {
+          cancelClickNode();
+          setInputMode("value");
+        }}
+        onClick={(e) => onClick(e, props.id, "value", "graphClick")}
+        onEdit={(value) => onEdit(value)}
+        title={isIterable ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
+        widthInInput={props.valueWidth}
+        popoverWidth={props.width}
+      />
       {props.hasChildren && (
         <SourceHandle id={props.keyText} indexInParent={props.index} isChildrenHidden={props.isChildrenHidden} />
       )}

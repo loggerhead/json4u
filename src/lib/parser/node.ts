@@ -19,9 +19,10 @@ export type NodeType = "object" | "array" | "string" | "number" | "boolean" | "n
 
 export interface Node {
   id: string; // construct by json pointer with format of `$/a/b/c`
-  type: NodeType;
+  type: NodeType; // type of node. For property node, it is the type of value.
   offset: number; // offset of rawValue in the whole text
   length: number; // length of rawValue
+  keyLength: number; // length of key without quotes (only property node have)
   boundOffset: number; // offset of bounding in the whole text
   boundLength: number; // length of bounding
   value?: any; // value with type (only leaf node have)

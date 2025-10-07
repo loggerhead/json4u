@@ -1,3 +1,4 @@
+import type { RevealType } from "@/lib/graph/types";
 import { getParentId, rootMarker } from "@/lib/idgen";
 import { escape } from "@/lib/worker/command/escape";
 import * as jsonc from "jsonc-parser";
@@ -124,7 +125,7 @@ export class Tree implements TreeObject {
     return this.isGraphNode(node) ? nodeId : getParentId(nodeId);
   }
 
-  findNodeAtOffset(offset: number): { node: Node; type: "node" | "key" | "value" } | undefined {
+  findNodeAtOffset(offset: number): { node: Node; type: RevealType } | undefined {
     if (!this.valid()) {
       return undefined;
     }
@@ -168,7 +169,7 @@ export class Tree implements TreeObject {
     }
 
     if (this.isGraphNode(node)) {
-      return { node, type: "node" };
+      return { node, type: "graphNode" };
     } else {
       return { node, type: node.offset < offset && offset <= node.offset + node.length ? "value" : "key" };
     }

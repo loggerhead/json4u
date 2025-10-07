@@ -100,8 +100,24 @@ export class EditorWrapper {
       return;
     }
 
-    const offset = type === "key" ? node.boundOffset : node.offset;
-    const length = type === "key" ? node.boundLength : node.length;
+    let offset = 0;
+    let length = 0;
+
+    if (type === "graphNode" || type === "keyValue") {
+      offset = node.boundOffset;
+      length = node.boundLength;
+    } else if (type === "key") {
+      offset = node.boundOffset;
+      length = node.keyLength + 2;
+    } else if (type === "value") {
+      offset = node.offset;
+      length = node.length;
+    }
+
+    if (length === 0) {
+      return;
+    }
+
     this.revealOffset(offset + 1);
     const range = this.range(offset, length);
     this.editor.setSelection(range);
@@ -144,17 +160,21 @@ export class EditorWrapper {
     treeEdits = uniqueEdits.filter((edit) => edit.version === this.tree.version);
 
     const nodes = treeEdits
-      .map((edit) => ({ ...this.tree.node(edit.treeNodeId), newValue: edit.value }))
+      .map((edit) => ({
+        ...this.tree.node(edit.treeNodeId),
+        newValue: edit.value,
+        editType: edit.type,
+      }))
       .filter((node) => node);
     if (nodes.length === 0) {
       return;
     }
 
-    const edits = nodes.map((node) => ({
-      text: node.type === "string" ? `"${node.newValue}"` : node.newValue,
-      range: this.range(node.offset, node.length),
+    const edits = nodes.map(({ editType, newValue, ...nd }) => ({
+      text: editType === "key" || nd.type === "string" ? `"${newValue}"` : newValue,
+      range: editType === "key" ? this.range(nd.boundOffset, nd.keyLength + 2) : this.range(nd.offset, nd.length),
     }));
-    console.l("edit nodes: ", treeEdits, edits);
+    console.l("edit nodes: ", treeEdits, nodes, edits);
 
     this.editor.executeEdits(null, edits);
     this.editor.pushUndoStop();

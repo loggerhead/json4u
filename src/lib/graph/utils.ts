@@ -18,7 +18,7 @@ export function toGraphNodeId(treeNodeId: string): GraphNodeId {
 
 export function getGraphNodeId(treeNodeId: string, type: RevealType) {
   const parentId = getParentId(treeNodeId);
-  return toGraphNodeId(type === "node" ? treeNodeId : (parentId ?? ""));
+  return toGraphNodeId(type === "graphNode" ? treeNodeId : (parentId ?? ""));
 }
 
 export function newGraph(g?: Omit<Graph, "__type">): Graph {

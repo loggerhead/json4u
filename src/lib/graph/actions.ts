@@ -156,7 +156,7 @@ export function computeRevealPosition(
   let xOffset = 0;
   let yOffset = 0;
 
-  if (type !== "node") {
+  if (type !== "graphNode") {
     const i = tree.node(parent!).childrenKeys?.indexOf(lastKey) ?? 0;
     yOffset = computeSourceHandleOffset(i);
     xOffset = type === "key" ? 0 : graphNode.data.width / 2;

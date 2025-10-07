@@ -156,7 +156,8 @@ const useViewStore = createStore<ViewState>((set, get) => ({
     const results: SearchResult[] = keysResults.map((r) => {
       const node = r.obj;
       const isMatchValue = r[0].score <= r[1].score;
-      const revealType = (isRoot(node) && "node") || (isMatchValue && "value") || (hasChildren(node) ? "node" : "key");
+      const revealType =
+        (isRoot(node) && "graphNode") || (isMatchValue && "value") || (hasChildren(node) ? "graphNode" : "key");
 
       return {
         revealType,
