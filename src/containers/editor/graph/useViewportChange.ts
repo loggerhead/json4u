@@ -1,6 +1,6 @@
 import { type Dispatch, type RefObject, type SetStateAction, useEffect } from "react";
 import { ViewMode } from "@/lib/db/config";
-import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
+import type { EdgeWithData, NodeWithData, RevealFrom } from "@/lib/graph/types";
 import { refreshInterval } from "@/lib/graph/virtual";
 import { useDebounceFn } from "@/lib/hooks";
 import { useStatusStore } from "@/stores/statusStore";
@@ -112,7 +112,7 @@ export function useRevealNode(
         setNodes(nodes);
         setEdges(edges);
 
-        if (!includes(["graph", "graphClick"], revealPosition.from)) {
+        if (!includes<RevealFrom>(["graph", "graphClick"], revealPosition.from)) {
           setCenter(x, y, { duration: 0, zoom });
         }
       }

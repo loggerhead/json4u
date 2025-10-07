@@ -10,7 +10,7 @@ interface EditableTextProps {
   onEdit: (value: string) => void;
   title: string;
   popoverWidth: number;
-  isIterable?: boolean;
+  editable?: boolean;
   widthInInput?: number;
 }
 
@@ -38,6 +38,7 @@ const EditableText = memo((props: EditableTextProps) => {
           onBlur={callEdit}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
+              e.stopPropagation();
               callEdit();
             }
           }}
@@ -47,8 +48,9 @@ const EditableText = memo((props: EditableTextProps) => {
           className={cn("hover:bg-yellow-100", ...props.classNames)}
           title={props.title}
           onClick={props.onClick}
-          onDoubleClick={() => {
-            if (!props.isIterable) {
+          onDoubleClick={(e) => {
+            if (props.editable) {
+              e.stopPropagation();
               props.onDoubleClick();
               setIsInput(true);
             }

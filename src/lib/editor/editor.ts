@@ -1,11 +1,11 @@
 import type { RevealTarget } from "@/lib/graph/types";
-import { ParseOptions, Tree } from "@/lib/parser";
+import { NodeType, ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
 import { getStatusState, type TreeEdit } from "@/stores/statusStore";
 import { getTreeState } from "@/stores/treeStore";
 import { sendGAEvent } from "@next/third-parties/google";
-import { debounce, type DebouncedFunc } from "lodash-es";
+import { debounce, includes, type DebouncedFunc } from "lodash-es";
 import { HoverProvider } from "./handler/hoverProvider";
 import { InlayHintsProvider } from "./handler/inlayHintsProvider";
 import { editorApi, IPosition, IScrollEvent } from "./types";
@@ -176,7 +176,8 @@ export class EditorWrapper {
     }
 
     const edits = nodes.map(({ editTarget, newValue, ...nd }) => ({
-      text: editTarget === "key" || nd.type === "string" ? `"${newValue}"` : newValue,
+      text:
+        editTarget === "key" || includes<NodeType>(["string", "object", "array"], nd.type) ? `"${newValue}"` : newValue,
       range: editTarget === "key" ? this.range(nd.boundOffset, nd.keyLength + 2) : this.range(nd.offset, nd.length),
     }));
     console.l("edit nodes: ", treeEdits, nodes, edits);

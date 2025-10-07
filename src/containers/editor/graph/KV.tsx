@@ -1,6 +1,5 @@
 import { memo, useCallback, useState } from "react";
 import type { RevealTarget } from "@/lib/graph/types";
-import { isIterableType, type NodeType } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
@@ -12,7 +11,6 @@ import useClickNode from "./useClickNode";
 interface KvProps {
   id: string; // tree node id of the key
   index: number; // The index of the key-value pair in the node, used to calculate the distance from the handle to the top border of the graph node
-  nodeType: NodeType;
   keyText: string;
   keyClassNames: string[];
   valueText: string;
@@ -26,12 +24,12 @@ interface KvProps {
 }
 
 const KV = memo((props: KvProps) => {
-  const isIterable = isIterableType(props.nodeType);
-
   const [inputMode, setInputMode] = useState<RevealTarget | "">("");
-  const tree = useTree();
   const { onClick, cancelClickNode } = useClickNode();
   const t = useTranslations();
+
+  const tree = useTree();
+  const parentNode = tree.getParent(props.id)!;
 
   const addToEditQueue = useStatusStore((state) => state.addToEditQueue);
   const onEdit = useCallback(
@@ -49,17 +47,18 @@ const KV = memo((props: KvProps) => {
       className={cn(
         "graph-kv hover:bg-blue-100 dark:hover:bg-blue-900",
         props.selected && "bg-blue-100 dark:bg-blue-900",
-        isIterable && "cursor-pointer",
+        props.hasChildren && "cursor-pointer",
       )}
-      title={isIterable ? t("double_click_to_reveal_first_child") : ""}
+      title={props.hasChildren ? t("double_click_to_reveal_first_child") : ""}
       style={{ width: props.width }}
       data-tree-id={props.id}
       onClick={inputMode ? undefined : (e) => onClick(e, props.id, "keyValue", "graphClick")}
       onDoubleClick={(e) => {
-        if (!(isIterable && !inputMode)) {
+        if (!(props.hasChildren && !inputMode)) {
           return;
         }
 
+        e.stopPropagation();
         cancelClickNode();
         // Double-click to focus on the first child node
         const childrenIds = tree.childrenIds(tree.node(props.id));
@@ -74,6 +73,7 @@ const KV = memo((props: KvProps) => {
       <EditableText
         classNames={["graph-k", ...props.keyClassNames]}
         text={props.keyText}
+        editable={parentNode.type !== "array"}
         onDoubleClick={() => {
           cancelClickNode();
           setInputMode("key");
@@ -87,14 +87,14 @@ const KV = memo((props: KvProps) => {
       <EditableText
         classNames={["graph-v", ...props.valueClassNames]}
         text={props.valueText}
-        isIterable={isIterable}
+        editable={!props.hasChildren}
         onDoubleClick={() => {
           cancelClickNode();
           setInputMode("value");
         }}
         onClick={(e) => onClick(e, props.id, "value", "graphClick")}
         onEdit={(value) => onEdit(value)}
-        title={isIterable ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
+        title={props.hasChildren ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
         widthInInput={props.valueWidth}
         popoverWidth={props.width}
       />

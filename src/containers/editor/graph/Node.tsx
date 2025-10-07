@@ -65,11 +65,12 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                 />
               );
             } else if (kvStart <= i && i < kvEnd) {
-              const kvTreeNodeId = child.id;
               const property = treeNode.type === "array" ? i : key;
               const keyText = genKeyText(property);
               const keyClassName =
                 typeof property === "number" ? "text-hl-index" : keyText ? "text-hl-key" : "text-hl-empty";
+
+              const kvTreeNodeId = child.id;
               const hlClassName = revealNodeId === kvTreeNodeId && "search-highlight";
               const { className, text } = genValueAttrs(child);
 
@@ -78,7 +79,6 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                   id={kvTreeNodeId}
                   key={i}
                   index={i}
-                  nodeType={child.type}
                   keyText={keyText}
                   keyClassNames={[keyClassName, (revealTarget === "key" && hlClassName) || ""]}
                   valueText={text}
