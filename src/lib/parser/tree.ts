@@ -1,5 +1,5 @@
 import type { RevealType } from "@/lib/graph/types";
-import { getParentId, rootMarker } from "@/lib/idgen";
+import { rootMarker } from "@/lib/idgen";
 import { escape } from "@/lib/worker/command/escape";
 import * as jsonc from "jsonc-parser";
 import { isEmpty, repeat } from "lodash-es";
@@ -118,11 +118,6 @@ export class Tree implements TreeObject {
 
   isGraphNode(node: Node) {
     return isRoot(node) || hasChildren(node);
-  }
-
-  getGraphNodeId(nodeId: string) {
-    const node = this.node(nodeId);
-    return this.isGraphNode(node) ? nodeId : getParentId(nodeId);
   }
 
   findNodeAtOffset(offset: number): { node: Node; type: RevealType } | undefined {
