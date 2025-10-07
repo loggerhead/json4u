@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from "react";
-import type { RevealType } from "@/lib/graph/types";
+import type { RevealTarget } from "@/lib/graph/types";
 import { isIterableType, type NodeType } from "@/lib/parser/node";
 import { cn } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
@@ -28,7 +28,7 @@ interface KvProps {
 const KV = memo((props: KvProps) => {
   const isIterable = isIterableType(props.nodeType);
 
-  const [inputMode, setInputMode] = useState<RevealType | "">("");
+  const [inputMode, setInputMode] = useState<RevealTarget | "">("");
   const tree = useTree();
   const { onClick, cancelClickNode } = useClickNode();
   const t = useTranslations();
@@ -37,7 +37,7 @@ const KV = memo((props: KvProps) => {
   const onEdit = useCallback(
     (value: string) => {
       if (inputMode) {
-        addToEditQueue({ treeNodeId: props.id, type: inputMode, value, version: tree.version });
+        addToEditQueue({ treeNodeId: props.id, target: inputMode, value, version: tree.version });
         setInputMode("");
       }
     },

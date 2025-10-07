@@ -18,15 +18,15 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
   const treeNode = tree.node(id);
   const graphNode = getGraphNode(id) as NodeWithData | undefined;
 
-  const { revealNodeId, revealType } = useStatusStore(
+  const { revealNodeId, revealTarget } = useStatusStore(
     useShallow((state) => {
-      const { treeNodeId, type: revealType } = state.revealPosition;
+      const { treeNodeId, target: revealTarget } = state.revealPosition;
       if (treeNodeId === id) {
-        return { revealNodeId: id, revealType };
+        return { revealNodeId: id, revealTarget };
       } else if (isChild(id, treeNodeId)) {
-        return { revealNodeId: treeNodeId, revealType };
+        return { revealNodeId: treeNodeId, revealTarget };
       } else {
-        return { revealNodeId: "", revealType };
+        return { revealNodeId: "", revealTarget };
       }
     }),
   );
@@ -80,9 +80,9 @@ export const ObjectNode = memo(({ id, data }: NodeProps<NodeWithData>) => {
                   index={i}
                   nodeType={child.type}
                   keyText={keyText}
-                  keyClassNames={[keyClassName, (revealType === "key" && hlClassName) || ""]}
+                  keyClassNames={[keyClassName, (revealTarget === "key" && hlClassName) || ""]}
                   valueText={text}
-                  valueClassNames={[className, (revealType === "value" && hlClassName) || ""]}
+                  valueClassNames={[className, (revealTarget === "value" && hlClassName) || ""]}
                   hasChildren={hasChildren(child)}
                   isChildrenHidden={getGraphNode(kvTreeNodeId)?.hidden}
                   selected={data.selectedKvId === kvTreeNodeId}

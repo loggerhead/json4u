@@ -16,7 +16,7 @@ export class HoverProvider {
   private registerHoverProvider() {
     const previewProvider = async (model: editorApi.ITextModel, position: IPosition) => {
       const r = this.editorWrapper.getNodeAtPosition(position);
-      if (!r || r?.type === "key") {
+      if (!r || r?.target === "key") {
         return;
       }
 

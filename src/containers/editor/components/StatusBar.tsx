@@ -68,7 +68,7 @@ function JsonPath() {
                   const node = tree.node(id);
                   setRevealPosition({
                     treeNodeId: id,
-                    type: tree.isGraphNode(node) ? "graphNode" : "keyValue",
+                    target: tree.isGraphNode(node) ? "graphNode" : "keyValue",
                     from: "statusBar",
                   });
                 }}

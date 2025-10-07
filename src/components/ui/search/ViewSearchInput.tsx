@@ -16,7 +16,7 @@ export default function ViewSearchInput() {
       id="view-search"
       openListOnFocus
       search={(input) => window.worker?.searchInView(input)}
-      onSelect={(item) => setRevealPosition({ treeNodeId: item.id, type: item.revealType, from: "search" })}
+      onSelect={(item) => setRevealPosition({ treeNodeId: item.id, target: item.revealTarget, from: "search" })}
       Item={Item}
       itemHeight={48}
       placeholder={"search_json"}
@@ -26,7 +26,7 @@ export default function ViewSearchInput() {
 }
 
 function Item(props: SearchResult) {
-  const { revealType, id, label } = props;
+  const { revealTarget, id, label } = props;
   const node = getTree().node(id);
 
   if (!node) {
@@ -36,7 +36,7 @@ function Item(props: SearchResult) {
   const pathStr = ["$", ...toPath(id)].join(" > ");
   let className = "";
 
-  if (revealType === "value") {
+  if (revealTarget === "value") {
     const { className: cls } = genValueAttrs(node);
     className = cls;
   } else if (!hasChildren(node)) {

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { EdgeWithData, Graph, NodeWithData, RevealType, SubGraph } from "@/lib/graph/types";
+import type { EdgeWithData, Graph, NodeWithData, RevealTarget, SubGraph } from "@/lib/graph/types";
 import { getParentId, type GraphNodeId } from "@/lib/idgen";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
 import { filter, keyBy } from "lodash-es";
@@ -16,9 +16,9 @@ export function toGraphNodeId(treeNodeId: string): GraphNodeId {
   return treeNodeId as GraphNodeId;
 }
 
-export function getGraphNodeId(treeNodeId: string, type: RevealType) {
+export function getGraphNodeId(treeNodeId: string, target: RevealTarget) {
   const parentId = getParentId(treeNodeId);
-  return toGraphNodeId(type === "graphNode" ? treeNodeId : (parentId ?? ""));
+  return toGraphNodeId(target === "graphNode" ? treeNodeId : (parentId ?? ""));
 }
 
 export function newGraph(g?: Omit<Graph, "__type">): Graph {

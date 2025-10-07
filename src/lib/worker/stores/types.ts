@@ -1,7 +1,7 @@
-import type { RevealType } from "@/lib/graph/types";
+import type { RevealTarget } from "@/lib/graph/types";
 
 export interface SearchResult {
-  revealType: RevealType;
+  revealTarget: RevealTarget;
   id: string;
   label: string;
 }

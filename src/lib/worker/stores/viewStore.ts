@@ -128,8 +128,8 @@ const useViewStore = createStore<ViewState>((set, get) => ({
 
   setGraphRevealPosition(pos: RevealPosition, zoom: number) {
     const { tree, graph, graphWidth, graphHeight } = getViewState();
-    const { treeNodeId, type } = pos;
-    const graphNodeId = getGraphNodeId(treeNodeId, type);
+    const { treeNodeId, target } = pos;
+    const graphNodeId = getGraphNodeId(treeNodeId, target);
 
     const r = computeRevealPosition(graphWidth, graphHeight, graph, tree, pos);
     if (!r) {
@@ -156,11 +156,11 @@ const useViewStore = createStore<ViewState>((set, get) => ({
     const results: SearchResult[] = keysResults.map((r) => {
       const node = r.obj;
       const isMatchValue = r[0].score <= r[1].score;
-      const revealType =
+      const revealTarget =
         (isRoot(node) && "graphNode") || (isMatchValue && "value") || (hasChildren(node) ? "graphNode" : "key");
 
       return {
-        revealType,
+        revealTarget,
         id: node.id,
         label: isMatchValue ? (getRawValue(node) ?? "") : lastKey(node.id),
       };

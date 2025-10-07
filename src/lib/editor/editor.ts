@@ -1,4 +1,4 @@
-import type { RevealType } from "@/lib/graph/types";
+import type { RevealTarget } from "@/lib/graph/types";
 import { ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
@@ -94,7 +94,7 @@ export class EditorWrapper {
     }
   }
 
-  setNodeSelection(nodeId: string, type: RevealType) {
+  setNodeSelection(nodeId: string, target: RevealTarget) {
     const node = this.tree.node(nodeId);
     if (!node) {
       return;
@@ -103,13 +103,13 @@ export class EditorWrapper {
     let offset = 0;
     let length = 0;
 
-    if (type === "graphNode" || type === "keyValue") {
+    if (target === "graphNode" || target === "keyValue") {
       offset = node.boundOffset;
       length = node.boundLength;
-    } else if (type === "key") {
+    } else if (target === "key") {
       offset = node.boundOffset;
       length = node.keyLength + 2;
-    } else if (type === "value") {
+    } else if (target === "value") {
       offset = node.offset;
       length = node.length;
     }
@@ -163,16 +163,16 @@ export class EditorWrapper {
       .map((edit) => ({
         ...this.tree.node(edit.treeNodeId),
         newValue: edit.value,
-        editType: edit.type,
+        editTarget: edit.target,
       }))
       .filter((node) => node);
     if (nodes.length === 0) {
       return;
     }
 
-    const edits = nodes.map(({ editType, newValue, ...nd }) => ({
-      text: editType === "key" || nd.type === "string" ? `"${newValue}"` : newValue,
-      range: editType === "key" ? this.range(nd.boundOffset, nd.keyLength + 2) : this.range(nd.offset, nd.length),
+    const edits = nodes.map(({ editTarget, newValue, ...nd }) => ({
+      text: editTarget === "key" || nd.type === "string" ? `"${newValue}"` : newValue,
+      range: editTarget === "key" ? this.range(nd.boundOffset, nd.keyLength + 2) : this.range(nd.offset, nd.length),
     }));
     console.l("edit nodes: ", treeEdits, nodes, edits);
 
@@ -249,7 +249,7 @@ export class EditorWrapper {
         if (e.source == "mouse") {
           getStatusState().setRevealPosition({
             treeNodeId: r.node.id,
-            type: r.type,
+            target: r.target,
             from: "editor",
           });
         }

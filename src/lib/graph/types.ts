@@ -110,8 +110,9 @@ export interface SubGraph {
   edges: EdgeWithData[];
 }
 
-// The type of the node in the graph to be revealed.
-export type RevealType = "graphNode" | "keyValue" | "key" | "value";
+// The type of the UI element to be revealed, specifying *what* to highlight or focus on.
+// This is distinct from `NodeType`, which describes the underlying JSON data type (e.g., object, string).
+export type RevealTarget = "graphNode" | "keyValue" | "key" | "value";
 export type RevealFrom =
   | "editor"
   | "statusBar"
@@ -121,9 +122,14 @@ export type RevealFrom =
   | "graphDoubleClick" // need reveal to the position
   | "graphButton"; // need reveal to the position
 
+/**
+ * Represents a request to reveal a specific element in the UI.
+ * This object is used as an event to coordinate actions between different components (e.g., editor, graph).
+ * It contains all the information needed to fulfill the reveal request, such as the target node and the source of the action.
+ */
 export interface RevealPosition {
   version: number; // version is used to re-trigger when assigned same id by caller
-  type: RevealType;
+  target: RevealTarget;
   from: RevealFrom;
   treeNodeId: string;
 }

@@ -137,7 +137,7 @@ export function computeRevealPosition(
   height: number,
   graph: Graph,
   tree: Tree,
-  { type, treeNodeId }: RevealPosition,
+  { target, treeNodeId }: RevealPosition,
 ):
   | {
       center: XYPosition;
@@ -145,21 +145,21 @@ export function computeRevealPosition(
     }
   | undefined {
   const { parent, lastKey } = splitParentPointer(treeNodeId);
-  const graphNodeId = getGraphNodeId(treeNodeId, type);
+  const graphNodeId = getGraphNodeId(treeNodeId, target);
   const graphNode = graph.nodeMap?.[graphNodeId];
 
   if (!graphNode) {
-    console.error("computeRevealPosition (node not found):", treeNodeId, type, graphNodeId, graph);
+    console.error("computeRevealPosition (node not found):", treeNodeId, target, graphNodeId, graph);
     return;
   }
 
   let xOffset = 0;
   let yOffset = 0;
 
-  if (type !== "graphNode") {
+  if (target !== "graphNode") {
     const i = tree.node(parent!).childrenKeys?.indexOf(lastKey) ?? 0;
     yOffset = computeSourceHandleOffset(i);
-    xOffset = type === "key" ? 0 : graphNode.data.width / 2;
+    xOffset = target === "key" ? 0 : graphNode.data.width / 2;
   }
 
   // must >= Toolbar's height, otherwise Toolbar of the graph node will not in viewport

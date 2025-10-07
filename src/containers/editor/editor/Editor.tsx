@@ -76,10 +76,10 @@ export function useRevealNode(kind: Kind) {
   );
 
   useEffect(() => {
-    const { treeNodeId, type } = revealPosition;
+    const { treeNodeId, target } = revealPosition;
 
     if (kind === "main" && editor && isNeedReveal && treeNodeId) {
-      editor.setNodeSelection(treeNodeId, type);
+      editor.setNodeSelection(treeNodeId, target);
     }
   }, [editor, revealPosition, isNeedReveal]);
 }
