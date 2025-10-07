@@ -8,8 +8,8 @@ const highlightColor = "rgb(4, 81, 165)";
 const selectedColor = "rgb(163, 21, 21)";
 
 export const nodeSelectedStyle: CSSProperties = { borderColor: selectedColor };
-export const nodeHighlightStyle: CSSProperties = { borderColor: highlightColor };
-export const edgeHighlightStyle: CSSProperties = { stroke: highlightColor };
+export const nodeHighlightStyle: CSSProperties = { borderColor: highlightColor, borderWidth: 1 };
+export const edgeHighlightStyle: CSSProperties = { stroke: highlightColor, strokeWidth: 1.5 };
 
 // See the comment for type `GraphNodeId` for relation between `TreeNodeId` and `GraphNodeId`.
 export function toGraphNodeId(treeNodeId: string): GraphNodeId {

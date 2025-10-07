@@ -85,6 +85,7 @@ export function getParentId(id: string) {
 export function isChild(parentId: string, childId: string) {
   return parentId === getParentId(childId);
 }
+
 /**
  * Checks if a pointer is a descendant of another pointer.
  * @param parentPointer - The parent pointer.

@@ -1,4 +1,4 @@
-import { getParentId, type GraphNodeId, join as idJoin, isDescendant, splitParentPointer } from "@/lib/idgen";
+import { getParentId, type GraphNodeId, join as idJoin, isChild, isDescendant, splitParentPointer } from "@/lib/idgen";
 import { type Tree } from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
 import { computeSourceHandleOffset } from "./layout";
@@ -53,17 +53,21 @@ export function toggleNodeSelected(
   const node = graph.nodeMap?.[id]!;
   const { nodes: ancestorNodes, edges: ancestorEdges } = getAncestor(graph, id);
   const { nodes: descendantNodes, edges: descendantEdges } = getDescendant(graph, id);
+  const selectedId = selectedKvId ?? id;
+
+  const isNeedHighlight = (nodeIdOrEdgeId: string) =>
+    nodeIdOrEdgeId == selectedId || isDescendant(nodeIdOrEdgeId, id) || isChild(selectedId, nodeIdOrEdgeId);
 
   matchApply(
     graph.edges,
     [...ancestorEdges, ...descendantEdges],
-    (ed) => highlightEdge(ed, true),
+    (ed) => highlightEdge(ed, isNeedHighlight(ed.id)),
     (ed) => highlightEdge(ed, false),
   );
   matchApply(
     graph.nodes,
     [node, ...ancestorNodes, ...descendantNodes],
-    (nd) => toggleToolbar(highlightNode(nd, true, nd.id === id), node),
+    (nd) => toggleToolbar(highlightNode(nd, isNeedHighlight(nd.id), nd.id === id), node),
     (nd) => toggleToolbar(highlightNode(nd, false), node),
   );
 

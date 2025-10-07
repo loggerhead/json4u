@@ -100,7 +100,15 @@ export function useRevealNode(
           center: { x, y, zoom },
         } = res;
 
-        console.l("reveal position in graph:", revealPosition, res);
+        console.l(
+          "reveal position in graph:",
+          revealPosition,
+          res.selected,
+          res.center,
+          res.changed,
+          res.renderable.nodes.length,
+          res.renderable.edges.length,
+        );
         setNodes(nodes);
         setEdges(edges);
 
