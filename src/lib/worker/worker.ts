@@ -10,12 +10,12 @@ import { pythonDictToJSON } from "./command/pythonDictToJSON";
 import { urlToJSON } from "./command/urlToJSON";
 import {
   clearGraphNodeSelected,
-  computeGraphRevealPosition,
   createGraph,
   createTable,
   searchInView,
   setGraphSize,
   setGraphViewport,
+  setGraphRevealPosition,
   toggleGraphNodeHidden,
   toggleGraphNodeSelected,
   triggerGraphFoldSiblings,
@@ -37,11 +37,11 @@ const worker = {
   createGraph,
   setGraphSize,
   setGraphViewport,
+  setGraphRevealPosition,
   toggleGraphNodeHidden,
   toggleGraphNodeSelected,
   clearGraphNodeSelected,
   triggerGraphFoldSiblings,
-  computeGraphRevealPosition,
   searchInView,
 };
 

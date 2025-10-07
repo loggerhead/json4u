@@ -140,7 +140,8 @@ export class EditorWrapper {
     const idMap = new Map<string, number>();
     treeEdits.forEach((edit, index) => idMap.set(edit.treeNodeId, index));
     idMap.forEach((index) => uniqueEdits.push(treeEdits[index]));
-    treeEdits = uniqueEdits;
+
+    treeEdits = uniqueEdits.filter((edit) => edit.version === this.tree.version);
 
     const nodes = treeEdits
       .map((edit) => ({ ...this.tree.node(edit.treeNodeId), newValue: edit.value }))
@@ -153,6 +154,8 @@ export class EditorWrapper {
       text: node.type === "string" ? `"${node.newValue}"` : node.newValue,
       range: this.range(node.offset, node.length),
     }));
+    console.l("edit nodes: ", treeEdits, edits);
+
     this.editor.executeEdits(null, edits);
     this.editor.pushUndoStop();
   }

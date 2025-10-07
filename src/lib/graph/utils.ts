@@ -1,8 +1,15 @@
-import { edgeHighlightStyle, nodeHighlightStyle, nodeSelectedStyle } from "@/lib/graph/layout";
-import type { EdgeWithData, Graph, NodeWithData, RevealType } from "@/lib/graph/types";
+import type { CSSProperties } from "react";
+import type { EdgeWithData, Graph, NodeWithData, RevealType, SubGraph } from "@/lib/graph/types";
 import { getParentId, type GraphNodeId } from "@/lib/idgen";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
 import { filter, keyBy } from "lodash-es";
+
+const highlightColor = "rgb(4, 81, 165)";
+const selectedColor = "rgb(163, 21, 21)";
+
+export const nodeSelectedStyle: CSSProperties = { borderColor: selectedColor };
+export const nodeHighlightStyle: CSSProperties = { borderColor: highlightColor };
+export const edgeHighlightStyle: CSSProperties = { stroke: highlightColor };
 
 // See the comment for type `GraphNodeId` for relation between `TreeNodeId` and `GraphNodeId`.
 export function toGraphNodeId(treeNodeId: string): GraphNodeId {
@@ -12,6 +19,14 @@ export function toGraphNodeId(treeNodeId: string): GraphNodeId {
 export function getGraphNodeId(treeNodeId: string, type: RevealType) {
   const parentId = getParentId(treeNodeId);
   return toGraphNodeId(type === "node" ? treeNodeId : (parentId ?? ""));
+}
+
+export function newGraph(g?: Omit<Graph, "__type">): Graph {
+  return g ? { ...g, __type: "graph" } : { nodes: [], edges: [], __type: "graph" };
+}
+
+export function newSubGraph(g?: Omit<SubGraph, "__type">): SubGraph {
+  return g ? { ...g, __type: "subGraph" } : { nodes: [], edges: [], __type: "subGraph" };
 }
 
 /**

@@ -14,7 +14,7 @@
     "test": "vitest",
     "bench": "vitest bench",
     "format": "prettier . --write",
-    "lint": "next lint && prettier . --check",
+    "lint": "pnpm tsc --noEmit && next lint && prettier . --check",
     "analyze": "ANALYZE=true next build",
     "unused": "npx knip",
     "cycle": "npx madge --circular --extensions ts ./",

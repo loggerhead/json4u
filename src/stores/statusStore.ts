@@ -15,6 +15,7 @@ interface Position {
 export interface TreeEdit {
   treeNodeId: string;
   value: string;
+  version?: number;
 }
 
 export type CommandMode = "jq" | "json_path";

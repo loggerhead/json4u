@@ -5,15 +5,9 @@ import {
   toggleNodeSelected,
   triggerFoldSiblings,
 } from "@/lib/graph/actions";
-import {
-  computeSourceHandleOffset,
-  genFlowNodes,
-  globalStyle,
-  Layouter,
-  newGraph,
-  initialViewport,
-} from "@/lib/graph/layout";
-import type { EdgeWithData, Graph, RevealPosition } from "@/lib/graph/types";
+import { computeSourceHandleOffset, genFlowNodes, globalStyle, Layouter, initialViewport } from "@/lib/graph/layout";
+import type { EdgeWithData, Graph, NodeWithData, RevealPosition, SubGraph } from "@/lib/graph/types";
+import { getGraphNodeId, newGraph, newSubGraph } from "@/lib/graph/utils";
 import computeVirtualGraph from "@/lib/graph/virtual";
 import { type GraphNodeId, lastKey } from "@/lib/idgen";
 import { getRawValue, hasChildren, isIterable, isRoot, Tree } from "@/lib/parser";
@@ -35,9 +29,13 @@ export interface ViewState {
 
   setTree: (tree: Tree) => void;
   createTable: () => string;
-  createGraph: () => { graph: Graph; renderable: Graph };
-  setGraphSize: (width?: number, height?: number) => { renderable: Graph; changed: boolean };
-  setGraphViewport: (viewport: Viewport, newGraph?: Graph) => { graph: Graph; renderable: Graph; changed: boolean };
+  createGraph: () => { graph: Graph; renderable: SubGraph };
+  setGraphSize: (width?: number, height?: number) => { renderable: SubGraph; changed: boolean };
+  setGraphViewport: (viewport: Viewport) => { renderable: SubGraph; changed: boolean };
+  setGraphRevealPosition: (
+    pos: RevealPosition,
+    zoom: number,
+  ) => { renderable: SubGraph; selected?: NodeWithData; center: Viewport; changed: boolean } | undefined;
   search: (input: string) => SearchResult[];
 }
 
@@ -80,7 +78,7 @@ const useViewStore = createStore<ViewState>((set, get) => ({
 
     if (!tree.valid()) {
       set({ graph: newGraph(), graphViewport });
-      return { graph: newGraph(), renderable: newGraph() };
+      return { graph: newGraph(), renderable: newSubGraph() };
     }
 
     // TODO: genFlowNodes is slow, need optimization
@@ -103,7 +101,7 @@ const useViewStore = createStore<ViewState>((set, get) => ({
       edgeMap[ed.id] = ed;
     });
 
-    const graph = { nodes: ordered, edges, levelMeta, nodeMap, edgeMap };
+    const graph = newGraph({ nodes: ordered, edges, levelMeta, nodeMap, edgeMap });
     const { renderable } = computeVirtualGraph(graph, graphWidth, graphHeight, graphViewport);
     set({ graph, graphViewport });
     return { graph, renderable };
@@ -121,12 +119,30 @@ const useViewStore = createStore<ViewState>((set, get) => ({
     return { renderable, changed };
   },
 
-  setGraphViewport(viewport: Viewport, newGraph?: Graph) {
+  setGraphViewport(viewport: Viewport) {
     const { graph, graphWidth, graphHeight } = get();
-    const g = newGraph ?? graph;
-    const { renderable, changed } = computeVirtualGraph(g, graphWidth, graphHeight, viewport);
-    set({ graph: g, graphViewport: viewport });
-    return { graph: g, renderable, changed };
+    const { renderable, changed } = computeVirtualGraph(graph, graphWidth, graphHeight, viewport);
+    set({ graph, graphViewport: viewport });
+    return { graph, renderable, changed };
+  },
+
+  setGraphRevealPosition(pos: RevealPosition, zoom: number) {
+    const { tree, graph, graphWidth, graphHeight } = getViewState();
+    const { treeNodeId, type } = pos;
+    const graphNodeId = getGraphNodeId(treeNodeId, type);
+
+    const r = computeRevealPosition(graphWidth, graphHeight, graph, tree, pos);
+    if (!r) {
+      return;
+    }
+
+    const { selected } = toggleNodeSelected(graph, graphNodeId, treeNodeId);
+
+    const viewport = { ...r.viewport, zoom };
+    const { renderable, changed } = computeVirtualGraph(graph, graphWidth, graphHeight, viewport);
+
+    set({ graph, graphViewport: viewport });
+    return { renderable, selected, center: { ...r.center, zoom }, changed };
   },
 
   search(input: string) {
@@ -167,8 +183,12 @@ export function setGraphSize(width?: number, height?: number) {
   return getViewState().setGraphSize(width, height);
 }
 
-export function setGraphViewport(viewport: Viewport, newGraph?: Graph) {
-  return getViewState().setGraphViewport(viewport, newGraph);
+export function setGraphViewport(viewport: Viewport) {
+  return getViewState().setGraphViewport(viewport);
+}
+
+export function setGraphRevealPosition(pos: RevealPosition, zoom: number) {
+  return getViewState().setGraphRevealPosition(pos, zoom);
 }
 
 export function toggleGraphNodeHidden(nodeId: GraphNodeId, handleId?: string, hide?: boolean) {
@@ -185,11 +205,6 @@ export function clearGraphNodeSelected() {
 
 export function triggerGraphFoldSiblings(nodeId: GraphNodeId, fold: boolean) {
   return triggerFoldSiblings(getViewState().graph, nodeId, fold);
-}
-
-export function computeGraphRevealPosition(revealPosition: RevealPosition) {
-  const { tree, graph, graphWidth, graphHeight } = getViewState();
-  return computeRevealPosition(graphWidth, graphHeight, graph, tree, revealPosition);
 }
 
 export function searchInView(input: string) {

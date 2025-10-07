@@ -2,7 +2,7 @@ import { getParentId, type GraphNodeId, join as idJoin, isDescendant, splitParen
 import { type Tree } from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
 import { computeSourceHandleOffset } from "./layout";
-import type { RevealPosition, Graph } from "./types";
+import type { RevealPosition, Graph, SubGraph, NodeWithData } from "./types";
 import {
   getAncestor,
   getDescendant,
@@ -10,6 +10,7 @@ import {
   highlightEdge,
   highlightNode,
   matchApply,
+  newSubGraph,
   toggleHidden,
   toggleToolbar,
 } from "./utils";
@@ -38,11 +39,15 @@ export function toggleNodeHidden(graph: Graph, nodeId: GraphNodeId, handleId?: s
  * @param graph - The graph.
  * @param id - The ID of the node to toggle.
  * @param selectedKvId - The ID of the selected key-value pair.
- * @returns The updated graph.
+ * @returns The visible subgraph after update.
  */
-export function toggleNodeSelected(graph: Graph, id?: GraphNodeId, selectedKvId?: string) {
+export function toggleNodeSelected(
+  graph: Graph,
+  id?: GraphNodeId,
+  selectedKvId?: string,
+): SubGraph & { selected?: NodeWithData } {
   if (!id) {
-    return graph;
+    return newSubGraph(graph);
   }
 
   const node = graph.nodeMap?.[id]!;
@@ -71,7 +76,7 @@ export function toggleNodeSelected(graph: Graph, id?: GraphNodeId, selectedKvId?
     nd.data.selectedKvId = ed.target;
   });
 
-  return generateVirtualGraph(graph);
+  return { ...generateVirtualGraph(graph), selected: node };
 }
 
 /**
@@ -140,7 +145,7 @@ export function computeRevealPosition(
   const graphNode = graph.nodeMap?.[graphNodeId];
 
   if (!graphNode) {
-    console.error("computeRevealPosition (node not found):", treeNodeId, type);
+    console.error("computeRevealPosition (node not found):", treeNodeId, type, graphNodeId, graph);
     return;
   }
 

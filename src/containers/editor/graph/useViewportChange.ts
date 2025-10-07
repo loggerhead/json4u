@@ -1,12 +1,12 @@
 import { type Dispatch, type RefObject, type SetStateAction, useEffect } from "react";
 import { ViewMode } from "@/lib/db/config";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
-import { getGraphNodeId } from "@/lib/graph/utils";
 import { refreshInterval } from "@/lib/graph/virtual";
 import { useDebounceFn } from "@/lib/hooks";
 import { useStatusStore } from "@/stores/statusStore";
 import { useOnViewportChange, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { includes } from "lodash-es";
 import { useResizeObserver } from "usehooks-ts";
 import { useShallow } from "zustand/shallow";
 import { setViewportSize } from "./useVirtualGraph";
@@ -88,30 +88,24 @@ export function useRevealNode(
   // compute the position and the virtual graph of the reveal node.
   useEffect(() => {
     (async () => {
-      const { treeNodeId, type } = revealPosition;
-      const graphNodeId = getGraphNodeId(treeNodeId, type);
-
-      if (isNeedReveal && treeNodeId) {
-        const r = await window.worker.computeGraphRevealPosition(revealPosition);
-        if (!r) {
+      if (isNeedReveal && revealPosition.treeNodeId) {
+        const res = await window.worker.setGraphRevealPosition(revealPosition, getZoom());
+        if (!res) {
+          console.l("skip reveal position in graph:", revealPosition);
           return;
         }
 
-        const { center, viewport } = r;
-        const zoom = getZoom();
-
-        const g = await window.worker.toggleGraphNodeSelected(graphNodeId);
         const {
-          graph: { nodes, edges },
-          changed,
-        } = await window.worker.setGraphViewport({ ...viewport, zoom }, g);
+          renderable: { nodes, edges },
+          center: { x, y, zoom },
+        } = res;
 
-        console.l("reveal node in graph:", changed, revealPosition, viewport, nodes.length);
-        setCenter(center.x, center.y, { duration: 0, zoom });
+        console.l("reveal position in graph:", revealPosition, res);
+        setNodes(nodes);
+        setEdges(edges);
 
-        if (changed) {
-          setNodes(nodes);
-          setEdges(edges);
+        if (!includes(["graph", "graphClick"], revealPosition.from)) {
+          setCenter(x, y, { duration: 0, zoom });
         }
       }
     })();
