@@ -56,10 +56,16 @@ const KV = memo((props: KvProps) => {
         // Prevent double-click from triggering viewport zoom (https://reactflow.dev/learn/concepts/the-viewport)
         e.stopPropagation();
 
+        if (!(isIterable && !isInput)) {
+          return;
+        }
+
         // Double-click to focus on the first child node
-        if (isIterable && !isInput) {
-          const childrenIds = tree.childrenIds(tree.node(props.id));
-          childrenIds.length > 0 && onClick(e, childrenIds[0], "key", "graphClick");
+        const childrenIds = tree.childrenIds(tree.node(props.id));
+        if (childrenIds.length > 0) {
+          const firstChildId = childrenIds[0];
+          console.l("double click to focus on the first child node:", firstChildId);
+          onClick(e, firstChildId, "key", "graphDoubleClick");
         }
       }}
     >

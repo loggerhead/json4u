@@ -111,7 +111,14 @@ export interface SubGraph {
 }
 
 export type RevealType = "node" | "key" | "value";
-export type RevealFrom = "editor" | "statusBar" | "search" | "graph" | "graphButton" | "graphClick";
+export type RevealFrom =
+  | "editor"
+  | "statusBar"
+  | "search"
+  | "graph" // don't need reveal to the position (see `useRevealNode` for details)
+  | "graphClick" // don't need reveal to the position
+  | "graphDoubleClick" // need reveal to the position
+  | "graphButton"; // need reveal to the position
 
 export interface RevealPosition {
   version: number; // version is used to re-trigger when assigned same id by caller
