@@ -2,13 +2,13 @@
 
 import { useRef } from "react";
 import { config } from "@/lib/graph/layout";
+import { toGraphNodeId } from "@/lib/graph/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { debounce } from "lodash-es";
 import MouseButton from "./MouseButton";
 import { ObjectNode, RootNode, VirtualTargetNode } from "./Node";
-import { useClearSearchHl } from "./useClickNode";
 import { useRevealNode, useViewportChange } from "./useViewportChange";
 import useVirtualGraph from "./useVirtualGraph";
 
@@ -32,8 +32,7 @@ function LayoutGraph() {
   // 3. xyflow will measure the new `nodes`, which will trigger a render.
   const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, translateExtent } = useVirtualGraph();
   useViewportChange(ref, setNodes, setEdges);
-  useRevealNode(nodes, setNodes, setEdges);
-  const clearSearchHl = useClearSearchHl();
+  useRevealNode(setNodes, setEdges);
 
   return (
     <ReactFlow
@@ -57,25 +56,20 @@ function LayoutGraph() {
       }}
       translateExtent={translateExtent}
       // clear all animated for edges
-      onPaneClick={(_: React.MouseEvent) => {
-        clearSearchHl();
-
-        (async () => {
-          const { nodes, edges } = await window.worker.clearGraphNodeSelected();
-          setNodes(nodes);
-          setEdges(edges);
-        })();
+      onPaneClick={async (_: React.MouseEvent) => {
+        const { nodes, edges } = await window.worker.clearGraphNodeSelected();
+        setNodes(nodes);
+        setEdges(edges);
       }}
-      onConnectStart={(_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
+      onConnectStart={async (_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
         if (handleType === "target" || !(nodeId && handleId)) {
           return;
         }
 
-        (async () => {
-          const { nodes, edges } = await window.worker.toggleGraphNodeHidden(nodeId, handleId);
-          setNodes(nodes);
-          setEdges(edges);
-        })();
+        const id = toGraphNodeId(nodeId);
+        const { nodes, edges } = await window.worker.toggleGraphNodeHidden(id, handleId);
+        setNodes(nodes);
+        setEdges(edges);
       }}
       onError={onError}
       nodes={nodes}

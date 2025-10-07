@@ -24,7 +24,7 @@ export type NodeWithData = FlowNode<{
   toolbarVisible?: boolean; // Whether the node's toolbar is visible
   style?: React.CSSProperties; // Custom CSS styles for the node
   selected?: boolean; // Whether the node is selected
-  idOfSelectedKV?: string; // Index of the selected key-value pair in the node
+  selectedKvId?: string; // Tree node id of the selected key-value pair in the graph node
 }>;
 
 interface NodeRender {

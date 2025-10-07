@@ -1,5 +1,6 @@
 import { type Config, defaultConfig, keyName, type ViewMode, type ViewModeValue, storage } from "@/lib/db/config";
 import type { RevealFrom, RevealPosition } from "@/lib/graph/types";
+import { GraphNodeId } from "@/lib/idgen";
 import { type ParseOptions } from "@/lib/parser";
 import { type FunctionKeys } from "@/lib/utils";
 import { includes } from "lodash-es";
@@ -12,7 +13,7 @@ interface Position {
 }
 
 export interface TreeEdit {
-  nodeId: string;
+  treeNodeId: string;
   value: string;
 }
 
@@ -31,8 +32,8 @@ export interface StatusState extends Config {
   leftPanelCollapsed: boolean;
   sideNavExpanded?: boolean;
   showPricingOverlay?: boolean;
-  unfoldNodeMap: Record<string, boolean>;
-  unfoldSiblingsNodeMap: Record<string, boolean>;
+  unfoldNodeMap: Record<GraphNodeId, boolean>;
+  unfoldSiblingsNodeMap: Record<GraphNodeId, boolean>;
   editQueue: Array<TreeEdit>;
 
   incrEditorInitCount: () => number;
@@ -55,8 +56,8 @@ export interface StatusState extends Config {
   setIsTouchpad: (isTouchpad: boolean) => void;
   addToEditQueue: (...edits: TreeEdit[]) => void;
   clearEditQueue: () => void;
-  toggleFoldNode: (nodeId: string) => void;
-  toggleFoldSibingsNode: (nodeId: string) => void;
+  toggleFoldNode: (id: GraphNodeId) => void;
+  toggleFoldSibingsNode: (id: GraphNodeId) => void;
   resetFoldStatus: () => void;
 }
 
@@ -191,15 +192,15 @@ export const useStatusStore = create<StatusState>()(
         set({ editQueue: [] });
       },
 
-      toggleFoldNode(nodeId: string) {
+      toggleFoldNode(id: GraphNodeId) {
         const { unfoldNodeMap } = get();
-        unfoldNodeMap[nodeId] = !unfoldNodeMap[nodeId];
+        unfoldNodeMap[id] = !unfoldNodeMap[id];
         set({ unfoldNodeMap });
       },
 
-      toggleFoldSibingsNode(nodeId: string) {
+      toggleFoldSibingsNode(id: GraphNodeId) {
         const { unfoldSiblingsNodeMap } = get();
-        unfoldSiblingsNodeMap[nodeId] = !unfoldSiblingsNodeMap[nodeId];
+        unfoldSiblingsNodeMap[id] = !unfoldSiblingsNodeMap[id];
         set({ unfoldSiblingsNodeMap });
       },
 

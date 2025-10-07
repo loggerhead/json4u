@@ -51,9 +51,7 @@ export class InlayHintsProvider {
         // Filter hints based on the visible range to avoid duplicates when folding.
         const { startLineNumber, endLineNumber } = range;
         const filteredHints = this.hints.filter(
-          (hint) =>
-            hint.position.lineNumber >= startLineNumber &&
-            hint.position.lineNumber <= endLineNumber
+          (hint) => hint.position.lineNumber >= startLineNumber && hint.position.lineNumber <= endLineNumber,
         );
 
         return { hints: filteredHints, dispose: () => {} };

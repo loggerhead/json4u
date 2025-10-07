@@ -3,6 +3,7 @@
 import { memo, type MouseEventHandler, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
+import { toGraphNodeId } from "@/lib/graph/utils";
 import { getParentId } from "@/lib/idgen";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeStore } from "@/stores/treeStore";
@@ -20,13 +21,14 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const t = useTranslations();
   const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
   const onClick = useClickNode();
+  const graphNodeId = toGraphNodeId(id);
 
   const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode } = useStatusStore(
     useShallow((state) => ({
       toggleFoldNode: state.toggleFoldNode,
       toggleFoldSibingsNode: state.toggleFoldSibingsNode,
-      fold: !state.unfoldNodeMap[id],
-      foldSiblings: !state.unfoldSiblingsNodeMap[id],
+      fold: !state.unfoldNodeMap[graphNodeId],
+      foldSiblings: !state.unfoldSiblingsNodeMap[graphNodeId],
     })),
   );
 
@@ -53,8 +55,8 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
         <ToolbarButton
           title={t(foldSiblings ? "fold_siblings" : "unfold_siblings")}
           onClick={async () => {
-            toggleFoldSibingsNode(id);
-            const { nodes, edges } = await window.worker.triggerGraphFoldSiblings(id, foldSiblings);
+            toggleFoldSibingsNode(graphNodeId);
+            const { nodes, edges } = await window.worker.triggerGraphFoldSiblings(graphNodeId, foldSiblings);
             setNodes(nodes);
             setEdges(edges);
           }}
@@ -66,8 +68,8 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
         <ToolbarButton
           title={t(fold ? "fold node" : "unfold node")}
           onClick={async () => {
-            toggleFoldNode(id);
-            const { nodes, edges } = await window.worker.toggleGraphNodeHidden(id, undefined, fold);
+            toggleFoldNode(graphNodeId);
+            const { nodes, edges } = await window.worker.toggleGraphNodeHidden(graphNodeId, undefined, fold);
             setNodes(nodes);
             setEdges(edges);
           }}

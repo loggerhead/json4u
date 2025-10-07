@@ -1,4 +1,4 @@
-import { getParentId, join as idJoin, isDescendant, splitParentPointer } from "@/lib/idgen";
+import { getParentId, type GraphNodeId, join as idJoin, isDescendant, splitParentPointer } from "@/lib/idgen";
 import { type Tree } from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
 import { computeSourceHandleOffset } from "./layout";
@@ -6,6 +6,7 @@ import type { RevealPosition, Graph } from "./types";
 import {
   getAncestor,
   getDescendant,
+  getGraphNodeId,
   highlightEdge,
   highlightNode,
   matchApply,
@@ -22,7 +23,7 @@ import { generateVirtualGraph } from "./virtual";
  * @param hide - Whether to hide the node.
  * @returns The updated graph.
  */
-export function toggleNodeHidden(graph: Graph, nodeId: string, handleId?: string, hide?: boolean) {
+export function toggleNodeHidden(graph: Graph, nodeId: GraphNodeId, handleId?: string, hide?: boolean) {
   const prefixId = handleId !== undefined ? idJoin(nodeId, handleId) : undefined;
   const { nodes: descendantNodes, edges: descendantEdges } = getDescendant(graph, nodeId, prefixId);
   const isHide = hide ?? !(descendantNodes[0]?.hidden ?? false);
@@ -36,9 +37,10 @@ export function toggleNodeHidden(graph: Graph, nodeId: string, handleId?: string
  * Toggles the selected state of a node and its ancestors and descendants.
  * @param graph - The graph.
  * @param id - The ID of the node to toggle.
+ * @param selectedKvId - The ID of the selected key-value pair.
  * @returns The updated graph.
  */
-export function toggleNodeSelected(graph: Graph, id?: string, selectedChildId?: string) {
+export function toggleNodeSelected(graph: Graph, id?: GraphNodeId, selectedKvId?: string) {
   if (!id) {
     return graph;
   }
@@ -60,13 +62,13 @@ export function toggleNodeSelected(graph: Graph, id?: string, selectedChildId?: 
     (nd) => toggleToolbar(highlightNode(nd, false), node),
   );
 
-  if (selectedChildId) {
-    node.data.idOfSelectedKV = selectedChildId;
+  if (selectedKvId) {
+    node.data.selectedKvId = selectedKvId;
   }
 
   ancestorEdges.forEach((ed) => {
     const nd = graph.nodeMap?.[ed.source]!;
-    nd.data.idOfSelectedKV = ed.id;
+    nd.data.selectedKvId = ed.target;
   });
 
   return generateVirtualGraph(graph);
@@ -90,7 +92,7 @@ export function clearNodeSelected(graph: Graph) {
  * @param fold - Whether to fold the siblings.
  * @returns The updated graph.
  */
-export function triggerFoldSiblings(graph: Graph, nodeId: string, fold: boolean) {
+export function triggerFoldSiblings(graph: Graph, nodeId: GraphNodeId, fold: boolean) {
   const parentId = getParentId(nodeId);
 
   if (parentId) {
@@ -134,7 +136,7 @@ export function computeRevealPosition(
     }
   | undefined {
   const { parent, lastKey } = splitParentPointer(treeNodeId);
-  const graphNodeId = type === "node" ? treeNodeId : (parent ?? "");
+  const graphNodeId = getGraphNodeId(treeNodeId, type);
   const graphNode = graph.nodeMap?.[graphNodeId];
 
   if (!graphNode) {

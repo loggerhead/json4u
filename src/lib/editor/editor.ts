@@ -1,3 +1,4 @@
+import type { RevealType } from "@/lib/graph/types";
 import { ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
@@ -93,6 +94,19 @@ export class EditorWrapper {
     }
   }
 
+  setNodeSelection(nodeId: string, type: RevealType) {
+    const node = this.tree.node(nodeId);
+    if (!node) {
+      return;
+    }
+
+    const offset = type === "key" ? node.boundOffset : node.offset;
+    const length = type === "key" ? node.boundLength : node.length;
+    this.revealOffset(offset + 1);
+    const range = this.range(offset, length);
+    this.editor.setSelection(range);
+  }
+
   setTree({ treeObject }: ParsedTree, resetCursor: boolean = true) {
     const tree = Tree.fromObject(treeObject);
     getEditorState().resetHighlight();
@@ -124,12 +138,12 @@ export class EditorWrapper {
     // Keep the last value for each treeNodeId in edits
     const uniqueEdits: Array<TreeEdit> = [];
     const idMap = new Map<string, number>();
-    treeEdits.forEach((edit, index) => idMap.set(edit.nodeId, index));
+    treeEdits.forEach((edit, index) => idMap.set(edit.treeNodeId, index));
     idMap.forEach((index) => uniqueEdits.push(treeEdits[index]));
     treeEdits = uniqueEdits;
 
     const nodes = treeEdits
-      .map((edit) => ({ ...this.tree.node(edit.nodeId), newValue: edit.value }))
+      .map((edit) => ({ ...this.tree.node(edit.treeNodeId), newValue: edit.value }))
       .filter((node) => node);
     if (nodes.length === 0) {
       return;

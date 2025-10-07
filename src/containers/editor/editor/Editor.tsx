@@ -6,7 +6,6 @@ import { vsURL } from "@/lib/editor/cdn";
 import { EditorWrapper, type Kind } from "@/lib/editor/editor";
 import { useEditor, useEditorStore } from "@/stores/editorStore";
 import { useStatusStore } from "@/stores/statusStore";
-import { getTree } from "@/stores/treeStore";
 import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
@@ -80,10 +79,7 @@ export function useRevealNode(kind: Kind) {
     const { treeNodeId, type } = revealPosition;
 
     if (kind === "main" && editor && isNeedReveal && treeNodeId) {
-      const node = getTree().node(treeNodeId);
-      if (node) {
-        editor.revealOffset((type === "key" ? node.boundOffset : node.offset) + 1);
-      }
+      editor.setNodeSelection(treeNodeId, type);
     }
   }, [editor, revealPosition, isNeedReveal]);
 }
