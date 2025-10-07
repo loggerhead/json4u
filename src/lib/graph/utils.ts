@@ -1,15 +1,8 @@
-import type { CSSProperties } from "react";
 import type { EdgeWithData, Graph, NodeWithData, RevealTarget, SubGraph } from "@/lib/graph/types";
 import { getParentId, type GraphNodeId } from "@/lib/idgen";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
 import { filter, keyBy } from "lodash-es";
-
-const highlightColor = "rgb(4, 81, 165)";
-const selectedColor = "rgb(163, 21, 21)";
-
-export const nodeSelectedStyle: CSSProperties = { borderColor: selectedColor };
-export const nodeHighlightStyle: CSSProperties = { borderColor: highlightColor, borderWidth: 1 };
-export const edgeHighlightStyle: CSSProperties = { stroke: highlightColor, strokeWidth: 1.5 };
+import { edgeHighlightStyle, nodeHighlightStyle, nodeSelectedStyle } from "./style";
 
 // See the comment for type `GraphNodeId` for relation between `TreeNodeId` and `GraphNodeId`.
 export function toGraphNodeId(treeNodeId: string): GraphNodeId {
