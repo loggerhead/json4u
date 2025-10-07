@@ -95,7 +95,7 @@ export function useEditTree(kind: Kind) {
 
   useEffect(() => {
     if (kind === "main" && editor && editQueue.length > 0) {
-      editor.editNodes(editQueue);
+      editor.applyTreeEdits(editQueue);
       clearEditQueue();
     }
   }, [editor, editQueue]);

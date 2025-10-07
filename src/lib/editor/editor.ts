@@ -150,7 +150,12 @@ export class EditorWrapper {
     return tree;
   }
 
-  editNodes(treeEdits: Array<TreeEdit>) {
+  /**
+   * Applies a batch of structured tree edits, typically originating from UI components like the graph view,
+   * to the Monaco editor. This function serves as a specialized bridge, translating high-level, intent-based
+   * edit requests into precise, low-level text manipulations.
+   */
+  applyTreeEdits(treeEdits: Array<TreeEdit>) {
     // Keep the last value for each treeNodeId in edits
     const uniqueEdits: Array<TreeEdit> = [];
     const idMap = new Map<string, number>();
