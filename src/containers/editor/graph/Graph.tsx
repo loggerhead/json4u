@@ -79,6 +79,7 @@ function LayoutGraph() {
       nodesDraggable={false}
       nodesConnectable={false}
       connectOnClick={false}
+      zoomOnDoubleClick={false}
       deleteKeyCode={null}
       selectionKeyCode={null}
       multiSelectionKeyCode={null}

@@ -20,7 +20,7 @@ interface ToolbarProps {
 const Toolbar = memo(({ id }: ToolbarProps) => {
   const t = useTranslations();
   const { setNodes, setEdges } = useReactFlow<NodeWithData, EdgeWithData>();
-  const onClick = useClickNode();
+  const { onClick } = useClickNode();
   const graphNodeId = toGraphNodeId(id);
 
   const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode } = useStatusStore(

@@ -32,7 +32,7 @@ const KV = memo((props: KvProps) => {
   const [isInput, setIsInput] = useState(false);
   const [content, setContent] = useState(props.valueText);
   const tree = useTree();
-  const onClick = useClickNode();
+  const { onClick, cancelClickNode } = useClickNode();
   const t = useTranslations();
 
   const addToEditQueue = useStatusStore((state) => state.addToEditQueue);
@@ -53,15 +53,14 @@ const KV = memo((props: KvProps) => {
       data-tree-id={props.id}
       onClick={isInput ? undefined : (e) => onClick(e, props.id, "key", "graphClick")}
       onDoubleClick={(e) => {
-        // Prevent double-click from triggering viewport zoom (https://reactflow.dev/learn/concepts/the-viewport)
-        e.stopPropagation();
-
         if (!(isIterable && !isInput)) {
           return;
         }
 
+        cancelClickNode();
         // Double-click to focus on the first child node
         const childrenIds = tree.childrenIds(tree.node(props.id));
+
         if (childrenIds.length > 0) {
           const firstChildId = childrenIds[0];
           console.l("double click to focus on the first child node:", firstChildId);
@@ -99,7 +98,14 @@ const KV = memo((props: KvProps) => {
               title={isIterable ? t("double_click_to_reveal_first_child") : t("double_click_to_enter_edit_mode")}
               onClick={(e) => onClick(e, props.id, "value", "graphClick")}
               // Double-click to enter input mode
-              onDoubleClick={() => !isIterable && setIsInput(true)}
+              onDoubleClick={() => {
+                if (isIterable) {
+                  return;
+                }
+
+                cancelClickNode();
+                setIsInput(true);
+              }}
             >
               {content}
             </div>
