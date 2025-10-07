@@ -16,7 +16,7 @@ export async function urlToJSON(text: string): Promise<{ text: string; parse: bo
   }
 }
 
-export function urlToMap(s: string): Map<string, string | Map<string, any>> {
+export function urlToMap(s: string, maxLevel?: number): Map<string, string | Map<string, any>> {
   const isFullURI = isURI(s);
   const u = new URL(isFullURI ? s : `http://json4u.com/${s.replace(/^\//, "")}`);
   const m = new Map();
@@ -32,27 +32,36 @@ export function urlToMap(s: string): Map<string, string | Map<string, any>> {
   u.pathname && m.set("Path", u.pathname);
   u.hash && m.set("Hash", u.hash);
 
-  const dups = new Map();
+  if (maxLevel === undefined || maxLevel > 0) {
+    const q = new Map();
+    const dups = new Map();
 
-  u.searchParams.forEach((_, name) => {
-    dups.set(name, (dups.get(name) ?? 0) + 1);
-  });
+    u.searchParams.forEach((_, name) => {
+      dups.set(name, (dups.get(name) ?? 0) + 1);
+    });
 
-  const q = new Map();
+    u.searchParams.forEach((value, name) => {
+      let v: string | ReturnType<typeof urlToMap> = value;
+      const lv = maxLevel !== undefined ? maxLevel - 1 : undefined;
 
-  u.searchParams.forEach((value, name) => {
-    const v = isURI(value) ? urlToMap(value) : value;
+      if ((lv ?? 1) > 0 && isURI(value)) {
+        v = urlToMap(value, lv);
+      }
 
-    if (dups.get(name) > 1) {
-      const vv = q.get(name) ?? [];
-      vv.push(v);
-      q.set(name, vv);
-    } else {
-      q.set(name, v);
+      if (dups.get(name) > 1) {
+        const vv = q.get(name) ?? [];
+        vv.push(v);
+        q.set(name, vv);
+      } else {
+        q.set(name, v);
+      }
+    });
+
+    if (q.size > 0) {
+      m.set("Query", q);
     }
-  });
-
-  if (q.size > 0) {
+  } else if (u.searchParams.size > 0) {
+    const q = u.searchParams.toString();
     m.set("Query", q);
   }
 
