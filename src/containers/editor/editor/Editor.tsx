@@ -9,6 +9,7 @@ import { useStatusStore } from "@/stores/statusStore";
 import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
+import { example } from "./data";
 
 loader.config({ paths: { vs: vsURL } });
 
@@ -101,61 +102,13 @@ export function useEditTree(kind: Kind) {
   }, [editor, editQueue]);
 }
 
-const exampleData = `{
-  "Aidan Gillen": {
-      "array": [
-          "Game of Thron\\"es",
-          "The Wire"
-      ],
-      "string": "some string",
-      "int": 2,
-      "aboolean": true,
-      "boolean": true,
-      "null": null,
-      "a_null": null,
-      "another_null": "null check",
-      "object": {
-          "foo": "bar",
-          "object1": {
-              "new prop1": "new prop value"
-          },
-          "object2": {
-              "new prop1": "new prop value"
-          },
-          "object3": {
-              "new prop1": "new prop value"
-          },
-          "object4": {
-              "new prop1": "new prop value"
-          }
-      }
-  },
-  "Amy Ryan": {
-      "one": "In Treatment",
-      "two": "The Wire"
-  },
-  "Annie Fitzgerald": [
-      "Big Love",
-      "True Blood"
-  ],
-  "Anwan Glover": [
-      "Treme",
-      "The Wire"
-  ],
-  "Alexander Skarsgard": [
-      "Generation Kill",
-      "True Blood"
-  ],
-  "Clarke Peters": null
-}`;
-
 function useDisplayExample(kind: Kind) {
   const editor = useEditor("main");
   const incrEditorInitCount = useStatusStore((state) => state.incrEditorInitCount);
 
   useEffect(() => {
     if (kind === "main" && editor && incrEditorInitCount() <= 1) {
-      editor.parseAndSet(exampleData);
+      editor.parseAndSet(example);
     }
   }, [editor]);
 }
