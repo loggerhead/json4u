@@ -68,7 +68,7 @@ const KV = memo((props: KvProps) => {
         if (childrenIds.length > 0) {
           const firstChildId = childrenIds[0];
           console.l("double click to focus on the first child node:", firstChildId);
-          onClick(e, firstChildId, "key", "graphDoubleClick");
+          onClick(e, firstChildId, "keyValue", "graphDoubleClick");
         }
       }}
     >
