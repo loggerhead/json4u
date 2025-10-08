@@ -11,7 +11,9 @@ export default function useClickNode() {
     onClick: useCallback(
       async (e: MouseEvent, treeNodeId: string, target: RevealTarget, from: RevealFrom) => {
         e.stopPropagation();
-        delaySetRevealPosition({ treeNodeId, target, from });
+        const pos = { treeNodeId, target, from };
+        console.l("set reveal position:", pos);
+        delaySetRevealPosition(pos);
       },
       [setRevealPosition, delaySetRevealPosition],
     ),

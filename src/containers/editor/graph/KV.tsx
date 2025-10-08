@@ -1,5 +1,6 @@
 import { memo, useCallback, useState } from "react";
 import type { RevealTarget } from "@/lib/graph/types";
+import { toGraphNodeId } from "@/lib/graph/utils";
 import { cn } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTree } from "@/stores/treeStore";
@@ -30,6 +31,7 @@ const KV = memo((props: KvProps) => {
 
   const tree = useTree();
   const parentNode = tree.getParent(props.id)!;
+  const graphNodeId = toGraphNodeId(parentNode.id);
 
   const addToEditQueue = useStatusStore((state) => state.addToEditQueue);
   const onEdit = useCallback(
@@ -99,7 +101,12 @@ const KV = memo((props: KvProps) => {
         popoverWidth={props.width}
       />
       {props.hasChildren && (
-        <SourceHandle id={props.keyText} indexInParent={props.index} isChildrenHidden={props.isChildrenHidden} />
+        <SourceHandle
+          id={props.keyText}
+          nodeId={graphNodeId}
+          indexInParent={props.index}
+          isChildrenHidden={props.isChildrenHidden}
+        />
       )}
     </div>
   );

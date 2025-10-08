@@ -1,6 +1,8 @@
 import { memo } from "react";
 import { computeSourceHandleOffset, computeTargetHandleOffset } from "@/lib/graph/layout";
-import { Handle, Position } from "@xyflow/react";
+import type { GraphNodeId } from "@/lib/idgen";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { useTranslations } from "next-intl";
 
 interface TargetHandleProps {
   childrenNum: number;
@@ -14,13 +16,32 @@ TargetHandle.displayName = "TargetHandle";
 
 interface SourceHandleProps {
   id: string;
+  nodeId: GraphNodeId;
   indexInParent: number;
   isChildrenHidden?: boolean;
 }
 
-export const SourceHandle = memo(({ id, indexInParent, isChildrenHidden }: SourceHandleProps) => {
+export const SourceHandle = memo(({ id, nodeId, indexInParent, isChildrenHidden }: SourceHandleProps) => {
   const top = indexInParent !== undefined ? computeSourceHandleOffset(indexInParent) : undefined;
   const backgroundColor = isChildrenHidden ? "rgb(156 163 175)" : undefined;
-  return <Handle type="source" isConnectable id={id} position={Position.Right} style={{ top, backgroundColor }} />;
+  const { setNodes, setEdges } = useReactFlow();
+  const t = useTranslations();
+
+  return (
+    <Handle
+      type="source"
+      title={isChildrenHidden ? t("click_to_unfold") : t("click_to_fold")}
+      isConnectable
+      id={id}
+      position={Position.Right}
+      style={{ top, backgroundColor }}
+      onClick={async (e) => {
+        e.stopPropagation();
+        const { nodes, edges } = await window.worker.toggleGraphNodeHidden(nodeId, id);
+        setNodes(nodes);
+        setEdges(edges);
+      }}
+    />
+  );
 });
 SourceHandle.displayName = "SourceHandle";

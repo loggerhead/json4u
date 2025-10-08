@@ -2,9 +2,8 @@
 
 import { useRef } from "react";
 import { config } from "@/lib/graph/layout";
-import { toGraphNodeId } from "@/lib/graph/utils";
 import { useStatusStore } from "@/stores/statusStore";
-import { Background, Controls, OnConnectStart, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { debounce } from "lodash-es";
 import MouseButton from "./MouseButton";
@@ -58,16 +57,6 @@ function LayoutGraph() {
       // clear all animated for edges
       onPaneClick={async (_: React.MouseEvent) => {
         const { nodes, edges } = await window.worker.clearGraphNodeSelected();
-        setNodes(nodes);
-        setEdges(edges);
-      }}
-      onConnectStart={async (_: any, { nodeId, handleId, handleType }: Parameters<OnConnectStart>[1]) => {
-        if (handleType === "target" || !(nodeId && handleId)) {
-          return;
-        }
-
-        const id = toGraphNodeId(nodeId);
-        const { nodes, edges } = await window.worker.toggleGraphNodeHidden(id, handleId);
         setNodes(nodes);
         setEdges(edges);
       }}
