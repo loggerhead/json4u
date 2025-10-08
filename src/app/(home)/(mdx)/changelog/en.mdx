@@ -2,6 +2,13 @@ export const metadata = {
   title: "Changelog",
 };
 
+- 2025-10-08:
+  - The graph view now supports double-clicking to enter edit mode or jump to the first element (Thanks to the suggestion from [@fangao888](https://github.com/loggerhead/json4u/issues/82)).
+  - Improved the selection logic in the graph view and added support for synchronized selecting the corresponding text in the editor
+    (Suggestion from [@jy](https://support.qq.com/products/670462/profile/35)).
+  - Fixed the issue where URLs with query parameters could not be properly previewed in the editor.
+  - Fixed the problem of partial rendering failures in the graph view under certain scenarios.
+  - Fixed the potential crash issue when folding in the table view.
 - 2025-08-24:
   - Support decoding JWT and Unicode strings in hover preview.
   - Fix the issue where inlay hints are displayed repeatedly when the code is folded.

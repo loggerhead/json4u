@@ -2,6 +2,12 @@ export const metadata = {
   title: "更新日志",
 };
 
+- 2025-10-08:
+  - graph 视图支持双击进入编辑模式，或者双击跳转第一个元素（感谢来自 [@fangao888](https://github.com/loggerhead/json4u/issues/82)）；
+  - 改进了 graph 视图中选中逻辑，并支持联动选中编辑器中的文本（建议来自 [@jy](https://support.qq.com/products/670462/profile/35)；
+  - 修复了带查询参数的 URL 在编辑器中无法正确预览的问题；
+  - 修复了部分场景下 graph 未正常局部渲染的问题；
+  - 修复了在 table 视图中进行折叠时可能发生的崩溃问题；
 - 2025-08-24:
   - 支持在悬停预览时解码 JWT 和 Unicode 字符串；
   - 修复 inlay hints 在代码被折叠时重复展示的问题；
