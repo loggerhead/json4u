@@ -3,6 +3,7 @@ import { Tree } from "@/lib/parser";
 import { type KeyWithType } from "@/lib/table";
 import { type FunctionKeys } from "@/lib/utils";
 import { create } from "zustand";
+import { useShallow } from "zustand/shallow";
 
 export const sides = ["top", "bottom", "left", "right"];
 export type Side = (typeof sides)[number];
@@ -66,6 +67,11 @@ export function useTree(kind: Kind = "main") {
   return useTreeStore((state) => state[kind]);
 }
 
-export function useTreeVersion() {
-  return useTreeStore((state) => state.main.version ?? 0);
+export function useTreeMeta() {
+  return useTreeStore(
+    useShallow((state) => ({
+      version: state.main.version ?? 0,
+      needReset: state.main.needReset ?? false,
+    })),
+  );
 }

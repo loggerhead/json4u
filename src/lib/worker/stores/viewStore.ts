@@ -29,7 +29,7 @@ export interface ViewState {
 
   setTree: (tree: Tree) => void;
   createTable: () => string;
-  createGraph: () => { graph: Graph; renderable: SubGraph };
+  createGraph: (needResetViewport: boolean) => { graph: Graph; renderable: SubGraph; viewport: Viewport };
   setGraphSize: (width?: number, height?: number) => { renderable: SubGraph; changed: boolean };
   setGraphViewport: (viewport: Viewport) => { renderable: SubGraph; changed: boolean };
   setGraphRevealPosition: (
@@ -66,19 +66,13 @@ const useViewStore = createStore<ViewState>((set, get) => ({
   },
 
   // 5MB costs 260ms
-  createGraph() {
-    const {
-      tree,
-      graphWidth,
-      graphHeight,
-      graphViewport: { zoom },
-    } = get();
-    // reset viewport
-    const graphViewport = { ...initialViewport, zoom };
+  createGraph(needResetViewport: boolean) {
+    const { tree, graphWidth, graphHeight, graphViewport: oldViewport } = get();
+    const newViewport = { ...initialViewport, zoom: oldViewport.zoom };
 
     if (!tree.valid()) {
-      set({ graph: newGraph(), graphViewport });
-      return { graph: newGraph(), renderable: newSubGraph() };
+      set({ graph: newGraph(), graphViewport: newViewport });
+      return { graph: newGraph(), renderable: newSubGraph(), viewport: newViewport };
     }
 
     // TODO: genFlowNodes is slow, need optimization
@@ -101,10 +95,11 @@ const useViewStore = createStore<ViewState>((set, get) => ({
       edgeMap[ed.id] = ed;
     });
 
+    const graphViewport = needResetViewport ? newViewport : oldViewport;
     const graph = newGraph({ nodes: ordered, edges, levelMeta, nodeMap, edgeMap });
     const { renderable } = computeVirtualGraph(graph, graphWidth, graphHeight, graphViewport);
     set({ graph, graphViewport });
-    return { graph, renderable };
+    return { graph, renderable, viewport: graphViewport };
   },
 
   setGraphSize(width?: number, height?: number) {
@@ -176,8 +171,8 @@ export function createTable() {
   return getViewState().createTable();
 }
 
-export function createGraph() {
-  return getViewState().createGraph();
+export function createGraph(needResetViewport: boolean) {
+  return getViewState().createGraph(needResetViewport);
 }
 
 export function setGraphSize(width?: number, height?: number) {

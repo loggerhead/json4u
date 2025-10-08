@@ -1,4 +1,4 @@
-import { memo, useState, useCallback } from "react";
+import { memo, useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Popover from "./Popover";
 
@@ -8,8 +8,8 @@ interface EditableTextProps {
   onDoubleClick: () => void;
   onClick: (e: React.MouseEvent) => void;
   onEdit: (value: string) => void;
-  title: string;
   popoverWidth: number;
+  title?: string;
   editable?: boolean;
   widthInInput?: number;
 }
@@ -23,6 +23,11 @@ const EditableText = memo((props: EditableTextProps) => {
     props.onEdit(content);
     setIsInput(false);
   }, [content, props]);
+
+  useEffect(() => {
+    setContent(props.text);
+    setIsInput(false);
+  }, [props.text]);
 
   return (
     <Popover width={props.popoverWidth} hlClassNames={classNamesWithoutHl} text={content}>

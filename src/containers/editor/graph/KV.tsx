@@ -80,7 +80,7 @@ const KV = memo((props: KvProps) => {
         }}
         onClick={(e) => onClick(e, props.id, "key", "graphClick")}
         onEdit={(value) => onEdit(value)}
-        title={t("double_click_to_enter_edit_mode")}
+        title={parentNode.type !== "array" ? t("double_click_to_enter_edit_mode") : undefined}
         popoverWidth={props.width}
         widthInInput={props.keyWidth}
       />

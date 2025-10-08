@@ -43,6 +43,7 @@ export class Tree implements TreeObject {
   nestNodeMap?: Record<string, Node>; // A map from node ID to the root Node of a nested JSON string that has been parsed into its own tree.
   errors?: ContextError[]; // An array of parsing errors.
   version?: number; // A version number for the tree, can be used to track changes.
+  needReset?: boolean; // If true, reset the editor's cursor to the beginning and the graph's viewport.
 
   constructor(text: string = "") {
     this.nodeMap = {};

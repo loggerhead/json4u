@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
 import { useStatusStore } from "@/stores/statusStore";
-import { useTreeVersion } from "@/stores/treeStore";
+import { useTreeMeta } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
 import { useShallow } from "zustand/shallow";
 
@@ -18,7 +18,7 @@ export function useTableHTML() {
       setShowPricingOverlay: state.setShowPricingOverlay,
     })),
   );
-  const treeVersion = useTreeVersion();
+  const { version: treeVersion, needReset } = useTreeMeta();
   const [innerHTML, setInnerHTML] = useState("");
 
   useEffect(() => {

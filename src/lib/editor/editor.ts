@@ -125,6 +125,7 @@ export class EditorWrapper {
 
   setTree({ treeObject }: ParsedTree, resetCursor: boolean = true) {
     const tree = Tree.fromObject(treeObject);
+    tree.needReset = resetCursor;
     getEditorState().resetHighlight();
 
     this.tree = tree;
@@ -145,7 +146,10 @@ export class EditorWrapper {
     // Indicates the above edit is a complete undo/redo change.
     this.editor.pushUndoStop();
 
-    resetCursor && this.revealPosition(1, 1);
+    if (resetCursor) {
+      this.revealPosition(1, 1);
+    }
+
     console.l("set tree:", tree);
     return tree;
   }

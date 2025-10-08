@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { ViewMode } from "@/lib/db/config";
-import { config, initialViewport } from "@/lib/graph/layout";
+import { config } from "@/lib/graph/layout";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
 import { useStatusStore } from "@/stores/statusStore";
-import { useTreeVersion } from "@/stores/treeStore";
+import { useTreeMeta } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
 import { useEdgesState, useNodesState, useReactFlow } from "@xyflow/react";
 import { XYPosition } from "@xyflow/react";
@@ -14,7 +14,7 @@ import { useShallow } from "zustand/shallow";
 const viewportSize: [number, number] = [0, 0];
 
 export default function useVirtualGraph() {
-  const treeVersion = useTreeVersion();
+  const { version: treeVersion, needReset } = useTreeMeta();
   // nodes and edges are not all that are in the graph, but rather the ones that will be rendered.
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
@@ -24,7 +24,7 @@ export default function useVirtualGraph() {
     [config.translateMargin, config.translateMargin],
   ]);
 
-  const { setViewport, getZoom } = useReactFlow();
+  const { setViewport } = useReactFlow();
   const { count, usable } = useUserStore(
     useShallow((state) => ({
       count: state.count,
@@ -55,12 +55,16 @@ export default function useVirtualGraph() {
       const {
         graph: { levelMeta },
         renderable: { nodes, edges },
-      } = await window.worker.createGraph();
+        viewport,
+      } = await window.worker.createGraph(needReset);
 
       setNodes(nodes);
       setEdges(edges);
-      setViewport({ ...initialViewport, zoom: getZoom() });
-      resetFoldStatus();
+
+      if (needReset) {
+        setViewport(viewport);
+        resetFoldStatus();
+      }
 
       const [w, h] = viewportSize;
       const px = Math.max(config.translateMargin, w / 2);
@@ -85,7 +89,7 @@ export default function useVirtualGraph() {
       );
       nodes.length > 0 && count("graphModeView");
     })();
-  }, [usable, isGraphView, treeVersion]);
+  }, [usable, isGraphView, treeVersion, needReset]);
 
   return {
     nodes,
