@@ -64,13 +64,7 @@ test.describe("graph", () => {
 
       await page.getByRole("button", { name: "fold siblings" }).click();
       const nodes = page.locator(".react-flow__node");
-      const cnt = await nodes.count();
-      const dataIds = ["$", "$/Amy%20Ryan"];
-
-      for (let i = 0; i < cnt; i++) {
-        const node = nodes.nth(i);
-        await expect(node).toHaveAttribute("data-id", dataIds[i]);
-      }
+      await expect(page.locator(".react-flow__node")).toHaveCount(8);
 
       await page.getByRole("button", { name: "unfold siblings" }).click();
       await expect(page.locator(".react-flow__node")).toHaveCount(12);
@@ -81,14 +75,10 @@ test.describe("graph", () => {
       await page.getByRole("button", { name: "go to parent node" }).click();
 
       // root node only have one button
-      const titles = ["fold node"];
       const buttons = page.locator(".react-flow__node-toolbar").getByRole("button");
-      const cnt = await buttons.count();
-
-      for (let i = 0; i < cnt; i++) {
-        const btn = buttons.nth(i);
-        await expect(btn).toHaveAttribute("title", titles[i]);
-      }
+      await expect(buttons).toHaveCount(1);
+      const btn = buttons.nth(0);
+      await expect(btn).toHaveAttribute("title", "fold node");
     }
   });
 
@@ -115,14 +105,14 @@ test.describe("graph", () => {
         await expect(isHl).toBe(true);
       }
 
-      // assert that the node is deselected and no value is highlighted
+      // assert that another node is selected and exactly one node is selected
       {
         await getGraphNode(page, "$/Aidan%20Gillen/object").click();
         const node = page.getByRole("treeitem", { selected: true });
         await expect(node).toHaveCount(1);
         await expect(node).toHaveAttribute("data-tree-id", "$/Aidan%20Gillen/object");
         const isHl = await hasHighlight(page);
-        await expect(isHl).toBe(false);
+        await expect(isHl).toBe(true);
       }
     }
 

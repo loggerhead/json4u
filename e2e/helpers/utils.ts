@@ -115,13 +115,7 @@ export function getGraphNode(page: Page, id: string) {
 }
 
 export function hasHighlight(page: Page) {
-  return page.evaluate(() => {
-    if (CSS.highlights) {
-      return !!CSS.highlights.get("search-highlight");
-    } else {
-      return !!document.querySelector(".search-highlight");
-    }
-  });
+  return page.evaluate(() => !!document.querySelector(".search-highlight"));
 }
 
 // A tricky way to write to the clipboard. see:
