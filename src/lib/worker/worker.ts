@@ -1,5 +1,6 @@
 import { init as dbInit } from "@/lib/db/config";
-import { setupGlobalGraphStyle } from "@/lib/graph/layout";
+import { setupGlobalGraphStyle } from "@/lib/graph/style";
+import { setupGlobalTableStyle } from "@/lib/table/style";
 import * as Comlink from "comlink";
 import { compareText, compareTree } from "./command/compare";
 import { csv2json, json2csv } from "./command/csv";
@@ -33,6 +34,7 @@ const worker = {
   json2csv,
   jsonPath,
   setupGlobalGraphStyle,
+  setupGlobalTableStyle,
   createTable,
   createGraph,
   setGraphSize,

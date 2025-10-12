@@ -4,7 +4,7 @@ import { TabIcon, TabView } from "@/containers/editor/components";
 import RightPanelButtons from "@/containers/editor/components/RightPanelButtons";
 import Editor from "@/containers/editor/editor/Editor";
 import Graph from "@/containers/editor/graph/Graph";
-import { JsonTable } from "@/containers/editor/table/JsonTable";
+import { Table } from "@/containers/editor/table/Table";
 import { ViewMode, ViewModeValue } from "@/lib/db/config";
 import { useConfigFromCookies } from "@/stores/hook";
 import { useStatusStore } from "@/stores/statusStore";
@@ -38,7 +38,7 @@ export default function RightPanel() {
             <Graph />
           </TabView>
           <TabView viewMode={ViewMode.Table}>
-            <JsonTable />
+            <Table />
           </TabView>
         </ContainerContent>
       </Container>

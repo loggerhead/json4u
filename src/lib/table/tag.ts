@@ -1,4 +1,4 @@
-import { escape, filter } from "lodash-es";
+import { escape } from "lodash-es";
 
 export function h(tag: string = "", ...children: (H | string)[]) {
   return new H(tag, ...children);
@@ -15,7 +15,7 @@ export class H {
   constructor(tag: string = "", ...children: (H | string)[]) {
     this.tag = tag;
     this.attrClass = [];
-    this.children = filter(children, (child) => child !== "");
+    this.children = children.filter((child) => child !== "");
   }
 
   id(id: string | undefined): H {

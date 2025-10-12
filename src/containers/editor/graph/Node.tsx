@@ -1,5 +1,6 @@
 import { memo } from "react";
-import { computeSourceHandleOffset, genKeyText, genValueAttrs, globalStyle } from "@/lib/graph/layout";
+import { computeSourceHandleOffset, genKeyText, genValueAttrs } from "@/lib/graph/layout";
+import { globalStyle } from "@/lib/graph/style";
 import type { NodeWithData } from "@/lib/graph/types";
 import { isChild, rootMarker } from "@/lib/idgen/pointer";
 import { getChildrenKeys, hasChildren } from "@/lib/parser/node";

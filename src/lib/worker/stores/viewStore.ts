@@ -5,30 +5,33 @@ import {
   toggleNodeSelected,
   triggerFoldSiblings,
 } from "@/lib/graph/actions";
-import { computeSourceHandleOffset, genFlowNodes, globalStyle, Layouter, initialViewport } from "@/lib/graph/layout";
+import { computeSourceHandleOffset, genFlowNodes, Layouter } from "@/lib/graph/layout";
+import { globalStyle, initialViewport } from "@/lib/graph/style";
 import type { EdgeWithData, Graph, NodeWithData, RevealPosition, SubGraph } from "@/lib/graph/types";
 import { getGraphNodeId, newGraph, newSubGraph } from "@/lib/graph/utils";
 import computeVirtualGraph from "@/lib/graph/virtual";
 import { type GraphNodeId, lastKey } from "@/lib/idgen";
 import { getRawValue, hasChildren, isIterable, isRoot, Tree } from "@/lib/parser";
-import { genDomString } from "@/lib/table";
-import { type FunctionKeys } from "@/lib/utils";
-import { type Viewport } from "@xyflow/react";
+import { buildTableTree } from "@/lib/table/builder";
+import { newTableTree } from "@/lib/table/tableNode";
+import type { TableTree } from "@/lib/table/types";
+import type { FunctionKeys } from "@/lib/utils";
+import type { Viewport } from "@xyflow/react";
 import fuzzysort from "fuzzysort";
 import { keyBy } from "lodash-es";
 import { createStore } from "zustand/vanilla";
-import { type SearchResult } from "./types";
+import type { SearchResult } from "./types";
 
 export interface ViewState {
   tree: Tree;
-  tableHTML: string;
+  table: TableTree;
   graph: Graph;
   graphWidth: number;
   graphHeight: number;
   graphViewport: Viewport;
 
   setTree: (tree: Tree) => void;
-  createTable: () => string;
+  createTable: () => TableTree;
   createGraph: (needResetViewport: boolean) => { graph: Graph; renderable: SubGraph; viewport: Viewport };
   setGraphSize: (width?: number, height?: number) => { renderable: SubGraph; changed: boolean };
   setGraphViewport: (viewport: Viewport) => { renderable: SubGraph; changed: boolean };
@@ -41,7 +44,7 @@ export interface ViewState {
 
 const initialStates: Omit<ViewState, FunctionKeys<ViewState>> = {
   tree: new Tree(),
-  tableHTML: "",
+  table: newTableTree(),
   graph: newGraph(),
   graphWidth: 0,
   graphHeight: 0,
@@ -57,12 +60,12 @@ const useViewStore = createStore<ViewState>((set, get) => ({
     set({ tree });
   },
 
-  // 5MB costs 230ms
+  // TODO: 5MB costs 230ms
   createTable() {
     const { tree } = get();
-    const tableHTML = genDomString(tree);
-    set({ tableHTML });
-    return tableHTML;
+    const table = buildTableTree(tree);
+    set({ table });
+    return table;
   },
 
   // 5MB costs 260ms

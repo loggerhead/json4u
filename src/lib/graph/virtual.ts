@@ -1,4 +1,4 @@
-import { globalStyle } from "@/lib/graph/layout";
+import { globalStyle } from "@/lib/graph/style";
 import type { NodeWithData, GraphVirtual, Graph, EdgeWithData, SubGraph } from "@/lib/graph/types";
 import { type Viewport, type Rect } from "@xyflow/react";
 import { getOverlappingArea } from "@xyflow/system";

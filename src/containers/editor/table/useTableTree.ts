@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
+import { newTableTree, nodeTo2dArray } from "@/lib/table/tableNode";
+import type { TableTree } from "@/lib/table/types";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeMeta } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
 import { useShallow } from "zustand/shallow";
 
-export function useTableHTML() {
+export function useTableTree() {
   const { count, usable } = useUserStore(
     useShallow((state) => ({
       count: state.count,
@@ -19,7 +21,7 @@ export function useTableHTML() {
     })),
   );
   const { version: treeVersion, needReset } = useTreeMeta();
-  const [innerHTML, setInnerHTML] = useState("");
+  const [tableTree, setTableTree] = useState<TableTree>(newTableTree());
 
   useEffect(() => {
     if (!(window.worker && isTableView)) {
@@ -34,12 +36,16 @@ export function useTableHTML() {
     }
 
     (async () => {
-      const tableHTML = await window.worker.createTable();
-      setInnerHTML(tableHTML);
-      console.l("create a new table:", treeVersion, tableHTML.length, tableHTML.slice(0, 100));
-      tableHTML.length > 0 && count("tableModeView");
+      const t = await window.worker.createTable();
+      setTableTree(t);
+      console.l(
+        "create a new table:",
+        treeVersion,
+        nodeTo2dArray(t.root).map((row, idx) => row.map((nd) => (nd.row === idx ? nd.text : ""))),
+      );
+      t.width && count("tableModeView");
     })();
-  }, [usable, isTableView, treeVersion]);
+  }, [usable, isTableView, treeVersion, setTableTree]);
 
-  return innerHTML ? { __html: innerHTML } : undefined;
+  return tableTree;
 }

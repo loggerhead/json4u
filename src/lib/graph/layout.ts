@@ -9,7 +9,8 @@ import {
   getChildCount,
 } from "@/lib/parser";
 import { type XYPosition } from "@xyflow/react";
-import type { EdgeWithData, Graph, GraphNodeStyle, NodeWithData } from "./types";
+import { globalStyle } from "./style";
+import type { EdgeWithData, Graph, NodeWithData } from "./types";
 import { newGraph } from "./utils";
 
 export const config: Readonly<Record<string, any>> = {
@@ -23,25 +24,6 @@ export const config: Readonly<Record<string, any>> = {
   imageWidth: 1024,
   imageHeight: 768,
 };
-
-// measured in MainPanel when mounted. The value should remain consistent between the main thread and the web worker.
-export const globalStyle: GraphNodeStyle = {
-  fontWidth: 7.2,
-  padding: 20,
-  borderWidth: 1,
-  kvGap: 20,
-  kvHeight: 18,
-  maxKeyWidth: 300,
-  maxValueWidth: 500,
-  nodeGap: 25,
-  levelGap: 75,
-};
-
-export const initialViewport = { x: globalStyle.nodeGap, y: globalStyle.nodeGap, zoom: 1 };
-
-export function setupGlobalGraphStyle(style: Partial<GraphNodeStyle>) {
-  Object.assign(globalStyle, style);
-}
 
 /**
  * Generates flow nodes from a tree.
@@ -204,7 +186,7 @@ export class Layouter {
 
 const re = /[\s\w\d\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\{\}\[\]\\\|\;\:\'\"\<\>\,\.\/\?]/g;
 
-function computeTextWidth(text: string, fontWidth: number) {
+export function computeTextWidth(text: string, fontWidth: number) {
   const single = (text.match(re) || []).length;
   const double = text.length - single;
   return Math.ceil((single + 2 * double) * fontWidth);

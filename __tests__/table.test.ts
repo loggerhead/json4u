@@ -1,9 +1,9 @@
 import { parseJSON } from "@/lib/parser/parse";
-import { genDomString } from "@/lib/table";
+import { genTableTree } from "@/lib/table/builder";
 
 function checkDom(jsonStr: string, expectDomStr: string) {
   const tree = parseJSON(jsonStr);
-  const domStr = genDomString(tree);
+  const domStr = genTableTree(tree);
   expect(compareDOMStrings(domStr, expectDomStr), domStr).equals("");
 }
 

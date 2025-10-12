@@ -283,117 +283,46 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   }
 }
 
-.tbl {
-  border-spacing: 0;
-  margin-bottom: 6px;
-  box-shadow: 0 0 2px 2px rgba(176, 176, 176, 0.5);
-  border-collapse: collapse;
-
-  th {
-    background-color: var(--tbl-key-bg-color);
-    font-weight: normal;
-    text-align: left;
-    vertical-align: top;
-    padding: 0 6px;
-    border: var(--tbl-border);
-  }
-
-  tr {
-    border: var(--tbl-border);
-  }
-
-  td {
-    position: relative;
-    font-weight: normal;
-    text-align: left;
-    vertical-align: top;
-    padding: 0 6px;
-  }
-
-  .sticky-scroll {
-    background-color: var(--tbl-key-bg-color);
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  .tbl-key {
-    display: flex;
-    align-items: center;
-
-    span {
-      display: inline-block;
-      max-width: var(--max-key-length);
-      white-space: nowrap;
-      overflow-x: auto;
-    }
-
-    :not(:first-child) {
-      margin-left: 4px;
-    }
-  }
-
-  .tbl-expander {
-    cursor: pointer;
-  }
-
-  .tbl-index {
-    padding: 0 6px;
-    border: var(--tbl-border);
-    color: var(--hl-index);
-    font-family: var(--graph-font-family);
-
-    .tbl-no {
-      display: inline-block;
-      vertical-align: top;
-    }
-  }
-
-  .tbl-leaf {
-    margin-left: 6px;
-    padding: 0 12px;
-    border-left: var(--tbl-border);
-  }
-
-  .tbl-val {
-    display: inline-block;
-    max-width: var(--max-value-length);
-    white-space: nowrap;
-    overflow-x: auto;
-  }
+.tbl-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
-#tbl-tooltip {
-  width: 400px;
-  padding: 15px;
-  position: absolute;
-  z-index: 1;
-  color: #000000;
+.tbl-cell {
+  display: inline-block;
+  align-items: center;
+  padding: 4px 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tbl-header {
+  max-width: var(--max-value-length);
+  background-color: var(--tbl-key-bg-color);
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+}
+
+.tbl-value {
+  max-width: var(--max-value-length);
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.tbl-index {
+  color: var(--hl-index);
   font-family: var(--graph-font-family);
+  vertical-align: top;
+  border: var(--tbl-border);
+}
 
-  /* stolen from https://www.radix-ui.com/primitives/docs/components/popover */
-  border-radius: 4px;
-  background-color: white;
-  box-shadow:
-    hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
-  animation-duration: 400ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
-
-  .tooltip-object {
-    color: var(--hl-number);
-  }
-
-  .tooltip-array {
-    color: var(--hl-null);
-  }
-
-  .tooltip-key {
-    margin-left: 0.5rem;
-    color: #000000;
-  }
+.tbl-expander {
+  cursor: pointer;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -403,19 +332,6 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-#tbl-tooltip[data-side="top"] {
-  animation-name: slideDownAndFade;
-}
-#tbl-tooltip[data-side="right"] {
-  animation-name: slideLeftAndFade;
-}
-#tbl-tooltip[data-side="bottom"] {
-  animation-name: slideUpAndFade;
-}
-#tbl-tooltip[data-side="left"] {
-  animation-name: slideRightAndFade;
 }
 
 .search-cmd-kbd {
