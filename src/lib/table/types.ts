@@ -9,14 +9,14 @@
  * Represents the entire virtual table, including its root node and overall dimensions.
  */
 export interface TableTree {
-  /** The root node of the table structure. */
-  root: TableNode;
+  grid: TableNode[][];
   /** The total width of the table in pixels. */
   width: number;
   /** The total height of the table in pixels. */
   height: number;
 }
 
+export type BorderType = "left" | "right" | "top" | "bottom";
 /**
  * Defines the type of a `TableNode`, which influences its styling and behavior.
  * This helps distinguish between different parts of the JSON structure, such as keys, values, and indices.
@@ -52,6 +52,10 @@ export interface TableNode {
   classNames: string[];
   /** A unique identifier for the node, linking it back to the original JSON data. */
   id?: string;
+  /** The nesting level of the node in the table view, which is different from its level in the JSON tree. */
+  level: number;
+  /** Specifies which borders to display, e.g., `["top", "left"]` for the top-left corner. */
+  borders: BorderType[];
 }
 
 /**
@@ -66,4 +70,5 @@ export interface TableNodeStyle {
   maxCellWidth: number;
   /** The horizontal padding within a cell. */
   padding: number;
+  scrollbarWidth: number;
 }

@@ -6,117 +6,7 @@
  */
 import { computeTextWidth } from "@/lib/graph/layout";
 import { globalStyle } from "./style";
-import type { TableNode, TableNodeType, TableTree } from "./types";
-
-/**
- * A concrete implementation of the `TableNode` interface. It represents a virtual cell in the table,
- * containing all layout and content information needed for rendering.
- */
-export class TableNodeImpl implements TableNode {
-  /** The type of the node, which determines how it is rendered in the table. */
-  type: TableNodeType;
-  /** The text content of the cell. */
-  text: string;
-  /** The starting row index for this cell. */
-  row: number;
-  /** The number of rows this cell spans. */
-  span: number;
-  /** The calculated width of the cell in pixels. */
-  width: number;
-  /** A pointer to the next cell in the same row. */
-  next?: TableNode;
-  /** For nested structures, this holds the first cell of each child row. */
-  heads: TableNode[];
-  /** An array of CSS classes to be applied to the cell. */
-  classNames: string[];
-  /** A unique identifier linking this node to the original JSON data. */
-  id?: string;
-
-  constructor(type: TableNodeType, row?: number) {
-    this.type = type;
-    this.row = row ?? 0;
-    this.span = type === "dummyParent" ? 0 : 1; // dummyParent span is calculated later
-    this.width = 0;
-    this.text = "";
-    this.classNames = [];
-    this.heads = [];
-  }
-
-  /**
-   * Sets the text content of the node and calculates its initial width based on the text length.
-   * @param t The text content.
-   * @returns The `TableNodeImpl` instance for chaining.
-   */
-  setText(t: string) {
-    this.text = t;
-
-    if (t) {
-      const width = computeTextWidth(t, globalStyle.fontWidth) + globalStyle.padding;
-      this.width = Math.min(width, globalStyle.maxCellWidth);
-    } else {
-      this.width = 0;
-    }
-    return this;
-  }
-
-  setWidth(w: number) {
-    this.width = w;
-    return this;
-  }
-
-  setSpan(span: number) {
-    this.span = span;
-    return this;
-  }
-
-  setId(id: string | undefined) {
-    this.id = id;
-    return this;
-  }
-
-  setClass(...clss: string[]) {
-    this.classNames.push(...clss);
-    return this;
-  }
-
-  setNext(nd: TableNode) {
-    this.next = nd;
-    return this;
-  }
-
-  setHeads(nodes: TableNode[]) {
-    this.heads = nodes;
-    return this;
-  }
-}
-
-/**
- * Traverses the linked-list and tree structure of `TableNode`s to collect all cells for a specific row index.
- * @param node The starting `TableNode` (usually the root or a sub-tree root).
- * @param row The row index to retrieve.
- * @returns An array of `TableNode`s that constitute the specified row.
- */
-export function getRow(node: TableNode, row: number): TableNode[] {
-  const res: TableNode[] = [];
-  const stack = [node];
-
-  while (stack.length > 0) {
-    const nd = stack.pop()!;
-    // Traverse horizontally to the next cell in the current row.
-    nd.next && stack.push(nd.next);
-
-    if (nd.type === "dummyParent") {
-      // If it's a parent, find the correct child head for the target row and traverse it.
-      const head = findHead(nd.heads, row)!;
-      head && stack.push(head);
-    } else {
-      // This is a regular cell, add it to the result.
-      res.push(nd);
-    }
-  }
-
-  return res;
-}
+import type { BorderType, TableNode, TableNodeType, TableTree } from "./types";
 
 /**
  * Converts a `TableNode` and its entire sub-tree into a 2D array of `TableNode`s.
@@ -137,7 +27,51 @@ export function nodeTo2dArray<T = TableNode>(
 
   // Iterate through each row spanned by the node and retrieve its cells.
   for (let i = 0; i < node.span; i++) {
-    res.push(getRow(node, node.row + i).map((nd, col) => apply(nd, i, col)));
+    res.push(getRow(node, node.row + i, node.span).map((nd, col) => apply(nd, i, col)));
+  }
+
+  return res;
+}
+
+/**
+ * Traverses the linked-list and tree structure of `TableNode`s to collect all cells for a specific row index.
+ * @param node The starting `TableNode` (usually the root or a sub-tree root).
+ * @param row The row index to retrieve.
+ * @returns An array of `TableNode`s that constitute the specified row.
+ */
+export function getRow(node: TableNode, row: number, rowCnt: number): TableNode[] {
+  const res: TableNode[] = [];
+  const stack = [node];
+
+  while (stack.length > 0) {
+    const nd = stack.pop()!;
+    // Traverse horizontally to the next cell in the current row.
+    nd.next && stack.push(nd.next);
+
+    if (nd.type === "dummyParent") {
+      // If it's a parent, find the correct child head for the target row and traverse it.
+      const head = findHead(nd.heads, row)!;
+      head && stack.push(head);
+      continue;
+    }
+
+    // This is a regular cell, add it to the result.
+    if (nd.row === row) {
+      const borders = nd.borders.filter((b) => !(row === 0 && b === "top") && !(nd.span > 1 && b === "bottom"));
+      res.push({ ...nd, borders });
+      continue;
+    }
+
+    const isLast = row === nd.row + nd.span - 1 && nd.borders.includes("bottom");
+    const borders = nd.borders.filter((b) => (b !== "bottom" && b !== "top") || (isLast && b === "bottom"));
+
+    if (nd.type === "header") {
+      res.push({ ...nd, borders, type: "dummyHeader" });
+    } else if (nd.type === "value") {
+      res.push({ ...nd, borders, type: "dummyValue" });
+    } else {
+      throw new Error(`Unexpected TableNode type: ${JSON.stringify(nd)}`);
+    }
   }
 
   return res;
@@ -174,5 +108,101 @@ function findHead(heads: TableNode[], row: number): TableNode | undefined {
 }
 
 export function newTableTree(): TableTree {
-  return { root: new TableNodeImpl("dummyParent"), width: 0, height: 0 };
+  return { grid: [], width: 0, height: 0 };
+}
+
+export function isDummyType(t: TableNodeType) {
+  return t.startsWith("dummy");
+}
+
+export class TableNodeImpl implements TableNode {
+  type: TableNodeType;
+  text: string;
+  row: number;
+  span: number;
+  width: number;
+  level: number;
+  borders: BorderType[];
+  next?: TableNode;
+  heads: TableNode[];
+  classNames: string[];
+  id?: string;
+
+  constructor(type: TableNodeType) {
+    this.type = type;
+    this.row = 0;
+    this.span = type === "dummyParent" ? 0 : 1; // dummyParent span is calculated later
+    this.width = 0;
+    this.text = "";
+    this.level = 0;
+    this.borders = [];
+    this.classNames = [];
+    this.heads = [];
+  }
+
+  /**
+   * Sets the text content of the node and calculates its initial width based on the text length.
+   * @param t The text content.
+   * @returns The `TableNodeImpl` instance for chaining.
+   */
+  setText(t: string) {
+    this.text = t;
+
+    if (t) {
+      const width = computeTextWidth(t, globalStyle.fontWidth) + globalStyle.padding;
+      this.width = Math.min(width, globalStyle.maxCellWidth);
+    } else {
+      this.width = 0;
+    }
+    return this;
+  }
+
+  setWidth(w: number) {
+    this.width = w;
+    return this;
+  }
+
+  setRow(row: number) {
+    this.row = row;
+    return this;
+  }
+
+  setSpan(span: number) {
+    this.span = span;
+    return this;
+  }
+
+  setLevel(lv: number) {
+    this.level = lv;
+    return this;
+  }
+
+  addBorder(border: BorderType | "") {
+    if (!border) {
+      return this;
+    }
+
+    this.borders.push(border);
+    return this;
+  }
+
+  setId(id: string | undefined) {
+    this.id = id;
+    return this;
+  }
+
+  setClass(...clss: string[]) {
+    this.classNames.push(...clss);
+    return this;
+  }
+
+  setNext(nd: TableNode) {
+    this.next = nd;
+    return this;
+  }
+
+  setHeads(nodes: TableNode[]) {
+    this.heads = nodes;
+    return this;
+  }
 }

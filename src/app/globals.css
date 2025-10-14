@@ -54,8 +54,8 @@
       "Courier New", monospace;
     --max-key-length: 300px;
     --max-value-length: 500px;
-    --tbl-key-bg-color: rgb(242, 242, 242);
-    --tbl-border: 1px solid #e0e0e080;
+
+    --tbl-border: rgb(155 162 174);
 
     --bg-key: #e0e0e04d;
     --hl-key: #a31515;
@@ -288,19 +288,22 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   top: 0;
   left: 0;
   width: 100%;
+  font-size: 14px;
+  border-color: var(--tbl-border);
 }
 
 .tbl-cell {
   display: inline-block;
   align-items: center;
-  padding: 4px 6px;
+  padding: 6px;
   text-align: left;
   vertical-align: top;
+  border-collapse: collapse;
+  border-color: var(--tbl-border);
+  box-sizing: border-box;
 }
 
 .tbl-header {
-  max-width: var(--max-value-length);
-  background-color: var(--tbl-key-bg-color);
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
@@ -308,7 +311,6 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
 }
 
 .tbl-value {
-  max-width: var(--max-value-length);
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
@@ -318,7 +320,6 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   color: var(--hl-index);
   font-family: var(--graph-font-family);
   vertical-align: top;
-  border: var(--tbl-border);
 }
 
 .tbl-expander {

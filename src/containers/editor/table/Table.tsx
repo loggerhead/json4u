@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Background from "@/components/Background";
 import { globalStyle } from "@/lib/table/style";
-import { getRow } from "@/lib/table/tableNode";
+import { cn } from "@/lib/utils";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import Cell from "./Cell";
 import { useOnResize } from "./useOnResize";
@@ -16,7 +16,7 @@ export function Table() {
   const tableTree = useTableTree();
   const { width, height } = useOnResize(containerRef, tableTree);
   const virtualizer = useVirtualizer({
-    count: tableTree.root.span,
+    count: tableTree.grid.length,
     getScrollElement: () => virtualRef.current,
     estimateSize: (i) => globalStyle.rowHeight,
     overscan: 10,
@@ -27,20 +27,24 @@ export function Table() {
       <div
         ref={virtualRef}
         className="bg-white"
-        style={{ width: `${width}px`, height: `${height}px`, overflow: "auto" }}
+        style={{
+          width: `${width + globalStyle.scrollbarWidth + 1}px`,
+          height: `${height}px`,
+          overflow: "auto",
+        }}
       >
         <div style={{ height: `${virtualizer.getTotalSize()}px`, width: "100%", position: "relative" }}>
-          {virtualizer.getVirtualItems().map(({ index, start }) => (
+          {virtualizer.getVirtualItems().map(({ index: row, start }) => (
             <div
-              key={index}
+              key={row}
               className="tbl-row"
               style={{
                 height: globalStyle.rowHeight,
                 transform: `translateY(${start}px)`,
               }}
             >
-              {getRow(tableTree.root, index).map((nd) => (
-                <Cell key={nd.id} {...nd} index={index} />
+              {tableTree.grid[row].map((nd, col) => (
+                <Cell key={`${row}-${col}`} {...nd} rowInTable={row} colInTable={col} />
               ))}
             </div>
           ))}

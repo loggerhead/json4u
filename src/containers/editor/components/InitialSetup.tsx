@@ -23,7 +23,7 @@ export default function InitialSetup() {
         <div className="graph-v" />
       </div>
       <div className="tbl-row">
-        <div className="tbl-cell tbl-value">
+        <div className="tbl-cell border">
           <span>{measureStr}</span>
         </div>
         <div className="tbl-header" />
@@ -55,6 +55,7 @@ function useInitial() {
 
     // measure graph style
     const el = document.getElementById("width-measure")!;
+    const { maxWidth: maxValueWidth } = getComputedStyle(el.querySelector(".graph-v")!);
 
     {
       const span = el.querySelector("span")!;
@@ -62,7 +63,6 @@ function useInitial() {
       const { borderWidth } = getComputedStyle(el);
       const { paddingLeft, paddingRight } = getComputedStyle(el.querySelector(".graph-kv")!);
       const { marginRight, maxWidth: maxKeyWidth } = getComputedStyle(el.querySelector(".graph-k")!);
-      const { maxWidth: maxValueWidth } = getComputedStyle(el.querySelector(".graph-v")!);
 
       const measured = {
         fontWidth: Math.ceil(span.offsetWidth / span.textContent!.length),
@@ -81,13 +81,13 @@ function useInitial() {
     // measure table style
     {
       const span = el.querySelector("span")!;
-      const { height: rowHeight } = getComputedStyle(el.querySelector(".tbl-row")!);
-      const { maxWidth: maxCellWidth, paddingLeft, paddingRight } = getComputedStyle(el.querySelector(".tbl-cell")!);
+      const { height: rowHeight, paddingLeft, paddingRight } = getComputedStyle(el.querySelector(".tbl-cell")!);
       const measured = {
         fontWidth: Math.ceil(span.offsetWidth / span.textContent!.length),
         rowHeight: px2num(rowHeight),
-        maxCellWidth: px2num(maxCellWidth),
+        maxCellWidth: px2num(maxValueWidth),
         padding: px2num(paddingLeft) + px2num(paddingRight),
+        scrollbarWidth: getScrollbarWidth(),
       };
 
       setupGlobalTableStyle(measured);
@@ -95,4 +95,21 @@ function useInitial() {
       console.l("finished measuring table view style:", measured);
     }
   }, []);
+}
+
+// Calculate the scrollbar width
+function getScrollbarWidth() {
+  const outer = document.createElement("div");
+  outer.style.width = "100px";
+  outer.style.height = "100px";
+  outer.style.overflow = "scroll";
+  document.body.appendChild(outer);
+
+  const inner = document.createElement("div");
+  inner.style.width = "100%";
+  outer.appendChild(inner);
+
+  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+  document.body.removeChild(outer);
+  return scrollbarWidth;
 }

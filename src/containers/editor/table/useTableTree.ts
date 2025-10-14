@@ -41,7 +41,9 @@ export function useTableTree() {
       console.l(
         "create a new table:",
         treeVersion,
-        nodeTo2dArray(t.root, (nd, row) => (nd.row === row ? nd.text : "")),
+        t.grid.slice(0, 10).map((nodes) => nodes.slice(0, 10)),
+        t.width,
+        t.height,
       );
       t.width && count("tableModeView");
     })();

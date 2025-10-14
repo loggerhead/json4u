@@ -1,4 +1,4 @@
-import type { TableNodeStyle, TableNodeType } from "./types";
+import type { BorderType, TableNodeStyle, TableNodeType } from "./types";
 
 /**
  * A mapping from `TableNodeType` to the corresponding CSS class name.
@@ -14,19 +14,25 @@ export const cellClassMap: Record<TableNodeType, string> = {
   dummyParent: "tbl-header", // dummyParent is not rendered, so this is just a fallback.
 };
 
+export const borderClassMap: Record<BorderType, string> = {
+  top: "border-t",
+  bottom: "border-b",
+  left: "border-l",
+  right: "border-r",
+};
+
+export const headerBgClassNames = ["bg-stone-300", "bg-gray-100"];
+
 /**
  * Global style properties used for layout calculations. These values are crucial for determining
  * the size of cells and the overall dimensions of the table.
  */
 export const globalStyle: TableNodeStyle = {
-  /** The average width of a single character. This is a key factor in calculating cell widths. */
   fontWidth: 8.9,
-  /** The fixed height for each row in pixels. */
   rowHeight: 32,
-  /** The maximum width a cell can have, to prevent overly wide columns. */
   maxCellWidth: 500,
-  /** The horizontal padding inside each cell. */
   padding: 12,
+  scrollbarWidth: 15,
 };
 
 /**
