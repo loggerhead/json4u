@@ -1,4 +1,5 @@
 import type { RevealTarget } from "@/lib/graph/types";
+import { newRevealPosition } from "@/lib/graph/utils";
 import { NodeType, ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
@@ -148,6 +149,7 @@ export class EditorWrapper {
 
     if (resetCursor) {
       this.revealPosition(1, 1);
+      getStatusState().setRevealPosition(newRevealPosition(tree.version ?? 0));
     }
 
     console.l("set tree:", tree);

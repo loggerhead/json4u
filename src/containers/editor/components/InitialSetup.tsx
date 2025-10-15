@@ -16,7 +16,7 @@ export default function InitialSetup() {
 
   return (
     <div id="width-measure" className="absolute invisible">
-      <div className="graph-kv">
+      <div className="graph-node graph-kv">
         <div className="graph-k">
           <span>{measureStr}</span>
         </div>
@@ -58,14 +58,14 @@ function useInitial() {
     const { maxWidth: maxValueWidth } = getComputedStyle(el.querySelector(".graph-v")!);
 
     {
-      const span = el.querySelector("span")!;
+      const span = el.querySelector(".graph-node span") as HTMLSpanElement;
       const { lineHeight } = getComputedStyle(span);
       const { borderWidth } = getComputedStyle(el);
       const { paddingLeft, paddingRight } = getComputedStyle(el.querySelector(".graph-kv")!);
       const { marginRight, maxWidth: maxKeyWidth } = getComputedStyle(el.querySelector(".graph-k")!);
 
       const measured = {
-        fontWidth: Math.ceil(span.offsetWidth / span.textContent!.length),
+        fontWidth: Math.ceil(span.offsetWidth / measureStr.length),
         kvHeight: px2num(lineHeight),
         padding: px2num(paddingLeft) + px2num(paddingRight),
         borderWidth: px2num(borderWidth),
@@ -80,10 +80,10 @@ function useInitial() {
 
     // measure table style
     {
-      const span = el.querySelector("span")!;
+      const span = el.querySelector(".tbl-row span") as HTMLSpanElement;
       const { height: rowHeight, paddingLeft, paddingRight } = getComputedStyle(el.querySelector(".tbl-cell")!);
       const measured = {
-        fontWidth: Math.ceil(span.offsetWidth / span.textContent!.length),
+        fontWidth: Math.ceil(span.offsetWidth / measureStr.length),
         rowHeight: px2num(rowHeight),
         maxCellWidth: px2num(maxValueWidth),
         padding: px2num(paddingLeft) + px2num(paddingRight),

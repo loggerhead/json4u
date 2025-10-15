@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
 import { config } from "@/lib/graph/layout";
 import type { EdgeWithData, NodeWithData } from "@/lib/graph/types";
@@ -15,10 +15,11 @@ const viewportSize: [number, number] = [0, 0];
 
 export default function useVirtualGraph() {
   const { version: treeVersion, needReset } = useTreeMeta();
+  // Prevent the graph from being re-rendered when switching to other tabs
+  const [renderedVersion, setRenderedVersion] = useState(-1);
   // nodes and edges are not all that are in the graph, but rather the ones that will be rendered.
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeWithData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeWithData>([]);
-
   const translateExtentRef = useRef<[[number, number], [number, number]]>([
     [-config.translateMargin, -config.translateMargin],
     [config.translateMargin, config.translateMargin],
@@ -40,7 +41,7 @@ export default function useVirtualGraph() {
   );
 
   useEffect(() => {
-    if (!(window.worker && isGraphView)) {
+    if (!(window.worker && isGraphView) || renderedVersion === treeVersion) {
       console.l("skip graph render:", isGraphView, treeVersion);
       return;
     }
@@ -60,6 +61,7 @@ export default function useVirtualGraph() {
 
       setNodes(nodes);
       setEdges(edges);
+      setRenderedVersion(treeVersion);
 
       if (needReset) {
         setViewport(viewport);

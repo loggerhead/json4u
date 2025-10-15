@@ -1,8 +1,14 @@
-import { memo } from "react";
+import { memo, useState } from "react";
+import useClickNode from "@/containers/editor/graph/useClickNode";
+import type { RevealTarget } from "@/lib/graph/types";
+import { isDescendant } from "@/lib/idgen";
 import { borderClassMap, cellClassMap, globalStyle, headerBgClassNames } from "@/lib/table/style";
-import { isDummyType } from "@/lib/table/tableNode";
 import type { TableNode } from "@/lib/table/types";
+import { isDummyType, tableNodeTypeToRevealTarget } from "@/lib/table/utils";
 import { cn } from "@/lib/utils";
+import { useStatusStore } from "@/stores/statusStore";
+import { includes } from "lodash-es";
+import { useTranslations } from "next-intl";
 
 interface CellProps extends Omit<TableNode, "next" | "heads"> {
   rowInTable: number;
@@ -11,25 +17,60 @@ interface CellProps extends Omit<TableNode, "next" | "heads"> {
 
 const Cell = memo((props: CellProps) => {
   const isDummy = isDummyType(props.type);
-  const isHeader = props.type === "header" || props.type === "dummyHeader";
+  const isEditable = !isDummy && props.id;
 
-  let classNames = props.borders.map((border) => borderClassMap[border]);
-  classNames.push(cellClassMap[props.type]);
-  classNames.push(isHeader ? headerBgClassNames[props.level % 2] : "");
-  classNames.push(isDummy ? "" : "hover:bg-blue-100 dark:hover:bg-blue-900");
-  classNames.push(...(props.classNames ?? []));
-  classNames = classNames.filter((cls) => cls);
+  const { onClick, cancelClickNode } = useClickNode();
+  const [inputMode, setInputMode] = useState("");
+  const t = useTranslations();
+  const needHighlight = useStatusStore((state) => {
+    const { treeNodeId, target } = state.revealPosition;
+    const rt = tableNodeTypeToRevealTarget(props.type);
+
+    if (!includes<RevealTarget>(["keyValue", "graphNode"], target)) {
+      return treeNodeId === props.id && target === rt;
+    } else if (target === "keyValue" && includes<RevealTarget>(["key", "value"], rt)) {
+      return treeNodeId === props.id;
+    } else {
+      return props.id && isDescendant(treeNodeId, props.id);
+    }
+  });
+
+  const hlClassName = cellClassMap[props.type];
+  const classNames = [
+    hlClassName,
+    hlClassName === "tbl-header" && headerBgClassNames[props.level % 2],
+    props.id && "cursor-pointer",
+    isEditable && "hover:bg-blue-100 dark:hover:bg-blue-900",
+    needHighlight && "search-highlight",
+    ...props.borders.map((border) => borderClassMap[border]),
+    ...(props.classNames ?? []),
+  ].filter((cls) => cls);
 
   return (
     <div
-      id={props.id}
+      data-id={props.id}
       data-type={props.type}
-      data-position={`${props.rowInTable},${props.colInTable}`}
-      data-level={props.level}
       className={cn("tbl-cell", ...classNames)}
       style={{
         width: `${props.width}px`,
         height: `${globalStyle.rowHeight}px`,
+      }}
+      title={isEditable ? t("double_click_to_enter_edit_mode") : undefined}
+      onClick={(e) => {
+        if (props.id) {
+          const target = tableNodeTypeToRevealTarget(props.type);
+          onClick(e, props.id, target, "table");
+        }
+      }}
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isEditable) {
+          cancelClickNode();
+          // TODO:
+          setInputMode("key");
+        }
       }}
     >
       {isDummy ? undefined : props.text}

@@ -117,6 +117,7 @@ export type RevealFrom =
   | "editor"
   | "statusBar"
   | "search"
+  | "table"
   | "graph" // don't need reveal to the position (see `useRevealNode` for details)
   | "graphClick" // don't need reveal to the position
   | "graphDoubleClick" // need reveal to the position

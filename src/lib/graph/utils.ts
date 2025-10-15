@@ -1,8 +1,12 @@
-import type { EdgeWithData, Graph, NodeWithData, RevealTarget, SubGraph } from "@/lib/graph/types";
+import type { EdgeWithData, Graph, NodeWithData, RevealPosition, RevealTarget, SubGraph } from "@/lib/graph/types";
 import { getParentId, type GraphNodeId } from "@/lib/idgen";
 import { type Node as FlowNode, type Edge } from "@xyflow/react";
 import { filter, keyBy } from "lodash-es";
 import { edgeHighlightStyle, nodeHighlightStyle, nodeSelectedStyle } from "./style";
+
+export function newRevealPosition(treeVersion: number): RevealPosition {
+  return { version: treeVersion, treeNodeId: "", target: "graphNode", from: "editor" };
+}
 
 // See the comment for type `GraphNodeId` for relation between `TreeNodeId` and `GraphNodeId`.
 export function toGraphNodeId(treeNodeId: string): GraphNodeId {

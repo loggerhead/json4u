@@ -288,8 +288,9 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   top: 0;
   left: 0;
   width: 100%;
-  font-size: 14px;
   border-color: var(--tbl-border);
+  font-size: 14px;
+  font-family: var(--graph-font-family);
 }
 
 .tbl-cell {
@@ -298,28 +299,22 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   padding: 6px;
   text-align: left;
   vertical-align: top;
-  border-collapse: collapse;
-  border-color: var(--tbl-border);
   box-sizing: border-box;
-}
-
-.tbl-header {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+}
+
+.tbl-header {
   font-weight: 400;
 }
 
 .tbl-value {
-  white-space: nowrap;
-  overflow-x: hidden;
-  text-overflow: ellipsis;
 }
 
 .tbl-index {
+  font-weight: 400;
   color: var(--hl-index);
-  font-family: var(--graph-font-family);
-  vertical-align: top;
 }
 
 .tbl-expander {

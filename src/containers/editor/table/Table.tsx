@@ -1,20 +1,21 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Background from "@/components/Background";
 import { globalStyle } from "@/lib/table/style";
-import { cn } from "@/lib/utils";
+import type { TableTree } from "@/lib/table/types";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import Cell from "./Cell";
 import { useOnResize } from "./useOnResize";
+import { useRevealNode } from "./useRevealNode";
 import { useTableTree } from "./useTableTree";
+import { newTableTree } from "@/lib/table/utils";
 
 export function Table() {
   const containerRef = useRef<HTMLDivElement>(null);
   const virtualRef = useRef<HTMLDivElement>(null);
+  const [tableTree, setTableTree] = useState<TableTree>(newTableTree());
 
-  const tableTree = useTableTree();
-  const { width, height } = useOnResize(containerRef, tableTree);
   const virtualizer = useVirtualizer({
     count: tableTree.grid.length,
     getScrollElement: () => virtualRef.current,
@@ -22,13 +23,17 @@ export function Table() {
     overscan: 10,
   });
 
+  useTableTree(virtualizer, containerRef, setTableTree);
+  useRevealNode(virtualizer, containerRef, tableTree);
+  const { width, height } = useOnResize(containerRef, tableTree);
+
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-x-auto">
       <div
         ref={virtualRef}
         className="bg-white"
         style={{
-          width: `${width + globalStyle.scrollbarWidth + 1}px`,
+          width: `${width + globalStyle.scrollbarWidth}px`,
           height: `${height}px`,
           overflow: "auto",
         }}

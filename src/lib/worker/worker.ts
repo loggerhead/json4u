@@ -20,6 +20,7 @@ import {
   toggleGraphNodeHidden,
   toggleGraphNodeSelected,
   triggerGraphFoldSiblings,
+  setTableRevealPosition,
 } from "./stores/viewStore";
 
 const worker = {
@@ -40,6 +41,7 @@ const worker = {
   setGraphSize,
   setGraphViewport,
   setGraphRevealPosition,
+  setTableRevealPosition,
   toggleGraphNodeHidden,
   toggleGraphNodeSelected,
   clearGraphNodeSelected,

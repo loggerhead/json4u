@@ -10,11 +10,11 @@ import { globalStyle, initialViewport } from "@/lib/graph/style";
 import type { EdgeWithData, Graph, NodeWithData, RevealPosition, SubGraph } from "@/lib/graph/types";
 import { getGraphNodeId, newGraph, newSubGraph } from "@/lib/graph/utils";
 import computeVirtualGraph from "@/lib/graph/virtual";
-import { type GraphNodeId, lastKey } from "@/lib/idgen";
+import { type GraphNodeId, isDescendant, lastKey } from "@/lib/idgen";
 import { getRawValue, hasChildren, isIterable, isRoot, Tree } from "@/lib/parser";
 import { buildTableTree } from "@/lib/table/builder";
-import { newTableTree } from "@/lib/table/tableNode";
 import type { TableTree } from "@/lib/table/types";
+import { newTableTree } from "@/lib/table/utils";
 import type { FunctionKeys } from "@/lib/utils";
 import type { Viewport } from "@xyflow/react";
 import fuzzysort from "fuzzysort";
@@ -22,6 +22,7 @@ import { keyBy } from "lodash-es";
 import { createStore } from "zustand/vanilla";
 import type { SearchResult } from "./types";
 
+// NOTICE: Only exists and is used in web workers
 export interface ViewState {
   tree: Tree;
   table: TableTree;
@@ -39,6 +40,7 @@ export interface ViewState {
     pos: RevealPosition,
     zoom: number,
   ) => { renderable: SubGraph; selected?: NodeWithData; center: Viewport; changed: boolean } | undefined;
+  setTableRevealPosition: (pos: RevealPosition) => { row: number; col: number } | undefined;
   search: (input: string) => SearchResult[];
 }
 
@@ -60,7 +62,7 @@ const useViewStore = createStore<ViewState>((set, get) => ({
     set({ tree });
   },
 
-  // TODO: 5MB costs 230ms
+  // 5MB costs 410ms
   createTable() {
     const { tree } = get();
     const table = buildTableTree(tree);
@@ -143,6 +145,29 @@ const useViewStore = createStore<ViewState>((set, get) => ({
     return { renderable, selected, center: { ...r.center, zoom }, changed };
   },
 
+  setTableRevealPosition(pos: RevealPosition) {
+    const { table } = get();
+    const { treeNodeId, target } = pos;
+    const match = table.posMap!.get(treeNodeId);
+
+    if (match) {
+      let p = match.find((p) => p.type === target);
+      if (!p) {
+        p = match[match.length - 1];
+      }
+      return { row: p.row, col: p.col };
+    }
+
+    for (const [id, pp] of table.posMap!) {
+      if (isDescendant(treeNodeId, id)) {
+        const p = pp[pp.length - 1];
+        return { row: p.row, col: p.col };
+      }
+    }
+
+    return;
+  },
+
   search(input: string) {
     const { tree } = get();
     const nodes = Object.values(tree.nodeMap);
@@ -171,7 +196,8 @@ const useViewStore = createStore<ViewState>((set, get) => ({
 export const getViewState = useViewStore.getState;
 
 export function createTable() {
-  return getViewState().createTable();
+  const table = getViewState().createTable();
+  return { ...table, posMap: undefined };
 }
 
 export function createGraph(needResetViewport: boolean) {
@@ -188,6 +214,10 @@ export function setGraphViewport(viewport: Viewport) {
 
 export function setGraphRevealPosition(pos: RevealPosition, zoom: number) {
   return getViewState().setGraphRevealPosition(pos, zoom);
+}
+
+export function setTableRevealPosition(pos: RevealPosition) {
+  return getViewState().setTableRevealPosition(pos);
 }
 
 export function toggleGraphNodeHidden(nodeId: GraphNodeId, handleId?: string, hide?: boolean) {

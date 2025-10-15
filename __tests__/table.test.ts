@@ -1,217 +1,201 @@
 import { parseJSON } from "@/lib/parser/parse";
-import { genTableTree } from "@/lib/table/builder";
+import { buildTableTree } from "@/lib/table/builder";
+import type { TableNode } from "@/lib/table/types";
+import { isDummyType } from "@/lib/table/utils";
 
-function checkDom(jsonStr: string, expectDomStr: string) {
+function checkText(jsonStr: string, expectGrid: Partial<TableNode>[][]) {
   const tree = parseJSON(jsonStr);
-  const domStr = genTableTree(tree);
-  expect(compareDOMStrings(domStr, expectDomStr), domStr).equals("");
+  const tableTree = buildTableTree(tree);
+  const actualGrid: Partial<TableNode>[][] = tableTree.grid.map((row) =>
+    row.map((cell) => (isDummyType(cell.type) ? { type: cell.type } : { type: cell.type, text: cell.text })),
+  );
+  expect(actualGrid).toEqual(expectGrid);
 }
 
-function compareDOMStrings(str1: string, str2: string) {
-  const parser = new DOMParser();
-  const doc1 = parser.parseFromString(str1, "text/html");
-  const doc2 = parser.parseFromString(str2, "text/html");
-  return areNodesEqual(doc1.documentElement, doc2.documentElement);
+function checkStyle(jsonStr: string, expectGrid: Partial<TableNode>[][]) {
+  const tree = parseJSON(jsonStr);
+  const tableTree = buildTableTree(tree);
+  const actualGrid: Partial<TableNode>[][] = tableTree.grid.map((row) =>
+    row.map((cell) => ({
+      width: cell.width,
+      type: cell.type,
+      text: isDummyType(cell.type) ? undefined : cell.text,
+    })),
+  );
+  expect(actualGrid).toEqual(expectGrid);
 }
 
-function areNodesEqual(nodeA: Element, nodeB: Element): string {
-  // 比较节点类型
-  if (nodeA.nodeType !== nodeB.nodeType) {
-    return `${nodeA.nodeType} ${nodeB.nodeType}`;
-  }
-
-  // 比较节点名称
-  if (nodeA.nodeName !== nodeB.nodeName) {
-    return `${nodeA.nodeName} ${nodeB.nodeName}`;
-  }
-
-  // 比较子节点
-  const childrenA = nodeA.children;
-  const childrenB = nodeB.children;
-
-  if (childrenA.length !== childrenB.length) {
-    return `${childrenA.length} ${childrenB.length}`;
-  }
-
-  for (let i = 0; i < childrenA.length; i++) {
-    const reason = areNodesEqual(childrenA[i], childrenB[i]);
-    if (reason) {
-      return reason;
-    }
-  }
-
-  return "";
-}
-
-describe("genFlowNodes", () => {
+describe("buildTableTree", () => {
   test("value", () => {
-    checkDom("6", "<span>6</span>");
+    checkText("6", [[{ type: "value", text: "6" }]]);
   });
 
   test("empty object", () => {
-    checkDom("{}", "<span>{}</span>");
+    checkText("{}", [[{ type: "value", text: "{}" }]]);
   });
 
   test("empty array", () => {
-    checkDom("[]", "<span>[]</span>");
+    checkText("[]", [[{ type: "value", text: "[]" }]]);
   });
 
   test("simple object", () => {
-    checkDom(
+    checkText(
       `{
   "int64": 12345678987654321,
   "key": "value"
 }`,
-      `<table>
-  <tbody>
-    <tr>
-      <th><div><span><span>int64</span></span></div></th>
-      <td><span>12345678987654321</span></td>
-    </tr>
-    <tr>
-      <th><div><span><span>key</span></span></div></th>
-      <td><span>value</span></td>
-    </tr>
-  </tbody>
-</table>
-`,
+      [
+        [
+          { type: "key", text: "int64" },
+          { type: "value", text: "12345678987654321" },
+        ],
+        [
+          { type: "key", text: "key" },
+          { type: "value", text: "value" },
+        ],
+      ],
     );
   });
 
   test("object inside object", () => {
-    checkDom(
+    checkText(
       `{
   "int64": 12345678987654321,
   "key": "value",
   "array": {"a": 1, "b": 2}
 }`,
-      `<table>
-  <tbody>
-    <tr>
-      <th><div><span><span>int64</span></span></div></th>
-      <td><span>12345678987654321</span></td>
-    </tr>
-    <tr>
-      <th><div><span><span>key</span></span></div></th>
-      <td><span>value</span></td>
-    </tr>
-    <tr>
-      <th><div><span><span>array</span><span>{2}</span></span><div id="exp$/array"></div></div></th>
-      <td>
-        <table>
-          <tbody>
-            <tr>
-              <th><div><span><span>a</span></span></div></th>
-              <td><span>1</span></td>
-            </tr>
-            <tr>
-              <th><div><span><span>b</span></span></div></th>
-              <td><span>2</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </tbody>
-</table>`,
+      [
+        [
+          { type: "key", text: "int64" },
+          { type: "value", text: "12345678987654321" },
+        ],
+        [
+          { type: "key", text: "key" },
+          { type: "value", text: "value" },
+        ],
+        [
+          { type: "key", text: "array" },
+          { type: "key", text: "a" },
+          { type: "value", text: "1" },
+        ],
+        [{ type: "dummyKey" }, { type: "key", text: "b" }, { type: "value", text: "2" }],
+      ],
     );
   });
 
   test("array inside object", () => {
-    checkDom(
+    checkText(
       `{
   "int64": 12345678987654321,
   "key": "value",
   "array": [12345678987654321, 0.1234567891111111111]
 }`,
-      `<table>
-<tbody>
-  <tr>
-    <th><div><span><span>int64</span></span></div></th>
-    <td><span>12345678987654321</span></td>
-  </tr>
-  <tr>
-    <th><div><span><span>key</span></span></div></th>
-    <td><span>value</span></td>
-  </tr>
-  <tr>
-    <th>
-      <div>
-        <span><span>array</span><span>[2]</span></span>
-        <div id="exp$/array"></div>
-      </div>
-    </th>
-    <td>
-      <table>
-        <tbody>
-          <tr><td><span>0</span><span>12345678987654321</span></td></tr>
-          <tr><td><span>1</span><span>0.1234567891111111111</span></td></tr>
-        </tbody>
-      </table>
-    </td>
-  </tr>
-</tbody>
-</table>`,
+      [
+        [
+          { type: "key", text: "int64" },
+          { type: "value", text: "12345678987654321" },
+        ],
+        [
+          { type: "key", text: "key" },
+          { type: "value", text: "value" },
+        ],
+        [
+          { type: "key", text: "array" },
+          { type: "index", text: "0" },
+          { type: "value", text: "12345678987654321" },
+        ],
+        [{ type: "dummyKey" }, { type: "index", text: "1" }, { type: "value", text: "0.1234567891111111111" }],
+      ],
     );
   });
 
   test("simple array", () => {
-    checkDom(
-      "[12345678987654321, 0.1234567891111111111]",
-      `<table>
-  <tbody>
-    <tr><td><span>0</span><span>12345678987654321</span></td></tr>
-    <tr><td><span>1</span><span>0.1234567891111111111</span></td></tr>
-  </tbody>
-</table>`,
-    );
+    checkText("[12345678987654321, 0.1234567891111111111]", [
+      [
+        { type: "index", text: "0" },
+        { type: "value", text: "12345678987654321" },
+      ],
+      [
+        { type: "index", text: "1" },
+        { type: "value", text: "0.1234567891111111111" },
+      ],
+    ]);
   });
 
   test("object inside array", () => {
-    checkDom(
-      '[{"a": 1}, {"b": 2}]',
-      `
-<table>
-  <tbody>
-    <tr>
-      <th><div><span><span>a</span></span></div></th>
-      <th><div><span><span>b</span></span></div></th>
-    </tr>
-    <tr>
-      <td><span>1</span></td>
-      <td><span>miss</span></td>
-    </tr>
-    <tr>
-      <td><span>miss</span></td>
-      <td><span>2</span></td>
-    </tr>
-  </tbody>
-</table>
-`,
-    );
+    checkText('[{"a": 1}, {"b": 2}]', [
+      [
+        { type: "header", text: "a" },
+        { type: "header", text: "b" },
+      ],
+      [
+        { type: "value", text: "1" },
+        { type: "value", text: "miss" },
+      ],
+      [
+        { type: "value", text: "miss" },
+        { type: "value", text: "2" },
+      ],
+    ]);
   });
 
   test("array inside array", () => {
-    checkDom(
-      "[[11, 12], [23, 24]]",
-      `
-<table>
-  <tbody>
-    <tr>
-      <th><div><span><span>0</span></span></div></th>
-      <th><div><span><span>1</span></span></div></th>
-    </tr>
-    <tr>
-      <td><span>11</span></td>
-      <td><span>12</span></td>
-    </tr>
-    <tr>
-      <td><span>23</span></td>
-      <td><span>24</span></td>
-    </tr>
-  </tbody>
-</table>
-`,
+    checkText("[[11, 12], [23, 24]]", [
+      [
+        { type: "header", text: "0" },
+        { type: "header", text: "1" },
+      ],
+      [
+        { type: "value", text: "11" },
+        { type: "value", text: "12" },
+      ],
+      [
+        { type: "value", text: "23" },
+        { type: "value", text: "24" },
+      ],
+    ]);
+  });
+
+  test("mixed array with string and object", () => {
+    checkText('["a",{"foo":"bar"},"c"]', [
+      [{ type: "dummyIndex" }, { type: "dummyHeader" }, { type: "header", text: "foo" }],
+      [{ type: "index", text: "0" }, { type: "value", text: "a" }, { type: "dummyValue" }],
+      [{ type: "index", text: "1" }, { type: "dummyValue" }, { type: "value", text: "bar" }],
+      [{ type: "index", text: "2" }, { type: "value", text: "c" }, { type: "dummyValue" }],
+    ]);
+  });
+
+  test("check style of complex array", () => {
+    checkStyle(
+      `[{
+  "simple object": {
+    "foo": "bar"
+  },
+  "simple array": [
+    {
+      "index": 0,
+      "": "empty string"
+    }
+  ]
+}]`,
+      [
+        [
+          { text: "simple object", type: "header", width: 130 },
+          { text: "simple array", type: "header", width: 179 },
+        ],
+        [
+          { text: "foo", type: "key", width: 40 },
+          { text: "bar", type: "value", width: 90 },
+          { text: "index", type: "header", width: 58 },
+          { text: '""', type: "header", width: 121 },
+        ],
+        [
+          { type: "dummyKey", width: 40 },
+          { type: "dummyValue", width: 90 },
+          { text: "0", type: "value", width: 58 },
+          { text: "empty string", type: "value", width: 121 },
+        ],
+      ],
     );
   });
 });

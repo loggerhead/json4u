@@ -14,7 +14,15 @@ export interface TableTree {
   width: number;
   /** The total height of the table in pixels. */
   height: number;
+  // Maps IDs to positions. NOTICE: Cannot be transferred via web worker.
+  posMap?: Map<string, TableNodePos[]>;
 }
+
+export type TableNodePos = {
+  row: number;
+  col: number;
+  type: TableNodeType;
+};
 
 export type BorderType = "left" | "right" | "top" | "bottom";
 /**
@@ -22,11 +30,14 @@ export type BorderType = "left" | "right" | "top" | "bottom";
  * This helps distinguish between different parts of the JSON structure, such as keys, values, and indices.
  */
 export type TableNodeType =
-  | "header" // Represents a header, which is used for object keys or as a column header for arrays of objects.
-  | "arrayIndex" // Represents an array index.
+  | "key"
   | "value" // Represents a JSON value (string, number, boolean, null).
-  | "dummyHeader" // A placeholder for alignment.
+  | "index" // Represents an array index.
+  | "header" // Represents a header, which is used for object keys or as a column header for arrays of objects.
+  | "dummyKey"
   | "dummyValue" // A placeholder for alignment in complex array structures.
+  | "dummyIndex" // A placeholder for alignment.
+  | "dummyHeader" // A placeholder for alignment.
   | "dummyParent"; // An internal node used to group children, not rendered directly.
 
 /**
@@ -56,6 +67,10 @@ export interface TableNode {
   level: number;
   /** Specifies which borders to display, e.g., `["top", "left"]` for the top-left corner. */
   borders: BorderType[];
+  /** The x-coordinate of the top-left corner of this cell in the virtual table, in pixels. */
+  x: number;
+  /** The y-coordinate of the top-left corner of this cell in the virtual table, in pixels. */
+  y: number;
 }
 
 /**

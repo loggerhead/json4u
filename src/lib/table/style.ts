@@ -6,9 +6,12 @@ import type { BorderType, TableNodeStyle, TableNodeType } from "./types";
  * The class names should correspond to styles defined in `globals.css`.
  */
 export const cellClassMap: Record<TableNodeType, string> = {
-  header: "tbl-header",
+  key: "tbl-header",
   value: "tbl-value",
-  arrayIndex: "tbl-index",
+  index: "tbl-index",
+  header: "tbl-header",
+  dummyKey: "tbl-header",
+  dummyIndex: "tbl-header",
   dummyHeader: "tbl-header",
   dummyValue: "tbl-value",
   dummyParent: "tbl-header", // dummyParent is not rendered, so this is just a fallback.
@@ -28,7 +31,7 @@ export const headerBgClassNames = ["bg-stone-300", "bg-gray-100"];
  * the size of cells and the overall dimensions of the table.
  */
 export const globalStyle: TableNodeStyle = {
-  fontWidth: 8.9,
+  fontWidth: 9,
   rowHeight: 32,
   maxCellWidth: 500,
   padding: 12,

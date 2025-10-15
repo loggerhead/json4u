@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { type Dispatch, type RefObject, SetStateAction, useEffect, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
-import { newTableTree, nodeTo2dArray } from "@/lib/table/tableNode";
 import type { TableTree } from "@/lib/table/types";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeMeta } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
+import type { Virtualizer } from "@tanstack/react-virtual";
 import { useShallow } from "zustand/shallow";
+import { scrollTo } from "./useRevealNode";
 
-export function useTableTree() {
+export function useTableTree(
+  virtualizer: Virtualizer<HTMLDivElement, Element>,
+  containerRef: RefObject<HTMLDivElement>,
+  setTableTree: Dispatch<SetStateAction<TableTree>>,
+) {
   const { count, usable } = useUserStore(
     useShallow((state) => ({
       count: state.count,
@@ -21,10 +26,11 @@ export function useTableTree() {
     })),
   );
   const { version: treeVersion, needReset } = useTreeMeta();
-  const [tableTree, setTableTree] = useState<TableTree>(newTableTree());
+  // Prevent the graph from being re-rendered when switching to other tabs
+  const [renderedVersion, setRenderedVersion] = useState(-1);
 
   useEffect(() => {
-    if (!(window.worker && isTableView)) {
+    if (!(window.worker && isTableView) || renderedVersion === treeVersion) {
       console.l("skip table render:", isTableView, treeVersion);
       return;
     }
@@ -38,9 +44,16 @@ export function useTableTree() {
     (async () => {
       const t = await window.worker.createTable();
       setTableTree(t);
+      setRenderedVersion(treeVersion);
+
+      if (needReset) {
+        scrollTo(virtualizer, containerRef, 0, 0);
+      }
+
       console.l(
         "create a new table:",
         treeVersion,
+        needReset,
         t.grid.slice(0, 10).map((nodes) => nodes.slice(0, 10)),
         t.width,
         t.height,
@@ -48,6 +61,4 @@ export function useTableTree() {
       t.width && count("tableModeView");
     })();
   }, [usable, isTableView, treeVersion, setTableTree]);
-
-  return tableTree;
 }

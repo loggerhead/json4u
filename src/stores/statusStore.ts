@@ -1,8 +1,9 @@
 import { type Config, defaultConfig, keyName, type ViewMode, type ViewModeValue, storage } from "@/lib/db/config";
 import type { RevealFrom, RevealPosition, RevealTarget } from "@/lib/graph/types";
+import { newRevealPosition } from "@/lib/graph/utils";
 import { GraphNodeId } from "@/lib/idgen";
-import { type ParseOptions } from "@/lib/parser";
-import { type FunctionKeys } from "@/lib/utils";
+import type { ParseOptions } from "@/lib/parser";
+import type { FunctionKeys } from "@/lib/utils";
 import { includes } from "lodash-es";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -50,7 +51,7 @@ export interface StatusState extends Config {
   setLeftPanelCollapsed: (collapsed: boolean) => void;
   setParseOptions: (options: ParseOptions) => void;
   setRevealPosition: (pos: Partial<RevealPosition>) => void;
-  isNeedReveal: (scene: "editor" | "graph") => boolean;
+  isNeedReveal: (scene: "editor" | "graph" | "table") => boolean;
   setEnableSyncScroll: (enable: boolean) => void;
   setSideNavExpanded: (expanded: boolean) => void;
   setFixSideNav: (fix: boolean) => void;
@@ -59,7 +60,7 @@ export interface StatusState extends Config {
   addToEditQueue: (...edits: TreeEdit[]) => void;
   clearEditQueue: () => void;
   toggleFoldNode: (id: GraphNodeId) => void;
-  toggleFoldSibingsNode: (id: GraphNodeId) => void;
+  toggleFoldSiblingsNode: (id: GraphNodeId) => void;
   resetFoldStatus: () => void;
 }
 
@@ -69,7 +70,7 @@ const initialStates: Omit<StatusState, FunctionKeys<StatusState>> = {
   editorInitCount: 0,
   cursorPosition: { line: 0, column: 0 },
   selectionLength: 0,
-  revealPosition: { version: 0, treeNodeId: "", target: "graphNode", from: "editor" },
+  revealPosition: newRevealPosition(0),
   unfoldNodeMap: {},
   unfoldSiblingsNodeMap: {},
   editQueue: [],
@@ -145,7 +146,7 @@ export const useStatusStore = create<StatusState>()(
         }
       },
 
-      isNeedReveal(scene: "editor" | "graph") {
+      isNeedReveal(scene: "editor" | "graph" | "table") {
         const {
           enableSyncScroll,
           revealPosition: { from },
@@ -154,11 +155,13 @@ export const useStatusStore = create<StatusState>()(
         let ok = false;
 
         if (enableSyncScroll) {
-          ok = from !== scene;
+          ok = !from.startsWith(scene);
         } else if (scene === "editor") {
           ok = includes<RevealFrom>(["statusBar"], from);
         } else if (scene === "graph") {
           ok = includes<RevealFrom>(["statusBar", "search", "graphButton"], from);
+        } else if (scene === "table") {
+          ok = includes<RevealFrom>(["statusBar", "search"], from);
         }
 
         return ok;
@@ -200,7 +203,7 @@ export const useStatusStore = create<StatusState>()(
         set({ unfoldNodeMap });
       },
 
-      toggleFoldSibingsNode(id: GraphNodeId) {
+      toggleFoldSiblingsNode(id: GraphNodeId) {
         const { unfoldSiblingsNodeMap } = get();
         unfoldSiblingsNodeMap[id] = !unfoldSiblingsNodeMap[id];
         set({ unfoldSiblingsNodeMap });

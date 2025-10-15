@@ -1,9 +1,9 @@
-import { genTableId } from "@/lib/idgen";
 import { hasChildren, getChildCount, isIterable, type Tree, type Node, getRawValue } from "@/lib/parser";
 import { maxBy, sum, union } from "lodash-es";
 import { globalStyle } from "./style";
-import { getRow, newTableTree, TableNodeImpl } from "./tableNode";
+import { TableNodeImpl } from "./tableNode";
 import type { TableNode, TableNodeType } from "./types";
+import { newTableTree, toDummyType } from "./utils";
 
 /**
  * The context object passed during the recursive build process.
@@ -29,16 +29,98 @@ export function buildTableTree(tree: Tree) {
   const ctx = { row: 0, level: 0 };
   const root = createNode(ctx, tree, tree.root());
   correctWidth(root);
-  const grid: TableNode[][] = [];
+  correctXY(root);
 
-  for (let i = 0; i < root.span; i++) {
-    grid.push(getRow(root, i, root.span));
+  const grid = Array.from({ length: root.span }, (_, i) => getRow(root, i));
+
+  // Populate the idToPos map.
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
+      const nd = grid[row][col];
+
+      if (!nd.id) {
+        continue;
+      }
+
+      if (!tableTree.posMap?.get(nd.id)) {
+        tableTree.posMap?.set(nd.id, []);
+      }
+
+      tableTree.posMap?.get(nd.id)?.push({ row, col, type: nd.type });
+    }
   }
 
   tableTree.grid = grid;
   tableTree.width = root.width;
   tableTree.height = root.span * globalStyle.rowHeight;
   return tableTree;
+}
+
+/**
+ * Traverses the linked-list and tree structure of `TableNode`s to collect all cells for a specific row index.
+ * @param node The starting `TableNode` (usually the root or a sub-tree root).
+ * @param row The row index to retrieve.
+ * @returns An array of `TableNode`s that constitute the specified row.
+ */
+function getRow(node: TableNode, row: number): TableNode[] {
+  const res: TableNode[] = [];
+  const stack = [node];
+
+  while (stack.length > 0) {
+    const nd = stack.pop()!;
+    // Traverse horizontally to the next cell in the current row.
+    nd.next && stack.push(nd.next);
+
+    if (nd.type === "dummyParent") {
+      // If it's a parent, find the correct child head for the target row and traverse it.
+      const head = findHead(nd.heads, row)!;
+      head && stack.push(head);
+      continue;
+    }
+
+    // This is a regular cell, add it to the result.
+    if (nd.row === row) {
+      const borders = nd.borders.filter((b) => !(row === 0 && b === "top") && !(nd.span > 1 && b === "bottom"));
+      res.push({ ...nd, borders });
+      continue;
+    }
+
+    const isLast = row === nd.row + nd.span - 1 && nd.borders.includes("bottom");
+    const borders = nd.borders.filter((b) => (b !== "bottom" && b !== "top") || (isLast && b === "bottom"));
+    res.push({ ...nd, borders, type: toDummyType(nd.type) });
+  }
+
+  return res;
+}
+
+/**
+ * Performs a binary search on the `heads` of a parent node to find the child
+ * `TableNode` that corresponds to a specific row index.
+ * @param heads An array of child head nodes.
+ * @param row The target row index.
+ * @returns The `TableNode` for the specified row, or `undefined` if not found.
+ */
+function findHead(heads: TableNode[], row: number): TableNode | undefined {
+  let left = 0;
+  let right = heads.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const node = heads[mid]!;
+
+    // Check if the target row falls within the span of the current node.
+    if (node.row <= row && row < node.row + node.span) {
+      return node;
+    }
+
+    if (row < node.row) {
+      right = mid - 1;
+    } else {
+      left = mid + 1;
+    }
+  }
+
+  return;
 }
 
 // The width of dummyParent might be set larger than keyNode.width + valNode.width in `createObjectNode()`. Therefore, we need to correct the width of valNode using BFS.
@@ -78,6 +160,31 @@ function correctWidth(root: TableNodeImpl) {
   }
 }
 
+function correctXY(root: TableNodeImpl) {
+  const queue: TableNodeImpl[] = [root];
+  root.x = 0;
+
+  while (queue.length > 0) {
+    const node = queue.shift()!;
+
+    // The x of the next node is the current node's x + its width.
+    if (node.next) {
+      const nextNode = node.next as TableNodeImpl;
+      nextNode.x = node.x + node.width;
+      queue.push(nextNode);
+    }
+
+    // If it's a dummy parent, the x of each head is the parent's x.
+    if (node.type === "dummyParent") {
+      for (const head of node.heads) {
+        const headNode = head as TableNodeImpl;
+        headNode.x = node.x;
+        queue.push(headNode);
+      }
+    }
+  }
+}
+
 /**
  * A factory function that creates a `TableNode` based on the type of the input JSON `Node`.
  * It dispatches to specialized functions for iterable types (arrays, objects) or handles primitives directly.
@@ -93,28 +200,28 @@ function createNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
     return newNode(ctx, "value").setText("miss").setClass("text-hl-empty");
   }
 
-  const id = genTableId(node.id);
+  const { id, type } = node;
 
   // If the node is an object or array, delegate to a specific creation function.
   if (isIterable(node)) {
     if (hasChildren(node)) {
-      const genFn = node.type === "array" ? createArrayNode : createObjectNode;
+      const genFn = type === "array" ? createArrayNode : createObjectNode;
       const newCtx = tree.isRoot(node) ? ctx : { ...ctx, level: ctx.level + 1 };
       return genFn(newCtx, tree, node).setId(id);
     } else {
       // Handle empty objects or arrays.
-      const text = node.type === "object" ? "{}" : "[]";
-      return newNode(ctx, "value").setText(text).setClass("text-hl-empty").setId(id);
+      const text = type === "object" ? "{}" : "[]";
+      return newNode(ctx, "value", id).setText(text).setClass("text-hl-empty");
     }
   }
 
   // Handle literal values (string, number, boolean, null).
-  if (node.type === "string") {
+  if (type === "string") {
     const text = node.value || '""';
     const cls = node.value ? "text-hl-string" : "text-hl-empty";
-    return newNode(ctx, "value").setText(text).setClass(cls).setId(id);
+    return newNode(ctx, "value", id).setText(text).setClass(cls);
   } else {
-    return newNode(ctx, "value").setText(getRawValue(node)!).setClass(`text-hl-${node.type}`).setId(id);
+    return newNode(ctx, "value", id).setText(getRawValue(node)!).setClass(`text-hl-${type}`);
   }
 }
 
@@ -144,13 +251,18 @@ function createArrayNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
 
   // If there are headers, it means we have an array of objects. Create a header row.
   if (headers.length > 0) {
-    let firstRow = headers.map((key) => createHeaderNode(ctx, key));
+    let firstRow = headers.map((key) =>
+      newNode(ctx, "header")
+        .setText(key || '""')
+        .setClass(key ? "text-hl-key" : "text-hl-empty")
+        .setId(node.id),
+    );
 
     // For heterogeneous arrays, add dummy columns for the index and value of primitive elements.
     if (existsLeafNode) {
-      const dummyIdxNode = newNode(ctx, "dummyHeader");
-      const dummyValNode = newNode(ctx, "dummyValue");
-      firstRow = [dummyIdxNode, dummyValNode, ...firstRow];
+      const dummyIdxNode = newNode(ctx, "dummyIndex", node.id);
+      const dummyNode = newNode(ctx, "dummyHeader", node.id);
+      firstRow = [dummyIdxNode, dummyNode, ...firstRow];
     }
 
     rows.push(firstRow);
@@ -159,13 +271,13 @@ function createArrayNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
   let deltaSpan = rows.length;
 
   // Iterate over each child of the array to create the data rows.
-  tree.mapChildren(node, (child, idxAsKey, idx) => {
+  tree.mapChildren(node, (child, idxAsKey) => {
     const newCtx = { ...ctx, row: ctx.row + deltaSpan };
     const rowNodes: TableNodeImpl[] = [];
 
     if (existsLeafNode) {
       // For heterogeneous arrays, create an index cell and a value cell for primitives.
-      const idxNode = newNode(newCtx, "arrayIndex").setText(idxAsKey);
+      const idxNode = newNode(newCtx, "index").setId(child.id).setText(idxAsKey);
       const valNode = hasChildren(child) ? newNode(newCtx, "dummyValue") : createNode(newCtx, tree, child);
       rowNodes.push(idxNode, valNode);
     }
@@ -242,12 +354,15 @@ function createObjectNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
   let maxSpan = 0;
 
   // Generate a key and a value node for each child property.
-  const kvNodes = tree.mapChildren(node, (child, key, idx) => {
+  const kvNodes = tree.mapChildren(node, (child, key) => {
     const newCtx = { ...ctx, row: ctx.row + span };
     const cnt = getChildCount(child);
     const cntText = cnt ? (child.type === "array" ? `[${cnt}]` : `{${cnt}}`) : undefined;
 
-    const keyNode = createHeaderNode(newCtx, key, cntText);
+    const keyNode = newNode(newCtx, "key")
+      .setText(key || '""')
+      .setClass(key ? "text-hl-key" : "text-hl-empty")
+      .setId(child.id);
     const valNode = createNode(newCtx, tree, child).addBorder("right");
 
     span += valNode.span;
@@ -276,34 +391,15 @@ function createObjectNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
     return keyNode;
   });
 
-  const parentNode = newNode(ctx, "dummyParent");
-  return parentNode
+  return newNode(ctx, "dummyParent")
     .setWidth(maxKeyWidth + maxValWidth)
     .setSpan(span)
     .setHeads(heads);
 }
 
-/**
- * Creates a header node, which is used for object keys or as a column header for arrays of objects.
- * @param ctx The current build context.
- * @param key The text of the key.
- * @param cntText Optional text to display, e.g., the number of keys in a object.
- * @returns A `TableNodeImpl` configured as a header.
- */
-function createHeaderNode(ctx: Context, key: string, cntText?: string): TableNodeImpl {
-  const headerNode = newNode(ctx, "header")
-    .setText(key || '""')
-    .setClass(key ? "text-hl-key" : "text-hl-empty");
-
-  if (cntText) {
-    // TODO: Implement appending child count text to the header node.
-    // headerNode.innerChild(h("span", cntText).class("text-hl-empty"));
-    return headerNode;
-  } else {
-    return headerNode;
-  }
-}
-
-function newNode(ctx: Context, type: TableNodeType) {
-  return new TableNodeImpl(type).setRow(ctx.row).setLevel(ctx.level);
+function newNode(ctx: Context, type: TableNodeType, id?: string) {
+  return new TableNodeImpl(type)
+    .setRow(ctx.row)
+    .setLevel(ctx.level)
+    .setId(id || "");
 }

@@ -26,7 +26,7 @@ const Toolbar = memo(({ id }: ToolbarProps) => {
   const { fold, foldSiblings, toggleFoldNode, toggleFoldSibingsNode } = useStatusStore(
     useShallow((state) => ({
       toggleFoldNode: state.toggleFoldNode,
-      toggleFoldSibingsNode: state.toggleFoldSibingsNode,
+      toggleFoldSibingsNode: state.toggleFoldSiblingsNode,
       fold: !state.unfoldNodeMap[graphNodeId],
       foldSiblings: !state.unfoldSiblingsNodeMap[graphNodeId],
     })),
