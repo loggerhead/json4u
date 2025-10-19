@@ -5,7 +5,7 @@ import { debounce } from "lodash-es";
 
 export default function useClickNode() {
   const setRevealPosition = useStatusStore((state) => state.setRevealPosition);
-  const delaySetRevealPosition = debounce(setRevealPosition, 100, { trailing: true });
+  const delaySetRevealPosition = debounce(setRevealPosition, 200, { trailing: true });
 
   return {
     onClick: useCallback(

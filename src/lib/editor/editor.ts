@@ -1,12 +1,12 @@
 import type { RevealTarget } from "@/lib/graph/types";
 import { newRevealPosition } from "@/lib/graph/utils";
-import { NodeType, ParseOptions, Tree } from "@/lib/parser";
+import { ParseOptions, Tree } from "@/lib/parser";
 import { type ParsedTree } from "@/lib/worker/command/parse";
 import { getEditorState } from "@/stores/editorStore";
 import { getStatusState, type TreeEdit } from "@/stores/statusStore";
 import { getTreeState } from "@/stores/treeStore";
 import { sendGAEvent } from "@next/third-parties/google";
-import { debounce, includes, type DebouncedFunc } from "lodash-es";
+import { debounce, type DebouncedFunc } from "lodash-es";
 import { HoverProvider } from "./handler/hoverProvider";
 import { InlayHintsProvider } from "./handler/inlayHintsProvider";
 import { editorApi, IPosition, IScrollEvent } from "./types";
@@ -181,11 +181,22 @@ export class EditorWrapper {
       return;
     }
 
-    const edits = nodes.map(({ editTarget, newValue, ...nd }) => ({
-      text:
-        editTarget === "key" || includes<NodeType>(["string", "object", "array"], nd.type) ? `"${newValue}"` : newValue,
-      range: editTarget === "key" ? this.range(nd.boundOffset, nd.keyLength + 2) : this.range(nd.offset, nd.length),
-    }));
+    const edits = nodes.map(({ editTarget, newValue, ...nd }) => {
+      let needQuotationMarks = false;
+      try {
+        JSON.parse(newValue);
+        needQuotationMarks = false;
+      } catch {
+        needQuotationMarks = true;
+      }
+      needQuotationMarks = needQuotationMarks || editTarget === "key";
+      needQuotationMarks = needQuotationMarks && !(newValue.startsWith('"') && newValue.endsWith('"'));
+
+      return {
+        text: needQuotationMarks ? `"${newValue}"` : newValue,
+        range: editTarget === "key" ? this.range(nd.boundOffset, nd.keyLength + 2) : this.range(nd.offset, nd.length),
+      };
+    });
     console.l("edit nodes: ", treeEdits, nodes, edits);
 
     this.editor.executeEdits(null, edits);

@@ -19,10 +19,11 @@ export function useTableTree(
       usable: state.usable("tableModeView"),
     })),
   );
-  const { isTableView, setShowPricingOverlay } = useStatusStore(
+  const { isTableView, setShowPricingOverlay, setTableEditModePos } = useStatusStore(
     useShallow((state) => ({
       isTableView: state.viewMode === ViewMode.Table,
       setShowPricingOverlay: state.setShowPricingOverlay,
+      setTableEditModePos: state.setTableEditModePos,
     })),
   );
   const { version: treeVersion, needReset } = useTreeMeta();
@@ -47,6 +48,7 @@ export function useTableTree(
       setRenderedVersion(treeVersion);
 
       if (needReset) {
+        setTableEditModePos(undefined);
         scrollTo(virtualizer, containerRef, 0, 0);
       }
 

@@ -38,6 +38,7 @@ export interface StatusState extends Config {
   unfoldNodeMap: Record<GraphNodeId, boolean>;
   unfoldSiblingsNodeMap: Record<GraphNodeId, boolean>;
   editQueue: Array<TreeEdit>;
+  tableEditModePos?: { row: number; col: number };
 
   incrEditorInitCount: () => number;
   setLeftPanelWidth: (width: number) => void;
@@ -59,6 +60,7 @@ export interface StatusState extends Config {
   setIsTouchpad: (isTouchpad: boolean) => void;
   addToEditQueue: (...edits: TreeEdit[]) => void;
   clearEditQueue: () => void;
+  setTableEditModePos: (pos?: { row: number; col: number }) => void;
   toggleFoldNode: (id: GraphNodeId) => void;
   toggleFoldSiblingsNode: (id: GraphNodeId) => void;
   resetFoldStatus: () => void;
@@ -195,6 +197,10 @@ export const useStatusStore = create<StatusState>()(
 
       clearEditQueue() {
         set({ editQueue: [] });
+      },
+
+      setTableEditModePos(pos?: { row: number; col: number }) {
+        set({ tableEditModePos: pos });
       },
 
       toggleFoldNode(id: GraphNodeId) {
