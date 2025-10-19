@@ -6,6 +6,7 @@ import { ViewMode } from "@/lib/db/config";
 import { useEditorStore } from "@/stores/editorStore";
 import { useConfigFromCookies } from "@/stores/hook";
 import { useStatusStore } from "@/stores/statusStore";
+import { includes } from "lodash-es";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 import FullScreenButton from "./FullScreenButton";
@@ -34,7 +35,7 @@ export default function RightPanelButtons({ viewMode }: { viewMode: ViewMode }) 
           <SwapButton variant="icon-outline" className="px-2" />
         </>
       )}
-      {viewMode === ViewMode.Graph && <ViewSearchInput />}
+      {includes<ViewMode>([ViewMode.Graph, ViewMode.Table], viewMode) && <ViewSearchInput />}
       <FullScreenButton />
     </div>
   );
