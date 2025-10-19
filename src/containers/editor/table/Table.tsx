@@ -4,12 +4,12 @@ import { useRef, useState } from "react";
 import Background from "@/components/Background";
 import { globalStyle } from "@/lib/table/style";
 import type { TableTree } from "@/lib/table/types";
+import { newTableTree } from "@/lib/table/utils";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import Cell from "./Cell";
 import { useOnResize } from "./useOnResize";
 import { useRevealNode } from "./useRevealNode";
 import { useTableTree } from "./useTableTree";
-import { newTableTree } from "@/lib/table/utils";
 
 export function Table() {
   const containerRef = useRef<HTMLDivElement>(null);
