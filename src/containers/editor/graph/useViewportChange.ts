@@ -60,7 +60,7 @@ export function useViewportChange(
       } = await window.worker.setGraphViewport(viewport);
 
       if (changed) {
-        console.l("compute virtual graph since the viewport has changed:", viewport, nodes.length, nodes.slice(0, 10));
+        console.l("compute virtual graph since the viewport has changed:", viewport, nodes.length);
         setNodes(nodes);
         setEdges(edges);
       }

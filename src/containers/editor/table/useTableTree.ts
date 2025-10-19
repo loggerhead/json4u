@@ -50,14 +50,7 @@ export function useTableTree(
         scrollTo(virtualizer, containerRef, 0, 0);
       }
 
-      console.l(
-        "create a new table:",
-        treeVersion,
-        needReset,
-        t.grid.slice(0, 10).map((nodes) => nodes.slice(0, 10)),
-        t.width,
-        t.height,
-      );
+      console.l("create a new table:", treeVersion, needReset, t.width, t.height);
       t.width && count("tableModeView");
     })();
   }, [usable, isTableView, treeVersion, setTableTree]);

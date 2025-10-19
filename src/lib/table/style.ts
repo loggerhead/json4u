@@ -14,7 +14,7 @@ export const cellClassMap: Record<TableNodeType, string> = {
   dummyIndex: "tbl-header",
   dummyHeader: "tbl-header",
   dummyValue: "tbl-value",
-  dummyParent: "tbl-header", // dummyParent is not rendered, so this is just a fallback.
+  dummyTable: "tbl-header", // dummyTable is not rendered, so this is just a fallback.
 };
 
 export const borderClassMap: Record<BorderType, string> = {
@@ -24,7 +24,7 @@ export const borderClassMap: Record<BorderType, string> = {
   right: "border-r",
 };
 
-export const headerBgClassNames = ["bg-stone-300", "bg-gray-100"];
+export const headerBgClassNames = ["bg-stone-300", "bg-gray-200"];
 
 /**
  * Global style properties used for layout calculations. These values are crucial for determining

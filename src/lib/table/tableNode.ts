@@ -17,6 +17,7 @@ export class TableNodeImpl implements TableNode {
   width: number;
   level: number;
   borders: BorderType[];
+  parent?: TableNode;
   next?: TableNode;
   heads: TableNode[];
   classNames: string[];
@@ -27,7 +28,7 @@ export class TableNodeImpl implements TableNode {
     this.type = type;
     this.id = "";
     this.row = 0;
-    this.span = type === "dummyParent" ? 0 : 1; // dummyParent span is calculated later
+    this.span = type === "dummyTable" ? 0 : 1; // dummyTable span is calculated later
     this.width = 0;
     this.text = "";
     this.level = 0;
@@ -93,6 +94,11 @@ export class TableNodeImpl implements TableNode {
 
   setClass(...classNames: string[]) {
     this.classNames.push(...classNames);
+    return this;
+  }
+
+  setParent(nd: TableNode) {
+    this.parent = nd;
     return this;
   }
 

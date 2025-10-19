@@ -2,7 +2,7 @@ import { memo, useState } from "react";
 import useClickNode from "@/containers/editor/graph/useClickNode";
 import type { RevealTarget } from "@/lib/graph/types";
 import { isDescendant } from "@/lib/idgen";
-import { borderClassMap, cellClassMap, globalStyle, headerBgClassNames } from "@/lib/table/style";
+import { cellClassMap, globalStyle, headerBgClassNames } from "@/lib/table/style";
 import type { TableNode } from "@/lib/table/types";
 import { isDummyType, tableNodeTypeToRevealTarget } from "@/lib/table/utils";
 import { cn } from "@/lib/utils";
@@ -42,13 +42,11 @@ const Cell = memo((props: CellProps) => {
     props.id && "cursor-pointer",
     isEditable && "hover:bg-blue-100 dark:hover:bg-blue-900",
     needHighlight && "search-highlight",
-    ...props.borders.map((border) => borderClassMap[border]),
     ...(props.classNames ?? []),
   ].filter((cls) => cls);
 
   return (
     <div
-      data-id={props.id}
       data-type={props.type}
       className={cn("tbl-cell", ...classNames)}
       style={{

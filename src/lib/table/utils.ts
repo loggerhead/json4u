@@ -14,7 +14,7 @@ export function tableNodeTypeToRevealTarget(t: TableNodeType): RevealTarget {
       return "keyValue";
     case "header":
     case "dummyHeader":
-    case "dummyParent":
+    case "dummyTable":
       return "graphNode";
   }
 }

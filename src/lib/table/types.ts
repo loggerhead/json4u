@@ -38,7 +38,7 @@ export type TableNodeType =
   | "dummyValue" // A placeholder for alignment in complex array structures.
   | "dummyIndex" // A placeholder for alignment.
   | "dummyHeader" // A placeholder for alignment.
-  | "dummyParent"; // An internal node used to group children, not rendered directly.
+  | "dummyTable"; // An internal node used to group children, not rendered directly.
 
 /**
  * Represents a single virtual cell in the table. Instead of a DOM element, it's a data object
@@ -47,7 +47,7 @@ export type TableNodeType =
 export interface TableNode {
   /** The type of the node, determining its role and appearance. */
   type: TableNodeType;
-  /** The starting row index of this cell in the virtual grid. */
+  /** The starting row index of this cell in the virtual grid, representing the global absolute row. */
   row: number;
   /** The number of rows this cell spans (rowSpan). */
   span: number;
@@ -55,6 +55,7 @@ export interface TableNode {
   width: number;
   /** The text content to be displayed in the cell. */
   text: string;
+  parent?: TableNode;
   /** A pointer to the next cell in the same row, forming a linked list of cells. */
   next?: TableNode;
   /** For nodes that contain nested structures (like objects or arrays), this holds the first cell of each child row. */

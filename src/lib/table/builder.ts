@@ -1,8 +1,8 @@
-import { hasChildren, getChildCount, isIterable, type Tree, type Node, getRawValue } from "@/lib/parser";
+import { hasChildren, isIterable, type Tree, type Node, getRawValue } from "@/lib/parser";
 import { maxBy, sum, union } from "lodash-es";
 import { globalStyle } from "./style";
 import { TableNodeImpl } from "./tableNode";
-import type { TableNode, TableNodeType } from "./types";
+import type { TableNode, TableNodeType, TableTree } from "./types";
 import { newTableTree, toDummyType } from "./utils";
 
 /**
@@ -27,79 +27,87 @@ export function buildTableTree(tree: Tree) {
   }
 
   const ctx = { row: 0, level: 0 };
+  /* The table represented by root needs to meet the following requirements:
+   * 1. Cells in the same column should maintain the same width.
+   * 2. Cells in the same row should maintain the same span.
+   */
   const root = createNode(ctx, tree, tree.root());
-  correctWidth(root);
-  correctXY(root);
 
-  const grid = Array.from({ length: root.span }, (_, i) => getRow(root, i));
-
-  // Populate the idToPos map.
-  for (let row = 0; row < grid.length; row++) {
-    for (let col = 0; col < grid[row].length; col++) {
-      const nd = grid[row][col];
-
-      if (!nd.id) {
-        continue;
-      }
-
-      if (!tableTree.posMap?.get(nd.id)) {
-        tableTree.posMap?.set(nd.id, []);
-      }
-
-      tableTree.posMap?.get(nd.id)?.push({ row, col, type: nd.type });
-    }
+  for (let i = 0; i < root.span; i++) {
+    populateGrid(tableTree, root, i);
   }
 
-  tableTree.grid = grid;
   tableTree.width = root.width;
   tableTree.height = root.span * globalStyle.rowHeight;
   return tableTree;
 }
 
-/**
- * Traverses the linked-list and tree structure of `TableNode`s to collect all cells for a specific row index.
- * @param node The starting `TableNode` (usually the root or a sub-tree root).
- * @param row The row index to retrieve.
- * @returns An array of `TableNode`s that constitute the specified row.
- */
-function getRow(node: TableNode, row: number): TableNode[] {
-  const res: TableNode[] = [];
-  const stack = [node];
+function populateGrid(tableTree: TableTree, node: TableNode, startRow: number) {
+  let x = node.x;
+  let sumWidth = 0;
 
-  while (stack.length > 0) {
-    const nd = stack.pop()!;
-    // Traverse horizontally to the next cell in the current row.
-    nd.next && stack.push(nd.next);
+  /* After createNode() finishes building the table, the width and span of non-leaf nodes are correct.
+   * However, if there are nested objects or arrays, the width and span of child nodes need to be adjusted.
+   */
+  const correctX = (nd: TableNode) => {
+    if (nd.parent && nd.borders.includes("right")) {
+      nd.width = nd.parent.x + nd.parent.width - x;
+    }
+    nd.x = x;
+    x += nd.width;
+    sumWidth += nd.width;
+  };
 
-    if (nd.type === "dummyParent") {
-      // If it's a parent, find the correct child head for the target row and traverse it.
-      const head = findHead(nd.heads, row)!;
-      head && stack.push(head);
+  for (let currentNode: TableNode | undefined = node; currentNode; currentNode = currentNode.next) {
+    if (currentNode.type !== "dummyTable") {
+      const nd = currentNode.row === startRow ? currentNode : { ...currentNode, type: toDummyType(currentNode.type) };
+      correctX(nd);
+      addCell(tableTree, startRow, nd);
       continue;
     }
 
-    // This is a regular cell, add it to the result.
-    if (nd.row === row) {
-      const borders = nd.borders.filter((b) => !(row === 0 && b === "top") && !(nd.span > 1 && b === "bottom"));
-      res.push({ ...nd, borders });
+    currentNode.x = x;
+    const head = findHead(currentNode.heads, startRow);
+
+    if (head) {
+      head.x = x;
+      const sub = populateGrid(tableTree, head, startRow);
+      x += sub.sumWidth;
+      sumWidth += sub.sumWidth;
       continue;
     }
 
-    const isLast = row === nd.row + nd.span - 1 && nd.borders.includes("bottom");
-    const borders = nd.borders.filter((b) => (b !== "bottom" && b !== "top") || (isLast && b === "bottom"));
-    res.push({ ...nd, borders, type: toDummyType(nd.type) });
+    for (let current: TableNode | undefined = currentNode.heads[0]; current; current = current.next) {
+      const nd = { ...current, type: toDummyType(current.type) };
+      correctX(nd);
+      addCell(tableTree, startRow, nd);
+    }
   }
 
-  return res;
+  return { x, sumWidth };
 }
 
-/**
- * Performs a binary search on the `heads` of a parent node to find the child
- * `TableNode` that corresponds to a specific row index.
- * @param heads An array of child head nodes.
- * @param row The target row index.
- * @returns The `TableNode` for the specified row, or `undefined` if not found.
- */
+function addCell(tableTree: TableTree, row: number, nd: TableNode) {
+  if (!tableTree.grid[row]) {
+    tableTree.grid[row] = [];
+  }
+  const col = tableTree.grid[row].length;
+  tableTree.grid[row].push(nd);
+
+  if (!nd.id) {
+    return;
+  }
+  if (!tableTree.posMap) {
+    tableTree.posMap = new Map();
+  }
+  if (!tableTree.posMap.get(nd.id)) {
+    tableTree.posMap.set(nd.id, []);
+  }
+
+  const posList = tableTree.posMap.get(nd.id)!;
+  posList.push({ row, col, type: nd.type });
+}
+
 function findHead(heads: TableNode[], row: number): TableNode | undefined {
   let left = 0;
   let right = heads.length - 1;
@@ -121,68 +129,6 @@ function findHead(heads: TableNode[], row: number): TableNode | undefined {
   }
 
   return;
-}
-
-// The width of dummyParent might be set larger than keyNode.width + valNode.width in `createObjectNode()`. Therefore, we need to correct the width of valNode using BFS.
-// For example: if dummyParent.width is 100 and keyNode.width is 20, then valNode.width should be corrected to 100-20=80.
-function correctWidth(root: TableNodeImpl) {
-  const queue: TableNodeImpl[] = [root];
-  while (queue.length > 0) {
-    const node = queue.shift()!;
-
-    // Check if it's a dummyParent for an object, which has a strict 2-column layout.
-    const isObjectParent =
-      node.type === "dummyParent" && node.heads.length > 0 && node.heads[0].next && !node.heads[0].next.next;
-
-    if (isObjectParent) {
-      for (const head of node.heads) {
-        const keyNode = head as TableNodeImpl;
-        const valNode = keyNode.next as TableNodeImpl | undefined;
-
-        if (valNode) {
-          // The parent's width is the total intended width for the row.
-          // The keyNode's width is already normalized.
-          // The valNode's width should be adjusted to fill the remaining space.
-          const correctedValWidth = node.width - keyNode.width;
-          valNode.setWidth(correctedValWidth);
-        }
-      }
-    }
-
-    // Add all children to the queue for the next level of traversal.
-    for (const head of node.heads) {
-      let current: TableNodeImpl | undefined = head as TableNodeImpl;
-      while (current) {
-        queue.push(current);
-        current = current.next as TableNodeImpl | undefined;
-      }
-    }
-  }
-}
-
-function correctXY(root: TableNodeImpl) {
-  const queue: TableNodeImpl[] = [root];
-  root.x = 0;
-
-  while (queue.length > 0) {
-    const node = queue.shift()!;
-
-    // The x of the next node is the current node's x + its width.
-    if (node.next) {
-      const nextNode = node.next as TableNodeImpl;
-      nextNode.x = node.x + node.width;
-      queue.push(nextNode);
-    }
-
-    // If it's a dummy parent, the x of each head is the parent's x.
-    if (node.type === "dummyParent") {
-      for (const head of node.heads) {
-        const headNode = head as TableNodeImpl;
-        headNode.x = node.x;
-        queue.push(headNode);
-      }
-    }
-  }
 }
 
 /**
@@ -310,31 +256,39 @@ function createArrayNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
       const nd = rows[i][j];
       maxSpanPerRow[i] = Math.max(maxSpanPerRow[i], nd.span);
       maxWidthPerCol[j] = Math.max(maxWidthPerCol[j], nd.width);
-
-      nd.addBorder("right").addBorder(
-        nd.type === "dummyParent" || rows?.[i + 1]?.[j]?.type === "dummyParent" || i === rowCnt - 1 ? "bottom" : "",
-      );
     }
   }
 
   const heads: TableNodeImpl[] = [];
+  const parent = newNode(ctx, "dummyTable");
 
   // Second pass: apply the calculated widths and spans, and link nodes together.
   for (let i = 0; i < rowCnt; i++) {
     const rowNodes = rows[i];
     const head = rowNodes[0];
-    let nd = head.setWidth(maxWidthPerCol[0]).setSpan(maxSpanPerRow[i]);
+    const isLast = i === rowCnt - 1;
+    let nd = head
+      .setWidth(maxWidthPerCol[0])
+      .setSpan(maxSpanPerRow[i])
+      .setParent(parent)
+      .addBorder(colCnt === 1 ? "right" : "")
+      .addBorder(isLast ? "bottom" : "");
 
     for (let j = 1; j < colCnt; j++) {
       nd.setNext(rowNodes[j]);
-      nd = rowNodes[j].setWidth(maxWidthPerCol[j]).setSpan(maxSpanPerRow[i]);
+      nd = rowNodes[j]
+        .setWidth(maxWidthPerCol[j])
+        .setSpan(maxSpanPerRow[i])
+        .setParent(parent)
+        .addBorder(j === colCnt - 1 ? "right" : "")
+        .addBorder(isLast ? "bottom" : "");
     }
 
     heads.push(head);
   }
 
   // Return a dummy parent node that groups all the rows of the array.
-  return newNode(ctx, "dummyParent").setHeads(heads).setWidth(sum(maxWidthPerCol)).setSpan(sum(maxSpanPerRow));
+  return parent.setHeads(heads).setWidth(sum(maxWidthPerCol)).setSpan(sum(maxSpanPerRow));
 }
 
 /**
@@ -353,17 +307,19 @@ function createObjectNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
   let span = 0;
   let maxSpan = 0;
 
+  const childCnt = node.childrenKeys?.length || 0;
   // Generate a key and a value node for each child property.
-  const kvNodes = tree.mapChildren(node, (child, key) => {
+  const kvNodes = tree.mapChildren(node, (child, key, idx) => {
     const newCtx = { ...ctx, row: ctx.row + span };
-    const cnt = getChildCount(child);
-    const cntText = cnt ? (child.type === "array" ? `[${cnt}]` : `{${cnt}}`) : undefined;
-
+    const isLast = idx === childCnt - 1;
     const keyNode = newNode(newCtx, "key")
       .setText(key || '""')
       .setClass(key ? "text-hl-key" : "text-hl-empty")
-      .setId(child.id);
-    const valNode = createNode(newCtx, tree, child).addBorder("right");
+      .setId(child.id)
+      .addBorder(isLast ? "bottom" : "");
+    const valNode = createNode(newCtx, tree, child)
+      .addBorder("right")
+      .addBorder(isLast ? "bottom" : "");
 
     span += valNode.span;
     maxSpan = Math.max(maxSpan, valNode.span);
@@ -372,26 +328,14 @@ function createObjectNode(ctx: Context, tree: Tree, node: Node): TableNodeImpl {
     return { keyNode, valNode };
   });
 
-  const childrenCnt = getChildCount(node);
-  const addBorder = (nd: TableNodeImpl, idx: number) =>
-    nd.addBorder(maxSpan > 1 || idx === childrenCnt - 1 || nd.type === "dummyParent" ? "bottom" : "");
-
-  const heads = kvNodes.map(({ keyNode, valNode }, idx) => {
-    // Normalize widths and spans after all children have been processed.
-    valNode.setWidth(maxValWidth);
-    // Link key and value nodes.
-    keyNode.setNext(valNode).setSpan(valNode.span).setWidth(maxKeyWidth);
-
-    addBorder(keyNode, idx);
-    addBorder(valNode, idx);
-
-    if (kvNodes?.[idx + 1]?.valNode?.type === "dummyParent") {
-      valNode.addBorder("bottom");
-    }
+  const parent = newNode(ctx, "dummyTable");
+  const heads = kvNodes.map(({ keyNode, valNode }) => {
+    valNode.setWidth(maxValWidth).setParent(parent);
+    keyNode.setNext(valNode).setSpan(valNode.span).setWidth(maxKeyWidth).setParent(parent);
     return keyNode;
   });
 
-  return newNode(ctx, "dummyParent")
+  return parent
     .setWidth(maxKeyWidth + maxValWidth)
     .setSpan(span)
     .setHeads(heads);

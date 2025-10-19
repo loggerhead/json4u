@@ -16,11 +16,17 @@ function checkStyle(jsonStr: string, expectGrid: Partial<TableNode>[][]) {
   const tree = parseJSON(jsonStr);
   const tableTree = buildTableTree(tree);
   const actualGrid: Partial<TableNode>[][] = tableTree.grid.map((row) =>
-    row.map((cell) => ({
-      width: cell.width,
-      type: cell.type,
-      text: isDummyType(cell.type) ? undefined : cell.text,
-    })),
+    row.map((cell) => {
+      const nd: Partial<TableNode> = {
+        x: cell.x,
+        width: cell.width,
+        type: cell.type,
+      };
+      if (!isDummyType(cell.type)) {
+        nd.text = cell.text;
+      }
+      return nd;
+    }),
   );
   expect(actualGrid).toEqual(expectGrid);
 }
@@ -165,7 +171,7 @@ describe("buildTableTree", () => {
     ]);
   });
 
-  test("check style of complex array", () => {
+  test("check style of complex array 1", () => {
     checkStyle(
       `[{
   "simple object": {
@@ -175,25 +181,69 @@ describe("buildTableTree", () => {
     {
       "index": 0,
       "": "empty string"
+    },
+    {
+      "index": 0,
+      "": "empty string"
     }
   ]
 }]`,
       [
         [
-          { text: "simple object", type: "header", width: 130 },
-          { text: "simple array", type: "header", width: 179 },
+          { text: "simple object", type: "header", x: 0, width: 130 },
+          { text: "simple array", type: "header", x: 130, width: 179 },
         ],
         [
-          { text: "foo", type: "key", width: 40 },
-          { text: "bar", type: "value", width: 90 },
-          { text: "index", type: "header", width: 58 },
-          { text: '""', type: "header", width: 121 },
+          { text: "foo", type: "key", x: 0, width: 40 },
+          { text: "bar", type: "value", x: 40, width: 90 },
+          { text: "index", type: "header", x: 130, width: 58 },
+          { text: '""', type: "header", x: 188, width: 121 },
         ],
         [
-          { type: "dummyKey", width: 40 },
-          { type: "dummyValue", width: 90 },
-          { text: "0", type: "value", width: 58 },
-          { text: "empty string", type: "value", width: 121 },
+          { type: "dummyKey", x: 0, width: 40 },
+          { type: "dummyValue", x: 40, width: 90 },
+          { text: "0", type: "value", x: 130, width: 58 },
+          { text: "empty string", type: "value", x: 188, width: 121 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 40 },
+          { type: "dummyValue", x: 40, width: 90 },
+          { text: "0", type: "value", x: 130, width: 58 },
+          { text: "empty string", type: "value", x: 188, width: 121 },
+        ],
+      ],
+    );
+  });
+
+  test("check style of complex array 2", () => {
+    checkStyle(
+      `{
+  "first": [
+    {
+      "second": 2,
+      "third": [
+        {
+          "header-of-third": 3
+        }
+      ]
+    }
+  ]
+}`,
+      [
+        [
+          { text: "first", type: "key", x: 0, width: 58 },
+          { text: "second", type: "header", x: 58, width: 67 },
+          { text: "third", type: "header", x: 125, width: 148 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 58 },
+          { text: "2", type: "value", x: 58, width: 67 },
+          { text: "header-of-third", type: "header", x: 125, width: 148 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 58 },
+          { type: "dummyValue", x: 58, width: 67 },
+          { text: "3", type: "value", x: 125, width: 148 },
         ],
       ],
     );

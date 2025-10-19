@@ -80,15 +80,7 @@ export default function useVirtualGraph() {
         [maxX + px, maxY + py],
       ];
 
-      console.l(
-        "create a new graph:",
-        treeVersion,
-        translateExtentRef.current,
-        nodes.length,
-        edges.length,
-        nodes.slice(0, 10),
-        edges.slice(0, 10),
-      );
+      console.l("create a new graph:", treeVersion, translateExtentRef.current, nodes.length, edges.length);
       nodes.length > 0 && count("graphModeView");
     })();
   }, [usable, isGraphView, treeVersion, needReset]);
