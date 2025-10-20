@@ -11,7 +11,7 @@ export const cellClassMap: Record<TableNodeType, string> = {
   index: "tbl-index",
   header: "tbl-header",
   dummyKey: "tbl-header",
-  dummyIndex: "tbl-header",
+  dummyIndex: "tbl-value",
   dummyHeader: "tbl-header",
   dummyValue: "tbl-value",
   dummyTable: "tbl-header", // dummyTable is not rendered, so this is just a fallback.

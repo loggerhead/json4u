@@ -66,6 +66,9 @@ function populateGrid(tableTree: TableTree, node: TableNode, startRow: number) {
       continue;
     }
 
+    if (currentNode.parent && currentNode.borders.includes("right")) {
+      currentNode.width = currentNode.parent.x + currentNode.parent.width - x;
+    }
     currentNode.x = x;
     const head = findHead(currentNode.heads, startRow);
 

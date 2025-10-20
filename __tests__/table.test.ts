@@ -171,6 +171,42 @@ describe("buildTableTree", () => {
     ]);
   });
 
+  test("check style of complex object", () => {
+    checkStyle(
+      `{
+  "row1": 1,
+  "r2": {
+    "a": 2,
+    "bb": {
+      "ccc": 3
+    }
+  },
+  "the fourth row": "loooooooooooong"
+}`,
+      [
+        [
+          { text: "row1", type: "key", x: 0, width: 139 },
+          { text: "1", type: "value", x: 139, width: 148 },
+        ],
+        [
+          { text: "r2", type: "key", x: 0, width: 139 },
+          { text: "a", type: "key", x: 139, width: 31 },
+          { text: "2", type: "value", x: 170, width: 117 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 139 },
+          { text: "bb", type: "key", x: 139, width: 31 },
+          { text: "ccc", type: "key", x: 170, width: 40 },
+          { text: "3", type: "value", x: 210, width: 77 },
+        ],
+        [
+          { text: "the fourth row", type: "key", x: 0, width: 139 },
+          { text: "loooooooooooong", type: "value", x: 139, width: 148 },
+        ],
+      ],
+    );
+  });
+
   test("check style of complex array 1", () => {
     checkStyle(
       `[{
