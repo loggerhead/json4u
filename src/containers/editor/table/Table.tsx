@@ -5,6 +5,7 @@ import Background from "@/components/Background";
 import { globalStyle } from "@/lib/table/style";
 import type { TableTree } from "@/lib/table/types";
 import { newTableTree } from "@/lib/table/utils";
+import { useStatusStore } from "@/stores/statusStore";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import Cell from "./Cell";
 import { useOnResize } from "./useOnResize";
@@ -15,6 +16,7 @@ export function Table() {
   const containerRef = useRef<HTMLDivElement>(null);
   const virtualRef = useRef<HTMLDivElement>(null);
   const [tableTree, setTableTree] = useState<TableTree>(newTableTree());
+  const inputPos = useStatusStore((state) => state.tableEditModePos);
 
   const virtualizer = useVirtualizer({
     count: tableTree.grid.length,
@@ -49,7 +51,18 @@ export function Table() {
               }}
             >
               {tableTree.grid[row].map((nd, col) => (
-                <Cell key={`${row}-${col}`} {...nd} rowInTable={row} colInTable={col} />
+                <Cell
+                  key={`${row}-${col}`}
+                  row={row}
+                  col={col}
+                  isInput={inputPos?.row === row && inputPos?.col === col}
+                  level={nd.level}
+                  type={nd.type}
+                  width={nd.width}
+                  text={nd.text}
+                  classNames={nd.classNames}
+                  id={nd.id}
+                />
               ))}
             </div>
           ))}

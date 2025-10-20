@@ -3,7 +3,7 @@ import useClickNode from "@/containers/editor/graph/useClickNode";
 import type { RevealTarget } from "@/lib/graph/types";
 import { isDescendant } from "@/lib/idgen";
 import { cellClassMap, globalStyle, headerBgClassNames } from "@/lib/table/style";
-import type { TableNode, TableNodeType } from "@/lib/table/types";
+import type { TableNodeType } from "@/lib/table/types";
 import { isDummyType, tableNodeTypeToRevealTarget } from "@/lib/table/utils";
 import { cn } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
@@ -12,9 +12,16 @@ import { includes } from "lodash-es";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 
-interface CellProps extends Omit<TableNode, "next" | "heads"> {
-  rowInTable: number;
-  colInTable: number;
+interface CellProps {
+  row: number;
+  col: number;
+  level: number;
+  type: TableNodeType;
+  width: number;
+  text: string;
+  classNames: string[];
+  id?: string;
+  isInput?: boolean;
 }
 
 const Cell = memo((props: CellProps) => {
@@ -60,10 +67,6 @@ const Cell = memo((props: CellProps) => {
       addToEditQueue: state.addToEditQueue,
     })),
   );
-  const isInput = useStatusStore((state) => {
-    const p = state.tableEditModePos;
-    return p?.row === props.rowInTable && p?.col === props.colInTable;
-  });
 
   const callEdit = useCallback(() => {
     addToEditQueue({ treeNodeId: props.id!, target, value: content, version: treeVersion });
@@ -71,11 +74,13 @@ const Cell = memo((props: CellProps) => {
   }, [content, props]);
 
   useEffect(() => {
-    setContent(props.text);
-    setTableEditModePos(undefined);
+    if (content !== props.text) {
+      setContent(props.text);
+      setTableEditModePos(undefined);
+    }
   }, [props.text]);
 
-  return isInput ? (
+  return props.isInput ? (
     <input
       className={cn("tbl-cell", ...classNames)}
       style={style}
@@ -109,7 +114,7 @@ const Cell = memo((props: CellProps) => {
 
         if (isEditable) {
           cancelClickNode();
-          setTableEditModePos({ row: props.rowInTable, col: props.colInTable });
+          setTableEditModePos({ row: props.row, col: props.col });
         }
       }}
     >
