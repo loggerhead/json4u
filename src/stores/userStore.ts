@@ -51,7 +51,8 @@ export const useUserStore = create<UserState>()((set, get) => ({
       return true;
     }
 
-    return usage[key] < freeQuota[key];
+    // TODO: free now
+    return true || usage[key] < freeQuota[key];
   },
 
   count(key: StatisticsKeys) {
