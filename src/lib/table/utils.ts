@@ -1,5 +1,5 @@
 import type { RevealTarget } from "@/lib/graph/types";
-import type { TableNodeType, TableTree } from "./types";
+import type { TableNodeType, TableGrid } from "./types";
 
 export function tableNodeTypeToRevealTarget(t: TableNodeType): RevealTarget {
   switch (t) {
@@ -14,7 +14,8 @@ export function tableNodeTypeToRevealTarget(t: TableNodeType): RevealTarget {
       return "keyValue";
     case "header":
     case "dummyHeader":
-    case "dummyTable":
+    case "leftHeaderTable":
+    case "topHeaderTable":
       return "graphNode";
   }
 }
@@ -37,6 +38,10 @@ export function isDummyType(t: TableNodeType) {
   return t.startsWith("dummy");
 }
 
-export function newTableTree(): TableTree {
+export function isTableType(t: TableNodeType) {
+  return t.endsWith("Table");
+}
+
+export function newTableGrid(): TableGrid {
   return { grid: [], posMap: new Map(), width: 0, height: 0 };
 }

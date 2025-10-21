@@ -12,9 +12,9 @@ import { getGraphNodeId, newGraph, newSubGraph } from "@/lib/graph/utils";
 import computeVirtualGraph from "@/lib/graph/virtual";
 import { type GraphNodeId, isDescendant, lastKey } from "@/lib/idgen";
 import { getRawValue, hasChildren, isIterable, isRoot, Tree } from "@/lib/parser";
-import { buildTableTree } from "@/lib/table/builder";
-import type { TableTree } from "@/lib/table/types";
-import { newTableTree } from "@/lib/table/utils";
+import { buildTableGrid } from "@/lib/table/builder";
+import type { TableGrid } from "@/lib/table/types";
+import { newTableGrid } from "@/lib/table/utils";
 import type { FunctionKeys } from "@/lib/utils";
 import type { Viewport } from "@xyflow/react";
 import fuzzysort from "fuzzysort";
@@ -25,14 +25,14 @@ import type { SearchResult } from "./types";
 // NOTICE: Only exists and is used in web workers
 export interface ViewState {
   tree: Tree;
-  table: TableTree;
+  table: TableGrid;
   graph: Graph;
   graphWidth: number;
   graphHeight: number;
   graphViewport: Viewport;
 
   setTree: (tree: Tree) => void;
-  createTable: () => TableTree;
+  createTable: () => TableGrid;
   createGraph: (needResetViewport: boolean) => { graph: Graph; renderable: SubGraph; viewport: Viewport };
   setGraphSize: (width?: number, height?: number) => { renderable: SubGraph; changed: boolean };
   setGraphViewport: (viewport: Viewport) => { renderable: SubGraph; changed: boolean };
@@ -46,7 +46,7 @@ export interface ViewState {
 
 const initialStates: Omit<ViewState, FunctionKeys<ViewState>> = {
   tree: new Tree(),
-  table: newTableTree(),
+  table: newTableGrid(),
   graph: newGraph(),
   graphWidth: 0,
   graphHeight: 0,
@@ -65,7 +65,7 @@ const useViewStore = createStore<ViewState>((set, get) => ({
   // 5MB costs 410ms
   createTable() {
     const { tree } = get();
-    const table = buildTableTree(tree);
+    const table = buildTableGrid(tree);
     set({ table });
     return table;
   },

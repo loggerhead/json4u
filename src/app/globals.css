@@ -55,7 +55,7 @@
     --max-key-length: 300px;
     --max-value-length: 500px;
 
-    --tbl-border: rgb(155 162 174);
+    --tbl-border: #00000040;
 
     --bg-key: #e0e0e04d;
     --hl-key: #a31515;
@@ -288,7 +288,6 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   top: 0;
   left: 0;
   width: 100%;
-  border-color: var(--tbl-border);
   font-size: 14px;
   font-family: var(--graph-font-family);
 }
@@ -299,10 +298,11 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   padding: 6px;
   text-align: left;
   vertical-align: top;
-  box-sizing: border-box;
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
+  border-color: var(--tbl-border);
 }
 
 .tbl-header {

@@ -1,6 +1,6 @@
 import { type Dispatch, type RefObject, SetStateAction, useEffect, useState } from "react";
 import { ViewMode } from "@/lib/db/config";
-import type { TableTree } from "@/lib/table/types";
+import type { TableGrid } from "@/lib/table/types";
 import { useStatusStore } from "@/stores/statusStore";
 import { useTreeMeta } from "@/stores/treeStore";
 import { useUserStore } from "@/stores/userStore";
@@ -8,10 +8,10 @@ import type { Virtualizer } from "@tanstack/react-virtual";
 import { useShallow } from "zustand/shallow";
 import { scrollTo } from "./useRevealNode";
 
-export function useTableTree(
+export function useTableGrid(
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   containerRef: RefObject<HTMLDivElement>,
-  setTableTree: Dispatch<SetStateAction<TableTree>>,
+  setTableGrid: Dispatch<SetStateAction<TableGrid>>,
 ) {
   const { count, usable } = useUserStore(
     useShallow((state) => ({
@@ -44,7 +44,7 @@ export function useTableTree(
 
     (async () => {
       const t = await window.worker.createTable();
-      setTableTree(t);
+      setTableGrid(t);
       setRenderedVersion(treeVersion);
 
       if (needReset) {
@@ -55,5 +55,5 @@ export function useTableTree(
       console.l("create a new table:", treeVersion, needReset, t.width, t.height);
       t.width && count("tableModeView");
     })();
-  }, [usable, isTableView, treeVersion, setTableTree]);
+  }, [usable, isTableView, treeVersion, setTableGrid]);
 }

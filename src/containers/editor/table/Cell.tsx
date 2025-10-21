@@ -3,7 +3,7 @@ import useClickNode from "@/containers/editor/graph/useClickNode";
 import type { RevealTarget } from "@/lib/graph/types";
 import { isDescendant } from "@/lib/idgen";
 import { cellClassMap, globalStyle, headerBgClassNames } from "@/lib/table/style";
-import type { TableNodeType } from "@/lib/table/types";
+import type { CellType, TableNodeType } from "@/lib/table/types";
 import { isDummyType, tableNodeTypeToRevealTarget } from "@/lib/table/utils";
 import { cn } from "@/lib/utils";
 import { useStatusStore } from "@/stores/statusStore";
@@ -16,7 +16,7 @@ interface CellProps {
   row: number;
   col: number;
   level: number;
-  type: TableNodeType;
+  type: CellType;
   width: number;
   text: string;
   classNames: string[];
@@ -52,7 +52,7 @@ const Cell = memo((props: CellProps) => {
     props.id && "cursor-pointer",
     isEditable && "hover:bg-blue-100 dark:hover:bg-blue-900",
     needHighlight && "search-highlight",
-    ...(props.classNames ?? []),
+    ...props.classNames,
   ].filter((cls) => cls);
   const style = {
     width: `${props.width}px`,

@@ -1,6 +1,6 @@
 import { RefObject, useEffect } from "react";
 import { ViewMode } from "@/lib/db/config";
-import type { TableTree } from "@/lib/table/types";
+import type { TableGrid } from "@/lib/table/types";
 import { useStatusStore } from "@/stores/statusStore";
 import type { Virtualizer } from "@tanstack/react-virtual";
 import { useShallow } from "zustand/shallow";
@@ -8,7 +8,7 @@ import { useShallow } from "zustand/shallow";
 export function useRevealNode(
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   containerRef: RefObject<HTMLDivElement>,
-  tableTree: TableTree,
+  tableGrid: TableGrid,
 ) {
   const { isNeedReveal, revealPosition } = useStatusStore(
     useShallow((state) => ({
@@ -27,11 +27,11 @@ export function useRevealNode(
           return;
         }
 
-        const { x, y } = tableTree.grid[res.row][res.col];
+        const { x, y } = tableGrid.grid[res.row][res.col];
         scrollTo(virtualizer, containerRef, x, y);
       }
     })();
-  }, [revealPosition, isNeedReveal, tableTree]);
+  }, [revealPosition, isNeedReveal, tableGrid]);
 }
 
 export function scrollTo(

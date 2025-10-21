@@ -1,12 +1,12 @@
 import { parseJSON } from "@/lib/parser/parse";
-import { buildTableTree } from "@/lib/table/builder";
-import type { TableNode } from "@/lib/table/types";
+import { buildTableGrid } from "@/lib/table/builder";
+import { TableNode } from "@/lib/table/tableNode";
 import { isDummyType } from "@/lib/table/utils";
 
 function checkText(jsonStr: string, expectGrid: Partial<TableNode>[][]) {
   const tree = parseJSON(jsonStr);
-  const tableTree = buildTableTree(tree);
-  const actualGrid: Partial<TableNode>[][] = tableTree.grid.map((row) =>
+  const tableGrid = buildTableGrid(tree);
+  const actualGrid: Partial<TableNode>[][] = tableGrid.grid.map((row) =>
     row.map((cell) => (isDummyType(cell.type) ? { type: cell.type } : { type: cell.type, text: cell.text })),
   );
   expect(actualGrid).toEqual(expectGrid);
@@ -14,8 +14,8 @@ function checkText(jsonStr: string, expectGrid: Partial<TableNode>[][]) {
 
 function checkStyle(jsonStr: string, expectGrid: Partial<TableNode>[][]) {
   const tree = parseJSON(jsonStr);
-  const tableTree = buildTableTree(tree);
-  const actualGrid: Partial<TableNode>[][] = tableTree.grid.map((row) =>
+  const tableGrid = buildTableGrid(tree);
+  const actualGrid: Partial<TableNode>[][] = tableGrid.grid.map((row) =>
     row.map((cell) => {
       const nd: Partial<TableNode> = {
         x: cell.x,
@@ -31,7 +31,7 @@ function checkStyle(jsonStr: string, expectGrid: Partial<TableNode>[][]) {
   expect(actualGrid).toEqual(expectGrid);
 }
 
-describe("buildTableTree", () => {
+describe("buildTableGrid", () => {
   test("value", () => {
     checkText("6", [[{ type: "value", text: "6" }]]);
   });
@@ -171,7 +171,7 @@ describe("buildTableTree", () => {
     ]);
   });
 
-  test("check style of complex object", () => {
+  test("check style of complex object 1", () => {
     checkStyle(
       `{
   "row1": 1,
@@ -202,6 +202,138 @@ describe("buildTableTree", () => {
         [
           { text: "the fourth row", type: "key", x: 0, width: 139 },
           { text: "loooooooooooong", type: "value", x: 139, width: 148 },
+        ],
+      ],
+    );
+  });
+
+  test("check style of complex object 2", () => {
+    checkStyle(
+      `{
+  "r0c0": [
+    {
+      "r0c1": 11,
+      "r0c2": {
+        "r1c2": 13,
+        "r2c2": 23,
+        "r3c2": 33
+      }
+    }
+  ],
+  "r4c0": [
+    {
+      "r4c1": 51
+    }
+  ]
+}`,
+      [
+        [
+          { text: "r0c0", type: "key", x: 0, width: 49 },
+          { text: "r0c1", type: "header", x: 49, width: 49 },
+          { text: "r0c2", type: "header", x: 98, width: 80 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { text: "11", type: "value", x: 49, width: 49 },
+          { text: "r1c2", type: "key", x: 98, width: 49 },
+          { text: "13", type: "value", x: 147, width: 31 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { type: "dummyValue", x: 49, width: 49 },
+          { text: "r2c2", type: "key", x: 98, width: 49 },
+          { text: "23", type: "value", x: 147, width: 31 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { type: "dummyValue", x: 49, width: 49 },
+          { text: "r3c2", type: "key", x: 98, width: 49 },
+          { text: "33", type: "value", x: 147, width: 31 },
+        ],
+        [
+          { text: "r4c0", type: "key", x: 0, width: 49 },
+          { text: "r4c1", type: "header", x: 49, width: 129 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { text: "51", type: "value", x: 49, width: 129 },
+        ],
+      ],
+    );
+  });
+
+  test("check style of array inside object 1", () => {
+    checkStyle(
+      `{
+  "col1": [
+    {
+      "col2": {
+        "r1c1": 1,
+        "r2c1": 2,
+        "r3c1": 3
+      }
+    }
+  ]
+}`,
+      [
+        [
+          { text: "col1", type: "key", x: 0, width: 49 },
+          { text: "col2", type: "header", x: 49, width: 71 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { text: "r1c1", type: "key", x: 49, width: 49 },
+          { text: "1", type: "value", x: 98, width: 22 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { text: "r2c1", type: "key", x: 49, width: 49 },
+          { text: "2", type: "value", x: 98, width: 22 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { text: "r3c1", type: "key", x: 49, width: 49 },
+          { text: "3", type: "value", x: 98, width: 22 },
+        ],
+      ],
+    );
+  });
+
+  test("check style of array inside object 2", () => {
+    checkStyle(
+      `{
+  "r0c0": [
+    {
+      "r0c1": {
+        "r1c1": [
+          13,
+          23
+        ]
+      }
+    }
+  ],
+  "r3c0": 31
+}`,
+      [
+        [
+          { text: "r0c0", type: "key", x: 0, width: 49 },
+          { text: "r0c1", type: "header", x: 49, width: 102 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { text: "r1c1", type: "key", x: 49, width: 49 },
+          { text: "0", type: "index", x: 98, width: 22 },
+          { text: "13", type: "value", x: 120, width: 31 },
+        ],
+        [
+          { type: "dummyKey", x: 0, width: 49 },
+          { type: "dummyKey", x: 49, width: 49 },
+          { text: "1", type: "index", x: 98, width: 22 },
+          { text: "23", type: "value", x: 120, width: 31 },
+        ],
+        [
+          { text: "r3c0", type: "key", x: 0, width: 49 },
+          { text: "31", type: "value", x: 49, width: 102 },
         ],
       ],
     );
@@ -324,6 +456,69 @@ describe("buildTableTree", () => {
           { type: "dummyValue", x: 31, width: 31 },
           { text: "r3c2", type: "key", x: 62, width: 49 },
           { text: "34", type: "value", x: 111, width: 31 },
+        ],
+      ],
+    );
+  });
+
+  test("check style of complex array 4", () => {
+    checkStyle(
+      `[
+  {
+    "h1": {
+      "r1c0": 1,
+      "r2c0": 2,
+      "r3c0": 3
+    },
+    "h2": 4,
+    "h3": {
+      "r1c3": 5
+    },
+    "h4": [
+      {
+        "r1c5": 6,
+        "r1c6": {
+          "r2c6": 7
+        }
+      }
+    ]
+  }
+]`,
+      [
+        [
+          { text: "h1", type: "header", x: 0, width: 71 },
+          { text: "h2", type: "header", x: 71, width: 31 },
+          { text: "h3", type: "header", x: 102, width: 71 },
+          { text: "h4", type: "header", x: 173, width: 120 },
+        ],
+        [
+          { text: "r1c0", type: "key", x: 0, width: 49 },
+          { text: "1", type: "value", x: 49, width: 22 },
+          { text: "4", type: "value", x: 71, width: 31 },
+          { text: "r1c3", type: "key", x: 102, width: 49 },
+          { text: "5", type: "value", x: 151, width: 22 },
+          { text: "r1c5", type: "header", x: 173, width: 49 },
+          { text: "r1c6", type: "header", x: 222, width: 71 },
+        ],
+        [
+          { text: "r2c0", type: "key", x: 0, width: 49 },
+          { text: "2", type: "value", x: 49, width: 22 },
+          { type: "dummyValue", x: 71, width: 31 },
+          { type: "dummyKey", x: 102, width: 49 },
+          { type: "dummyValue", x: 151, width: 22 },
+          { text: "6", type: "value", x: 173, width: 49 },
+          { text: "r2c6", type: "key", x: 222, width: 49 },
+          { text: "7", type: "value", x: 271, width: 22 },
+        ],
+        [
+          { text: "r3c0", type: "key", x: 0, width: 49 },
+          { text: "3", type: "value", x: 49, width: 22 },
+          { type: "dummyValue", x: 71, width: 31 },
+          { type: "dummyKey", x: 102, width: 49 },
+          { type: "dummyValue", x: 151, width: 22 },
+          { type: "dummyValue", x: 173, width: 49 },
+          { type: "dummyKey", x: 222, width: 49 },
+          { type: "dummyValue", x: 271, width: 22 },
         ],
       ],
     );

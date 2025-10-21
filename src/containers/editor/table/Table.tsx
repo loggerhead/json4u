@@ -3,31 +3,31 @@
 import { useRef, useState } from "react";
 import Background from "@/components/Background";
 import { globalStyle } from "@/lib/table/style";
-import type { TableTree } from "@/lib/table/types";
-import { newTableTree } from "@/lib/table/utils";
+import type { TableGrid } from "@/lib/table/types";
+import { newTableGrid } from "@/lib/table/utils";
 import { useStatusStore } from "@/stores/statusStore";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import Cell from "./Cell";
 import { useOnResize } from "./useOnResize";
 import { useRevealNode } from "./useRevealNode";
-import { useTableTree } from "./useTableTree";
+import { useTableGrid } from "./useTableGrid";
 
 export function Table() {
   const containerRef = useRef<HTMLDivElement>(null);
   const virtualRef = useRef<HTMLDivElement>(null);
-  const [tableTree, setTableTree] = useState<TableTree>(newTableTree());
+  const [tableGrid, setTableGrid] = useState<TableGrid>(newTableGrid());
   const inputPos = useStatusStore((state) => state.tableEditModePos);
 
   const virtualizer = useVirtualizer({
-    count: tableTree.grid.length,
+    count: tableGrid.grid.length,
     getScrollElement: () => virtualRef.current,
     estimateSize: (i) => globalStyle.rowHeight,
     overscan: 10,
   });
 
-  useTableTree(virtualizer, containerRef, setTableTree);
-  useRevealNode(virtualizer, containerRef, tableTree);
-  const { width, height } = useOnResize(containerRef, tableTree);
+  useTableGrid(virtualizer, containerRef, setTableGrid);
+  useRevealNode(virtualizer, containerRef, tableGrid);
+  const { width, height } = useOnResize(containerRef, tableGrid);
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-x-auto">
@@ -50,18 +50,18 @@ export function Table() {
                 transform: `translateY(${start}px)`,
               }}
             >
-              {tableTree.grid[row].map((nd, col) => (
+              {tableGrid.grid[row].map((cell, col) => (
                 <Cell
                   key={`${row}-${col}`}
                   row={row}
                   col={col}
                   isInput={inputPos?.row === row && inputPos?.col === col}
-                  level={nd.level}
-                  type={nd.type}
-                  width={nd.width}
-                  text={nd.text}
-                  classNames={nd.classNames}
-                  id={nd.id}
+                  level={cell.level}
+                  type={cell.type}
+                  width={cell.width}
+                  text={cell.text}
+                  classNames={cell.classNames}
+                  id={cell.id}
                 />
               ))}
             </div>
