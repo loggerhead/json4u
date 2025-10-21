@@ -23,12 +23,11 @@ export function toDummyType(t: TableNodeType): TableNodeType {
   switch (t) {
     case "key":
       return "dummyKey";
-    case "value":
-      return "dummyValue";
     case "index":
       return "dummyIndex";
     case "header":
-      return "dummyHeader";
+    case "value":
+      return "dummyValue";
     default:
       return t;
   }

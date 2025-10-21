@@ -284,4 +284,48 @@ describe("buildTableTree", () => {
       ],
     );
   });
+
+  test("check style of complex array 3", () => {
+    checkStyle(
+      `[
+  {
+    "foo": [
+      {
+        "c0": "20",
+        "c1": "21"
+      }
+    ],
+    "bar": {
+      "r1c2": 14,
+      "r2c2": 24,
+      "r3c2": 34
+    }
+  }
+]`,
+      [
+        [
+          { text: "foo", type: "header", x: 0, width: 62 },
+          { text: "bar", type: "header", x: 62, width: 80 },
+        ],
+        [
+          { text: "c0", type: "header", x: 0, width: 31 },
+          { text: "c1", type: "header", x: 31, width: 31 },
+          { text: "r1c2", type: "key", x: 62, width: 49 },
+          { text: "14", type: "value", x: 111, width: 31 },
+        ],
+        [
+          { text: "20", type: "value", x: 0, width: 31 },
+          { text: "21", type: "value", x: 31, width: 31 },
+          { text: "r2c2", type: "key", x: 62, width: 49 },
+          { text: "24", type: "value", x: 111, width: 31 },
+        ],
+        [
+          { type: "dummyValue", x: 0, width: 31 },
+          { type: "dummyValue", x: 31, width: 31 },
+          { text: "r3c2", type: "key", x: 62, width: 49 },
+          { text: "34", type: "value", x: 111, width: 31 },
+        ],
+      ],
+    );
+  });
 });
