@@ -1,14 +1,16 @@
-import React from "react";
+import React, { memo } from "react";
+import { globalStyle } from "@/lib/graph/style";
 import { cn } from "@/lib/utils";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
 interface PopoverProps extends React.PropsWithChildren {
-  width: number;
   text: string;
   hlClassNames: string[];
+  width?: number;
 }
 
-export default function Popover({ width, text, hlClassNames, children }: PopoverProps) {
+const Popover = memo(({ text, hlClassNames, width, children }: PopoverProps) => {
+  const maxWidth = width ?? globalStyle.maxValueWidth;
   return (
     <Tooltip.Provider>
       <Tooltip.Root>
@@ -16,7 +18,7 @@ export default function Popover({ width, text, hlClassNames, children }: Popover
         <Tooltip.Portal>
           <Tooltip.Content side="top">
             <div className="popover-container" data-testid="graph-popover">
-              <div className={cn("popover-item", ...hlClassNames)} style={{ maxWidth: width }}>
+              <div className={cn("popover-item", ...hlClassNames)} style={{ maxWidth }}>
                 {text}
               </div>
             </div>
@@ -25,4 +27,8 @@ export default function Popover({ width, text, hlClassNames, children }: Popover
       </Tooltip.Root>
     </Tooltip.Provider>
   );
-}
+});
+
+Popover.displayName = "Popover";
+
+export default Popover;

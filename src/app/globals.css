@@ -274,13 +274,14 @@ https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
   overflow: hidden;
   background: #f8f9fa;
   border: 1px solid #dee2e6;
+}
 
-  .popover-item {
-    width: max-content;
-    word-wrap: break-word;
-    font-size: 12px;
-    padding: 10px;
-  }
+.popover-item {
+  width: max-content;
+  overflow-wrap: break-word;
+  white-space: normal;
+  font-size: 12px;
+  padding: 10px;
 }
 
 .tbl-row {

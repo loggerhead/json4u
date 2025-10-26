@@ -1,4 +1,5 @@
 import { memo, useCallback, useEffect, useState } from "react";
+import Popover from "@/containers/editor/graph/Popover";
 import useClickNode from "@/containers/editor/graph/useClickNode";
 import type { RevealTarget } from "@/lib/graph/types";
 import { isDescendant } from "@/lib/idgen";
@@ -98,28 +99,30 @@ const Cell = memo((props: CellProps) => {
       }}
     />
   ) : (
-    <div
-      data-type={props.type}
-      className={cn("tbl-cell", ...classNames)}
-      style={style}
-      title={isEditable ? t("double_click_to_enter_edit_mode") : undefined}
-      onClick={(e) => {
-        if (props.id) {
-          onClick(e, props.id, target, "table");
-        }
-      }}
-      onDoubleClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    <Popover hlClassNames={props.classNames} text={content}>
+      <div
+        data-type={props.type}
+        className={cn("tbl-cell", ...classNames)}
+        style={style}
+        title={isEditable ? t("double_click_to_enter_edit_mode") : undefined}
+        onClick={(e) => {
+          if (props.id) {
+            onClick(e, props.id, target, "table");
+          }
+        }}
+        onDoubleClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
 
-        if (isEditable) {
-          cancelClickNode();
-          setTableEditModePos({ row: props.row, col: props.col });
-        }
-      }}
-    >
-      {isDummy ? undefined : props.text}
-    </div>
+          if (isEditable) {
+            cancelClickNode();
+            setTableEditModePos({ row: props.row, col: props.col });
+          }
+        }}
+      >
+        {isDummy ? undefined : props.text}
+      </div>
+    </Popover>
   );
 });
 Cell.displayName = "Cell";
