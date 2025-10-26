@@ -16,7 +16,7 @@ const Popover = memo(({ text, hlClassNames, width, children }: PopoverProps) => 
       <Tooltip.Root>
         <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
         <Tooltip.Portal>
-          <Tooltip.Content side="top">
+          <Tooltip.Content side="top" align="start">
             <div className="popover-container" data-testid="graph-popover">
               <div className={cn("popover-item", ...hlClassNames)} style={{ maxWidth }}>
                 {text}
