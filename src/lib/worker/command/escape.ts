@@ -1,7 +1,6 @@
 const ESCAPE_MAP: Record<string, string> = {
   "\\": "\\\\",
   '"': '\\"',
-  "/": "\\/",
   "\b": "\\b",
   "\f": "\\f",
   "\n": "\\n",
@@ -17,7 +16,6 @@ const UNESCAPE_MAP: Record<string, string> = {
   t: "\t",
   '"': '"',
   "\\": "\\",
-  "/": "/",
 };
 
 const ESCAPE_RE = /[\\"\u0000-\u001F\/]/g;
