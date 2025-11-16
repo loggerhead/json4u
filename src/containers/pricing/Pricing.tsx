@@ -87,7 +87,7 @@ export default function PricingTemp({ hideTitle, className }: PricingProps) {
         </div>
       </div>
       <div className="isolate mx-auto mt-4 max-w-md gap-8 lg:mx-0 lg:max-w-none">
-        {isCN ? <Description /> : <p className="text-lg leading-8 text-muted-foreground">{t("no_pricing")}</p>}
+        {isCN ? <Description /> : <Pricing />}
       </div>
     </Section>
   );
