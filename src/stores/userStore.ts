@@ -86,9 +86,12 @@ export const useUserStore = create<UserState>()((set, get) => ({
   },
 
   async setUser(user: User | null) {
-    const { updateActiveOrder: setActiveOrder } = get();
-    set({ user });
-    await setActiveOrder(user);
+    if (user) {
+      set({ user });
+      await get().updateActiveOrder(user);
+    } else {
+      set(initialStates);
+    }
   },
 
   async updateActiveOrder(user: User | null) {
