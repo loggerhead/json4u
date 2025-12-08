@@ -33,11 +33,11 @@ const stringToJSONSchema = z.string().transform((str, ctx) => {
 // https://env.t3.gg/docs/nextjs
 export const env = createEnv({
   server: {
-    LEMONSQUEEZY_SUBSCRIPTION_VARIANT_MAP: stringToJSONSchema.pipe(SubscriptionVariantMapSchema),
-    LEMONSQUEEZY_STORE_ID: z.coerce.number().min(1),
-    LEMONSQUEEZY_WEBHOOK_SECRET: z.string().min(1),
-    LEMONSQUEEZY_API_KEY: z.string().min(1),
-    SUPABASE_KEY: z.string().min(1),
+    LEMONSQUEEZY_SUBSCRIPTION_VARIANT_MAP: stringToJSONSchema.pipe(SubscriptionVariantMapSchema).optional(),
+    LEMONSQUEEZY_STORE_ID: z.coerce.number().min(1).optional(),
+    LEMONSQUEEZY_WEBHOOK_SECRET: z.string().min(1).optional(),
+    LEMONSQUEEZY_API_KEY: z.string().min(1).optional(),
+    SUPABASE_KEY: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().regex(/https?:\/\/(\w+\.)+\w+(:\d+)?/g),
