@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { clearEditor, getEditor, selectAllInEditor, writeToClipboard } from "../helpers/utils";
+import { clearEditor, getEditor, getEditorText, selectAllInEditor, writeToClipboard } from "../helpers/utils";
 
 test.describe("edit in the editor", () => {
   test.beforeEach(async ({ page }) => {
@@ -36,5 +36,16 @@ test.describe("edit in the editor", () => {
     await page.waitForTimeout(100);
     await page.keyboard.type("{");
     await expect(page.getByRole("treeitem").getByText("hello")).toBeVisible();
+  });
+
+  test("loads json from URL params", async ({ page }) => {
+    const json = JSON.stringify({ hello: "world", count: 1 });
+
+    await page.goto(`/editor?json=${encodeURIComponent(json)}`);
+    await getEditor(page);
+
+    await expect(page.getByRole("treeitem").getByText("hello")).toBeVisible();
+    await expect(page.getByRole("treeitem").getByText("world")).toBeVisible();
+    await expect.poll(() => getEditorText(page)).toContain('"count": 1');
   });
 });

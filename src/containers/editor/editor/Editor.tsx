@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ComponentPropsWithoutRef } from "react";
+import { useEffect, useRef, type ComponentPropsWithoutRef } from "react";
 import Loading from "@/components/Loading";
 import { vsURL } from "@/lib/editor/cdn";
 import { EditorWrapper, type Kind } from "@/lib/editor/editor";
@@ -10,6 +10,7 @@ import { loader, Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 import { example } from "./data";
+import { getInitialJSONFromSearch } from "./url";
 
 loader.config({ paths: { vs: vsURL } });
 
@@ -105,10 +106,21 @@ export function useEditTree(kind: Kind) {
 function useDisplayExample(kind: Kind) {
   const editor = useEditor("main");
   const incrEditorInitCount = useStatusStore((state) => state.incrEditorInitCount);
+  const didSetInitialText = useRef(false);
 
   useEffect(() => {
-    if (kind === "main" && editor && incrEditorInitCount() <= 1) {
-      editor.parseAndSet(example);
+    if (kind !== "main" || !editor || didSetInitialText.current) {
+      return;
     }
+
+    const initialJSON = getInitialJSONFromSearch(window.location.search);
+    const initialText = initialJSON ?? (incrEditorInitCount() <= 1 ? example : undefined);
+
+    if (initialText === undefined) {
+      return;
+    }
+
+    didSetInitialText.current = true;
+    editor.parseAndSet(initialText);
   }, [editor]);
 }
