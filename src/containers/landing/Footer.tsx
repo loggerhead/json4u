@@ -28,7 +28,7 @@ export default function Footer() {
       <div className="flex flex-col sm:flex-row items-center w-full max-w-page-header sm:px-8 px-4 gap-y-3 sm:gap-x-8 text-xs text-slate-500">
         <div className="flex items-center gap-2 shrink-0">
           <Logo className="w-[20px] h-[20px] text-slate-500" />
-          <span className="whitespace-nowrap">{"© 2025 JSON For You"}</span>
+          <span className="whitespace-nowrap">{`© ${new Date().getFullYear()} JSON For You`}</span>
         </div>
         <div className="flex items-center gap-4 sm:gap-8 sm:ml-0">
           <Legal />
