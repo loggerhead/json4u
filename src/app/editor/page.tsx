@@ -1,3 +1,4 @@
+import SiteSunsetBanner from "@/components/SiteSunsetBanner";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MainPanel from "@/containers/editor/panels/MainPanel";
@@ -7,11 +8,14 @@ import { PricingOverlay } from "@/containers/pricing";
 export default async function Page() {
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex h-full w-full">
-        <SideNav />
-        <Separator orientation="vertical" />
-        <MainPanel />
-        <PricingOverlay />
+      <div className="flex h-full w-full flex-col">
+        <SiteSunsetBanner />
+        <div className="flex min-h-0 flex-1">
+          <SideNav />
+          <Separator orientation="vertical" />
+          <MainPanel />
+          <PricingOverlay />
+        </div>
       </div>
     </TooltipProvider>
   );
